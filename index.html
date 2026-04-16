@@ -204,6 +204,28 @@
     .photo-lightbox-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .photo-lightbox-close svg { width: 18px; height: 18px; stroke: white; }
 
+    /* FILTER PANEL */
+    .filter-bar { display: flex; align-items: center; gap: 8px; padding: 0 16px 10px; flex-shrink: 0; }
+    .filter-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--card); cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-2); white-space: nowrap; transition: all 0.18s; }
+    .filter-btn svg { width: 13px; height: 13px; stroke: var(--text-2); fill: none; }
+    .filter-btn.active { background: var(--text-1); border-color: var(--text-1); color: white; }
+    .filter-btn.active svg { stroke: white; }
+    .filter-sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 300; display: none; align-items: flex-end; justify-content: center; }
+    .filter-sheet-overlay.visible { display: flex; }
+    .filter-sheet { background: var(--card); border-radius: 24px 24px 0 0; width: 100%; max-width: 430px; padding: 0 0 32px; }
+    .filter-sheet-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 20px; }
+    .filter-sheet-title { font-size: 16px; font-weight: 700; padding: 0 20px 16px; color: var(--text-1); }
+    .filter-section { padding: 0 20px 20px; }
+    .filter-section-label { font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+    .filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .filter-chip { padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--bg); font-size: 13px; font-weight: 500; color: var(--text-2); cursor: pointer; transition: all 0.15s; }
+    .filter-chip.active { background: var(--yellow); border-color: var(--yellow); color: white; }
+    .filter-star-row { display: flex; gap: 8px; }
+    .filter-star-btn { flex: 1; padding: 10px; border: 1.5px solid var(--border); border-radius: 12px; background: var(--bg); font-size: 13px; font-weight: 600; color: var(--text-2); cursor: pointer; text-align: center; transition: all 0.15s; }
+    .filter-star-btn.active { background: var(--yellow); border-color: var(--yellow); color: white; }
+    .filter-apply-btn { margin: 0 20px; width: calc(100% - 40px); padding: 16px; background: var(--yellow); color: white; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .filter-divider { height: 0.5px; background: var(--border); margin: 0 20px 20px; }
+
     /* CITY PICKER */
     .city-picker-btn { display: flex; align-items: center; gap: 8px; margin: 0 16px 10px; padding: 10px 14px; background: var(--card); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; border: 1.5px solid var(--border); transition: border-color 0.2s; }
     .city-picker-btn.active { border-color: var(--yellow); background: var(--yellow-light); }
@@ -425,6 +447,16 @@
         <button class="search-clear" id="searchClear">x</button>
       </div>
     </div>
+    <div id="filterBar" class="filter-bar" style="display:none">
+      <button class="filter-btn" id="filterSubBtn" onclick="openFilterSheet('sub')">
+        <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <span id="filterSubLabel">Unterkategorie</span>
+      </button>
+      <button class="filter-btn" id="filterStarBtn" onclick="openFilterSheet('stars')">
+        <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span id="filterStarLabel">Bewertung</span>
+      </button>
+    </div>
     <div class="cats-wrap">
       <div class="cats-scroll" id="catsScroll">
         <div class="cat-chip active" data-cat="Alle">Alle</div>
@@ -557,13 +589,19 @@
         </div>
         <div class="form-field">
           <label class="field-label">Kategorie *</label>
-          <select class="field-select" id="newCategory">
+          <select class="field-select" id="newCategory" onchange="updateSubcatOptions()">
             <option value="">Bitte wählen...</option>
             <option value="kat-restaurants">Restaurants und Cafés</option>
             <option value="kat-dienstleistung">Dienstleistungen</option>
             <option value="kat-orte">Orte und Sehenswürdigkeiten</option>
             <option value="kat-unterkunft">Unterkünfte</option>
             <option value="kat-geschaefte">Geschäfte und Märkte</option>
+          </select>
+        </div>
+        <div class="form-field" id="subcatField" style="display:none">
+          <label class="field-label">Unterkategorie</label>
+          <select class="field-select" id="newSubcategory">
+            <option value="">Bitte wählen...</option>
           </select>
         </div>
         <div class="form-field">
@@ -806,6 +844,16 @@
     </div>
   </div>
 
+  <!-- FILTER SHEET -->
+  <div class="filter-sheet-overlay" id="filterSheetOverlay" onclick="if(event.target.id==='filterSheetOverlay')closeFilterSheet()">
+    <div class="filter-sheet">
+      <div class="filter-sheet-handle"></div>
+      <div class="filter-sheet-title" id="filterSheetTitle">Filter</div>
+      <div id="filterSheetContent"></div>
+      <button class="filter-apply-btn" onclick="applyFilter()">Anwenden</button>
+    </div>
+  </div>
+
   <!-- CITY SHEET -->
   <div class="city-sheet-overlay" id="citySheetOverlay" onclick="if(event.target.id==='citySheetOverlay')closeCitySheet()">
     <div class="city-sheet">
@@ -889,12 +937,9 @@
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     window.scrollTo(0, 0);
-    if (id !== 'screenMap' && leafletMap) {
-      document.getElementById('leafletMap').style.visibility = 'hidden';
-    } else if (id === 'screenMap' && leafletMap) {
-      document.getElementById('leafletMap').style.visibility = 'visible';
-      setTimeout(() => leafletMap.invalidateSize(), 100);
-    }
+    const mapEl = document.getElementById('leafletMap');
+    if (mapEl) mapEl.style.display = id === 'screenMap' ? 'block' : 'none';
+    if (id === 'screenMap' && leafletMap) setTimeout(() => leafletMap.invalidateSize(), 150);
   }
 
   function switchTab(tab) {
@@ -1069,6 +1114,82 @@
     'Fuerte Olimpo','Puerto Casado',
   ];
 
+  // Filter state
+  let activeSubcat = 'Alle';
+  let activeMinStars = 0;
+  let filterMode = 'sub';
+
+  const subcats = {
+    'kat-restaurants': ['Alle', 'Restaurant', 'Café', 'Bar', 'Parrilla', 'Fast Food', 'Bäckerei'],
+    'kat-dienstleistung': ['Alle', 'Arzt', 'Zahnarzt', 'Anwalt', 'Notar', 'Bank', 'Handwerker', 'Schule', 'Übersetzung'],
+    'kat-orte': ['Alle', 'Strand', 'Park', 'Museum', 'Kirche', 'Aussichtspunkt', 'Natur'],
+    'kat-unterkunft': ['Alle', 'Hotel', 'Hostel', 'Ferienwohnung', 'B&B', 'Camping'],
+    'kat-geschaefte': ['Alle', 'Supermarkt', 'Markt', 'Apotheke', 'Elektronik', 'Kleidung', 'Baumarkt'],
+  };
+
+  function openFilterSheet(mode) {
+    filterMode = mode;
+    const overlay = document.getElementById('filterSheetOverlay');
+    const content = document.getElementById('filterSheetContent');
+    overlay.classList.add('visible');
+
+    if (mode === 'sub') {
+      document.getElementById('filterSheetTitle').textContent = 'Unterkategorie';
+      const cats = subcats[activeCategory] || [];
+      content.innerHTML = `<div class="filter-section"><div class="filter-chips">${
+        cats.map(s => `<div class="filter-chip${activeSubcat===s?' active':''}" onclick="selectFilterChip('${s}')">${s}</div>`).join('')
+      }</div></div><div class="filter-divider"></div>`;
+    } else {
+      document.getElementById('filterSheetTitle').textContent = 'Mindest-Bewertung';
+      content.innerHTML = `<div class="filter-section"><div class="filter-section-label">Minimum Sterne</div><div class="filter-star-row">
+        <div class="filter-star-btn${activeMinStars===0?' active':''}" onclick="selectStarFilter(0)">Alle</div>
+        <div class="filter-star-btn${activeMinStars===3?' active':''}" onclick="selectStarFilter(3)">3+ ★</div>
+        <div class="filter-star-btn${activeMinStars===4?' active':''}" onclick="selectStarFilter(4)">4+ ★</div>
+        <div class="filter-star-btn${activeMinStars===5?' active':''}" onclick="selectStarFilter(5)">5 ★</div>
+      </div></div><div class="filter-divider"></div>`;
+    }
+  }
+
+  function selectFilterChip(val) {
+    activeSubcat = val;
+    document.querySelectorAll('#filterSheetContent .filter-chip').forEach(c => c.classList.toggle('active', c.textContent === val));
+  }
+
+  function selectStarFilter(val) {
+    activeMinStars = val;
+    document.querySelectorAll('.filter-star-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+
+  function closeFilterSheet() {
+    document.getElementById('filterSheetOverlay').classList.remove('visible');
+  }
+
+  function applyFilter() {
+    closeFilterSheet();
+    const subBtn = document.getElementById('filterSubBtn');
+    const starBtn = document.getElementById('filterStarBtn');
+    const subLabel = document.getElementById('filterSubLabel');
+    const starLabel = document.getElementById('filterStarLabel');
+
+    if (activeSubcat !== 'Alle') {
+      subBtn.classList.add('active');
+      subLabel.textContent = activeSubcat;
+    } else {
+      subBtn.classList.remove('active');
+      subLabel.textContent = 'Unterkategorie';
+    }
+
+    if (activeMinStars > 0) {
+      starBtn.classList.add('active');
+      starLabel.textContent = activeMinStars + '+ ★';
+    } else {
+      starBtn.classList.remove('active');
+      starLabel.textContent = 'Bewertung';
+    }
+    renderListings();
+  }
+
   function buildCityChips() {
     // No longer needed - city picker handles this
   }
@@ -1133,6 +1254,8 @@
     let filtered = allListings;
     if (activeCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === activeCategory);
     if (activeCity !== 'Alle') filtered = filtered.filter(l => l.city === activeCity);
+    if (activeSubcat !== 'Alle') filtered = filtered.filter(l => (l.subcategory||'') === activeSubcat);
+    if (activeMinStars > 0) filtered = filtered.filter(l => { const avg = getAvgRating(l.id); return avg && avg >= activeMinStars; });
     if (searchQuery) { const q = searchQuery.toLowerCase(); filtered = filtered.filter(l => (l.name||'').toLowerCase().includes(q)||(l.description||'').toLowerCase().includes(q)||(l.city||'').toLowerCase().includes(q)); }
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = activeCategory === 'Alle' ? filtered.length + ' Einträge' : filtered.length + ' Ergebnisse';
@@ -1347,7 +1470,7 @@
     const btn = document.getElementById('formSubmitBtn');
     btn.disabled = true; btn.textContent = 'Wird eingereicht...';
     try {
-      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: document.getElementById('newHours').value.trim()||null, lat: window._newLat||null, lng: window._newLng||null, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date() });
+      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: document.getElementById('newHours').value.trim()||null, lat: window._newLat||null, lng: window._newLng||null, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date() });
       if (pendingFormPhotos.length) await uploadFormPhotos(ref.id);
       document.getElementById('formSuccess').classList.add('visible');
       pendingFormPhotos = [];
@@ -2088,6 +2211,17 @@
     }
   }
 
+  function updateSubcatOptions() {
+    const cat = document.getElementById('newCategory').value;
+    const field = document.getElementById('subcatField');
+    const sel = document.getElementById('newSubcategory');
+    const opts = subcats[cat];
+    if (!opts || opts.length <= 1) { field.style.display = 'none'; return; }
+    field.style.display = 'block';
+    sel.innerHTML = '<option value="">Bitte wählen...</option>' +
+      opts.filter(o => o !== 'Alle').map(o => `<option value="${o}">${o}</option>`).join('');
+  }
+
   function useMyLocation() {
     const btn = document.getElementById('locationBtn');
     const status = document.getElementById('locationStatus');
@@ -2117,8 +2251,19 @@
   document.getElementById('catsScroll').addEventListener('click', e => {
     const chip = e.target.closest('.cat-chip');
     if (!chip) return;
-    document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active'); activeCategory = chip.dataset.cat; renderListings();
+    document.querySelectorAll('#catsScroll .cat-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeCategory = chip.dataset.cat;
+    activeSubcat = 'Alle';
+    activeMinStars = 0;
+    document.getElementById('filterSubBtn').classList.remove('active');
+    document.getElementById('filterStarBtn').classList.remove('active');
+    document.getElementById('filterSubLabel').textContent = 'Unterkategorie';
+    document.getElementById('filterStarLabel').textContent = 'Bewertung';
+    const filterBar = document.getElementById('filterBar');
+    const hasSubs = subcats[activeCategory] && subcats[activeCategory].length > 1;
+    filterBar.style.display = (activeCategory !== 'Alle' && hasSubs) ? 'flex' : 'none';
+    renderListings();
   });
   const searchInput = document.getElementById('searchInput');
   const searchClear = document.getElementById('searchClear');
