@@ -198,6 +198,32 @@
     .photo-lightbox-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .photo-lightbox-close svg { width: 18px; height: 18px; stroke: white; }
 
+    /* CITY PICKER */
+    .city-picker-btn { display: flex; align-items: center; gap: 8px; margin: 0 16px 10px; padding: 10px 14px; background: var(--card); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; border: 1.5px solid var(--border); transition: border-color 0.2s; }
+    .city-picker-btn.active { border-color: var(--yellow); background: var(--yellow-light); }
+    .city-picker-btn svg { width: 16px; height: 16px; stroke: var(--text-3); flex-shrink: 0; }
+    .city-picker-btn.active svg { stroke: var(--yellow-dark); }
+    .city-picker-label { flex: 1; font-size: 14px; color: var(--text-3); font-weight: 500; }
+    .city-picker-btn.active .city-picker-label { color: var(--yellow-dark); font-weight: 600; }
+    .city-picker-clear { width: 20px; height: 20px; border-radius: 50%; background: var(--yellow); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; color: white; flex-shrink: 0; }
+    .city-sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 300; display: none; align-items: flex-end; justify-content: center; }
+    .city-sheet-overlay.visible { display: flex; }
+    .city-sheet { background: var(--card); border-radius: 24px 24px 0 0; width: 100%; max-width: 430px; max-height: 80vh; display: flex; flex-direction: column; padding-bottom: 24px; }
+    .city-sheet-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 16px; }
+    .city-sheet-title { font-size: 16px; font-weight: 700; color: var(--text-1); padding: 0 20px 12px; }
+    .city-sheet-search { margin: 0 16px 12px; display: flex; align-items: center; background: var(--bg); border-radius: 12px; padding: 0 14px; gap: 8px; height: 44px; }
+    .city-sheet-search svg { width: 16px; height: 16px; stroke: var(--text-3); flex-shrink: 0; }
+    .city-sheet-search input { flex: 1; border: none; outline: none; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-1); background: transparent; }
+    .city-sheet-list { overflow-y: auto; flex: 1; padding: 0 8px; }
+    .city-sheet-item { display: flex; align-items: center; gap: 10px; padding: 12px 12px; border-radius: 10px; cursor: pointer; transition: background 0.15s; }
+    .city-sheet-item:active { background: var(--yellow-light); }
+    .city-sheet-item svg { width: 14px; height: 14px; stroke: var(--text-3); flex-shrink: 0; }
+    .city-sheet-item span { font-size: 14px; color: var(--text-1); }
+    .city-sheet-item.selected { background: var(--yellow-light); }
+    .city-sheet-item.selected svg { stroke: var(--yellow-dark); }
+    .city-sheet-item.selected span { color: var(--yellow-dark); font-weight: 600; }
+    .city-sheet-empty { text-align: center; padding: 30px; color: var(--text-3); font-size: 13px; }
+
     /* FAVORITEN */
     .fav-btn { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; top: 52px; right: 20px; }
     .fav-btn svg { width: 20px; height: 20px; transition: all 0.2s; }
@@ -399,7 +425,10 @@
         <div class="cat-chip" data-cat="kat-unterkunft">Unterkünfte</div>
         <div class="cat-chip" data-cat="kat-geschaefte">Geschäfte</div>
       </div>
-      <div class="cats-scroll" id="citiesScroll" style="padding-top:0;padding-bottom:4px"></div>
+      <div id="cityPickerBtn" class="city-picker-btn" onclick="openCitySheet()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span class="city-picker-label" id="cityPickerLabel">Stadt wählen...</span>
+      </div>
     </div>
     <div class="listings">
       <div class="section-title" id="sectionTitle">Alle Einträge</div>
@@ -768,6 +797,19 @@
     </div>
   </div>
 
+  <!-- CITY SHEET -->
+  <div class="city-sheet-overlay" id="citySheetOverlay" onclick="if(event.target.id==='citySheetOverlay')closeCitySheet()">
+    <div class="city-sheet">
+      <div class="city-sheet-handle"></div>
+      <div class="city-sheet-title">Stadt wählen</div>
+      <div class="city-sheet-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="citySearchInput" placeholder="Stadt suchen..." oninput="filterCitySheet()">
+      </div>
+      <div class="city-sheet-list" id="citySheetList"></div>
+    </div>
+  </div>
+
   <!-- LIGHTBOX -->
   <div class="photo-lightbox" id="photoLightbox" onclick="closeLightbox()">
     <button class="photo-lightbox-close" onclick="closeLightbox()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
@@ -1003,19 +1045,63 @@
   ];
 
   function buildCityChips() {
-    const scroll = document.getElementById('citiesScroll');
-    scroll.style.display = 'flex';
-    scroll.innerHTML = ALL_PY_CITIES.map(c =>
-      `<div class="cat-chip${c==='Alle'?' active':''}" data-city="${c}" style="font-size:12px;padding:5px 12px">${c==='Alle'?'🌍 Alle Städte':'📍 '+c}</div>`
-    ).join('');
-    scroll.addEventListener('click', e => {
-      const chip = e.target.closest('[data-city]');
-      if (!chip) return;
-      scroll.querySelectorAll('[data-city]').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      activeCity = chip.dataset.city;
-      renderListings();
-    });
+    // No longer needed - city picker handles this
+  }
+
+  function openCitySheet() {
+    document.getElementById('citySheetOverlay').classList.add('visible');
+    document.getElementById('citySearchInput').value = '';
+    renderCitySheet('');
+    setTimeout(() => document.getElementById('citySearchInput').focus(), 100);
+  }
+
+  function closeCitySheet() {
+    document.getElementById('citySheetOverlay').classList.remove('visible');
+  }
+
+  function renderCitySheet(query) {
+    const list = document.getElementById('citySheetList');
+    const q = query.toLowerCase().trim();
+    const filtered = ALL_PY_CITIES.filter(c => !q || c.toLowerCase().includes(q));
+    if (!filtered.length) {
+      list.innerHTML = '<div class="city-sheet-empty">Keine Stadt gefunden</div>';
+      return;
+    }
+    list.innerHTML = filtered.map(c => `
+      <div class="city-sheet-item${activeCity===c?' selected':''}" onclick="selectCity('${c}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>${c === 'Alle' ? '🌍 Alle Städte' : c}</span>
+      </div>`).join('');
+  }
+
+  function filterCitySheet() {
+    renderCitySheet(document.getElementById('citySearchInput').value);
+  }
+
+  function selectCity(city) {
+    activeCity = city;
+    const btn = document.getElementById('cityPickerBtn');
+    const label = document.getElementById('cityPickerLabel');
+    if (city === 'Alle') {
+      btn.classList.remove('active');
+      label.textContent = 'Stadt wählen...';
+      btn.onclick = openCitySheet;
+    } else {
+      btn.classList.add('active');
+      label.textContent = city;
+      // Add clear button
+      let clearBtn = document.getElementById('cityPickerClear');
+      if (!clearBtn) {
+        clearBtn = document.createElement('button');
+        clearBtn.id = 'cityPickerClear';
+        clearBtn.className = 'city-picker-clear';
+        clearBtn.textContent = '×';
+        clearBtn.onclick = (e) => { e.stopPropagation(); selectCity('Alle'); };
+        btn.appendChild(clearBtn);
+      }
+    }
+    closeCitySheet();
+    renderListings();
   }
 
   function renderListings() {
