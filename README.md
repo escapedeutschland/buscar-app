@@ -310,6 +310,8 @@
         <div><label class="field-label">E-Mail</label><input class="field-input" type="email" id="loginEmail" placeholder="deine@email.de" required></div>
         <div><label class="field-label">Passwort</label><input class="field-input" type="password" id="loginPassword" placeholder="min. 6 Zeichen" required></div>
         <button class="auth-btn" type="submit" id="loginBtn">Einloggen</button>
+        <div class="auth-divider"><span style="color:var(--yellow);cursor:pointer;font-weight:600" onclick="showForgotPassword()">Passwort vergessen?</span></div>
+        <div id="forgotMsg" style="display:none;background:var(--green-light);color:var(--green);padding:10px 14px;border-radius:10px;font-size:13px;text-align:center"></div>
         <div class="auth-divider">Noch kein Konto? <span style="color:var(--yellow);cursor:pointer;font-weight:600" onclick="switchTab('register')">Registrieren</span></div>
       </form>
       <form class="auth-form hidden" id="formRegister" onsubmit="handleRegister(event)">
@@ -554,6 +556,34 @@
   const auth = firebase.auth();
 
   let allListings = [], activeCategory = 'Alle', mapCategory = 'Alle', searchQuery = '', currentUser = null;
+  let ratingsCache = {};
+
+  async function loadAllRatings() {
+    try {
+      const snap = await db.collection('reviews').get();
+      ratingsCache = {};
+      snap.docs.forEach(d => {
+        const r = d.data();
+        if (!ratingsCache[r.listing_id]) ratingsCache[r.listing_id] = [];
+        ratingsCache[r.listing_id].push(r.rating);
+      });
+    } catch(e) {}
+  }
+
+  function getAvgRating(listingId) {
+    const ratings = ratingsCache[listingId];
+    if (!ratings || !ratings.length) return null;
+    return (ratings.reduce((s,r) => s+r, 0) / ratings.length);
+  }
+
+  function starsSmall(avg) {
+    if (!avg) return '';
+    const full = Math.round(avg);
+    let h = '<span style="display:inline-flex;align-items:center;gap:2px;margin-top:5px">';
+    for (let i = 1; i <= 5; i++) h += `<span style="font-size:11px;color:${i<=full?'#F5A623':'#E0E0E0'}">&#9733;</span>`;
+    h += `<span style="font-size:11px;color:var(--text-3);margin-left:3px">${avg.toFixed(1)}</span></span>`;
+    return h;
+  }
 
   const catIcons = {
     'kat-restaurants': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>',
@@ -624,6 +654,29 @@
 
   async function handleLogout() { await auth.signOut(); }
 
+  async function showForgotPassword() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const msgEl = document.getElementById('forgotMsg');
+    if (!email) {
+      msgEl.style.background = 'var(--red-light)';
+      msgEl.style.color = 'var(--red)';
+      msgEl.textContent = 'Bitte zuerst deine E-Mail eintragen.';
+      msgEl.style.display = 'block'; return;
+    }
+    try {
+      await auth.sendPasswordResetEmail(email);
+      msgEl.style.background = 'var(--green-light)';
+      msgEl.style.color = 'var(--green)';
+      msgEl.textContent = 'E-Mail gesendet! Pruefe dein Postfach.';
+      msgEl.style.display = 'block';
+    } catch(e) {
+      msgEl.style.background = 'var(--red-light)';
+      msgEl.style.color = 'var(--red)';
+      msgEl.textContent = 'E-Mail nicht gefunden.';
+      msgEl.style.display = 'block';
+    }
+  }
+
   auth.onAuthStateChanged(user => {
     currentUser = user;
     if (user) {
@@ -642,6 +695,7 @@
     try {
       const snap = await db.collection('listings').where('verified', '==', true).get();
       allListings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      await loadAllRatings();
       renderListings();
     } catch (err) {
       document.getElementById('listingsInner').innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-title">Verbindungsfehler</div></div>';
@@ -655,7 +709,7 @@
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = activeCategory === 'Alle' ? filtered.length + ' Eintraege' : filtered.length + ' Ergebnisse';
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">Nichts gefunden</div><div class="empty-sub">Versuch einen anderen Suchbegriff</div></div>'; return; }
-    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${l.verified?'<span class="badge-geprueft">Geprueft</span>':''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}</div>`:''}<div class="listing-desc">${l.description||''}</div>${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${l.verified?'<span class="badge-geprueft">Geprueft</span>':''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}</div>`:''}<div class="listing-desc">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
   }
 
   function showDetail(id) {
