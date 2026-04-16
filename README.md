@@ -525,6 +525,18 @@
           <input class="field-input" type="text" id="newHours" placeholder="z.B. Mo-Fr 08:00-18:00">
         </div>
       </div>
+      <div class="form-card">
+        <div class="form-card-title">Fotos (optional, max. 3)</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px" id="formPhotoGrid">
+          <label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span>
+          </label>
+          <input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">
+        </div>
+        <div style="font-size:11px;color:var(--text-3)">Fotos helfen bei der Prüfung und werden nach Genehmigung sichtbar.</div>
+        <div id="formPhotoProgress" style="font-size:12px;color:var(--text-2);margin-top:6px;display:none"></div>
+      </div>
       <button class="form-submit" id="formSubmitBtn" onclick="submitListing()">Eintrag einreichen</button>
     </div>
   </div>
@@ -651,6 +663,7 @@
   const storage = firebase.storage();
 
   let allListings = [], activeCategory = 'Alle', mapCategory = 'Alle', searchQuery = '', currentUser = null;
+  let pendingFormPhotos = [];
   let ratingsCache = {};
 
   async function loadAllRatings() {
@@ -922,8 +935,12 @@
     const btn = document.getElementById('formSubmitBtn');
     btn.disabled = true; btn.textContent = 'Wird eingereicht...';
     try {
-      await db.collection('listings').add({ name, category_id: cat, city, description: desc, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: document.getElementById('newHours').value.trim()||null, lat: window._newLat||null, lng: window._newLng||null, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date() });
+      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: document.getElementById('newHours').value.trim()||null, lat: window._newLat||null, lng: window._newLng||null, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date() });
+      if (pendingFormPhotos.length) await uploadFormPhotos(ref.id);
       document.getElementById('formSuccess').classList.add('visible');
+      pendingFormPhotos = [];
+      const grid2 = document.getElementById('formPhotoGrid');
+      grid2.innerHTML = `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span></label><input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">`;
       ['newName','newCity','newDesc','newPhone','newWebsite','newAddress','newHours'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('newCategory').value = '';
       document.getElementById('nameCounter').textContent = '0 / 60';
@@ -948,12 +965,25 @@
       const pending = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       document.getElementById('adminSub').textContent = pending.length + ' offen';
       if (!pending.length) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-icon">&#10003;</div><div class="admin-empty-text">Alles geprüft!</div><div class="admin-empty-sub">Keine offenen Einträge.</div></div>'; return; }
-      body.innerHTML = pending.map(l => `<div class="admin-card" id="adminCard_${l.id}"><div class="admin-card-name">${l.name||'Ohne Name'}</div><div class="admin-card-meta">${catNames[l.category_id]||''} &middot; ${l.city||'Unbekannt'}</div><div class="admin-card-desc">${l.description||'Keine Beschreibung'}</div><div class="admin-card-info">${l.phone?`<div class="admin-info-pill">${l.phone}</div>`:''}${l.website?`<div class="admin-info-pill">${l.website}</div>`:''}${l.opening_hours?`<div class="admin-info-pill">${l.opening_hours}</div>`:''}</div><div class="admin-actions"><button class="admin-btn approve" onclick="approveEntry('${l.id}')">Genehmigen</button><button class="admin-btn reject" onclick="rejectEntry('${l.id}')">Ablehnen</button></div></div>`).join('');
+      const photoSnaps = await Promise.all(pending.map(l =>
+        db.collection('listing_photos').where('listing_id','==',l.id).where('pending','==',true).get()
+      ));
+      body.innerHTML = pending.map((l, idx) => {
+        const photos = photoSnaps[idx].docs.map(d => d.data());
+        const photoHTML = photos.length ? `<div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto">${photos.map(p => `<img src="${p.url}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0">`).join('')}</div>` : '';
+        return `<div class="admin-card" id="adminCard_${l.id}"><div class="admin-card-name">${l.name||'Ohne Name'}</div><div class="admin-card-meta">${catNames[l.category_id]||''} &middot; ${l.city||'Unbekannt'}</div>${photoHTML}<div class="admin-card-desc">${l.description||'Keine Beschreibung'}</div><div class="admin-card-info">${l.phone?`<div class="admin-info-pill">${l.phone}</div>`:''}${l.website?`<div class="admin-info-pill">${l.website}</div>`:''}${l.opening_hours?`<div class="admin-info-pill">${l.opening_hours}</div>`:''}</div><div class="admin-actions"><button class="admin-btn approve" onclick="approveEntry('${l.id}')">Genehmigen</button><button class="admin-btn reject" onclick="rejectEntry('${l.id}')">Ablehnen</button></div></div>`;
+      }).join('');
     } catch (err) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-text">Fehler beim Laden</div></div>'; }
   }
 
   async function approveEntry(id) {
-    try { await db.collection('listings').doc(id).update({ verified: true }); document.getElementById('adminCard_'+id).remove(); await loadListings(); } catch (err) { alert('Fehler.'); }
+    try {
+      await db.collection('listings').doc(id).update({ verified: true });
+      const photos = await db.collection('listing_photos').where('listing_id','==',id).where('pending','==',true).get();
+      await Promise.all(photos.docs.map(d => d.ref.update({ pending: false })));
+      document.getElementById('adminCard_'+id).remove();
+      await loadListings();
+    } catch (err) { alert('Fehler.'); }
   }
   async function rejectEntry(id) {
     if (!confirm('Eintrag wirklich löschen?')) return;
@@ -1243,6 +1273,7 @@
     try {
       const snap = await db.collection('listing_photos')
         .where('listing_id', '==', listingId)
+        .where('pending', '==', false)
         .orderBy('created_at', 'asc').get();
       const photos = snap.docs.map(d => ({id: d.id, ...d.data()}));
       grid.innerHTML = photos.map(p => `
@@ -1305,6 +1336,51 @@
   function closeLightbox() {
     document.getElementById('photoLightbox').classList.remove('visible');
     document.getElementById('lightboxImg').src = '';
+  }
+
+  function handleFormPhotos(event) {
+    const files = Array.from(event.target.files).slice(0, 3);
+    pendingFormPhotos = files;
+    const grid = document.getElementById('formPhotoGrid');
+    const previews = files.map((f, i) => {
+      const url = URL.createObjectURL(f);
+      return `<div style="position:relative;aspect-ratio:1">
+        <img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:12px">
+        <button onclick="removeFormPhoto(${i})" type="button" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.55);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`;
+    }).join('');
+    const addBtn = files.length < 3 ? `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Hinzufügen</span></label>` : '';
+    grid.innerHTML = previews + addBtn;
+  }
+
+  function removeFormPhoto(index) {
+    pendingFormPhotos.splice(index, 1);
+    const fakeEvent = { target: { files: pendingFormPhotos } };
+    handleFormPhotos(fakeEvent);
+  }
+
+  async function uploadFormPhotos(listingId) {
+    if (!pendingFormPhotos.length) return;
+    const progress = document.getElementById('formPhotoProgress');
+    progress.style.display = 'block';
+    for (let i = 0; i < pendingFormPhotos.length; i++) {
+      const file = pendingFormPhotos[i];
+      progress.textContent = `Foto ${i+1} von ${pendingFormPhotos.length} wird hochgeladen...`;
+      const filename = Date.now() + '_' + i + '.' + file.name.split('.').pop();
+      const ref = storage.ref('listings/' + listingId + '/' + filename);
+      const snap = await ref.put(file);
+      const url = await snap.ref.getDownloadURL();
+      await db.collection('listing_photos').add({
+        listing_id: listingId,
+        uploaded_by: currentUser ? currentUser.uid : null,
+        url,
+        pending: true,
+        created_at: new Date()
+      });
+    }
+    progress.textContent = 'Fotos hochgeladen!';
   }
 
   function useMyLocation() {
