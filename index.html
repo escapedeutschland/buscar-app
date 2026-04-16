@@ -255,7 +255,7 @@
     .map-chip { display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--bg); cursor: pointer; white-space: nowrap; font-size: 12px; font-weight: 500; color: var(--text-2); transition: all 0.18s; flex-shrink: 0; }
     .map-chip.active { background: var(--yellow); border-color: var(--yellow); color: white; }
     .map-chip.city-chip.active { background: var(--text-1); border-color: var(--text-1); color: white; }
-    .map-container { flex: 1; position: relative; min-height: 0; margin-bottom: 64px; }
+    .map-container { flex: 1; position: relative; min-height: 0; margin-bottom: 80px; }
     #leafletMap { width: 100%; height: 100%; }
     .leaflet-popup-content-wrapper { border-radius: 14px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important; padding: 0 !important; overflow: hidden; }
     .leaflet-popup-content { margin: 0 !important; width: auto !important; }
@@ -987,7 +987,7 @@
       document.getElementById('profilName').textContent = displayName;
       document.getElementById('profilEmail').textContent = user.email;
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
-      showScreen('screenHome'); loadListings();
+      setNav('navHome'); showScreen('screenHome'); loadListings();
     } else { showScreen('screenAuth'); }
   });
 
