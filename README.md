@@ -814,7 +814,18 @@
       </div>` : '<div style="padding:12px 16px;font-size:13px;color:var(--text-3)">Noch keine Bewertungen</div>';
 
     if (myReview) {
-      document.getElementById('reviewForm').innerHTML = `<div class="own-review-note">Deine Bewertung: ${starsHTML(myReview.rating,14)} ${myReview.comment ? '<br><em>"'+myReview.comment+'"</em>' : ''}</div>`;
+      document.getElementById('reviewForm').innerHTML = `
+        <div class="own-review-note">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:13px;font-weight:600;color:var(--text-1)">Deine Bewertung</span>
+            <div style="display:flex;gap:8px">
+              <button onclick="editReview('${myReview.id}','${listingId}',${myReview.rating})" style="font-size:11px;font-weight:600;color:var(--yellow-dark);background:var(--yellow-light);border:1px solid var(--yellow);border-radius:8px;padding:4px 10px;cursor:pointer">Bearbeiten</button>
+              <button onclick="deleteReview('${myReview.id}','${listingId}')" style="font-size:11px;font-weight:600;color:var(--red);background:var(--red-light);border:1px solid var(--red);border-radius:8px;padding:4px 10px;cursor:pointer">Loeschen</button>
+            </div>
+          </div>
+          <div>${starsHTML(myReview.rating,18)}</div>
+          ${myReview.comment ? `<div style="font-size:13px;color:var(--text-2);margin-top:6px;font-style:italic">"${myReview.comment}"</div>` : ''}
+        </div>`;
     } else {
       currentUserRating = 0;
       document.getElementById('reviewForm').innerHTML = `
@@ -896,6 +907,42 @@
         </div>
       </div>`;
     }).join('');
+  }
+
+  async function deleteReview(reviewId, listingId) {
+    if (!confirm('Bewertung wirklich loeschen?')) return;
+    try {
+      await db.collection('reviews').doc(reviewId).delete();
+      await loadReviews(listingId);
+    } catch(e) { alert('Fehler beim Loeschen.'); }
+  }
+
+  function editReview(reviewId, listingId, currentRating) {
+    currentUserRating = currentRating;
+    document.getElementById('reviewForm').innerHTML = `
+      <div class="review-form">
+        <div class="review-form-title">Bewertung bearbeiten</div>
+        <div class="review-stars" id="reviewStars">
+          ${[1,2,3,4,5].map(i => `<span class="star${i<=currentRating?' active':''}" data-val="${i}" onclick="setRating(${i})">&#9733;</span>`).join('')}
+        </div>
+        <textarea class="review-textarea" id="reviewText" placeholder="Deine Erfahrung (optional)"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="review-submit" onclick="updateReview('${reviewId}','${listingId}')">Speichern</button>
+          <button onclick="loadReviews('${listingId}')" style="padding:11px 16px;background:var(--bg);color:var(--text-2);border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">Abbrechen</button>
+        </div>
+      </div>`;
+  }
+
+  async function updateReview(reviewId, listingId) {
+    if (!currentUserRating) { alert('Bitte waehle eine Sternebewertung.'); return; }
+    try {
+      await db.collection('reviews').doc(reviewId).update({
+        rating: currentUserRating,
+        comment: document.getElementById('reviewText').value.trim() || null,
+        updated_at: new Date()
+      });
+      await loadReviews(listingId);
+    } catch(e) { alert('Fehler beim Speichern.'); }
   }
 
   async function deleteComment(commentId, listingId) {
