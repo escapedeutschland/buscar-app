@@ -316,6 +316,12 @@
       </form>
       <form class="auth-form hidden" id="formRegister" onsubmit="handleRegister(event)">
         <div><label class="field-label">Name</label><input class="field-input" type="text" id="regName" placeholder="Dein Name" required></div>
+        <div>
+          <label class="field-label">Benutzername *</label>
+          <input class="field-input" type="text" id="regUsername" placeholder="z.B. max_py, deutscherpypy" required maxlength="30" style="margin-bottom:4px">
+          <div style="font-size:11px;color:var(--text-3)">Wird oeffentlich angezeigt. Nur Buchstaben, Zahlen und _</div>
+          <div id="usernameError" style="font-size:12px;color:var(--red);display:none;margin-top:3px"></div>
+        </div>
         <div><label class="field-label">E-Mail</label><input class="field-input" type="email" id="regEmail" placeholder="deine@email.de" required></div>
         <div><label class="field-label">Passwort</label><input class="field-input" type="password" id="regPassword" placeholder="min. 6 Zeichen" required minlength="6"></div>
         <button class="auth-btn" type="submit" id="registerBtn">Konto erstellen</button>
@@ -640,11 +646,31 @@
   async function handleRegister(e) {
     e.preventDefault();
     const btn = document.getElementById('registerBtn');
+    const username = document.getElementById('regUsername').value.trim();
+    const usernameErr = document.getElementById('usernameError');
+    usernameErr.style.display = 'none';
+
+    if (!/^[a-zA-Z0-9_]{3,30}$/.test(username)) {
+      usernameErr.textContent = 'Min. 3 Zeichen, nur Buchstaben, Zahlen und _.';
+      usernameErr.style.display = 'block'; return;
+    }
+
+    const taken = await db.collection('users').where('username', '==', username).get();
+    if (!taken.empty) {
+      usernameErr.textContent = 'Dieser Benutzername ist bereits vergeben.';
+      usernameErr.style.display = 'block'; return;
+    }
+
     btn.disabled = true; btn.textContent = 'Wird erstellt...';
     document.getElementById('authError').classList.remove('visible');
     try {
       const cred = await auth.createUserWithEmailAndPassword(document.getElementById('regEmail').value, document.getElementById('regPassword').value);
-      await db.collection('users').doc(cred.user.uid).set({ name: document.getElementById('regName').value, email: document.getElementById('regEmail').value, created_at: new Date(), verified: false });
+      await db.collection('users').doc(cred.user.uid).set({
+        name: document.getElementById('regName').value,
+        username: username,
+        email: document.getElementById('regEmail').value,
+        created_at: new Date(), verified: false
+      });
     } catch (err) {
       const msgs = { 'auth/email-already-in-use': 'E-Mail bereits registriert.', 'auth/weak-password': 'Passwort zu schwach.' };
       showAuthError(msgs[err.code] || 'Fehler bei der Registrierung.');
@@ -677,14 +703,21 @@
     }
   }
 
-  auth.onAuthStateChanged(user => {
+  auth.onAuthStateChanged(async user => {
     currentUser = user;
     if (user) {
-      const name = user.displayName || user.email.split('@')[0];
-      const initial = name.charAt(0).toUpperCase();
+      let displayName = user.email.split('@')[0];
+      try {
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          const data = userDoc.data();
+          displayName = data.username || data.name || displayName;
+        }
+      } catch(e) {}
+      const initial = displayName.charAt(0).toUpperCase();
       document.getElementById('headerAvatar').textContent = initial;
       document.getElementById('profilAvatar').textContent = initial;
-      document.getElementById('profilName').textContent = name;
+      document.getElementById('profilName').textContent = displayName;
       document.getElementById('profilEmail').textContent = user.email;
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
       showScreen('screenHome'); loadListings();
@@ -913,7 +946,7 @@
     if (!currentUserRating) { alert('Bitte waehle eine Sternebewertung.'); return; }
     const btn = document.getElementById('reviewSubmitBtn');
     btn.disabled = true; btn.textContent = 'Wird gespeichert...';
-    const name = currentUser.displayName || currentUser.email.split('@')[0];
+    const name = await getUsername();
     try {
       await db.collection('reviews').add({
         listing_id: listingId, user_id: currentUser.uid, user_name: name,
@@ -1016,11 +1049,19 @@
     const input = document.getElementById('replyInput_' + parentId);
     const body = input.value.trim();
     if (!body) return;
-    const name = currentUser.displayName || currentUser.email.split('@')[0];
+    const name = await getUsername();
     try {
       await db.collection('comments').add({ listing_id: listingId, parent_id: parentId, user_id: currentUser.uid, user_name: name, body, created_at: new Date() });
       await loadComments(listingId);
     } catch(e) { alert('Fehler beim Speichern.'); }
+  }
+
+  async function getUsername() {
+    try {
+      const doc = await db.collection('users').doc(currentUser.uid).get();
+      if (doc.exists) return doc.data().username || doc.data().name || currentUser.email.split('@')[0];
+    } catch(e) {}
+    return currentUser.email.split('@')[0];
   }
 
   async function submitComment() {
@@ -1028,7 +1069,7 @@
     const input = document.getElementById('commentInput');
     const body = input.value.trim();
     if (!body) return;
-    const name = currentUser.displayName || currentUser.email.split('@')[0];
+    const name = await getUsername();
     input.value = '';
     try {
       await db.collection('comments').add({ listing_id: currentListingId, parent_id: null, user_id: currentUser.uid, user_name: name, body, created_at: new Date() });
