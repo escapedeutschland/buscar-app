@@ -864,27 +864,46 @@
     const comments = snap.docs.map(d => ({id:d.id,...d.data()}));
     const topLevel = comments.filter(c => !c.parent_id);
     const replies = comments.filter(c => c.parent_id);
+    const myUid = currentUser ? currentUser.uid : null;
+    const trashIcon = (id, lid) => `<button onclick="deleteComment('${id}','${lid}')" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center" title="Loeschen"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>`;
 
     document.getElementById('commentsList').innerHTML = topLevel.map(c => {
       const cReplies = replies.filter(r => r.parent_id === c.id);
+      const isOwn = myUid && c.user_id === myUid;
       return `<div class="comment-item" id="comment_${c.id}">
         <div class="comment-item-top">
           <span class="comment-item-name">${c.user_name||'Anonym'}</span>
-          <span class="comment-item-date">${formatDate(c.created_at)}</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="comment-item-date">${formatDate(c.created_at)}</span>
+            ${isOwn ? trashIcon(c.id, listingId) : ''}
+          </div>
         </div>
         <div class="comment-item-text">${c.body}</div>
         <button class="comment-reply-btn" onclick="toggleReplyForm('${c.id}')">Antworten</button>
-        ${cReplies.length ? `<div class="comment-replies">${cReplies.map(r => `
-          <div class="reply-item">
-            <div class="reply-item-name">${r.user_name||'Anonym'} <span class="reply-item-date">${formatDate(r.created_at)}</span></div>
+        ${cReplies.length ? `<div class="comment-replies">${cReplies.map(r => {
+          const isOwnReply = myUid && r.user_id === myUid;
+          return `<div class="reply-item">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+              <div><span class="reply-item-name">${r.user_name||'Anonym'}</span> <span class="reply-item-date">${formatDate(r.created_at)}</span></div>
+              ${isOwnReply ? trashIcon(r.id, listingId) : ''}
+            </div>
             <div class="reply-item-text">${r.body}</div>
-          </div>`).join('')}</div>` : ''}
+          </div>`;
+        }).join('')}</div>` : ''}
         <div class="reply-form" id="replyForm_${c.id}">
           <input class="reply-input" id="replyInput_${c.id}" placeholder="Antwort schreiben...">
           <button class="reply-submit" onclick="submitReply('${listingId}','${c.id}')">Antworten</button>
         </div>
       </div>`;
     }).join('');
+  }
+
+  async function deleteComment(commentId, listingId) {
+    if (!confirm('Kommentar wirklich loeschen?')) return;
+    try {
+      await db.collection('comments').doc(commentId).delete();
+      await loadComments(listingId);
+    } catch(e) { alert('Fehler beim Loeschen.'); }
   }
 
   function toggleReplyForm(commentId) {
