@@ -46,7 +46,7 @@
       background: var(--bg);
       color: var(--text-1);
       -webkit-font-smoothing: antialiased;
-      overflow: hidden;
+      overflow: auto;
     }
 
     #app {
@@ -295,7 +295,7 @@
       font-weight: 600;
       color: var(--text-1);
       white-space: nowrap;
-      overflow: hidden;
+      overflow: auto;
       text-overflow: ellipsis;
     }
 
@@ -331,7 +331,7 @@
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
-      overflow: hidden;
+      overflow: auto;
     }
 
     .listing-phone {
