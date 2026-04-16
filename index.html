@@ -1330,9 +1330,7 @@
 
     try {
       const snap = await ref.put(file);
-      console.log('Upload snap:', snap);
       const url = await snap.ref.getDownloadURL();
-      console.log('Download URL:', url);
       const name = await getUsername();
       await db.collection('listing_photos').add({
         listing_id: listingId,
@@ -1406,8 +1404,10 @@
   }
 
   async function uploadAvatar(event) {
+    console.log('uploadAvatar called');
     const file = event.target.files[0];
-    if (!file) return;
+    console.log('File:', file);
+    if (!file) { console.log('No file selected'); return; }
     if (file.size > 5 * 1024 * 1024) { alert('Foto ist zu groß. Max. 5 MB.'); return; }
     if (!file.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
 
@@ -1416,17 +1416,22 @@
     progress.textContent = 'Wird hochgeladen...';
 
     try {
+      console.log('Starting upload, user:', currentUser.uid);
       const ref = storage.ref('avatars/' + currentUser.uid + '/avatar.' + file.name.split('.').pop());
+      console.log('Storage ref:', ref.fullPath);
       const snap = await ref.put(file);
+      console.log('Upload snap:', snap);
       const url = await snap.ref.getDownloadURL();
+      console.log('Download URL:', url);
       await db.collection('users').doc(currentUser.uid).update({ avatar_url: url });
       const displayName = document.getElementById('profilName').textContent;
       setAvatarDisplay(url, displayName.charAt(0).toUpperCase());
       progress.textContent = 'Profilbild gespeichert!';
       setTimeout(() => { progress.style.display = 'none'; }, 2500);
     } catch(e) {
-      progress.textContent = 'Fehler beim Hochladen.';
-      setTimeout(() => { progress.style.display = 'none'; }, 2500);
+      console.error('Upload error:', e);
+      progress.textContent = 'Fehler: ' + e.message;
+      setTimeout(() => { progress.style.display = 'none'; }, 5000);
     }
   }
 
