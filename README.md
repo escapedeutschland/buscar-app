@@ -11,6 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -181,6 +182,19 @@
     .comment-send { width: 44px; height: 44px; border-radius: 12px; background: var(--yellow); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .comment-send svg { width: 18px; height: 18px; stroke: white; }
     .own-review-note { font-size: 12px; color: var(--text-3); padding: 10px 16px; font-style: italic; }
+
+    /* FOTOS */
+    .photos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 12px 16px 16px; }
+    .photo-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; cursor: pointer; }
+    .photo-upload-btn { width: 100%; aspect-ratio: 1; border: 1.5px dashed var(--border); border-radius: 8px; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; gap: 4px; }
+    .photo-upload-btn svg { width: 22px; height: 22px; stroke: var(--text-3); }
+    .photo-upload-btn span { font-size: 11px; color: var(--text-3); font-weight: 500; }
+    .photo-upload-progress { padding: 8px 16px; font-size: 12px; color: var(--text-2); display: none; }
+    .photo-lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 999; display: none; align-items: center; justify-content: center; }
+    .photo-lightbox.visible { display: flex; }
+    .photo-lightbox img { max-width: 95%; max-height: 90vh; object-fit: contain; border-radius: 8px; }
+    .photo-lightbox-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .photo-lightbox-close svg { width: 18px; height: 18px; stroke: white; }
 
     /* KARTE */
     .map-screen { background: var(--bg); overflow: hidden; }
@@ -392,6 +406,13 @@
         <div id="ratingSummary"></div>
         <div id="reviewForm"></div>
         <div id="reviewsList"></div>
+      </div>
+
+      <!-- FOTOS -->
+      <div class="detail-card" id="detailPhotosCard">
+        <div class="detail-section-title">Fotos</div>
+        <div class="photos-grid" id="photosGrid"></div>
+        <div class="photo-upload-progress" id="photoProgress">Wird hochgeladen...</div>
       </div>
 
       <!-- KOMMENTARE -->
@@ -613,6 +634,12 @@
     </div>
   </div>
 
+  <!-- LIGHTBOX -->
+  <div class="photo-lightbox" id="photoLightbox" onclick="closeLightbox()">
+    <button class="photo-lightbox-close" onclick="closeLightbox()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <img id="lightboxImg" src="" alt="">
+  </div>
+
 </div>
 <script>
   const ADMIN_EMAIL = 'DEINE-EMAIL@gmail.com';
@@ -621,6 +648,7 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
   const auth = firebase.auth();
+  const storage = firebase.storage();
 
   let allListings = [], activeCategory = 'Alle', mapCategory = 'Alle', searchQuery = '', currentUser = null;
   let ratingsCache = {};
@@ -833,6 +861,7 @@
     showScreen('screenDetail');
     loadReviews(id);
     loadComments(id);
+    loadPhotos(id);
   }
 
   function renderMap() {
@@ -1207,6 +1236,75 @@
       await db.collection('comments').add({ listing_id: currentListingId, parent_id: null, user_id: currentUser.uid, user_name: name, body, created_at: new Date() });
       await loadComments(currentListingId);
     } catch(e) { alert('Fehler beim Speichern.'); }
+  }
+
+  async function loadPhotos(listingId) {
+    const grid = document.getElementById('photosGrid');
+    try {
+      const snap = await db.collection('listing_photos')
+        .where('listing_id', '==', listingId)
+        .orderBy('created_at', 'asc').get();
+      const photos = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      grid.innerHTML = photos.map(p => `
+        <img class="photo-thumb" src="${p.url}" alt="Foto" onclick="openLightbox('${p.url}')">`
+      ).join('');
+      grid.innerHTML += `
+        <label class="photo-upload-btn" for="photoFileInput">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Foto hinzufügen</span>
+        </label>
+        <input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="uploadPhoto(event,'${listingId}')">`;
+    } catch(e) {
+      grid.innerHTML = `
+        <label class="photo-upload-btn" for="photoFileInput">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Foto hinzufügen</span>
+        </label>
+        <input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="uploadPhoto(event,'${listingId}')">`;
+    }
+  }
+
+  async function uploadPhoto(event, listingId) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { alert('Foto ist zu groß. Max. 5 MB.'); return; }
+    if (!file.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
+
+    const progress = document.getElementById('photoProgress');
+    progress.style.display = 'block';
+    progress.textContent = 'Wird hochgeladen...';
+
+    const filename = Date.now() + '_' + currentUser.uid + '.' + file.name.split('.').pop();
+    const ref = storage.ref('listings/' + listingId + '/' + filename);
+
+    try {
+      const snap = await ref.put(file);
+      const url = await snap.ref.getDownloadURL();
+      const name = await getUsername();
+      await db.collection('listing_photos').add({
+        listing_id: listingId,
+        uploaded_by: currentUser.uid,
+        uploaded_by_name: name,
+        url,
+        created_at: new Date()
+      });
+      progress.textContent = 'Foto hochgeladen!';
+      setTimeout(() => { progress.style.display = 'none'; }, 2000);
+      await loadPhotos(listingId);
+    } catch(e) {
+      progress.textContent = 'Fehler beim Hochladen.';
+      setTimeout(() => { progress.style.display = 'none'; }, 2000);
+    }
+  }
+
+  function openLightbox(url) {
+    document.getElementById('lightboxImg').src = url;
+    document.getElementById('photoLightbox').classList.add('visible');
+  }
+
+  function closeLightbox() {
+    document.getElementById('photoLightbox').classList.remove('visible');
+    document.getElementById('lightboxImg').src = '';
   }
 
   function useMyLocation() {
