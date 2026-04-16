@@ -107,7 +107,7 @@
 
     /* DETAIL */
     .detail-screen { background: var(--bg); overflow-y: auto; }
-    .detail-hero { background: linear-gradient(135deg, var(--yellow) 0%, var(--yellow-dark) 100%); padding: 52px 20px 28px; }
+    .detail-hero { background: linear-gradient(135deg, var(--yellow) 0%, var(--yellow-dark) 100%); padding: 52px 20px 28px; position: relative; }
     .detail-back { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 20px; }
     .detail-back svg { width: 20px; height: 20px; stroke: white; }
     .detail-hero-icon { width: 68px; height: 68px; border-radius: 20px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
@@ -195,6 +195,13 @@
     .photo-lightbox img { max-width: 95%; max-height: 90vh; object-fit: contain; border-radius: 8px; }
     .photo-lightbox-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .photo-lightbox-close svg { width: 18px; height: 18px; stroke: white; }
+
+    /* FAVORITEN */
+    .fav-btn { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; top: 52px; right: 20px; }
+    .fav-btn svg { width: 20px; height: 20px; transition: all 0.2s; }
+    .fav-btn.active svg { fill: #EF4444; stroke: #EF4444; }
+    .fav-btn:not(.active) svg { fill: none; stroke: white; }
+    .profil-fav-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 14px; cursor: pointer; }
 
     /* CLAIMED LISTING */
     .owner-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #FFF8EC; color: #D4841A; border: 1px solid #F5A623; }
@@ -403,6 +410,7 @@
   <div class="screen detail-screen" id="screenDetail">
     <div class="detail-hero">
       <button class="detail-back" onclick="showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <button class="fav-btn" id="favBtn" onclick="toggleFavorite()"><svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
       <div class="detail-hero-icon" id="detailIcon"></div>
       <div class="detail-title" id="detailTitle">-</div>
       <div class="detail-city" id="detailCity"></div>
@@ -607,6 +615,17 @@
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
+      <div class="profil-section" style="margin-bottom:16px">
+        <div class="profil-row" onclick="showFavorites()">
+          <div class="profil-row-left">
+            <div class="profil-row-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <span class="profil-row-label">Meine Favoriten</span>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
       <button class="logout-btn" onclick="handleLogout()">Ausloggen</button>
     </div>
     <nav class="bottom-nav">
@@ -715,6 +734,22 @@
       <div id="editListingError" style="display:none;background:var(--red-light);color:var(--red);padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:14px"></div>
       <div id="editListingSuccess" style="display:none;background:var(--green-light);color:var(--green);padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:14px">Änderungen gespeichert!</div>
       <button class="form-submit" onclick="saveListingEdits()">Änderungen speichern</button>
+    </div>
+  </div>
+
+  <!-- FAVORITEN -->
+  <div class="screen" id="screenFavorites">
+    <div class="form-header">
+      <button class="form-back" onclick="showScreen('screenProfil')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="form-title">Meine Favoriten</div>
+      <div class="form-sub">Gespeicherte Orte</div>
+    </div>
+    <div style="padding:16px 16px 100px" id="favoritesBody">
+      <div class="empty-state">
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <div class="empty-title">Noch keine Favoriten</div>
+        <div class="empty-sub">Tippe auf das Herz in der Detailansicht</div>
+      </div>
     </div>
   </div>
 
@@ -961,6 +996,7 @@
     loadComments(id);
     loadPhotos(id);
     loadOwnerSection(l);
+    loadFavoriteStatus(id);
   }
 
   function renderMap() {
@@ -1591,10 +1627,13 @@
         }
       } else {
         section.innerHTML = `
-          <button class="claim-btn" onclick="showClaimForm('${listing.id}','${(listing.name||'').replace(/'/g,"\'")}')">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            Ich bin der Inhaber dieses Ortes
-          </button>`;
+          <div style="margin-top:6px">
+            <button class="claim-btn" onclick="showClaimForm('${listing.id}','${(listing.name||'').replace(/'/g,"\'")}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+              Ich bin der Inhaber dieses Ortes
+            </button>
+            <div style="font-size:11px;color:var(--text-3);margin-top:6px;text-align:center;padding:0 8px">Als verifizierter Inhaber kannst du diesen Eintrag selbst verwalten und bearbeiten.</div>
+          </div>`;
       }
     }
   }
@@ -1687,6 +1726,76 @@
       okEl.style.display = 'block';
       setTimeout(() => { showScreen('screenDetail'); loadListings(); }, 1500);
     } catch(e) { errEl.textContent = 'Fehler beim Speichern.'; errEl.style.display = 'block'; }
+  }
+
+  let currentFavorites = new Set();
+
+  async function loadFavoriteStatus(listingId) {
+    if (!currentUser) return;
+    try {
+      const snap = await db.collection('favorites')
+        .where('user_id','==',currentUser.uid)
+        .where('listing_id','==',listingId).get();
+      const isFav = !snap.empty;
+      currentFavorites = isFav ? new Set([...currentFavorites, listingId]) : (() => { currentFavorites.delete(listingId); return currentFavorites; })();
+      const btn = document.getElementById('favBtn');
+      if (btn) btn.classList.toggle('active', isFav);
+    } catch(e) {}
+  }
+
+  async function toggleFavorite() {
+    if (!currentListingId || !currentUser) return;
+    const btn = document.getElementById('favBtn');
+    const isFav = currentFavorites.has(currentListingId);
+    try {
+      if (isFav) {
+        const snap = await db.collection('favorites')
+          .where('user_id','==',currentUser.uid)
+          .where('listing_id','==',currentListingId).get();
+        await Promise.all(snap.docs.map(d => d.ref.delete()));
+        currentFavorites.delete(currentListingId);
+        btn.classList.remove('active');
+      } else {
+        await db.collection('favorites').add({
+          user_id: currentUser.uid,
+          listing_id: currentListingId,
+          created_at: new Date()
+        });
+        currentFavorites.add(currentListingId);
+        btn.classList.add('active');
+      }
+    } catch(e) { alert('Fehler.'); }
+  }
+
+  async function showFavorites() {
+    showScreen('screenFavorites');
+    const body = document.getElementById('favoritesBody');
+    body.innerHTML = '<div style="text-align:center;padding:40px"><div style="width:28px;height:28px;border:3px solid #FFF8EC;border-top-color:#F5A623;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto"></div></div>';
+    try {
+      const snap = await db.collection('favorites').where('user_id','==',currentUser.uid).orderBy('created_at','desc').get();
+      if (snap.empty) {
+        body.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="empty-title">Noch keine Favoriten</div><div class="empty-sub">Tippe auf das Herz in der Detailansicht</div></div>';
+        return;
+      }
+      const favListingIds = snap.docs.map(d => d.data().listing_id);
+      const favListings = allListings.filter(l => favListingIds.includes(l.id));
+      if (!favListings.length) {
+        body.innerHTML = '<div class="empty-state"><div class="empty-title">Keine Einträge gefunden</div></div>';
+        return;
+      }
+      body.innerHTML = favListings.map(l => `
+        <div class="profil-fav-card" onclick="showDetail('${l.id}')">
+          <div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div>
+          <div class="listing-body">
+            <div class="listing-name">${l.name||''}</div>
+            ${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" width="11" height="11"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}</div>`:''}
+            <div class="listing-desc">${l.description||''}</div>
+          </div>
+          <div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>`).join('');
+    } catch(e) {
+      body.innerHTML = '<div class="empty-state"><div class="empty-title">Fehler beim Laden</div></div>';
+    }
   }
 
   function useMyLocation() {
