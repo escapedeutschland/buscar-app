@@ -134,6 +134,54 @@
     .detail-cta-btn.primary svg { stroke: white; width: 18px; height: 18px; fill: none; }
     .detail-cta-btn.secondary svg { stroke: var(--text-1); width: 18px; height: 18px; fill: none; }
 
+    /* BEWERTUNGEN & KOMMENTARE */
+    .stars-row { display: flex; gap: 4px; align-items: center; }
+    .star { font-size: 22px; cursor: pointer; color: #E0E0E0; transition: color 0.15s; line-height: 1; }
+    .star.active { color: var(--yellow); }
+    .rating-summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; }
+    .rating-avg { font-size: 36px; font-weight: 700; color: var(--text-1); font-family: 'Fraunces', serif; }
+    .rating-meta { display: flex; flex-direction: column; gap: 3px; }
+    .rating-stars-small { display: flex; gap: 2px; }
+    .rating-stars-small span { font-size: 14px; color: var(--yellow); }
+    .rating-count { font-size: 12px; color: var(--text-3); }
+    .review-form { padding: 14px 16px; border-top: 0.5px solid var(--border); }
+    .review-form-title { font-size: 13px; font-weight: 600; color: var(--text-1); margin-bottom: 10px; }
+    .review-stars { display: flex; gap: 6px; margin-bottom: 10px; }
+    .review-textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-1); background: var(--bg); outline: none; resize: none; min-height: 80px; -webkit-appearance: none; }
+    .review-textarea:focus { border-color: var(--yellow); }
+    .review-submit { margin-top: 8px; padding: 11px 20px; background: var(--yellow); color: white; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .review-submit:disabled { background: var(--text-3); cursor: not-allowed; }
+    .review-item { padding: 14px 16px; border-top: 0.5px solid var(--border); }
+    .review-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .review-item-name { font-size: 13px; font-weight: 600; color: var(--text-1); }
+    .review-item-stars { display: flex; gap: 2px; }
+    .review-item-stars span { font-size: 12px; color: var(--yellow); }
+    .review-item-text { font-size: 13px; color: var(--text-2); line-height: 1.5; margin-top: 4px; }
+    .review-item-date { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+    .comment-item { padding: 12px 16px; border-top: 0.5px solid var(--border); }
+    .comment-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .comment-item-name { font-size: 13px; font-weight: 600; color: var(--text-1); }
+    .comment-item-date { font-size: 11px; color: var(--text-3); }
+    .comment-item-text { font-size: 13px; color: var(--text-2); line-height: 1.5; }
+    .comment-reply-btn { font-size: 11px; color: var(--yellow-dark); font-weight: 600; background: none; border: none; cursor: pointer; margin-top: 5px; padding: 0; }
+    .comment-replies { margin-top: 8px; padding-left: 14px; border-left: 2px solid var(--yellow-light); }
+    .reply-item { padding: 8px 0; border-top: 0.5px solid var(--border); }
+    .reply-item:first-child { border-top: none; }
+    .reply-item-name { font-size: 12px; font-weight: 600; color: var(--text-1); }
+    .reply-item-text { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+    .reply-item-date { font-size: 10px; color: var(--text-3); }
+    .reply-form { margin-top: 8px; display: none; }
+    .reply-form.visible { display: block; }
+    .reply-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-1); background: var(--bg); outline: none; -webkit-appearance: none; }
+    .reply-input:focus { border-color: var(--yellow); }
+    .reply-submit { margin-top: 6px; padding: 9px 16px; background: var(--yellow); color: white; border: none; border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .comment-form { padding: 14px 16px; border-top: 0.5px solid var(--border); display: flex; gap: 8px; align-items: flex-end; }
+    .comment-input { flex: 1; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-1); background: var(--bg); outline: none; resize: none; min-height: 44px; max-height: 100px; -webkit-appearance: none; }
+    .comment-input:focus { border-color: var(--yellow); }
+    .comment-send { width: 44px; height: 44px; border-radius: 12px; background: var(--yellow); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .comment-send svg { width: 18px; height: 18px; stroke: white; }
+    .own-review-note { font-size: 12px; color: var(--text-3); padding: 10px 16px; font-style: italic; }
+
     /* KARTE */
     .map-screen { background: var(--bg); overflow: hidden; }
     .map-header { background: linear-gradient(135deg, var(--yellow) 0%, var(--yellow-dark) 100%); padding: 52px 20px 16px; flex-shrink: 0; }
@@ -329,6 +377,24 @@
       <div class="detail-card"><div class="detail-section-title">Beschreibung</div><div class="detail-desc" id="detailDesc">-</div></div>
       <div class="detail-card" id="detailInfoCard" style="display:none"></div>
       <div class="detail-cta" id="detailCta"></div>
+
+      <!-- BEWERTUNGEN -->
+      <div class="detail-card" id="detailRatingsCard">
+        <div class="detail-section-title">Bewertungen</div>
+        <div id="ratingSummary"></div>
+        <div id="reviewForm"></div>
+        <div id="reviewsList"></div>
+      </div>
+
+      <!-- KOMMENTARE -->
+      <div class="detail-card" id="detailCommentsCard">
+        <div class="detail-section-title">Diskussion</div>
+        <div id="commentsList"></div>
+        <div class="comment-form">
+          <textarea class="comment-input" id="commentInput" placeholder="Schreib einen Kommentar..." rows="1"></textarea>
+          <button class="comment-send" onclick="submitComment()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -480,7 +546,7 @@
 
 </div>
 <script>
-  const ADMIN_EMAIL = 'maximechristalle@gmail.com';
+  const ADMIN_EMAIL = 'DEINE-EMAIL@gmail.com';
 
   const firebaseConfig = { apiKey: "AIzaSyC_nxQL9Jo0EPUCtyI8QvnnRVKRBPbREKU", authDomain: "paraguay-app-8beb3.firebaseapp.com", projectId: "paraguay-app-8beb3" };
   firebase.initializeApp(firebaseConfig);
@@ -615,7 +681,10 @@
     if (l.phone) ctaHTML += `<a class="detail-cta-btn primary" href="tel:${l.phone}"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>Anrufen</a>`;
     if (l.lat && l.lng) ctaHTML += `<a class="detail-cta-btn secondary" href="https://maps.google.com/?q=${l.lat},${l.lng}" target="_blank"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Karte</a>`;
     document.getElementById('detailCta').innerHTML = ctaHTML;
+    currentListingId = id;
     showScreen('screenDetail');
+    loadReviews(id);
+    loadComments(id);
   }
 
   function renderMap() {
@@ -712,6 +781,139 @@
   async function rejectEntry(id) {
     if (!confirm('Eintrag wirklich loeschen?')) return;
     try { await db.collection('listings').doc(id).delete(); document.getElementById('adminCard_'+id).remove(); } catch (err) { alert('Fehler.'); }
+  }
+
+  let currentListingId = null;
+  let currentUserRating = 0;
+
+  function formatDate(ts) {
+    if (!ts) return '';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric' });
+  }
+
+  function starsHTML(rating, size) {
+    let h = '';
+    for (let i = 1; i <= 5; i++) h += `<span style="font-size:${size||14}px;color:${i<=rating?'#F5A623':'#E0E0E0'}">&#9733;</span>`;
+    return h;
+  }
+
+  async function loadReviews(listingId) {
+    const snap = await db.collection('reviews').where('listing_id','==',listingId).orderBy('created_at','desc').get();
+    const reviews = snap.docs.map(d => ({id:d.id,...d.data()}));
+    const myReview = reviews.find(r => r.user_id === (currentUser ? currentUser.uid : null));
+    const avg = reviews.length ? (reviews.reduce((s,r) => s+r.rating,0)/reviews.length).toFixed(1) : null;
+
+    document.getElementById('ratingSummary').innerHTML = avg ? `
+      <div class="rating-summary">
+        <div class="rating-avg">${avg}</div>
+        <div class="rating-meta">
+          <div class="rating-stars-small">${starsHTML(Math.round(avg),16)}</div>
+          <div class="rating-count">${reviews.length} Bewertung${reviews.length!==1?'en':''}</div>
+        </div>
+      </div>` : '<div style="padding:12px 16px;font-size:13px;color:var(--text-3)">Noch keine Bewertungen</div>';
+
+    if (myReview) {
+      document.getElementById('reviewForm').innerHTML = `<div class="own-review-note">Deine Bewertung: ${starsHTML(myReview.rating,14)} ${myReview.comment ? '<br><em>"'+myReview.comment+'"</em>' : ''}</div>`;
+    } else {
+      currentUserRating = 0;
+      document.getElementById('reviewForm').innerHTML = `
+        <div class="review-form">
+          <div class="review-form-title">Bewertung abgeben</div>
+          <div class="review-stars" id="reviewStars">
+            ${[1,2,3,4,5].map(i => `<span class="star" data-val="${i}" onclick="setRating(${i})">&#9733;</span>`).join('')}
+          </div>
+          <textarea class="review-textarea" id="reviewText" placeholder="Deine Erfahrung (optional)"></textarea>
+          <button class="review-submit" id="reviewSubmitBtn" onclick="submitReview('${listingId}')">Bewertung abschicken</button>
+        </div>`;
+    }
+
+    document.getElementById('reviewsList').innerHTML = reviews.filter(r => r.comment).map(r => `
+      <div class="review-item">
+        <div class="review-item-top">
+          <span class="review-item-name">${r.user_name||'Anonym'}</span>
+          <div class="review-item-stars">${starsHTML(r.rating,12)}</div>
+        </div>
+        <div class="review-item-text">${r.comment}</div>
+        <div class="review-item-date">${formatDate(r.created_at)}</div>
+      </div>`).join('');
+  }
+
+  function setRating(val) {
+    currentUserRating = val;
+    document.querySelectorAll('#reviewStars .star').forEach((s,i) => s.classList.toggle('active', i<val));
+  }
+
+  async function submitReview(listingId) {
+    if (!currentUserRating) { alert('Bitte waehle eine Sternebewertung.'); return; }
+    const btn = document.getElementById('reviewSubmitBtn');
+    btn.disabled = true; btn.textContent = 'Wird gespeichert...';
+    const name = currentUser.displayName || currentUser.email.split('@')[0];
+    try {
+      await db.collection('reviews').add({
+        listing_id: listingId, user_id: currentUser.uid, user_name: name,
+        rating: currentUserRating, comment: document.getElementById('reviewText').value.trim()||null,
+        created_at: new Date()
+      });
+      await loadReviews(listingId);
+    } catch(e) { btn.disabled=false; btn.textContent='Bewertung abschicken'; }
+  }
+
+  async function loadComments(listingId) {
+    const snap = await db.collection('comments').where('listing_id','==',listingId).orderBy('created_at','asc').get();
+    const comments = snap.docs.map(d => ({id:d.id,...d.data()}));
+    const topLevel = comments.filter(c => !c.parent_id);
+    const replies = comments.filter(c => c.parent_id);
+
+    document.getElementById('commentsList').innerHTML = topLevel.map(c => {
+      const cReplies = replies.filter(r => r.parent_id === c.id);
+      return `<div class="comment-item" id="comment_${c.id}">
+        <div class="comment-item-top">
+          <span class="comment-item-name">${c.user_name||'Anonym'}</span>
+          <span class="comment-item-date">${formatDate(c.created_at)}</span>
+        </div>
+        <div class="comment-item-text">${c.body}</div>
+        <button class="comment-reply-btn" onclick="toggleReplyForm('${c.id}')">Antworten</button>
+        ${cReplies.length ? `<div class="comment-replies">${cReplies.map(r => `
+          <div class="reply-item">
+            <div class="reply-item-name">${r.user_name||'Anonym'} <span class="reply-item-date">${formatDate(r.created_at)}</span></div>
+            <div class="reply-item-text">${r.body}</div>
+          </div>`).join('')}</div>` : ''}
+        <div class="reply-form" id="replyForm_${c.id}">
+          <input class="reply-input" id="replyInput_${c.id}" placeholder="Antwort schreiben...">
+          <button class="reply-submit" onclick="submitReply('${listingId}','${c.id}')">Antworten</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function toggleReplyForm(commentId) {
+    const form = document.getElementById('replyForm_' + commentId);
+    if (form) { form.classList.toggle('visible'); if (form.classList.contains('visible')) document.getElementById('replyInput_'+commentId).focus(); }
+  }
+
+  async function submitReply(listingId, parentId) {
+    const input = document.getElementById('replyInput_' + parentId);
+    const body = input.value.trim();
+    if (!body) return;
+    const name = currentUser.displayName || currentUser.email.split('@')[0];
+    try {
+      await db.collection('comments').add({ listing_id: listingId, parent_id: parentId, user_id: currentUser.uid, user_name: name, body, created_at: new Date() });
+      await loadComments(listingId);
+    } catch(e) { alert('Fehler beim Speichern.'); }
+  }
+
+  async function submitComment() {
+    if (!currentListingId) return;
+    const input = document.getElementById('commentInput');
+    const body = input.value.trim();
+    if (!body) return;
+    const name = currentUser.displayName || currentUser.email.split('@')[0];
+    input.value = '';
+    try {
+      await db.collection('comments').add({ listing_id: currentListingId, parent_id: null, user_id: currentUser.uid, user_name: name, body, created_at: new Date() });
+      await loadComments(currentListingId);
+    } catch(e) { alert('Fehler beim Speichern.'); }
   }
 
   function useMyLocation() {
