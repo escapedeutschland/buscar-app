@@ -556,9 +556,16 @@
   <!-- PROFIL -->
   <div class="screen" id="screenProfil">
     <div class="profil-header">
-      <div class="profil-avatar" id="profilAvatar">?</div>
+      <div style="position:relative;display:inline-block;cursor:pointer" onclick="document.getElementById('avatarFileInput').click()">
+        <div class="profil-avatar" id="profilAvatar" style="overflow:hidden">?</div>
+        <div style="position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:var(--yellow);border:2px solid white;display:flex;align-items:center;justify-content:center">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 0 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+      </div>
+      <input type="file" id="avatarFileInput" accept="image/*" style="display:none" onchange="uploadAvatar(event)">
       <div class="profil-name" id="profilName">-</div>
       <div class="profil-email" id="profilEmail">-</div>
+      <div id="avatarProgress" style="font-size:12px;color:rgba(255,255,255,0.8);display:none">Wird hochgeladen...</div>
     </div>
     <div class="profil-body">
       <div class="profil-section">
@@ -809,22 +816,35 @@
     currentUser = user;
     if (user) {
       let displayName = user.email.split('@')[0];
+      let avatarUrl = null;
       try {
         const userDoc = await db.collection('users').doc(user.uid).get();
         if (userDoc.exists) {
           const data = userDoc.data();
           displayName = data.username || data.name || displayName;
+          avatarUrl = data.avatar_url || null;
         }
       } catch(e) {}
       const initial = displayName.charAt(0).toUpperCase();
-      document.getElementById('headerAvatar').textContent = initial;
-      document.getElementById('profilAvatar').textContent = initial;
+      setAvatarDisplay(avatarUrl, initial);
       document.getElementById('profilName').textContent = displayName;
       document.getElementById('profilEmail').textContent = user.email;
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
       showScreen('screenHome'); loadListings();
     } else { showScreen('screenAuth'); }
   });
+
+  function setAvatarDisplay(url, initial) {
+    const headerAvatar = document.getElementById('headerAvatar');
+    const profilAvatar = document.getElementById('profilAvatar');
+    if (url) {
+      headerAvatar.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      profilAvatar.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    } else {
+      headerAvatar.textContent = initial;
+      profilAvatar.textContent = initial;
+    }
+  }
 
   async function loadListings() {
     try {
@@ -1381,6 +1401,31 @@
       });
     }
     progress.textContent = 'Fotos hochgeladen!';
+  }
+
+  async function uploadAvatar(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { alert('Foto ist zu groß. Max. 5 MB.'); return; }
+    if (!file.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
+
+    const progress = document.getElementById('avatarProgress');
+    progress.style.display = 'block';
+    progress.textContent = 'Wird hochgeladen...';
+
+    try {
+      const ref = storage.ref('avatars/' + currentUser.uid + '/avatar.' + file.name.split('.').pop());
+      const snap = await ref.put(file);
+      const url = await snap.ref.getDownloadURL();
+      await db.collection('users').doc(currentUser.uid).update({ avatar_url: url });
+      const displayName = document.getElementById('profilName').textContent;
+      setAvatarDisplay(url, displayName.charAt(0).toUpperCase());
+      progress.textContent = 'Profilbild gespeichert!';
+      setTimeout(() => { progress.style.display = 'none'; }, 2500);
+    } catch(e) {
+      progress.textContent = 'Fehler beim Hochladen.';
+      setTimeout(() => { progress.style.display = 'none'; }, 2500);
+    }
   }
 
   function useMyLocation() {
