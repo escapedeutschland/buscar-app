@@ -423,7 +423,7 @@
         <div class="form-field">
           <label class="field-label">Adresse</label>
           <input class="field-input" type="text" id="newAddress" placeholder="Strasse, Stadtviertel">
-          <div class="form-hint">Tipp: Eine genaue Adresse hilft bei der Kartenanzeige.</div>
+          <button type="button" onclick="useMyLocation()" id="locationBtn" style="margin-top:8px;width:100%;padding:12px;background:var(--yellow-light);color:var(--yellow-dark);border:1.5px solid var(--yellow);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Meinen Standort verwenden</button><div id="locationStatus" style="font-size:12px;margin-top:6px;display:none"></div>
         </div>
         <div class="form-field">
           <label class="field-label">Oeffnungszeiten</label>
@@ -480,7 +480,7 @@
 
 </div>
 <script>
-  const ADMIN_EMAIL = 'DEINE-EMAIL@gmail.com';
+  const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   const firebaseConfig = { apiKey: "AIzaSyC_nxQL9Jo0EPUCtyI8QvnnRVKRBPbREKU", authDomain: "paraguay-app-8beb3.firebaseapp.com", projectId: "paraguay-app-8beb3" };
   firebase.initializeApp(firebaseConfig);
@@ -676,12 +676,17 @@
     const btn = document.getElementById('formSubmitBtn');
     btn.disabled = true; btn.textContent = 'Wird eingereicht...';
     try {
-      await db.collection('listings').add({ name, category_id: cat, city, description: desc, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: document.getElementById('newHours').value.trim()||null, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date() });
+      await db.collection('listings').add({ name, category_id: cat, city, description: desc, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: document.getElementById('newHours').value.trim()||null, lat: window._newLat||null, lng: window._newLng||null, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date() });
       document.getElementById('formSuccess').classList.add('visible');
       ['newName','newCity','newDesc','newPhone','newWebsite','newAddress','newHours'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('newCategory').value = '';
       document.getElementById('nameCounter').textContent = '0 / 60';
       document.getElementById('descCounter').textContent = '0 / 500';
+      window._newLat = null; window._newLng = null;
+      const btn2 = document.getElementById('locationBtn');
+      btn2.disabled = false; btn2.style.background = 'var(--yellow-light)'; btn2.style.borderColor = 'var(--yellow)'; btn2.style.color = 'var(--yellow-dark)';
+      btn2.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg> Meinen Standort verwenden';
+      document.getElementById('locationStatus').style.display = 'none';
     } catch (err) {
       document.getElementById('formError').textContent = 'Fehler beim Einreichen. Bitte versuche es erneut.'; document.getElementById('formError').classList.add('visible');
     }
@@ -707,6 +712,32 @@
   async function rejectEntry(id) {
     if (!confirm('Eintrag wirklich loeschen?')) return;
     try { await db.collection('listings').doc(id).delete(); document.getElementById('adminCard_'+id).remove(); } catch (err) { alert('Fehler.'); }
+  }
+
+  function useMyLocation() {
+    const btn = document.getElementById('locationBtn');
+    const status = document.getElementById('locationStatus');
+    if (!navigator.geolocation) {
+      status.style.color = 'var(--red)'; status.style.display = 'block';
+      status.textContent = 'Standort wird von diesem Browser nicht unterstuetzt.'; return;
+    }
+    btn.textContent = 'Standort wird ermittelt...'; btn.disabled = true;
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        window._newLat = pos.coords.latitude;
+        window._newLng = pos.coords.longitude;
+        status.style.color = 'var(--green)'; status.style.display = 'block';
+        status.textContent = 'Standort gespeichert: ' + pos.coords.latitude.toFixed(5) + ', ' + pos.coords.longitude.toFixed(5);
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg> Standort gespeichert';
+        btn.style.background = 'var(--green-light)'; btn.style.borderColor = 'var(--green)'; btn.style.color = 'var(--green)';
+      },
+      err => {
+        status.style.color = 'var(--red)'; status.style.display = 'block';
+        status.textContent = 'Standort konnte nicht ermittelt werden. Bitte Berechtigung erteilen.';
+        btn.disabled = false; btn.textContent = 'Meinen Standort verwenden';
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
   }
 
   document.getElementById('catsScroll').addEventListener('click', e => {
