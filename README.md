@@ -95,7 +95,7 @@
     .listing-body { flex: 1; min-width: 0; }
     .listing-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
     .listing-name { font-size: 15px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .badge-geprueft { font-size: 10px; font-weight: 700; color: var(--green); background: var(--green-light); padding: 2px 7px; border-radius: 6px; flex-shrink: 0; }
+    .badge-geprüft { font-size: 10px; font-weight: 700; color: var(--green); background: var(--green-light); padding: 2px 7px; border-radius: 6px; flex-shrink: 0; }
     .listing-city { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--text-3); margin-bottom: 5px; }
     .listing-city svg { width: 11px; height: 11px; stroke: var(--text-3); }
     .listing-desc { font-size: 13px; color: var(--text-2); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -337,7 +337,7 @@
         <div class="logo"><div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></div><span class="logo-name">Buscar</span></div>
         <div class="header-avatar" id="headerAvatar" onclick="showScreen('screenProfil')">?</div>
       </div>
-      <div class="header-sub">Dein Guide fuer Paraguay</div>
+      <div class="header-sub">Dein Guide für Paraguay</div>
     </div>
     <div class="search-wrap">
       <div class="search-box">
@@ -352,12 +352,12 @@
         <div class="cat-chip" data-cat="kat-restaurants">Restaurants</div>
         <div class="cat-chip" data-cat="kat-dienstleistung">Dienstleistungen</div>
         <div class="cat-chip" data-cat="kat-orte">Orte</div>
-        <div class="cat-chip" data-cat="kat-unterkunft">Unterkunfte</div>
-        <div class="cat-chip" data-cat="kat-geschaefte">Geschaefte</div>
+        <div class="cat-chip" data-cat="kat-unterkunft">Unterkünfte</div>
+        <div class="cat-chip" data-cat="kat-geschaefte">Geschäfte</div>
       </div>
     </div>
     <div class="listings">
-      <div class="section-title" id="sectionTitle">Alle Eintraege</div>
+      <div class="section-title" id="sectionTitle">Alle Einträge</div>
       <div id="listingsInner">
         <div class="skeleton-card"><div class="skeleton skel-icon"></div><div class="skel-body"><div class="skeleton skel-line w-60"></div><div class="skeleton skel-line w-40"></div><div class="skeleton skel-line w-80"></div></div></div>
         <div class="skeleton-card"><div class="skeleton skel-icon"></div><div class="skel-body"><div class="skeleton skel-line w-60"></div><div class="skeleton skel-line w-40"></div><div class="skeleton skel-line w-80"></div></div></div>
@@ -417,8 +417,8 @@
       <div class="map-cat" data-cat="kat-restaurants">Restaurants</div>
       <div class="map-cat" data-cat="kat-dienstleistung">Dienstleistungen</div>
       <div class="map-cat" data-cat="kat-orte">Orte</div>
-      <div class="map-cat" data-cat="kat-unterkunft">Unterkunfte</div>
-      <div class="map-cat" data-cat="kat-geschaefte">Geschaefte</div>
+      <div class="map-cat" data-cat="kat-unterkunft">Unterkünfte</div>
+      <div class="map-cat" data-cat="kat-geschaefte">Geschäfte</div>
     </div>
     <div class="map-container">
       <div id="mapContent" style="width:100%;height:100%;"></div>
@@ -437,48 +437,48 @@
     <div class="form-header">
       <button class="form-back" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       <div class="form-title">Eintrag vorschlagen</div>
-      <div class="form-sub">Wird nach Pruefung veroeffentlicht</div>
+      <div class="form-sub">Wird nach Prüfung veröffentlicht</div>
     </div>
     <div class="form-body">
       <div class="form-rules">
-        <div class="form-rules-title">Regeln fuer Eintraege</div>
+        <div class="form-rules-title">Regeln für Einträge</div>
         <div class="form-rule">• Keine Emojis im Titel</div>
         <div class="form-rule">• Name: max. 60 Zeichen</div>
         <div class="form-rule">• Beschreibung: min. 50, max. 500 Zeichen</div>
         <div class="form-rule">• Nur echte Orte in Paraguay</div>
         <div class="form-rule">• Keine Werbung oder Spam</div>
       </div>
-      <div id="formSuccess" class="form-success">Danke! Dein Eintrag wurde eingereicht und wird geprueft.</div>
+      <div id="formSuccess" class="form-success">Danke! Dein Eintrag wurde eingereicht und wird geprüft.</div>
       <div id="formError" class="form-error-msg"></div>
       <div class="form-card">
         <div class="form-card-title">Grundinfos</div>
         <div class="form-field">
           <label class="field-label">Name des Ortes *</label>
-          <input class="field-input" type="text" id="newName" placeholder="z.B. Dr. Mueller, Cafe Central" maxlength="60">
+          <input class="field-input" type="text" id="newName" placeholder="z.B. Dr. Müller, Café Central" maxlength="60">
           <div class="field-counter" id="nameCounter">0 / 60</div>
           <div class="field-error" id="nameError">Name darf keine Emojis enthalten.</div>
         </div>
         <div class="form-field">
           <label class="field-label">Kategorie *</label>
           <select class="field-select" id="newCategory">
-            <option value="">Bitte waehlen...</option>
-            <option value="kat-restaurants">Restaurants und Cafes</option>
+            <option value="">Bitte wählen...</option>
+            <option value="kat-restaurants">Restaurants und Cafés</option>
             <option value="kat-dienstleistung">Dienstleistungen</option>
-            <option value="kat-orte">Orte und Sehenswuerdigkeiten</option>
-            <option value="kat-unterkunft">Unterkunfte</option>
-            <option value="kat-geschaefte">Geschaefte und Maerkte</option>
+            <option value="kat-orte">Orte und Sehenswürdigkeiten</option>
+            <option value="kat-unterkunft">Unterkünfte</option>
+            <option value="kat-geschaefte">Geschäfte und Märkte</option>
           </select>
         </div>
         <div class="form-field">
           <label class="field-label">Stadt *</label>
-          <input class="field-input" type="text" id="newCity" placeholder="z.B. Asuncion, Encarnacion">
+          <input class="field-input" type="text" id="newCity" placeholder="z.B. Asunción, Encarnación">
         </div>
       </div>
       <div class="form-card">
         <div class="form-card-title">Beschreibung</div>
         <div class="form-field">
           <label class="field-label">Deine Erfahrung *</label>
-          <textarea class="field-textarea" id="newDesc" placeholder="Beschreibe den Ort fuer andere Deutsche. Was macht ihn besonders? Worauf sollte man achten?" maxlength="500"></textarea>
+          <textarea class="field-textarea" id="newDesc" placeholder="Beschreibe den Ort für andere Deutsche. Was macht ihn besonders? Worauf sollte man achten?" maxlength="500"></textarea>
           <div class="field-counter" id="descCounter">0 / 500</div>
           <div class="field-error" id="descError">Mindestens 50 Zeichen erforderlich.</div>
         </div>
@@ -496,11 +496,11 @@
         </div>
         <div class="form-field">
           <label class="field-label">Adresse</label>
-          <input class="field-input" type="text" id="newAddress" placeholder="Strasse, Stadtviertel">
+          <input class="field-input" type="text" id="newAddress" placeholder="Straße, Stadtviertel">
           <button type="button" onclick="useMyLocation()" id="locationBtn" style="margin-top:8px;width:100%;padding:12px;background:var(--yellow-light);color:var(--yellow-dark);border:1.5px solid var(--yellow);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Meinen Standort verwenden</button><div id="locationStatus" style="font-size:12px;margin-top:6px;display:none"></div>
         </div>
         <div class="form-field">
-          <label class="field-label">Oeffnungszeiten</label>
+          <label class="field-label">Öffnungszeiten</label>
           <input class="field-input" type="text" id="newHours" placeholder="z.B. Mo-Fr 08:00-18:00">
         </div>
       </div>
@@ -513,10 +513,10 @@
     <div class="admin-header">
       <button class="admin-back" onclick="showScreen('screenProfil')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       <div class="admin-title">Admin Panel</div>
-      <div class="admin-sub" id="adminSub">Eintraege pruefen</div>
+      <div class="admin-sub" id="adminSub">Einträge prüfen</div>
     </div>
     <div class="admin-body" id="adminBody">
-      <div class="admin-empty"><div class="admin-empty-icon">✓</div><div class="admin-empty-text">Alles geprueft!</div><div class="admin-empty-sub">Keine offenen Eintraege.</div></div>
+      <div class="admin-empty"><div class="admin-empty-icon">✓</div><div class="admin-empty-text">Alles geprüft!</div><div class="admin-empty-sub">Keine offenen Einträge.</div></div>
     </div>
   </div>
 
@@ -544,11 +544,11 @@
       </div>
       <div class="profil-section" style="margin-bottom:16px">
         <div class="profil-row" onclick="showEditUsername()">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="profil-row-label">Benutzername aendern</span></div>
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="profil-row-label">Benutzername ändern</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
         <div class="profil-row" onclick="showEditPassword()">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><span class="profil-row-label">Passwort aendern</span></div>
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><span class="profil-row-label">Passwort ändern</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
@@ -567,7 +567,7 @@
     <div class="form-header">
       <button class="form-back" onclick="showScreen('screenProfil')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       <div class="form-title">Benutzername</div>
-      <div class="form-sub">Oeffentlich sichtbar in der App</div>
+      <div class="form-sub">Öffentlich sichtbar in der App</div>
     </div>
     <div class="form-body">
       <div class="form-card">
@@ -588,7 +588,7 @@
   <div class="screen" id="screenEditPassword">
     <div class="form-header">
       <button class="form-back" onclick="showScreen('screenProfil')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <div class="form-title">Passwort aendern</div>
+      <div class="form-title">Passwort ändern</div>
       <div class="form-sub">Mindestens 6 Zeichen</div>
     </div>
     <div class="form-body">
@@ -604,12 +604,12 @@
         </div>
         <div class="form-field">
           <label class="field-label">Neues Passwort wiederholen</label>
-          <input class="field-input" type="password" id="newPasswordConfirm" placeholder="Passwort bestaetigen">
+          <input class="field-input" type="password" id="newPasswordConfirm" placeholder="Passwort bestätigen">
         </div>
         <div id="passwordChangeError" style="display:none;background:var(--red-light);color:var(--red);padding:10px 14px;border-radius:10px;font-size:13px;margin-top:10px"></div>
         <div id="passwordChangeSuccess" style="display:none;background:var(--green-light);color:var(--green);padding:10px 14px;border-radius:10px;font-size:13px;margin-top:10px"></div>
       </div>
-      <button class="form-submit" onclick="savePassword()">Passwort aendern</button>
+      <button class="form-submit" onclick="savePassword()">Passwort ändern</button>
     </div>
   </div>
 
@@ -660,7 +660,7 @@
     'kat-geschaefte': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
     'default': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
   };
-  const catNames = { 'kat-restaurants': 'Restaurants', 'kat-dienstleistung': 'Dienstleistungen', 'kat-orte': 'Orte', 'kat-unterkunft': 'Unterkunfte', 'kat-geschaefte': 'Geschaefte' };
+  const catNames = { 'kat-restaurants': 'Restaurants', 'kat-dienstleistung': 'Dienstleistungen', 'kat-orte': 'Orte', 'kat-unterkunft': 'Unterkünfte', 'kat-geschaefte': 'Geschäfte' };
 
   function setNav(active) {
     ['navHome','navMap','navForm','navProfil'].forEach(id => {
@@ -698,7 +698,7 @@
     try {
       await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
     } catch (err) {
-      const msgs = { 'auth/user-not-found': 'Kein Konto mit dieser E-Mail.', 'auth/wrong-password': 'Falsches Passwort.', 'auth/invalid-email': 'Ungueltige E-Mail.', 'auth/too-many-requests': 'Zu viele Versuche.' };
+      const msgs = { 'auth/user-not-found': 'Kein Konto mit dieser E-Mail.', 'auth/wrong-password': 'Falsches Passwort.', 'auth/invalid-email': 'Ungültige E-Mail.', 'auth/too-many-requests': 'Zu viele Versuche.' };
       showAuthError(msgs[err.code] || 'Fehler beim Einloggen.');
       btn.disabled = false; btn.textContent = 'Einloggen';
     }
@@ -754,7 +754,7 @@
       await auth.sendPasswordResetEmail(email);
       msgEl.style.background = 'var(--green-light)';
       msgEl.style.color = 'var(--green)';
-      msgEl.textContent = 'E-Mail gesendet! Pruefe dein Postfach.';
+      msgEl.textContent = 'E-Mail gesendet! Prüfe dein Postfach.';
       msgEl.style.display = 'block';
     } catch(e) {
       msgEl.style.background = 'var(--red-light)';
@@ -801,9 +801,9 @@
     if (activeCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === activeCategory);
     if (searchQuery) { const q = searchQuery.toLowerCase(); filtered = filtered.filter(l => (l.name||'').toLowerCase().includes(q)||(l.description||'').toLowerCase().includes(q)||(l.city||'').toLowerCase().includes(q)); }
     const container = document.getElementById('listingsInner');
-    document.getElementById('sectionTitle').textContent = activeCategory === 'Alle' ? filtered.length + ' Eintraege' : filtered.length + ' Ergebnisse';
+    document.getElementById('sectionTitle').textContent = activeCategory === 'Alle' ? filtered.length + ' Einträge' : filtered.length + ' Ergebnisse';
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">Nichts gefunden</div><div class="empty-sub">Versuch einen anderen Suchbegriff</div></div>'; return; }
-    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${l.verified?'<span class="badge-geprueft">Geprueft</span>':''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}</div>`:''}<div class="listing-desc">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${l.verified?'<span class="badge-geprüft">Geprüft</span>':''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}</div>`:''}<div class="listing-desc">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
   }
 
   function showDetail(id) {
@@ -816,12 +816,12 @@
     document.getElementById('detailCity').innerHTML = l.city?`<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}`:'';
     document.getElementById('detailDesc').textContent = l.description||'Keine Beschreibung.';
     const badges = document.getElementById('detailBadges');
-    document.getElementById('detailBadgeRow').innerHTML = l.verified?'<span class="detail-badge green">Geprueft</span>':'';
+    document.getElementById('detailBadgeRow').innerHTML = l.verified?'<span class="detail-badge green">Geprüft</span>':'';
     badges.style.display = l.verified?'block':'none';
     let infoHTML = '';
     if (l.phone) infoHTML += `<a class="detail-row" href="tel:${l.phone}"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Telefon</div><div class="detail-row-value">${l.phone}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
     if (l.website) infoHTML += `<a class="detail-row" href="https://${l.website}" target="_blank"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Website</div><div class="detail-row-value">${l.website}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
-    if (l.opening_hours) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Oeffnungszeiten</div><div class="detail-row-value">${l.opening_hours}</div></div></div></div>`;
+    if (l.opening_hours) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Öffnungszeiten</div><div class="detail-row-value">${l.opening_hours}</div></div></div></div>`;
     if (l.address) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Adresse</div><div class="detail-row-value">${l.address}</div></div></div></div>`;
     const infoCard = document.getElementById('detailInfoCard');
     infoCard.innerHTML = infoHTML; infoCard.style.display = infoHTML?'block':'none';
@@ -840,7 +840,7 @@
     const withCoords = filtered.filter(l => l.lat && l.lng);
     const content = document.getElementById('mapContent');
     if (!withCoords.length) {
-      content.innerHTML = '<div class="map-empty"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><div class="map-empty-title">Keine Orte mit Koordinaten</div><div class="map-empty-sub">Fuege genaue Adressen bei neuen Eintraegen hinzu.</div></div>';
+      content.innerHTML = '<div class="map-empty"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><div class="map-empty-title">Keine Orte mit Koordinaten</div><div class="map-empty-sub">Fuege genaue Adressen bei neuen Einträgen hinzu.</div></div>';
       document.getElementById('mapList').innerHTML = ''; return;
     }
     const center = withCoords[0];
@@ -887,7 +887,7 @@
     if (hasEmoji(name)) { document.getElementById('nameError').classList.add('visible'); document.getElementById('newName').classList.add('error'); valid = false; } else { document.getElementById('newName').classList.remove('error'); }
     if (desc.length < 50) { document.getElementById('descError').classList.add('visible'); document.getElementById('newDesc').classList.add('error'); valid = false; } else { document.getElementById('newDesc').classList.remove('error'); }
     if (!isValidPhone(phone)) { document.getElementById('phoneError').classList.add('visible'); document.getElementById('newPhone').classList.add('error'); valid = false; } else { document.getElementById('newPhone').classList.remove('error'); }
-    if (!name || !cat || !city || !desc) { document.getElementById('formError').textContent = 'Bitte alle Pflichtfelder ausfullen.'; document.getElementById('formError').classList.add('visible'); valid = false; }
+    if (!name || !cat || !city || !desc) { document.getElementById('formError').textContent = 'Bitte alle Pflichtfelder ausfüllen.'; document.getElementById('formError').classList.add('visible'); valid = false; }
     if (!valid) return;
 
     const btn = document.getElementById('formSubmitBtn');
@@ -918,7 +918,7 @@
       const snap = await db.collection('listings').where('verified', '==', false).get();
       const pending = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       document.getElementById('adminSub').textContent = pending.length + ' offen';
-      if (!pending.length) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-icon">&#10003;</div><div class="admin-empty-text">Alles geprueft!</div><div class="admin-empty-sub">Keine offenen Eintraege.</div></div>'; return; }
+      if (!pending.length) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-icon">&#10003;</div><div class="admin-empty-text">Alles geprüft!</div><div class="admin-empty-sub">Keine offenen Einträge.</div></div>'; return; }
       body.innerHTML = pending.map(l => `<div class="admin-card" id="adminCard_${l.id}"><div class="admin-card-name">${l.name||'Ohne Name'}</div><div class="admin-card-meta">${catNames[l.category_id]||''} &middot; ${l.city||'Unbekannt'}</div><div class="admin-card-desc">${l.description||'Keine Beschreibung'}</div><div class="admin-card-info">${l.phone?`<div class="admin-info-pill">${l.phone}</div>`:''}${l.website?`<div class="admin-info-pill">${l.website}</div>`:''}${l.opening_hours?`<div class="admin-info-pill">${l.opening_hours}</div>`:''}</div><div class="admin-actions"><button class="admin-btn approve" onclick="approveEntry('${l.id}')">Genehmigen</button><button class="admin-btn reject" onclick="rejectEntry('${l.id}')">Ablehnen</button></div></div>`).join('');
     } catch (err) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-text">Fehler beim Laden</div></div>'; }
   }
@@ -927,7 +927,7 @@
     try { await db.collection('listings').doc(id).update({ verified: true }); document.getElementById('adminCard_'+id).remove(); await loadListings(); } catch (err) { alert('Fehler.'); }
   }
   async function rejectEntry(id) {
-    if (!confirm('Eintrag wirklich loeschen?')) return;
+    if (!confirm('Eintrag wirklich löschen?')) return;
     try { await db.collection('listings').doc(id).delete(); document.getElementById('adminCard_'+id).remove(); } catch (err) { alert('Fehler.'); }
   }
 
@@ -968,7 +968,7 @@
             <span style="font-size:13px;font-weight:600;color:var(--text-1)">Deine Bewertung</span>
             <div style="display:flex;gap:8px">
               <button onclick="editReview('${myReview.id}','${listingId}',${myReview.rating})" style="font-size:11px;font-weight:600;color:var(--yellow-dark);background:var(--yellow-light);border:1px solid var(--yellow);border-radius:8px;padding:4px 10px;cursor:pointer">Bearbeiten</button>
-              <button onclick="deleteReview('${myReview.id}','${listingId}')" style="font-size:11px;font-weight:600;color:var(--red);background:var(--red-light);border:1px solid var(--red);border-radius:8px;padding:4px 10px;cursor:pointer">Loeschen</button>
+              <button onclick="deleteReview('${myReview.id}','${listingId}')" style="font-size:11px;font-weight:600;color:var(--red);background:var(--red-light);border:1px solid var(--red);border-radius:8px;padding:4px 10px;cursor:pointer">Löschen</button>
             </div>
           </div>
           <div>${starsHTML(myReview.rating,18)}</div>
@@ -1004,7 +1004,7 @@
   }
 
   async function submitReview(listingId) {
-    if (!currentUserRating) { alert('Bitte waehle eine Sternebewertung.'); return; }
+    if (!currentUserRating) { alert('Bitte wähle eine Sternebewertung.'); return; }
     const btn = document.getElementById('reviewSubmitBtn');
     btn.disabled = true; btn.textContent = 'Wird gespeichert...';
     const name = await getUsername();
@@ -1024,7 +1024,7 @@
     const topLevel = comments.filter(c => !c.parent_id);
     const replies = comments.filter(c => c.parent_id);
     const myUid = currentUser ? currentUser.uid : null;
-    const trashIcon = (id, lid) => `<button onclick="deleteComment('${id}','${lid}')" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center" title="Loeschen"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>`;
+    const trashIcon = (id, lid) => `<button onclick="deleteComment('${id}','${lid}')" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center" title="Löschen"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>`;
 
     document.getElementById('commentsList').innerHTML = topLevel.map(c => {
       const cReplies = replies.filter(r => r.parent_id === c.id);
@@ -1058,11 +1058,11 @@
   }
 
   async function deleteReview(reviewId, listingId) {
-    if (!confirm('Bewertung wirklich loeschen?')) return;
+    if (!confirm('Bewertung wirklich löschen?')) return;
     try {
       await db.collection('reviews').doc(reviewId).delete();
       await loadReviews(listingId);
-    } catch(e) { alert('Fehler beim Loeschen.'); }
+    } catch(e) { alert('Fehler beim Löschen.'); }
   }
 
   function editReview(reviewId, listingId, currentRating) {
@@ -1082,7 +1082,7 @@
   }
 
   async function updateReview(reviewId, listingId) {
-    if (!currentUserRating) { alert('Bitte waehle eine Sternebewertung.'); return; }
+    if (!currentUserRating) { alert('Bitte wähle eine Sternebewertung.'); return; }
     try {
       await db.collection('reviews').doc(reviewId).update({
         rating: currentUserRating,
@@ -1094,11 +1094,11 @@
   }
 
   async function deleteComment(commentId, listingId) {
-    if (!confirm('Kommentar wirklich loeschen?')) return;
+    if (!confirm('Kommentar wirklich löschen?')) return;
     try {
       await db.collection('comments').doc(commentId).delete();
       await loadComments(listingId);
-    } catch(e) { alert('Fehler beim Loeschen.'); }
+    } catch(e) { alert('Fehler beim Löschen.'); }
   }
 
   function toggleReplyForm(commentId) {
@@ -1145,7 +1145,7 @@
       document.getElementById('profilName').textContent = username;
       document.getElementById('headerAvatar').textContent = username.charAt(0).toUpperCase();
       document.getElementById('profilAvatar').textContent = username.charAt(0).toUpperCase();
-      okEl.textContent = 'Benutzername erfolgreich geaendert!';
+      okEl.textContent = 'Benutzername erfolgreich geändert!';
       okEl.style.display = 'block';
     } catch(e) {
       errEl.textContent = 'Fehler beim Speichern.'; errEl.style.display = 'block';
@@ -1168,23 +1168,23 @@
     errEl.style.display = 'none'; okEl.style.display = 'none';
 
     if (!current || !newPw || !confirm) {
-      errEl.textContent = 'Bitte alle Felder ausfullen.'; errEl.style.display = 'block'; return;
+      errEl.textContent = 'Bitte alle Felder ausfüllen.'; errEl.style.display = 'block'; return;
     }
     if (newPw.length < 6) {
       errEl.textContent = 'Neues Passwort muss min. 6 Zeichen haben.'; errEl.style.display = 'block'; return;
     }
     if (newPw !== confirm) {
-      errEl.textContent = 'Passwoerter stimmen nicht ueberein.'; errEl.style.display = 'block'; return;
+      errEl.textContent = 'Passwörter stimmen nicht überein.'; errEl.style.display = 'block'; return;
     }
     try {
       const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, current);
       await currentUser.reauthenticateWithCredential(credential);
       await currentUser.updatePassword(newPw);
-      okEl.textContent = 'Passwort erfolgreich geaendert!'; okEl.style.display = 'block';
+      okEl.textContent = 'Passwort erfolgreich geändert!'; okEl.style.display = 'block';
       ['currentPassword','newPassword','newPasswordConfirm'].forEach(id => document.getElementById(id).value = '');
     } catch(e) {
-      const msgs = { 'auth/wrong-password': 'Aktuelles Passwort ist falsch.', 'auth/too-many-requests': 'Zu viele Versuche. Bitte warte kurz.' };
-      errEl.textContent = msgs[e.code] || 'Fehler beim Aendern.'; errEl.style.display = 'block';
+      const msgs = { 'auth/wrong-password': 'Aktuelles Passwort ist falsch.', 'auth/too-many-requests': 'Zu viele Versuche. Bitte kurz warten.' };
+      errEl.textContent = msgs[e.code] || 'Fehler beim Ändern.'; errEl.style.display = 'block';
     }
   }
 
@@ -1214,7 +1214,7 @@
     const status = document.getElementById('locationStatus');
     if (!navigator.geolocation) {
       status.style.color = 'var(--red)'; status.style.display = 'block';
-      status.textContent = 'Standort wird von diesem Browser nicht unterstuetzt.'; return;
+      status.textContent = 'Standort wird von diesem Browser nicht unterstützt.'; return;
     }
     btn.textContent = 'Standort wird ermittelt...'; btn.disabled = true;
     navigator.geolocation.getCurrentPosition(
