@@ -542,6 +542,16 @@
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
+      <div class="profil-section" style="margin-bottom:16px">
+        <div class="profil-row" onclick="showEditUsername()">
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="profil-row-label">Benutzername aendern</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="profil-row" onclick="showEditPassword()">
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><span class="profil-row-label">Passwort aendern</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
       <button class="logout-btn" onclick="handleLogout()">Ausloggen</button>
     </div>
     <nav class="bottom-nav">
@@ -550,6 +560,57 @@
       <div class="nav-item" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Eintrag</span></div>
       <div class="nav-item active"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profil</span></div>
     </nav>
+  </div>
+
+  <!-- BENUTZERNAME AENDERN -->
+  <div class="screen" id="screenEditUsername">
+    <div class="form-header">
+      <button class="form-back" onclick="showScreen('screenProfil')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="form-title">Benutzername</div>
+      <div class="form-sub">Oeffentlich sichtbar in der App</div>
+    </div>
+    <div class="form-body">
+      <div class="form-card">
+        <div class="form-card-title">Neuer Benutzername</div>
+        <div class="form-field">
+          <label class="field-label">Benutzername</label>
+          <input class="field-input" type="text" id="newUsername" placeholder="z.B. max_py" maxlength="30">
+          <div style="font-size:11px;color:var(--text-3);margin-top:4px">Min. 3 Zeichen, nur Buchstaben, Zahlen und _</div>
+        </div>
+        <div id="usernameChangeError" style="display:none;background:var(--red-light);color:var(--red);padding:10px 14px;border-radius:10px;font-size:13px;margin-top:10px"></div>
+        <div id="usernameChangeSuccess" style="display:none;background:var(--green-light);color:var(--green);padding:10px 14px;border-radius:10px;font-size:13px;margin-top:10px"></div>
+      </div>
+      <button class="form-submit" onclick="saveUsername()">Speichern</button>
+    </div>
+  </div>
+
+  <!-- PASSWORT AENDERN -->
+  <div class="screen" id="screenEditPassword">
+    <div class="form-header">
+      <button class="form-back" onclick="showScreen('screenProfil')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="form-title">Passwort aendern</div>
+      <div class="form-sub">Mindestens 6 Zeichen</div>
+    </div>
+    <div class="form-body">
+      <div class="form-card">
+        <div class="form-card-title">Neues Passwort</div>
+        <div class="form-field">
+          <label class="field-label">Aktuelles Passwort</label>
+          <input class="field-input" type="password" id="currentPassword" placeholder="Dein aktuelles Passwort">
+        </div>
+        <div class="form-field">
+          <label class="field-label">Neues Passwort</label>
+          <input class="field-input" type="password" id="newPassword" placeholder="Min. 6 Zeichen" minlength="6">
+        </div>
+        <div class="form-field">
+          <label class="field-label">Neues Passwort wiederholen</label>
+          <input class="field-input" type="password" id="newPasswordConfirm" placeholder="Passwort bestaetigen">
+        </div>
+        <div id="passwordChangeError" style="display:none;background:var(--red-light);color:var(--red);padding:10px 14px;border-radius:10px;font-size:13px;margin-top:10px"></div>
+        <div id="passwordChangeSuccess" style="display:none;background:var(--green-light);color:var(--green);padding:10px 14px;border-radius:10px;font-size:13px;margin-top:10px"></div>
+      </div>
+      <button class="form-submit" onclick="savePassword()">Passwort aendern</button>
+    </div>
   </div>
 
 </div>
@@ -1054,6 +1115,77 @@
       await db.collection('comments').add({ listing_id: listingId, parent_id: parentId, user_id: currentUser.uid, user_name: name, body, created_at: new Date() });
       await loadComments(listingId);
     } catch(e) { alert('Fehler beim Speichern.'); }
+  }
+
+  function showEditUsername() {
+    document.getElementById('newUsername').value = document.getElementById('profilName').textContent || '';
+    document.getElementById('usernameChangeError').style.display = 'none';
+    document.getElementById('usernameChangeSuccess').style.display = 'none';
+    showScreen('screenEditUsername');
+  }
+
+  async function saveUsername() {
+    const username = document.getElementById('newUsername').value.trim();
+    const errEl = document.getElementById('usernameChangeError');
+    const okEl = document.getElementById('usernameChangeSuccess');
+    errEl.style.display = 'none'; okEl.style.display = 'none';
+
+    if (!/^[a-zA-Z0-9_]{3,30}$/.test(username)) {
+      errEl.textContent = 'Min. 3 Zeichen, nur Buchstaben, Zahlen und _.';
+      errEl.style.display = 'block'; return;
+    }
+    const taken = await db.collection('users').where('username', '==', username).get();
+    const alreadyMine = taken.docs.length === 1 && taken.docs[0].id === currentUser.uid;
+    if (!taken.empty && !alreadyMine) {
+      errEl.textContent = 'Dieser Benutzername ist bereits vergeben.';
+      errEl.style.display = 'block'; return;
+    }
+    try {
+      await db.collection('users').doc(currentUser.uid).update({ username });
+      document.getElementById('profilName').textContent = username;
+      document.getElementById('headerAvatar').textContent = username.charAt(0).toUpperCase();
+      document.getElementById('profilAvatar').textContent = username.charAt(0).toUpperCase();
+      okEl.textContent = 'Benutzername erfolgreich geaendert!';
+      okEl.style.display = 'block';
+    } catch(e) {
+      errEl.textContent = 'Fehler beim Speichern.'; errEl.style.display = 'block';
+    }
+  }
+
+  function showEditPassword() {
+    ['currentPassword','newPassword','newPasswordConfirm'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('passwordChangeError').style.display = 'none';
+    document.getElementById('passwordChangeSuccess').style.display = 'none';
+    showScreen('screenEditPassword');
+  }
+
+  async function savePassword() {
+    const current = document.getElementById('currentPassword').value;
+    const newPw = document.getElementById('newPassword').value;
+    const confirm = document.getElementById('newPasswordConfirm').value;
+    const errEl = document.getElementById('passwordChangeError');
+    const okEl = document.getElementById('passwordChangeSuccess');
+    errEl.style.display = 'none'; okEl.style.display = 'none';
+
+    if (!current || !newPw || !confirm) {
+      errEl.textContent = 'Bitte alle Felder ausfullen.'; errEl.style.display = 'block'; return;
+    }
+    if (newPw.length < 6) {
+      errEl.textContent = 'Neues Passwort muss min. 6 Zeichen haben.'; errEl.style.display = 'block'; return;
+    }
+    if (newPw !== confirm) {
+      errEl.textContent = 'Passwoerter stimmen nicht ueberein.'; errEl.style.display = 'block'; return;
+    }
+    try {
+      const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, current);
+      await currentUser.reauthenticateWithCredential(credential);
+      await currentUser.updatePassword(newPw);
+      okEl.textContent = 'Passwort erfolgreich geaendert!'; okEl.style.display = 'block';
+      ['currentPassword','newPassword','newPasswordConfirm'].forEach(id => document.getElementById(id).value = '');
+    } catch(e) {
+      const msgs = { 'auth/wrong-password': 'Aktuelles Passwort ist falsch.', 'auth/too-many-requests': 'Zu viele Versuche. Bitte warte kurz.' };
+      errEl.textContent = msgs[e.code] || 'Fehler beim Aendern.'; errEl.style.display = 'block';
+    }
   }
 
   async function getUsername() {
