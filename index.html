@@ -8,6 +8,8 @@
   <meta name="apple-mobile-web-app-title" content="Buscar">
   <title>Buscar – Deutsche in Paraguay</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -217,25 +219,33 @@
     .admin-claim-reason { font-size: 13px; color: var(--text-2); line-height: 1.5; margin-bottom: 14px; background: var(--bg); padding: 10px 12px; border-radius: 10px; }
 
     /* KARTE */
-    .map-screen { background: var(--bg); overflow: hidden; }
+    .map-screen { background: var(--bg); overflow: hidden; display: flex; flex-direction: column; }
     .map-header { background: linear-gradient(135deg, var(--yellow) 0%, var(--yellow-dark) 100%); padding: 52px 20px 16px; flex-shrink: 0; }
     .map-header-title { font-size: 20px; font-weight: 700; color: white; margin-bottom: 4px; }
     .map-header-sub { font-size: 13px; color: rgba(255,255,255,0.8); }
-    .map-cats { display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; background: var(--card); border-bottom: 0.5px solid var(--border); }
-    .map-cats::-webkit-scrollbar { display: none; }
-    .map-cat { display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--bg); cursor: pointer; white-space: nowrap; font-size: 12px; font-weight: 500; color: var(--text-2); transition: all 0.18s; flex-shrink: 0; }
-    .map-cat.active { background: var(--yellow); border-color: var(--yellow); color: white; }
-    .map-container { flex: 1; position: relative; overflow: hidden; }
-    #mapIframe { width: 100%; height: 100%; border: none; }
-    .map-list { position: absolute; bottom: 80px; left: 0; right: 0; padding: 0 12px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+    .map-filters { background: var(--card); border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
+    .map-filter-row { display: flex; gap: 8px; padding: 10px 16px 6px; overflow-x: auto; scrollbar-width: none; }
+    .map-filter-row::-webkit-scrollbar { display: none; }
+    .map-chip { display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--bg); cursor: pointer; white-space: nowrap; font-size: 12px; font-weight: 500; color: var(--text-2); transition: all 0.18s; flex-shrink: 0; }
+    .map-chip.active { background: var(--yellow); border-color: var(--yellow); color: white; }
+    .map-chip.city-chip.active { background: var(--text-1); border-color: var(--text-1); color: white; }
+    .map-container { flex: 1; position: relative; min-height: 0; }
+    #leafletMap { width: 100%; height: 100%; }
+    .leaflet-popup-content-wrapper { border-radius: 14px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important; padding: 0 !important; overflow: hidden; }
+    .leaflet-popup-content { margin: 0 !important; width: auto !important; }
+    .map-popup { padding: 12px 16px; min-width: 160px; cursor: pointer; }
+    .map-popup-name { font-size: 14px; font-weight: 700; color: #1A1A1A; margin-bottom: 2px; font-family: 'DM Sans', sans-serif; }
+    .map-popup-city { font-size: 12px; color: #AAAAAA; font-family: 'DM Sans', sans-serif; }
+    .map-popup-cat { font-size: 11px; color: #D4841A; font-weight: 600; margin-top: 4px; font-family: 'DM Sans', sans-serif; }
+    .leaflet-popup-tip-container { display: none; }
+    .map-list { position: absolute; bottom: 80px; left: 0; right: 0; padding: 0 12px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; z-index: 500; }
     .map-list::-webkit-scrollbar { display: none; }
-    .map-card { background: var(--card); border-radius: 14px; padding: 12px 14px; min-width: 200px; box-shadow: var(--shadow-md); cursor: pointer; flex-shrink: 0; }
-    .map-card-name { font-size: 14px; font-weight: 600; color: var(--text-1); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
-    .map-card-city { font-size: 12px; color: var(--text-3); }
-    .map-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px; padding: 40px; text-align: center; }
-    .map-empty svg { width: 48px; height: 48px; stroke: var(--text-3); }
-    .map-empty-title { font-size: 15px; font-weight: 600; color: var(--text-2); }
-    .map-empty-sub { font-size: 13px; color: var(--text-3); }
+    .map-card { background: var(--card); border-radius: 14px; padding: 12px 14px; min-width: 180px; max-width: 220px; box-shadow: var(--shadow-md); cursor: pointer; flex-shrink: 0; border: 1.5px solid transparent; transition: border-color 0.15s; }
+    .map-card:active { border-color: var(--yellow); }
+    .map-card-name { font-size: 13px; font-weight: 700; color: var(--text-1); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .map-card-city { font-size: 11px; color: var(--text-3); margin-bottom: 4px; }
+    .map-card-cat { font-size: 11px; color: var(--yellow-dark); font-weight: 600; }
+    .map-no-coords { position: absolute; bottom: 80px; left: 16px; right: 16px; background: var(--card); border-radius: 12px; padding: 10px 14px; font-size: 12px; color: var(--text-2); text-align: center; z-index: 500; box-shadow: var(--shadow-sm); display: none; }
 
     /* FORM */
     .form-screen { background: var(--bg); overflow-y: auto; }
@@ -454,19 +464,23 @@
   <div class="screen map-screen" id="screenMap">
     <div class="map-header">
       <div class="map-header-title">Karte</div>
-      <div class="map-header-sub">Alle Orte in Paraguay</div>
+      <div class="map-header-sub" id="mapHeaderSub">Alle Orte in Paraguay</div>
     </div>
-    <div class="map-cats" id="mapCats">
-      <div class="map-cat active" data-cat="Alle">Alle</div>
-      <div class="map-cat" data-cat="kat-restaurants">Restaurants</div>
-      <div class="map-cat" data-cat="kat-dienstleistung">Dienstleistungen</div>
-      <div class="map-cat" data-cat="kat-orte">Orte</div>
-      <div class="map-cat" data-cat="kat-unterkunft">Unterkünfte</div>
-      <div class="map-cat" data-cat="kat-geschaefte">Geschäfte</div>
+    <div class="map-filters">
+      <div class="map-filter-row" id="mapCats">
+        <div class="map-chip active" data-cat="Alle">Alle</div>
+        <div class="map-chip" data-cat="kat-restaurants">Restaurants</div>
+        <div class="map-chip" data-cat="kat-dienstleistung">Dienst&shy;leistungen</div>
+        <div class="map-chip" data-cat="kat-orte">Orte</div>
+        <div class="map-chip" data-cat="kat-unterkunft">Unterkünfte</div>
+        <div class="map-chip" data-cat="kat-geschaefte">Geschäfte</div>
+      </div>
+      <div class="map-filter-row" id="mapCities"></div>
     </div>
     <div class="map-container">
-      <div id="mapContent" style="width:100%;height:100%;"></div>
+      <div id="leafletMap"></div>
       <div class="map-list" id="mapList"></div>
+      <div class="map-no-coords" id="mapNoCoords">Einige Orte haben noch keine Koordinaten</div>
     </div>
     <nav class="bottom-nav">
       <div class="nav-item" id="navHome2" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
@@ -999,25 +1013,125 @@
     loadFavoriteStatus(id);
   }
 
+  let leafletMap = null;
+  let leafletMarkers = [];
+  let mapCityFilter = 'Alle';
+
+  const catColors = {
+    'kat-restaurants': '#F5A623',
+    'kat-dienstleistung': '#3B82F6',
+    'kat-orte': '#22C55E',
+    'kat-unterkunft': '#8B5CF6',
+    'kat-geschaefte': '#EF4444',
+    'default': '#6B6B6B'
+  };
+
+  const catLabels = {
+    'kat-restaurants': 'Restaurant',
+    'kat-dienstleistung': 'Dienstleistung',
+    'kat-orte': 'Ort',
+    'kat-unterkunft': 'Unterkunft',
+    'kat-geschaefte': 'Geschäft',
+    'default': 'Ort'
+  };
+
+  function makeMarkerIcon(color) {
+    return L.divIcon({
+      className: '',
+      html: `<div style="width:32px;height:32px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -36]
+    });
+  }
+
+  function buildCityFilter() {
+    const cities = [...new Set(allListings.filter(l => l.city).map(l => l.city))].sort();
+    const container = document.getElementById('mapCities');
+    if (cities.length < 2) { container.style.display = 'none'; return; }
+    container.style.display = 'flex';
+    container.innerHTML = `<div class="map-chip city-chip active" data-city="Alle">Alle Städte</div>` +
+      cities.map(c => `<div class="map-chip city-chip" data-city="${c}">${c}</div>`).join('');
+    container.addEventListener('click', e => {
+      const chip = e.target.closest('.city-chip');
+      if (!chip) return;
+      container.querySelectorAll('.city-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      mapCityFilter = chip.dataset.city;
+      renderMap();
+    });
+  }
+
   function renderMap() {
-    const filtered = mapCategory === 'Alle' ? allListings : allListings.filter(l => l.category_id === mapCategory);
-    const withCoords = filtered.filter(l => l.lat && l.lng);
-    const content = document.getElementById('mapContent');
-    if (!withCoords.length) {
-      content.innerHTML = '<div class="map-empty"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><div class="map-empty-title">Keine Orte mit Koordinaten</div><div class="map-empty-sub">Fuege genaue Adressen bei neuen Einträgen hinzu.</div></div>';
-      document.getElementById('mapList').innerHTML = ''; return;
+    // Init Leaflet map once
+    if (!leafletMap) {
+      leafletMap = L.map('leafletMap', { zoomControl: true, attributionControl: false }).setView([-23.5, -57.5], 6);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap);
+      L.control.attribution({ prefix: '© OpenStreetMap' }).addTo(leafletMap);
     }
-    const center = withCoords[0];
-    const markers = withCoords.map(l => `${l.lat},${l.lng}(${encodeURIComponent(l.name||'Ort')})`).join('|');
-    const mapUrl = `https://maps.google.com/maps?q=${center.lat},${center.lng}&z=7&output=embed&markers=${markers}`;
-    content.innerHTML = `<iframe id="mapIframe" src="${mapUrl}" width="100%" height="100%" style="border:none;" allowfullscreen loading="lazy"></iframe>`;
-    document.getElementById('mapList').innerHTML = withCoords.map(l => `<div class="map-card" onclick="showDetail('${l.id}')"><div class="map-card-name">${l.name||''}</div><div class="map-card-city">${l.city||''}</div></div>`).join('');
+
+    // Build city filter once
+    if (!document.querySelector('.city-chip')) buildCityFilter();
+
+    // Clear existing markers
+    leafletMarkers.forEach(m => leafletMap.removeLayer(m));
+    leafletMarkers = [];
+
+    // Filter listings
+    let filtered = allListings;
+    if (mapCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === mapCategory);
+    if (mapCityFilter !== 'Alle') filtered = filtered.filter(l => l.city === mapCityFilter);
+
+    const withCoords = filtered.filter(l => l.lat && l.lng);
+    const noCoords = filtered.filter(l => !l.lat || !l.lng);
+
+    // Update header
+    document.getElementById('mapHeaderSub').textContent = withCoords.length + ' Orte auf der Karte';
+    document.getElementById('mapNoCoords').style.display = noCoords.length ? 'block' : 'none';
+
+    if (!withCoords.length) {
+      document.getElementById('mapList').innerHTML = '';
+      return;
+    }
+
+    // Add markers
+    withCoords.forEach(l => {
+      const color = catColors[l.category_id] || catColors['default'];
+      const marker = L.marker([l.lat, l.lng], { icon: makeMarkerIcon(color) });
+      marker.bindPopup(`
+        <div class="map-popup" onclick="showDetail('${l.id}')">
+          <div class="map-popup-name">${l.name||''}</div>
+          <div class="map-popup-city">${l.city||''}</div>
+          <div class="map-popup-cat">${catLabels[l.category_id]||'Ort'}</div>
+        </div>`, { closeButton: false, maxWidth: 220 });
+      marker.addTo(leafletMap);
+      leafletMarkers.push(marker);
+    });
+
+    // Fit bounds
+    if (withCoords.length === 1) {
+      leafletMap.setView([withCoords[0].lat, withCoords[0].lng], 14);
+    } else {
+      const bounds = L.latLngBounds(withCoords.map(l => [l.lat, l.lng]));
+      leafletMap.fitBounds(bounds, { padding: [40, 40] });
+    }
+
+    // Bottom cards
+    document.getElementById('mapList').innerHTML = withCoords.map(l => `
+      <div class="map-card" onclick="showDetail('${l.id}')">
+        <div class="map-card-name">${l.name||''}</div>
+        <div class="map-card-city">${l.city||''}</div>
+        <div class="map-card-cat">${catLabels[l.category_id]||''}</div>
+      </div>`).join('');
+
+    // Invalidate size after screen transition
+    setTimeout(() => leafletMap.invalidateSize(), 200);
   }
 
   document.getElementById('mapCats').addEventListener('click', e => {
-    const chip = e.target.closest('.map-cat');
-    if (!chip) return;
-    document.querySelectorAll('.map-cat').forEach(c => c.classList.remove('active'));
+    const chip = e.target.closest('.map-chip');
+    if (!chip || chip.classList.contains('city-chip')) return;
+    document.querySelectorAll('#mapCats .map-chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active'); mapCategory = chip.dataset.cat; renderMap();
   });
 
