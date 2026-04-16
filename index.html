@@ -399,6 +399,7 @@
         <div class="cat-chip" data-cat="kat-unterkunft">Unterkünfte</div>
         <div class="cat-chip" data-cat="kat-geschaefte">Geschäfte</div>
       </div>
+      <div class="cats-scroll" id="citiesScroll" style="padding-top:0;padding-bottom:4px"></div>
     </div>
     <div class="listings">
       <div class="section-title" id="sectionTitle">Alle Einträge</div>
@@ -783,7 +784,7 @@
   const auth = firebase.auth();
   const storage = firebase.storage();
 
-  let allListings = [], activeCategory = 'Alle', mapCategory = 'Alle', searchQuery = '', currentUser = null;
+  let allListings = [], activeCategory = 'Alle', mapCategory = 'Alle', activeCity = 'Alle', searchQuery = '', currentUser = null;
   let pendingFormPhotos = [];
   let ratingsCache = {};
 
@@ -965,15 +966,35 @@
       const snap = await db.collection('listings').where('verified', '==', true).get();
       allListings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       await loadAllRatings();
+      buildCityChips();
       renderListings();
     } catch (err) {
       document.getElementById('listingsInner').innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-title">Verbindungsfehler</div></div>';
     }
   }
 
+  function buildCityChips() {
+    const cities = ['Alle', ...[...new Set(allListings.filter(l => l.city).map(l => l.city))].sort()];
+    const scroll = document.getElementById('citiesScroll');
+    if (cities.length <= 2) { scroll.style.display = 'none'; return; }
+    scroll.style.display = 'flex';
+    scroll.innerHTML = cities.map(c =>
+      `<div class="cat-chip${c==='Alle'?' active':''}" data-city="${c}" style="font-size:12px;padding:5px 12px">${c==='Alle'?'🌍 Alle Städte':'📍 '+c}</div>`
+    ).join('');
+    scroll.addEventListener('click', e => {
+      const chip = e.target.closest('[data-city]');
+      if (!chip) return;
+      scroll.querySelectorAll('[data-city]').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeCity = chip.dataset.city;
+      renderListings();
+    });
+  }
+
   function renderListings() {
     let filtered = allListings;
     if (activeCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === activeCategory);
+    if (activeCity !== 'Alle') filtered = filtered.filter(l => l.city === activeCity);
     if (searchQuery) { const q = searchQuery.toLowerCase(); filtered = filtered.filter(l => (l.name||'').toLowerCase().includes(q)||(l.description||'').toLowerCase().includes(q)||(l.city||'').toLowerCase().includes(q)); }
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = activeCategory === 'Alle' ? filtered.length + ' Einträge' : filtered.length + ' Ergebnisse';
@@ -1045,19 +1066,36 @@
     });
   }
 
+  // City coords for map zoom
+  const mapCityCoords = {
+    "Asunción": [-25.2867, -57.6470], "San Lorenzo": [-25.3333, -57.5167],
+    "Luque": [-25.2667, -57.4833], "Capiatá": [-25.3500, -57.4500],
+    "Lambaré": [-25.3500, -57.6167], "San Bernardino": [-25.2933, -57.2847],
+    "Caacupé": [-25.3833, -57.1333], "Ciudad del Este": [-25.5096, -54.6112],
+    "Encarnación": [-27.3306, -55.8658], "Concepción": [-23.4167, -57.4333],
+    "Pedro Juan Caballero": [-22.5500, -55.7333], "Coronel Oviedo": [-25.4500, -56.4333],
+    "Villarrica": [-25.7500, -56.4333], "Pilar": [-26.8667, -58.3000],
+    "Filadelfia": [-22.3500, -60.0333], "Loma Plata": [-22.3833, -59.8500],
+    "Hohenau": [-27.0833, -55.6333], "Obligado": [-27.2333, -55.6167],
+  };
+
   function buildCityFilter() {
     const cities = [...new Set(allListings.filter(l => l.city).map(l => l.city))].sort();
     const container = document.getElementById('mapCities');
     if (cities.length < 2) { container.style.display = 'none'; return; }
     container.style.display = 'flex';
-    container.innerHTML = `<div class="map-chip city-chip active" data-city="Alle">Alle Städte</div>` +
-      cities.map(c => `<div class="map-chip city-chip" data-city="${c}">${c}</div>`).join('');
+    container.innerHTML = `<div class="map-chip city-chip active" data-city="Alle">🌍 Alle</div>` +
+      cities.map(c => `<div class="map-chip city-chip" data-city="${c}">📍 ${c}</div>`).join('');
     container.addEventListener('click', e => {
       const chip = e.target.closest('.city-chip');
       if (!chip) return;
       container.querySelectorAll('.city-chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
       mapCityFilter = chip.dataset.city;
+      if (mapCityFilter !== 'Alle' && leafletMap) {
+        const coords = mapCityCoords[mapCityFilter];
+        if (coords) leafletMap.setView(coords, 13);
+      }
       renderMap();
     });
   }
