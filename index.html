@@ -1423,7 +1423,6 @@
       progress.textContent = 'Profilbild gespeichert!';
       setTimeout(() => { progress.style.display = 'none'; }, 2500);
     } catch(e) {
-      alert('Upload Fehler: ' + e.code + ' / ' + e.message);
       progress.textContent = 'Fehler beim Hochladen.';
       setTimeout(() => { progress.style.display = 'none'; }, 2500);
     }
