@@ -1329,7 +1329,22 @@
     const ref = storage.ref('listings/' + listingId + '/' + filename);
 
     try {
-      const snap = await ref.put(file);
+      Der Upload schlägt also still fehl. Das Problem ist wahrscheinlich dass GitHub Pages HTTPS verwendet aber der Firebase Storage Upload durch CORS blockiert wird.
+
+Lass uns einen einfachen Test machen. Füge in GitHub direkt in der `uploadAvatar` Funktion nach `const snap = await ref.put(file);` eine `console.log` ein:
+
+Suche nach:
+```javascript
+const snap = await ref.put(file);
+```
+
+Ersetze mit:
+```javascript
+const snap = await ref.put(file);
+console.log('Upload snap:', snap);
+```
+
+Dann in Chrome Console schauen was erscheint wenn du ein Foto versuchst hochzuladen.
       const url = await snap.ref.getDownloadURL();
       const name = await getUsername();
       await db.collection('listing_photos').add({
