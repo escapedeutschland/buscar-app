@@ -973,12 +973,39 @@
     }
   }
 
+  const ALL_PY_CITIES = [
+    'Alle',
+    // Großraum Asunción
+    'Asunción','San Lorenzo','Luque','Capiatá','Lambaré','Fernando de la Mora',
+    'Limpio','Nemby','Mariano Roque Alonso','Villa Elisa','Itauguá','Areguá',
+    'Itá','San Antonio','Ypané','Guarambaré','Nueva Italia',
+    // Cordillera
+    'San Bernardino','Caacupé','Altos','Tobatí','Emboscada','Piribebuy','Eusebio Ayala',
+    // Alto Paraná
+    'Ciudad del Este','Hernandarias','Minga Guazú','Presidente Franco','Naranjal',
+    // Itapúa
+    'Encarnación','Hohenau','Obligado','Bella Vista Sur','Fram','Trinidad',
+    'Coronel Bogado','Natalio','Capitán Miranda',
+    // Caaguazú / Guairá / Paraguarí
+    'Coronel Oviedo','Caaguazú','Villarrica','Paraguarí','Caazapá',
+    // Concepción / Norte
+    'Concepción','Pedro Juan Caballero','Horqueta','Bella Vista Norte',
+    // Misiones / Ñeembucú
+    'Pilar','San Ignacio','San Juan Bautista','Ayolas',
+    // Amambay / Canindeyú
+    'Capitán Bado','Salto del Guairá','Curuguaty',
+    // San Pedro
+    'San Pedro','Lima',
+    // Chaco
+    'Filadelfia','Loma Plata','Neuland','Mariscal Estigarribia','Benjamín Aceval',
+    // Alto Paraguay
+    'Fuerte Olimpo','Puerto Casado',
+  ];
+
   function buildCityChips() {
-    const cities = ['Alle', ...[...new Set(allListings.filter(l => l.city).map(l => l.city))].sort()];
     const scroll = document.getElementById('citiesScroll');
-    if (cities.length <= 2) { scroll.style.display = 'none'; return; }
     scroll.style.display = 'flex';
-    scroll.innerHTML = cities.map(c =>
+    scroll.innerHTML = ALL_PY_CITIES.map(c =>
       `<div class="cat-chip${c==='Alle'?' active':''}" data-city="${c}" style="font-size:12px;padding:5px 12px">${c==='Alle'?'🌍 Alle Städte':'📍 '+c}</div>`
     ).join('');
     scroll.addEventListener('click', e => {
