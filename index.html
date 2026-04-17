@@ -210,7 +210,7 @@
     .filter-btn svg { width: 13px; height: 13px; stroke: var(--text-2); fill: none; }
     .filter-btn.active { background: var(--text-1); border-color: var(--text-1); color: white; }
     .filter-btn.active svg { stroke: white; }
-    .filter-sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 300; display: none; align-items: flex-end; justify-content: center; }
+    .filter-sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
     .filter-sheet-overlay.visible { display: flex; }
     .filter-sheet { background: var(--card); border-radius: 24px 24px 0 0; width: 100%; max-width: 430px; padding: 0 0 32px; }
     .filter-sheet-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 20px; }
@@ -260,7 +260,7 @@
     .city-picker-label { flex: 1; font-size: 14px; color: var(--text-3); font-weight: 500; }
     .city-picker-btn.active .city-picker-label { color: var(--yellow-dark); font-weight: 600; }
     .city-picker-clear { width: 20px; height: 20px; border-radius: 50%; background: var(--yellow); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; color: white; flex-shrink: 0; }
-    .city-sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 300; display: none; align-items: flex-end; justify-content: center; }
+    .city-sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
     .city-sheet-overlay.visible { display: flex; }
     .city-sheet { background: var(--card); border-radius: 24px 24px 0 0; width: 100%; max-width: 430px; max-height: 80vh; display: flex; flex-direction: column; padding-bottom: 24px; }
     .city-sheet-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 16px; }
@@ -2500,7 +2500,7 @@
 
   function showClaimForm(listingId, listingName) {
     const html = `
-      <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:200;display:flex;align-items:flex-end" id="claimOverlay" onclick="if(event.target.id==='claimOverlay')closeClaimForm()">
+      <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:flex-end" id="claimOverlay" onclick="if(event.target.id==='claimOverlay')closeClaimForm()">
         <div style="background:var(--card);border-radius:24px 24px 0 0;padding:24px;width:100%;max-width:430px;margin:0 auto">
           <div style="font-size:18px;font-weight:700;margin-bottom:6px">Inhaber-Anfrage</div>
           <div style="font-size:13px;color:var(--text-2);margin-bottom:16px">${listingName}</div>
@@ -2715,11 +2715,13 @@
     document.getElementById('mapCitySheetOverlay').classList.add('visible');
     document.getElementById('mapCitySearchInput').value = '';
     renderMapCitySheet('');
+    if (leafletMap) leafletMap.scrollWheelZoom.disable();
     setTimeout(() => document.getElementById('mapCitySearchInput').focus(), 100);
   }
 
   function closeMapCitySheet() {
     document.getElementById('mapCitySheetOverlay').classList.remove('visible');
+    if (leafletMap) leafletMap.scrollWheelZoom.enable();
   }
 
   function renderMapCitySheet(query) {
@@ -2760,6 +2762,7 @@
   }
 
   function openMapFilterSheet(mode) {
+    if (leafletMap) leafletMap.scrollWheelZoom.disable();
     mapFilterMode = mode;
     const overlay = document.getElementById('mapFilterSheetOverlay');
     const content = document.getElementById('mapFilterSheetContent');
@@ -2798,6 +2801,7 @@
 
   function closeMapFilterSheet() {
     document.getElementById('mapFilterSheetOverlay').classList.remove('visible');
+    if (leafletMap) leafletMap.scrollWheelZoom.enable();
   }
 
   function applyMapFilter() {
