@@ -226,6 +226,14 @@
     .filter-apply-btn { margin: 0 20px; width: calc(100% - 40px); padding: 16px; background: var(--yellow); color: white; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
     .filter-divider { height: 0.5px; background: var(--border); margin: 0 20px 20px; }
 
+    /* TRANSLATE */
+    .translate-btn { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; padding: 4px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--text-3); cursor: pointer; transition: all 0.15s; }
+    .translate-btn:active { background: var(--yellow-light); color: var(--yellow-dark); border-color: var(--yellow); }
+    .translate-btn svg { width: 11px; height: 11px; stroke: currentColor; fill: none; }
+    .translated-text { font-size: 13px; color: var(--text-2); line-height: 1.55; margin-top: 6px; padding: 8px 12px; background: var(--yellow-light); border-radius: 10px; border-left: 3px solid var(--yellow); display: none; }
+    .translated-text.visible { display: block; }
+    .translate-source { font-size: 10px; color: var(--text-3); margin-top: 4px; }
+
     /* CITY PICKER */
     .city-picker-btn { display: flex; align-items: center; gap: 8px; margin: 0 16px 10px; padding: 10px 14px; background: var(--card); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; border: 1.5px solid var(--border); transition: border-color 0.2s; }
     .city-picker-btn.active { border-color: var(--yellow); background: var(--yellow-light); }
@@ -396,12 +404,12 @@
     <div class="auth-header">
       <div class="auth-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></div>
       <div class="auth-logo-name">Buscar</div>
-      <div class="auth-tagline">Deutsche in Paraguay</div>
+      <div class="auth-tagline" data-i18n="tagline">Deutsche in Paraguay</div>
     </div>
     <div class="auth-body">
       <div class="auth-tabs">
-        <div class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Einloggen</div>
-        <div class="auth-tab" id="tabRegister" onclick="switchTab('register')">Registrieren</div>
+        <div class="auth-tab active" id="tabLogin" onclick="switchTab('login')" data-i18n="login">Einloggen</div>
+        <div class="auth-tab" id="tabRegister" onclick="switchTab('register')" data-i18n="register">Registrieren</div>
       </div>
       <div id="authError" class="auth-error"></div>
       <form class="auth-form" id="formLogin" onsubmit="handleLogin(event)">
@@ -433,7 +441,10 @@
     <div class="header">
       <div class="header-top">
         <div class="logo"><div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></div><span class="logo-name">Buscar</span></div>
-        <div class="header-avatar" id="headerAvatar" onclick="setNav('navProfil');showScreen('screenProfil')">?</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button id="langToggle" onclick="toggleLang()" style="background:rgba(255,255,255,0.22);border:1.5px solid rgba(255,255,255,0.4);border-radius:20px;padding:5px 12px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:white;cursor:pointer;letter-spacing:0.5px">ES</button>
+          <div class="header-avatar" id="headerAvatar" onclick="setNav('navProfil');showScreen('screenProfil')">?</div>
+        </div>
       </div>
       <div class="header-hero">
         <div class="header-greeting" id="headerGreeting">Guten Tag</div>
@@ -450,25 +461,25 @@
     <div id="filterBar" class="filter-bar" style="display:none">
       <button class="filter-btn" id="filterSubBtn" onclick="openFilterSheet('sub')">
         <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        <span id="filterSubLabel">Unterkategorie</span>
+        <span id="filterSubLabel" data-i18n="subcategory">Unterkategorie</span>
       </button>
       <button class="filter-btn" id="filterStarBtn" onclick="openFilterSheet('stars')">
         <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <span id="filterStarLabel">Bewertung</span>
+        <span id="filterStarLabel" data-i18n="rating_filter">Bewertung</span>
       </button>
     </div>
     <div class="cats-wrap">
       <div class="cats-scroll" id="catsScroll">
-        <div class="cat-chip active" data-cat="Alle">Alle</div>
-        <div class="cat-chip" data-cat="kat-restaurants">Restaurants</div>
-        <div class="cat-chip" data-cat="kat-dienstleistung">Dienstleistungen</div>
-        <div class="cat-chip" data-cat="kat-orte">Orte</div>
-        <div class="cat-chip" data-cat="kat-unterkunft">Unterkünfte</div>
-        <div class="cat-chip" data-cat="kat-geschaefte">Geschäfte</div>
+        <div class="cat-chip active" data-cat="Alle" data-i18n="cat_all">Alle</div>
+        <div class="cat-chip" data-cat="kat-restaurants" data-i18n="cat_restaurants">Restaurants</div>
+        <div class="cat-chip" data-cat="kat-dienstleistung" data-i18n="cat_services">Dienstleistungen</div>
+        <div class="cat-chip" data-cat="kat-orte" data-i18n="cat_places">Orte</div>
+        <div class="cat-chip" data-cat="kat-unterkunft" data-i18n="cat_accommodation">Unterkünfte</div>
+        <div class="cat-chip" data-cat="kat-geschaefte" data-i18n="cat_shops">Geschäfte</div>
       </div>
       <div id="cityPickerBtn" class="city-picker-btn" onclick="openCitySheet()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span class="city-picker-label" id="cityPickerLabel">Stadt wählen...</span>
+        <span class="city-picker-label" id="cityPickerLabel" data-i18n="city_select">Stadt wählen...</span>
       </div>
     </div>
     <div class="listings">
@@ -480,10 +491,10 @@
       </div>
     </div>
     <nav class="bottom-nav">
-      <div class="nav-item active" id="navHome" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
-      <div class="nav-item" id="navMap" onclick="setNav('navMap');showScreen('screenMap');renderMap()"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span>Karte</span></div>
-      <div class="nav-item" id="navForm" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Eintrag</span></div>
-      <div class="nav-item" id="navProfil" onclick="setNav('navProfil');showScreen('screenProfil')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profil</span></div>
+      <div class="nav-item active" id="navHome" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span data-i18n="nav_home">Home</span></div>
+      <div class="nav-item" id="navMap" onclick="setNav('navMap');showScreen('screenMap');renderMap()"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span data-i18n="nav_map">Karte</span></div>
+      <div class="nav-item" id="navForm" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span data-i18n="nav_entry">Eintrag</span></div>
+      <div class="nav-item" id="navProfil" onclick="setNav('navProfil');showScreen('screenProfil')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span data-i18n="nav_profile">Profil</span></div>
     </nav>
   </div>
 
@@ -498,7 +509,7 @@
     </div>
     <div class="detail-body">
       <div id="detailBadges" class="detail-card" style="display:none"><div class="detail-badge-row" id="detailBadgeRow"></div></div>
-      <div class="detail-card"><div class="detail-section-title">Beschreibung</div><div class="detail-desc" id="detailDesc">-</div></div>
+      <div class="detail-card"><div class="detail-section-title" data-i18n="description">Beschreibung</div><div class="detail-desc" id="detailDesc">-</div></div>
       <div class="detail-card" id="detailInfoCard" style="display:none"></div>
       <div class="detail-cta" id="detailCta"></div>
 
@@ -506,7 +517,7 @@
 
       <!-- BEWERTUNGEN -->
       <div class="detail-card" id="detailRatingsCard">
-        <div class="detail-section-title">Bewertungen</div>
+        <div class="detail-section-title" data-i18n="ratings">Bewertungen</div>
         <div id="ratingSummary"></div>
         <div id="reviewForm"></div>
         <div id="reviewsList"></div>
@@ -514,17 +525,17 @@
 
       <!-- FOTOS -->
       <div class="detail-card" id="detailPhotosCard">
-        <div class="detail-section-title">Fotos</div>
+        <div class="detail-section-title" data-i18n="photos">Fotos</div>
         <div class="photos-grid" id="photosGrid"></div>
         <div class="photo-upload-progress" id="photoProgress">Wird hochgeladen...</div>
       </div>
 
       <!-- KOMMENTARE -->
       <div class="detail-card" id="detailCommentsCard">
-        <div class="detail-section-title">Diskussion</div>
+        <div class="detail-section-title" data-i18n="discussion">Diskussion</div>
         <div id="commentsList"></div>
         <div class="comment-form">
-          <textarea class="comment-input" id="commentInput" placeholder="Schreib einen Kommentar..." rows="1"></textarea>
+          <textarea class="comment-input" id="commentInput" placeholder="Schreib einen Kommentar..." data-i18n-ph="comment_placeholder" rows="1"></textarea>
           <button class="comment-send" onclick="submitComment()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
         </div>
       </div>
@@ -534,8 +545,8 @@
   <!-- KARTE -->
   <div class="screen map-screen" id="screenMap">
     <div class="map-header">
-      <div class="map-header-title">Karte</div>
-      <div class="map-header-sub" id="mapHeaderSub">Alle Orte in Paraguay</div>
+      <div class="map-header-title" data-i18n="map_title">Karte</div>
+      <div class="map-header-sub" id="mapHeaderSub" data-i18n="map_sub_all">Alle Orte in Paraguay</div>
     </div>
     <div class="map-filters">
       <div class="map-filter-row" id="mapCats">
@@ -565,8 +576,8 @@
   <div class="screen form-screen" id="screenForm">
     <div class="form-header">
       <button class="form-back" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <div class="form-title">Eintrag vorschlagen</div>
-      <div class="form-sub">Wird nach Prüfung veröffentlicht</div>
+      <div class="form-title" data-i18n="suggest_entry">Eintrag vorschlagen</div>
+      <div class="form-sub" data-i18n="after_review">Wird nach Prüfung veröffentlicht</div>
     </div>
     <div class="form-body">
       <div class="form-rules">
@@ -651,7 +662,7 @@
         <div style="font-size:11px;color:var(--text-3)">Fotos helfen bei der Prüfung und werden nach Genehmigung sichtbar.</div>
         <div id="formPhotoProgress" style="font-size:12px;color:var(--text-2);margin-top:6px;display:none"></div>
       </div>
-      <button class="form-submit" id="formSubmitBtn" onclick="submitListing()">Eintrag einreichen</button>
+      <button class="form-submit" id="formSubmitBtn" onclick="submitListing()" data-i18n="submit_btn">Eintrag einreichen</button>
     </div>
   </div>
 
@@ -684,25 +695,25 @@
     <div class="profil-body">
       <div class="profil-section">
         <div class="profil-row" onclick="setNav('navHome');showScreen('screenHome')">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><span class="profil-row-label">Zur Startseite</span></div>
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><span class="profil-row-label" data-i18n="to_home">Zur Startseite</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
         <div class="profil-row" onclick="setNav('navForm');showScreen('screenForm')">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div><span class="profil-row-label">Eintrag vorschlagen</span></div>
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div><span class="profil-row-label" data-i18n="suggest_entry_prof">Eintrag vorschlagen</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
         <div class="profil-row" id="adminRow" style="display:none" onclick="loadAdmin()">
-          <div class="profil-row-left"><div class="profil-row-icon dark"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="profil-row-label">Admin Panel</span></div>
+          <div class="profil-row-left"><div class="profil-row-icon dark"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="profil-row-label" data-i18n="admin_panel">Admin Panel</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
       <div class="profil-section" style="margin-bottom:16px">
         <div class="profil-row" onclick="showEditUsername()">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="profil-row-label">Benutzername ändern</span></div>
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="profil-row-label" data-i18n="change_username">Benutzername ändern</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
         <div class="profil-row" onclick="showEditPassword()">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><span class="profil-row-label">Passwort ändern</span></div>
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><span class="profil-row-label" data-i18n="change_password">Passwort ändern</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
@@ -712,12 +723,12 @@
             <div class="profil-row-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             </div>
-            <span class="profil-row-label">Meine Favoriten</span>
+            <span class="profil-row-label" data-i18n="my_favorites">Meine Favoriten</span>
           </div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
-      <button class="logout-btn" onclick="handleLogout()">Ausloggen</button>
+      <button class="logout-btn" onclick="handleLogout()" data-i18n="logout">Ausloggen</button>
     </div>
     <nav class="bottom-nav">
       <div class="nav-item" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
@@ -876,6 +887,210 @@
 </div>
 <script>
   const ADMIN_EMAIL = 'DEINE-EMAIL@gmail.com';
+
+  let currentLang = localStorage.getItem('buscar_lang') || 'de';
+
+  const translations = {
+    de: {
+      // Navigation
+      nav_home: 'Home', nav_map: 'Karte', nav_entry: 'Eintrag', nav_profile: 'Profil',
+      // Header
+      greet_morning: 'Guten Morgen', greet_day: 'Guten Tag', greet_evening: 'Guten Abend', greet_night: 'Gute Nacht',
+      header_sub: 'Was suchst du heute?',
+      // Search
+      search_placeholder: 'Arzt, Restaurant, Anwalt...',
+      // Categories
+      cat_all: 'Alle', cat_restaurants: 'Restaurants', cat_services: 'Dienstleistungen',
+      cat_places: 'Orte', cat_accommodation: 'Unterkünfte', cat_shops: 'Geschäfte',
+      // City picker
+      city_select: 'Stadt wählen...', city_all: '🌍 Alle Städte',
+      // Listings
+      entries_all: 'Einträge', results: 'Ergebnisse',
+      nothing_found: 'Nichts gefunden', nothing_found_sub: 'Versuch einen anderen Suchbegriff',
+      verified: 'Geprüft',
+      // Detail
+      description: 'Beschreibung', no_description: 'Keine Beschreibung.',
+      phone: 'Telefon', website: 'Website', hours: 'Öffnungszeiten', address: 'Adresse',
+      call: 'Anrufen', route: 'Route',
+      ratings: 'Bewertungen', discussion: 'Diskussion', photos: 'Fotos',
+      no_ratings: 'Noch keine Bewertungen',
+      rate_now: 'Bewertung abgeben', rate_submit: 'Bewertung abschicken',
+      rate_optional: 'Deine Erfahrung (optional)',
+      your_rating: 'Deine Bewertung', edit: 'Bearbeiten', delete: 'Löschen',
+      reply: 'Antworten', comment_placeholder: 'Schreib einen Kommentar...',
+      add_photo: 'Foto hinzufügen', uploading: 'Wird hochgeladen...',
+      claim_btn: 'Ich bin der Inhaber dieses Ortes',
+      claim_info: 'Als verifizierter Inhaber kannst du diesen Eintrag selbst verwalten.',
+      owner_badge: t('owner_badge'), pending_claim: t('pending_claim'),
+      edit_entry: t('edit_entry'),
+      // Form
+      suggest_entry: 'Eintrag vorschlagen', after_review: 'Wird nach Prüfung veröffentlicht',
+      rules_title: 'Regeln für Einträge',
+      rule1: '• Keine Emojis im Titel', rule2: '• Name: max. 60 Zeichen',
+      rule3: '• Beschreibung: min. 50, max. 500 Zeichen',
+      rule4: '• Nur echte Orte in Paraguay', rule5: '• Keine Werbung oder Spam',
+      name_label: 'Name des Ortes *', cat_label: 'Kategorie *', city_label: 'Stadt *',
+      cat_choose: 'Bitte wählen...', cat_rest: 'Restaurants und Cafés',
+      cat_serv: 'Dienstleistungen', cat_place: 'Orte und Sehenswürdigkeiten',
+      cat_accom: 'Unterkünfte', cat_shop: 'Geschäfte und Märkte',
+      desc_label: 'Deine Erfahrung *',
+      desc_placeholder: 'Beschreibe den Ort für andere Deutsche. Was macht ihn besonders? Worauf sollte man achten?',
+      contact_optional: 'Kontakt (optional)',
+      tel_label: 'Telefon', web_label: 'Website', addr_label: 'Adresse', hours_label: 'Öffnungszeiten',
+      location_btn: 'Meinen Standort verwenden', location_saved: 'Standort gespeichert',
+      photos_optional: 'Fotos (optional, max. 3)',
+      photos_hint: 'Fotos helfen bei der Prüfung und werden nach Genehmigung sichtbar.',
+      submit_btn: 'Eintrag einreichen', submitting: 'Wird eingereicht...',
+      submit_success: 'Danke! Dein Eintrag wurde eingereicht und wird geprüft.',
+      fill_all: 'Bitte alle Pflichtfelder ausfüllen.',
+      // Auth
+      login: 'Einloggen', register: 'Registrieren', logout: 'Ausloggen',
+      email_label: 'E-Mail', password_label: 'Passwort', name_auth: 'Name',
+      username_label: 'Benutzername *',
+      username_hint: 'Wird öffentlich angezeigt. Nur Buchstaben, Zahlen und _',
+      create_account: 'Konto erstellen', logging_in: 'Einloggen...',
+      forgot_pw: 'Passwort vergessen?', no_account: 'Noch kein Konto?',
+      has_account: 'Schon ein Konto?',
+      tagline: 'Deutsche in Paraguay',
+      // Profile
+      to_home: 'Zur Startseite', suggest_entry_prof: 'Eintrag vorschlagen',
+      admin_panel: 'Admin Panel', change_username: 'Benutzername ändern',
+      change_password: 'Passwort ändern', my_favorites: 'Meine Favoriten',
+      // Map
+      map_title: 'Karte', map_sub_all: 'Alle Orte in Paraguay',
+      // Filter
+      subcategory: 'Unterkategorie', rating_filter: 'Bewertung',
+      filter_title_sub: 'Unterkategorie', filter_title_stars: 'Mindest-Bewertung',
+      min_stars: 'Minimum Sterne', stars_all: 'Alle',
+      apply_filter: 'Anwenden',
+    },
+    es: {
+      // Navegación
+      nav_home: 'Inicio', nav_map: 'Mapa', nav_entry: 'Agregar', nav_profile: 'Perfil',
+      // Encabezado
+      greet_morning: 'Buenos días', greet_day: 'Buenas tardes', greet_evening: 'Buenas tardes', greet_night: 'Buenas noches',
+      header_sub: '¿Qué estás buscando?',
+      // Búsqueda
+      search_placeholder: 'Médico, Restaurante, Abogado...',
+      // Categorías
+      cat_all: 'Todos', cat_restaurants: 'Restaurantes', cat_services: 'Servicios',
+      cat_places: 'Lugares', cat_accommodation: 'Alojamientos', cat_shops: 'Tiendas',
+      // Selector de ciudad
+      city_select: 'Seleccionar ciudad...', city_all: '🌍 Todas las ciudades',
+      // Listados
+      entries_all: 'Resultados', results: 'Resultados',
+      nothing_found: 'Sin resultados', nothing_found_sub: 'Prueba otro término de búsqueda',
+      verified: 'Verificado',
+      // Detalle
+      description: 'Descripción', no_description: 'Sin descripción.',
+      phone: 'Teléfono', website: 'Sitio web', hours: 'Horario', address: 'Dirección',
+      call: 'Llamar', route: 'Ruta',
+      ratings: 'Valoraciones', discussion: 'Comentarios', photos: 'Fotos',
+      no_ratings: 'Sin valoraciones aún',
+      rate_now: 'Dejar valoración', rate_submit: 'Enviar valoración',
+      rate_optional: 'Tu experiencia (opcional)',
+      your_rating: 'Tu valoración', edit: 'Editar', delete: 'Eliminar',
+      reply: 'Responder', comment_placeholder: 'Escribe un comentario...',
+      add_photo: 'Agregar foto', uploading: 'Subiendo...',
+      claim_btn: 'Soy el propietario de este lugar',
+      claim_info: 'Como propietario verificado puedes gestionar este listado.',
+      owner_badge: '⭐ Propietario verificado', pending_claim: '✓ Tu solicitud está siendo revisada...',
+      edit_entry: 'Editar listado',
+      // Formulario
+      suggest_entry: 'Sugerir lugar', after_review: 'Se publicará tras revisión',
+      rules_title: 'Reglas para listados',
+      rule1: '• Sin emojis en el título', rule2: '• Nombre: máx. 60 caracteres',
+      rule3: '• Descripción: mín. 50, máx. 500 caracteres',
+      rule4: '• Solo lugares reales en Paraguay', rule5: '• Sin publicidad ni spam',
+      name_label: 'Nombre del lugar *', cat_label: 'Categoría *', city_label: 'Ciudad *',
+      cat_choose: 'Seleccionar...', cat_rest: 'Restaurantes y Cafés',
+      cat_serv: 'Servicios', cat_place: 'Lugares y Atracciones',
+      cat_accom: 'Alojamientos', cat_shop: 'Tiendas y Mercados',
+      desc_label: 'Tu experiencia *',
+      desc_placeholder: 'Describe el lugar. ¿Qué lo hace especial? ¿Qué hay que tener en cuenta?',
+      contact_optional: 'Contacto (opcional)',
+      tel_label: 'Teléfono', web_label: 'Sitio web', addr_label: 'Dirección', hours_label: 'Horario',
+      location_btn: 'Usar mi ubicación', location_saved: 'Ubicación guardada',
+      photos_optional: 'Fotos (opcional, máx. 3)',
+      photos_hint: 'Las fotos ayudan en la revisión y serán visibles tras aprobación.',
+      submit_btn: 'Enviar listado', submitting: 'Enviando...',
+      submit_success: '¡Gracias! Tu listado fue enviado y será revisado.',
+      fill_all: 'Por favor completa todos los campos obligatorios.',
+      // Auth
+      login: 'Iniciar sesión', register: 'Registrarse', logout: 'Cerrar sesión',
+      email_label: 'Correo electrónico', password_label: 'Contraseña', name_auth: 'Nombre',
+      username_label: 'Nombre de usuario *',
+      username_hint: 'Visible públicamente. Solo letras, números y _',
+      create_account: 'Crear cuenta', logging_in: 'Iniciando...',
+      forgot_pw: '¿Olvidaste tu contraseña?', no_account: '¿No tienes cuenta?',
+      has_account: '¿Ya tienes cuenta?',
+      tagline: 'Alemanes en Paraguay',
+      // Perfil
+      to_home: 'Ir al inicio', suggest_entry_prof: 'Sugerir lugar',
+      admin_panel: 'Panel admin', change_username: 'Cambiar usuario',
+      change_password: 'Cambiar contraseña', my_favorites: 'Mis favoritos',
+      // Mapa
+      map_title: 'Mapa', map_sub_all: 'Todos los lugares en Paraguay',
+      // Filtros
+      subcategory: 'Subcategoría', rating_filter: 'Valoración',
+      filter_title_sub: 'Subcategoría', filter_title_stars: 'Valoración mínima',
+      min_stars: 'Estrellas mínimas', stars_all: 'Todas',
+      apply_filter: 'Aplicar',
+    }
+  };
+
+  function t(key) {
+    return (translations[currentLang] && translations[currentLang][key]) || translations['de'][key] || key;
+  }
+
+  function toggleLang() {
+    currentLang = currentLang === 'de' ? 'es' : 'de';
+    localStorage.setItem('buscar_lang', currentLang);
+    applyLang();
+  }
+
+  function applyLang() {
+    const btn = document.getElementById('langToggle');
+    if (btn) btn.textContent = currentLang === 'de' ? 'ES' : 'DE';
+
+    // Update all elements with data-i18n
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      el.textContent = t(key);
+    });
+
+    // Update placeholders
+    document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+      el.placeholder = t(el.getAttribute('data-i18n-ph'));
+    });
+
+    // Dynamic updates
+    const greeting = document.getElementById('headerGreeting');
+    const headerSub = document.querySelector('.header-sub');
+    if (greeting) updateGreeting();
+    if (headerSub) headerSub.textContent = t('header_sub');
+
+    const cityLabel = document.getElementById('cityPickerLabel');
+    if (cityLabel && cityLabel.textContent !== t('city_select')) {
+      // keep selected city name, don't overwrite
+    } else if (cityLabel) {
+      cityLabel.textContent = t('city_select');
+    }
+
+    // Section titles in detail
+    document.querySelectorAll('.detail-section-title').forEach(el => {
+      const txt = el.textContent.trim();
+      if (txt === 'Bewertungen' || txt === 'Valoraciones') el.textContent = t('ratings');
+      if (txt === 'Diskussion' || txt === 'Comentarios') el.textContent = t('discussion');
+      if (txt === 'Fotos') el.textContent = t('photos');
+      if (txt === 'Beschreibung' || txt === 'Descripción') el.textContent = t('description');
+    });
+
+    // Rerender listings to update badges etc
+    if (allListings.length) renderListings();
+  }
+
+
 
   const firebaseConfig = { apiKey: "AIzaSyC_nxQL9Jo0EPUCtyI8QvnnRVKRBPbREKU", authDomain: "paraguay-app-8beb3.firebaseapp.com", projectId: "paraguay-app-8beb3", storageBucket: "paraguay-app-8beb3.firebasestorage.app" };
   firebase.initializeApp(firebaseConfig);
@@ -1052,14 +1267,19 @@
     } else { showScreen('screenAuth'); }
   });
 
+  // Apply language on load
+  document.addEventListener('DOMContentLoaded', () => applyLang());
+
   function updateGreeting() {
+    const searchEl = document.querySelector('#searchInput');
+    if (searchEl) searchEl.placeholder = t('search_placeholder');
     const h = new Date().getHours();
     const el = document.getElementById('headerGreeting');
     if (!el) return;
-    if (h >= 5 && h < 12) el.textContent = 'Guten Morgen';
-    else if (h >= 12 && h < 18) el.textContent = 'Guten Tag';
-    else if (h >= 18 && h < 22) el.textContent = 'Guten Abend';
-    else el.textContent = 'Gute Nacht';
+    if (h >= 5 && h < 12) el.textContent = t('greet_morning');
+    else if (h >= 12 && h < 18) el.textContent = t('greet_day');
+    else if (h >= 18 && h < 22) el.textContent = t('greet_evening');
+    else el.textContent = t('greet_night');
   }
 
   function setAvatarDisplay(url, initial) {
@@ -1259,9 +1479,9 @@
     if (activeMinStars > 0) filtered = filtered.filter(l => { const avg = getAvgRating(l.id); return avg && avg >= activeMinStars; });
     if (searchQuery) { const q = searchQuery.toLowerCase(); filtered = filtered.filter(l => (l.name||'').toLowerCase().includes(q)||(l.description||'').toLowerCase().includes(q)||(l.city||'').toLowerCase().includes(q)); }
     const container = document.getElementById('listingsInner');
-    document.getElementById('sectionTitle').textContent = activeCategory === 'Alle' ? filtered.length + ' Einträge' : filtered.length + ' Ergebnisse';
-    if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">Nichts gefunden</div><div class="empty-sub">Versuch einen anderen Suchbegriff</div></div>'; return; }
-    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${l.verified?'<span class="badge-geprüft">Geprüft</span>':''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}</div>`:''}<div class="listing-desc">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+    document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
+    if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
+    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${l.verified?('<span class="badge-geprüft">'+t('verified')+'</span>'):''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}</div>`:''}<div class="listing-desc">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
   }
 
   function showDetail(id) {
@@ -1272,7 +1492,9 @@
     if (svg) { svg.style.width='34px'; svg.style.height='34px'; svg.style.stroke='white'; }
     document.getElementById('detailTitle').textContent = l.name||'';
     document.getElementById('detailCity').innerHTML = l.city?`<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}`:'';
-    document.getElementById('detailDesc').textContent = l.description||'Keine Beschreibung.';
+    const descEl = document.getElementById('detailDesc');
+    const descText = l.description || t('no_description');
+    descEl.innerHTML = descText + translateBtnHTML('desc_'+id, descText);
     const badges = document.getElementById('detailBadges');
     document.getElementById('detailBadgeRow').innerHTML = l.verified?'<span class="detail-badge green">Geprüft</span>':'';
     badges.style.display = l.verified?'block':'none';
@@ -1284,8 +1506,8 @@
     const infoCard = document.getElementById('detailInfoCard');
     infoCard.innerHTML = infoHTML; infoCard.style.display = infoHTML?'block':'none';
     let ctaHTML = '';
-    if (l.phone) ctaHTML += `<a class="detail-cta-btn primary" href="tel:${l.phone}"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>Anrufen</a>`;
-    if (l.lat && l.lng) ctaHTML += `<a class="detail-cta-btn secondary" href="https://maps.google.com/?q=${l.lat},${l.lng}" target="_blank"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Route</a>`;
+    if (l.phone) ctaHTML += `<a class="detail-cta-btn primary" href="tel:${l.phone}"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>'+t('call')+'</a>`;
+    if (l.lat && l.lng) ctaHTML += `<a class="detail-cta-btn secondary" href="https://maps.google.com/?q=${l.lat},${l.lng}" target="_blank"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>'+t('route')+'</a>`;
     document.getElementById('detailCta').innerHTML = ctaHTML;
     currentListingId = id;
     showScreen('screenDetail');
@@ -1465,7 +1687,7 @@
     if (hasEmoji(name)) { document.getElementById('nameError').classList.add('visible'); document.getElementById('newName').classList.add('error'); valid = false; } else { document.getElementById('newName').classList.remove('error'); }
     if (desc.length < 50) { document.getElementById('descError').classList.add('visible'); document.getElementById('newDesc').classList.add('error'); valid = false; } else { document.getElementById('newDesc').classList.remove('error'); }
     if (!isValidPhone(phone)) { document.getElementById('phoneError').classList.add('visible'); document.getElementById('newPhone').classList.add('error'); valid = false; } else { document.getElementById('newPhone').classList.remove('error'); }
-    if (!name || !cat || !city || !desc) { document.getElementById('formError').textContent = 'Bitte alle Pflichtfelder ausfüllen.'; document.getElementById('formError').classList.add('visible'); valid = false; }
+    if (!name || !cat || !city || !desc) { document.getElementById('formError').textContent = t('fill_all'); document.getElementById('formError').classList.add('visible'); valid = false; }
     if (!valid) return;
 
     const btn = document.getElementById('formSubmitBtn');
@@ -1473,7 +1695,7 @@
     try {
       const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: document.getElementById('newHours').value.trim()||null, lat: window._newLat||null, lng: window._newLng||null, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date() });
       if (pendingFormPhotos.length) await uploadFormPhotos(ref.id);
-      document.getElementById('formSuccess').classList.add('visible');
+      document.getElementById('formSuccess').textContent = t('submit_success'); document.getElementById('formSuccess').classList.add('visible');
       pendingFormPhotos = [];
       const grid2 = document.getElementById('formPhotoGrid');
       grid2.innerHTML = `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span></label><input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">`;
@@ -1617,7 +1839,7 @@
           <div class="rating-stars-small">${starsHTML(Math.round(avg),16)}</div>
           <div class="rating-count">${reviews.length} Bewertung${reviews.length!==1?'en':''}</div>
         </div>
-      </div>` : '<div style="padding:12px 16px;font-size:13px;color:var(--text-3)">Noch keine Bewertungen</div>';
+      </div>` : '<div style="padding:12px 16px;font-size:13px;color:var(--text-3)">'+t('no_ratings')+'</div>';
 
     if (myReview) {
       document.getElementById('reviewForm').innerHTML = `
@@ -1652,6 +1874,7 @@
           <div class="review-item-stars">${starsHTML(r.rating,12)}</div>
         </div>
         <div class="review-item-text">${r.comment}</div>
+        ${translateBtnHTML('rev_'+r.id, r.comment)}
         <div class="review-item-date">${formatDate(r.created_at)}</div>
       </div>`).join('');
   }
@@ -1696,6 +1919,7 @@
           </div>
         </div>
         <div class="comment-item-text">${c.body}</div>
+        ${translateBtnHTML('com_'+c.id, c.body)}
         <button class="comment-reply-btn" onclick="toggleReplyForm('${c.id}')">Antworten</button>
         ${cReplies.length ? `<div class="comment-replies">${cReplies.map(r => {
           const isOwnReply = myUid && r.user_id === myUid;
@@ -1705,6 +1929,7 @@
               ${isOwnReply ? trashIcon(r.id, listingId) : ''}
             </div>
             <div class="reply-item-text">${r.body}</div>
+            ${translateBtnHTML('rep_'+r.id, r.body)}
           </div>`;
         }).join('')}</div>` : ''}
         <div class="reply-form" id="replyForm_${c.id}">
@@ -2221,6 +2446,44 @@
     field.style.display = 'block';
     sel.innerHTML = '<option value="">Bitte wählen...</option>' +
       opts.filter(o => o !== 'Alle').map(o => `<option value="${o}">${o}</option>`).join('');
+  }
+
+  async function translateText(text, targetLang, btnEl, outputEl) {
+    if (btnEl.dataset.loading === 'true') return;
+    // If already translated, toggle visibility
+    if (outputEl.classList.contains('visible')) {
+      outputEl.classList.remove('visible');
+      btnEl.innerHTML = '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-2"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg> ' + (currentLang === 'de' ? 'Übersetzen' : 'Traducir');
+      return;
+    }
+    btnEl.dataset.loading = 'true';
+    btnEl.innerHTML = '⏳ ...';
+    try {
+      const langCode = targetLang === 'de' ? 'de' : 'es';
+      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=auto|${langCode}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const translated = data.responseData?.translatedText;
+      if (translated && translated !== text) {
+        outputEl.innerHTML = translated + '<div class="translate-source">MyMemory</div>';
+        outputEl.classList.add('visible');
+        btnEl.innerHTML = '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-2"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg> ' + (currentLang === 'de' ? 'Original' : 'Original');
+      } else {
+        btnEl.innerHTML = currentLang === 'de' ? '— kein Ergebnis' : '— sin resultado';
+      }
+    } catch(e) {
+      btnEl.innerHTML = currentLang === 'de' ? '— Fehler' : '— Error';
+    }
+    btnEl.dataset.loading = 'false';
+  }
+
+  function translateIcon() {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-2"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>';
+  }
+
+  function translateBtnHTML(id, text) {
+    const label = currentLang === 'de' ? 'Übersetzen' : 'Traducir';
+    return `<button class="translate-btn" id="tbtn_${id}" onclick="translateText('${text.replace(/'/g,"\'")}','${currentLang}',document.getElementById('tbtn_${id}'),document.getElementById('tout_${id}'))">${translateIcon()} ${label}</button><div class="translated-text" id="tout_${id}"></div>`;
   }
 
   function useMyLocation() {
