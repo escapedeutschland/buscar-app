@@ -1056,41 +1056,53 @@
     translateVisibleContent();
   }
 
+  async function detectAndTranslate(text, targetLang) {
+    // Try de->target first, if result looks same try es->target
+    const sourceLang = targetLang === 'es' ? 'de' : 'es';
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.substring(0,400))}&langpair=${sourceLang}|${targetLang}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const translated = data.responseData?.translatedText;
+    if (translated && !translated.includes('INVALID') && !translated.includes('QUERY') && translated !== text) {
+      return translated;
+    }
+    return null;
+  }
+
   async function translateVisibleContent() {
     const btn = document.getElementById('langToggle');
     const origText = btn.textContent;
     btn.textContent = '⏳';
     btn.disabled = true;
 
-    // Collect all user-generated text elements
-    const elements = [
-      ...document.querySelectorAll('[data-original]'),
-      document.getElementById('detailDesc'),
-    ].filter(el => el && el.dataset.original && el.dataset.original.length > 3);
+    const targetLang = currentLang === 'es' ? 'es' : 'de';
 
-    // Also translate listing descriptions in cards
-    document.querySelectorAll('.listing-desc').forEach(el => {
-      if (el.textContent.trim().length > 3) {
-        el.dataset.original = el.dataset.original || el.textContent.trim();
-        elements.push(el);
-      }
-    });
-
-    const targetLang = currentLang === 'de' ? 'de' : 'es';
-
-    for (const el of elements) {
-      const original = el.dataset.original || el.textContent.trim();
+    // Collect listing description cards
+    const descCards = document.querySelectorAll('.listing-desc[data-original]');
+    for (const el of descCards) {
+      const original = el.dataset.original;
       if (!original || original.length < 4) continue;
-      try {
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(original.substring(0,500))}&langpair=auto|${targetLang}`;
-        const res = await fetch(url);
-        const data = await res.json();
-        const translated = data.responseData?.translatedText;
-        if (translated && translated !== original && !translated.includes('QUERY LENGTH')) {
-          el.textContent = translated;
-        }
-      } catch(e) {}
-      await new Promise(r => setTimeout(r, 100)); // rate limit
+      const translated = await detectAndTranslate(original, targetLang);
+      if (translated) el.textContent = translated;
+      await new Promise(r => setTimeout(r, 120));
+    }
+
+    // Detail description
+    const detailDesc = document.getElementById('detailDesc');
+    if (detailDesc && detailDesc.dataset.original && detailDesc.dataset.original.length > 3) {
+      const translated = await detectAndTranslate(detailDesc.dataset.original, targetLang);
+      if (translated) detailDesc.textContent = translated;
+      await new Promise(r => setTimeout(r, 120));
+    }
+
+    // Reviews, comments, replies
+    const textEls = document.querySelectorAll('.review-item-text[data-original], .comment-item-text[data-original], .reply-item-text[data-original]');
+    for (const el of textEls) {
+      const original = el.dataset.original;
+      if (!original || original.length < 4) continue;
+      const translated = await detectAndTranslate(original, targetLang);
+      if (translated) el.textContent = translated;
+      await new Promise(r => setTimeout(r, 120));
     }
 
     btn.textContent = origText;
@@ -1642,8 +1654,8 @@
     const infoCard = document.getElementById('detailInfoCard');
     infoCard.innerHTML = infoHTML; infoCard.style.display = infoHTML?'block':'none';
     let ctaHTML = '';
-    if (l.phone) ctaHTML += `<a class="detail-cta-btn primary" href="tel:${l.phone}"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>'+t('call')+'</a>`;
-    if (l.lat && l.lng) ctaHTML += `<a class="detail-cta-btn secondary" href="https://maps.google.com/?q=${l.lat},${l.lng}" target="_blank"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>'+t('route')+'</a>`;
+    if (l.phone) ctaHTML += `<a class="detail-cta-btn primary" href="tel:${l.phone}"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${t('call')}</a>`;
+    if (l.lat && l.lng) ctaHTML += `<a class="detail-cta-btn secondary" href="https://maps.google.com/?q=${l.lat},${l.lng}" target="_blank"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>${t('route')}</a>`;
     document.getElementById('detailCta').innerHTML = ctaHTML;
     currentListingId = id;
     showScreen('screenDetail');
