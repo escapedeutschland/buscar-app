@@ -1016,6 +1016,9 @@
       submit_btn: 'Enviar listado', submitting: 'Enviando...',
       submit_success: '¡Gracias! Tu listado fue enviado y será revisado.',
       fill_all: 'Por favor completa todos los campos obligatorios.',
+      // Formulario extra
+      photos_optional: 'Fotos (opcional, máx. 3)',
+      photos_hint: 'Las fotos ayudan en la revisión y serán visibles tras aprobación.',
       // Auth
       login: 'Iniciar sesión', register: 'Registrarse', logout: 'Cerrar sesión',
       email_label: 'Correo electrónico', password_label: 'Contraseña', name_auth: 'Nombre',
@@ -1043,10 +1046,56 @@
     return (translations[currentLang] && translations[currentLang][key]) || translations['de'][key] || key;
   }
 
+  let contentTranslated = false;
+
   function toggleLang() {
     currentLang = currentLang === 'de' ? 'es' : 'de';
     localStorage.setItem('buscar_lang', currentLang);
+    contentTranslated = false;
     applyLang();
+    translateVisibleContent();
+  }
+
+  async function translateVisibleContent() {
+    const btn = document.getElementById('langToggle');
+    const origText = btn.textContent;
+    btn.textContent = '⏳';
+    btn.disabled = true;
+
+    // Collect all user-generated text elements
+    const elements = [
+      ...document.querySelectorAll('[data-original]'),
+      document.getElementById('detailDesc'),
+    ].filter(el => el && el.dataset.original && el.dataset.original.length > 3);
+
+    // Also translate listing descriptions in cards
+    document.querySelectorAll('.listing-desc').forEach(el => {
+      if (el.textContent.trim().length > 3) {
+        el.dataset.original = el.dataset.original || el.textContent.trim();
+        elements.push(el);
+      }
+    });
+
+    const targetLang = currentLang === 'de' ? 'de' : 'es';
+
+    for (const el of elements) {
+      const original = el.dataset.original || el.textContent.trim();
+      if (!original || original.length < 4) continue;
+      try {
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(original.substring(0,500))}&langpair=auto|${targetLang}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const translated = data.responseData?.translatedText;
+        if (translated && translated !== original && !translated.includes('QUERY LENGTH')) {
+          el.textContent = translated;
+        }
+      } catch(e) {}
+      await new Promise(r => setTimeout(r, 100)); // rate limit
+    }
+
+    btn.textContent = origText;
+    btn.disabled = false;
+    contentTranslated = true;
   }
 
   function applyLang() {
@@ -1055,8 +1104,7 @@
 
     // Update all elements with data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      el.textContent = t(key);
+      el.textContent = t(el.getAttribute('data-i18n'));
     });
 
     // Update placeholders
@@ -1064,29 +1112,120 @@
       el.placeholder = t(el.getAttribute('data-i18n-ph'));
     });
 
-    // Dynamic updates
-    const greeting = document.getElementById('headerGreeting');
+    // Header
     const headerSub = document.querySelector('.header-sub');
-    if (greeting) updateGreeting();
     if (headerSub) headerSub.textContent = t('header_sub');
+    updateGreeting();
 
+    // City picker
     const cityLabel = document.getElementById('cityPickerLabel');
-    if (cityLabel && cityLabel.textContent !== t('city_select')) {
-      // keep selected city name, don't overwrite
-    } else if (cityLabel) {
-      cityLabel.textContent = t('city_select');
-    }
+    if (cityLabel && activeCity === 'Alle') cityLabel.textContent = t('city_select');
 
-    // Section titles in detail
-    document.querySelectorAll('.detail-section-title').forEach(el => {
-      const txt = el.textContent.trim();
-      if (txt === 'Bewertungen' || txt === 'Valoraciones') el.textContent = t('ratings');
-      if (txt === 'Diskussion' || txt === 'Comentarios') el.textContent = t('discussion');
-      if (txt === 'Fotos') el.textContent = t('photos');
-      if (txt === 'Beschreibung' || txt === 'Descripción') el.textContent = t('description');
+    // Search placeholder
+    const searchEl = document.getElementById('searchInput');
+    if (searchEl) searchEl.placeholder = t('search_placeholder');
+
+    // Auth screen
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn && !loginBtn.disabled) loginBtn.textContent = t('login');
+    const registerBtn = document.getElementById('registerBtn');
+    if (registerBtn && !registerBtn.disabled) registerBtn.textContent = t('create_account');
+
+    // Form screen - labels
+    const formFields = {
+      'Bitte wählen...': t('cat_choose'),
+      'Restaurants und Cafés': t('cat_rest'),
+      'Dienstleistungen': t('cat_serv'),
+      'Orte und Sehenswürdigkeiten': t('cat_place'),
+      'Unterkünfte': t('cat_accom'),
+      'Geschäfte und Märkte': t('cat_shop'),
+    };
+    document.querySelectorAll('#newCategory option').forEach(opt => {
+      if (formFields[opt.textContent]) opt.textContent = formFields[opt.textContent];
     });
 
-    // Rerender listings to update badges etc
+    // Form labels
+    const labelMap = {
+      'Name des Ortes *': t('name_label'), 'Nombre del lugar *': t('name_label'),
+      'Kategorie *': t('cat_label'), 'Categoría *': t('cat_label'),
+      'Stadt *': t('city_label'), 'Ciudad *': t('city_label'),
+      'Deine Erfahrung *': t('desc_label'), 'Tu experiencia *': t('desc_label'),
+      'Kontakt (optional)': t('contact_optional'), 'Contacto (opcional)': t('contact_optional'),
+      'Telefon': t('tel_label'), 'Teléfono': t('tel_label'),
+      'Website': t('web_label'), 'Sitio web': t('web_label'),
+      'Adresse': t('addr_label'), 'Dirección': t('addr_label'),
+      'Öffnungszeiten': t('hours_label'), 'Horario': t('hours_label'),
+    };
+    document.querySelectorAll('.field-label').forEach(el => {
+      if (labelMap[el.textContent]) el.textContent = labelMap[el.textContent];
+    });
+    document.querySelectorAll('.form-card-title').forEach(el => {
+      if (labelMap[el.textContent]) el.textContent = labelMap[el.textContent];
+    });
+
+    // Form placeholders
+    const phMap = {
+      'z.B. Dr. Müller, Café Central': currentLang === 'es' ? 'ej. Dr. Martínez, Café Central' : 'z.B. Dr. Müller, Café Central',
+      'z.B. Asunción, Encarnación': currentLang === 'es' ? 'ej. Asunción, Encarnación' : 'z.B. Asunción, Encarnación',
+      'z.B. Mo-Fr 08:00-18:00': currentLang === 'es' ? 'ej. Lun-Vie 08:00-18:00' : 'z.B. Mo-Fr 08:00-18:00',
+      'Straße, Stadtviertel': currentLang === 'es' ? 'Calle, Barrio' : 'Straße, Stadtviertel',
+      'www.beispiel.com': 'www.ejemplo.com',
+      '+595 21 ...': '+595 21 ...',
+    };
+    document.querySelectorAll('.field-input, .field-textarea').forEach(el => {
+      if (phMap[el.placeholder]) el.placeholder = phMap[el.placeholder];
+    });
+
+    // Form desc placeholder
+    const descEl = document.getElementById('newDesc');
+    if (descEl) descEl.placeholder = t('desc_placeholder');
+
+    // Form rules
+    const rulesTitle = document.querySelector('.form-rules-title');
+    if (rulesTitle) rulesTitle.textContent = t('rules_title');
+    const rules = document.querySelectorAll('.form-rule');
+    const ruleKeys = ['rule1','rule2','rule3','rule4','rule5'];
+    rules.forEach((el, i) => { if (ruleKeys[i]) el.textContent = t(ruleKeys[i]); });
+
+    // Photos hint
+    const photoHint = document.querySelector('#formPhotoProgress');
+    const photosLabel = document.querySelector('.form-card-title:last-of-type');
+    document.querySelectorAll('.form-card-title').forEach(el => {
+      if (el.textContent.includes('Fotos') || el.textContent.includes('Foto')) {
+        el.textContent = t('photos_optional');
+      }
+      if (el.textContent === 'Grundinfos' || el.textContent === 'Información básica') {
+        el.textContent = currentLang === 'es' ? 'Información básica' : 'Grundinfos';
+      }
+      if (el.textContent === 'Beschreibung' || el.textContent === 'Descripción') {
+        el.textContent = t('description');
+      }
+    });
+
+    // Location button
+    const locBtn = document.getElementById('locationBtn');
+    if (locBtn && window._newLat === null) {
+      locBtn.innerHTML = locBtn.innerHTML.replace('Meinen Standort verwenden','').replace('Usar mi ubicación','').trim();
+      locBtn.innerHTML = locBtn.innerHTML + ' ' + t('location_btn');
+    }
+
+    // Profile screen
+    const profilEmail = document.getElementById('profilEmail');
+
+    // Map cats
+    document.querySelectorAll('#mapCats .map-chip').forEach(el => {
+      const cat = el.dataset.cat;
+      const catKeyMap = {'Alle':'cat_all','kat-restaurants':'cat_restaurants','kat-dienstleistung':'cat_services','kat-orte':'cat_places','kat-unterkunft':'cat_accommodation','kat-geschaefte':'cat_shops'};
+      if (cat && catKeyMap[cat]) el.textContent = t(catKeyMap[cat]);
+    });
+
+    // Filter buttons
+    const filterSubBtn = document.getElementById('filterSubBtn');
+    const filterStarBtn = document.getElementById('filterStarBtn');
+    if (filterSubBtn && !filterSubBtn.classList.contains('active')) document.getElementById('filterSubLabel').textContent = t('subcategory');
+    if (filterStarBtn && !filterStarBtn.classList.contains('active')) document.getElementById('filterStarLabel').textContent = t('rating_filter');
+
+    // Rerender if data loaded
     if (allListings.length) renderListings();
   }
 
@@ -1478,7 +1617,7 @@
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
-    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${l.verified?('<span class="badge-geprüft">'+t('verified')+'</span>'):''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}</div>`:''}<div class="listing-desc">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${l.verified?('<span class="badge-geprüft">'+t('verified')+'</span>'):''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
   }
 
   function showDetail(id) {
@@ -1490,8 +1629,8 @@
     document.getElementById('detailTitle').textContent = l.name||'';
     document.getElementById('detailCity').innerHTML = l.city?`<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}`:'';
     const descEl = document.getElementById('detailDesc');
-    const descText = l.description || t('no_description');
-    descEl.innerHTML = descText + translateBtnHTML('desc_'+id, descText);
+    descEl.innerHTML = l.description || t('no_description');
+    descEl.dataset.original = l.description || '';
     const badges = document.getElementById('detailBadges');
     document.getElementById('detailBadgeRow').innerHTML = l.verified?'<span class="detail-badge green">Geprüft</span>':'';
     badges.style.display = l.verified?'block':'none';
@@ -1870,8 +2009,7 @@
           <span class="review-item-name">${r.user_name||'Anonym'}</span>
           <div class="review-item-stars">${starsHTML(r.rating,12)}</div>
         </div>
-        <div class="review-item-text">${r.comment}</div>
-        ${translateBtnHTML('rev_'+r.id, r.comment)}
+        <div class="review-item-text" data-original="${r.comment}">${r.comment}</div>
         <div class="review-item-date">${formatDate(r.created_at)}</div>
       </div>`).join('');
   }
@@ -1915,8 +2053,7 @@
             ${isOwn ? trashIcon(c.id, listingId) : ''}
           </div>
         </div>
-        <div class="comment-item-text">${c.body}</div>
-        ${translateBtnHTML('com_'+c.id, c.body)}
+        <div class="comment-item-text" data-original="${c.body}">${c.body}</div>
         <button class="comment-reply-btn" onclick="toggleReplyForm('${c.id}')">Antworten</button>
         ${cReplies.length ? `<div class="comment-replies">${cReplies.map(r => {
           const isOwnReply = myUid && r.user_id === myUid;
@@ -1925,8 +2062,7 @@
               <div><span class="reply-item-name">${r.user_name||'Anonym'}</span> <span class="reply-item-date">${formatDate(r.created_at)}</span></div>
               ${isOwnReply ? trashIcon(r.id, listingId) : ''}
             </div>
-            <div class="reply-item-text">${r.body}</div>
-            ${translateBtnHTML('rep_'+r.id, r.body)}
+            <div class="reply-item-text" data-original="${r.body}">${r.body}</div>
           </div>`;
         }).join('')}</div>` : ''}
         <div class="reply-form" id="replyForm_${c.id}">
