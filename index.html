@@ -576,7 +576,20 @@
         <div class="map-chip map-chip-unterkunft" data-cat="kat-unterkunft"><span class="chip-dot"></span><span data-i18n="cat_accommodation">Unterkünfte</span></div>
         <div class="map-chip map-chip-geschaefte" data-cat="kat-geschaefte"><span class="chip-dot"></span><span data-i18n="cat_shops">Geschäfte</span></div>
       </div>
-      <div class="map-filter-row" id="mapCities"></div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 16px 10px">
+        <div id="mapCityPickerBtn" onclick="openMapCitySheet()" style="flex:1;display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-2)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="13" height="13"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span id="mapCityPickerLabel">Stadt wählen...</span>
+        </div>
+        <button class="filter-btn" id="mapFilterSubBtn" onclick="openMapFilterSheet('sub')" style="white-space:nowrap">
+          <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          <span id="mapFilterSubLabel">Typ</span>
+        </button>
+        <button class="filter-btn" id="mapFilterStarBtn" onclick="openMapFilterSheet('stars')" style="white-space:nowrap">
+          <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span id="mapFilterStarLabel">★</span>
+        </button>
+      </div>
     </div>
     <div class="map-container">
       <div id="leafletMap"></div>
@@ -894,6 +907,29 @@
         <input type="text" id="citySearchInput" placeholder="Stadt suchen..." oninput="filterCitySheet()">
       </div>
       <div class="city-sheet-list" id="citySheetList"></div>
+    </div>
+  </div>
+
+  <!-- MAP CITY SHEET -->
+  <div class="city-sheet-overlay" id="mapCitySheetOverlay" onclick="if(event.target.id==='mapCitySheetOverlay')closeMapCitySheet()">
+    <div class="city-sheet">
+      <div class="city-sheet-handle"></div>
+      <div class="city-sheet-title">Stadt auf Karte</div>
+      <div class="city-sheet-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="mapCitySearchInput" placeholder="Stadt suchen..." oninput="filterMapCitySheet()">
+      </div>
+      <div class="city-sheet-list" id="mapCitySheetList"></div>
+    </div>
+  </div>
+
+  <!-- MAP FILTER SHEET -->
+  <div class="filter-sheet-overlay" id="mapFilterSheetOverlay" onclick="if(event.target.id==='mapFilterSheetOverlay')closeMapFilterSheet()">
+    <div class="filter-sheet">
+      <div class="filter-sheet-handle"></div>
+      <div class="filter-sheet-title" id="mapFilterSheetTitle">Filter</div>
+      <div id="mapFilterSheetContent"></div>
+      <button class="filter-apply-btn" onclick="applyMapFilter()">Anwenden</button>
     </div>
   </div>
 
@@ -1777,8 +1813,7 @@
       L.control.attribution({ prefix: '© OpenStreetMap' }).addTo(leafletMap);
     }
 
-    // Build city filter once
-    if (!document.querySelector('.city-chip')) buildCityFilter();
+    // City filter is now a sheet - no longer needed here
 
     // Clear existing markers
     leafletMarkers.forEach(m => leafletMap.removeLayer(m));
@@ -1788,6 +1823,8 @@
     let filtered = allListings;
     if (mapCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === mapCategory);
     if (mapCityFilter !== 'Alle') filtered = filtered.filter(l => l.city === mapCityFilter);
+    if (mapSubcatFilter !== 'Alle') filtered = filtered.filter(l => (l.subcategory||'') === mapSubcatFilter);
+    if (mapMinStars > 0) filtered = filtered.filter(l => { const avg = getAvgRating(l.id); return avg && avg >= mapMinStars; });
 
     const withCoords = filtered.filter(l => l.lat && l.lng);
     const noCoords = filtered.filter(l => !l.lat || !l.lng);
@@ -2668,6 +2705,120 @@
   function translateBtnHTML(id, text) {
     const label = currentLang === 'de' ? 'Übersetzen' : 'Traducir';
     return `<button class="translate-btn" id="tbtn_${id}" onclick="translateText('${text.replace(/'/g,"\'")}','${currentLang}',document.getElementById('tbtn_${id}'),document.getElementById('tout_${id}'))">${translateIcon()} ${label}</button><div class="translated-text" id="tout_${id}"></div>`;
+  }
+
+  let mapSubcatFilter = 'Alle';
+  let mapMinStars = 0;
+  let mapFilterMode = 'sub';
+
+  function openMapCitySheet() {
+    document.getElementById('mapCitySheetOverlay').classList.add('visible');
+    document.getElementById('mapCitySearchInput').value = '';
+    renderMapCitySheet('');
+    setTimeout(() => document.getElementById('mapCitySearchInput').focus(), 100);
+  }
+
+  function closeMapCitySheet() {
+    document.getElementById('mapCitySheetOverlay').classList.remove('visible');
+  }
+
+  function renderMapCitySheet(query) {
+    const list = document.getElementById('mapCitySheetList');
+    const q = query.toLowerCase().trim();
+    const filtered = ALL_PY_CITIES.filter(c => !q || c.toLowerCase().includes(q));
+    if (!filtered.length) { list.innerHTML = '<div class="city-sheet-empty">Keine Stadt gefunden</div>'; return; }
+    list.innerHTML = filtered.map(c => `
+      <div class="city-sheet-item${mapCityFilter===c?' selected':''}" onclick="selectMapCity('${c}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>${c === 'Alle' ? '🌍 Alle Städte' : c}</span>
+      </div>`).join('');
+  }
+
+  function filterMapCitySheet() {
+    renderMapCitySheet(document.getElementById('mapCitySearchInput').value);
+  }
+
+  function selectMapCity(city) {
+    mapCityFilter = city;
+    const btn = document.getElementById('mapCityPickerBtn');
+    const label = document.getElementById('mapCityPickerLabel');
+    if (city === 'Alle') {
+      btn.style.borderColor = '';
+      btn.style.color = '';
+      label.textContent = 'Stadt wählen...';
+    } else {
+      btn.style.borderColor = 'var(--yellow)';
+      btn.style.color = 'var(--yellow-dark)';
+      label.textContent = city;
+      // Zoom to city
+      if (leafletMap && mapCityCoords[city]) {
+        leafletMap.setView(mapCityCoords[city], 13);
+      }
+    }
+    closeMapCitySheet();
+    renderMap();
+  }
+
+  function openMapFilterSheet(mode) {
+    mapFilterMode = mode;
+    const overlay = document.getElementById('mapFilterSheetOverlay');
+    const content = document.getElementById('mapFilterSheetContent');
+    overlay.classList.add('visible');
+    if (mode === 'sub') {
+      document.getElementById('mapFilterSheetTitle').textContent = t('filter_title_sub');
+      const cats = subcats[mapCategory] || [];
+      if (!cats.length || cats.length <= 1) {
+        content.innerHTML = '<div style="padding:16px 20px;color:var(--text-3);font-size:13px">Zuerst eine Kategorie auf der Karte wählen.</div><div class="filter-divider"></div>';
+      } else {
+        content.innerHTML = `<div class="filter-section"><div class="filter-chips">${
+          cats.map(s => `<div class="filter-chip${mapSubcatFilter===s?' active':''}" onclick="selectMapFilterChip('${s}')">${s}</div>`).join('')
+        }</div></div><div class="filter-divider"></div>`;
+      }
+    } else {
+      document.getElementById('mapFilterSheetTitle').textContent = t('filter_title_stars');
+      content.innerHTML = `<div class="filter-section"><div class="filter-section-label">${t('min_stars')}</div><div class="filter-star-row">
+        <div class="filter-star-btn${mapMinStars===0?' active':''}" onclick="selectMapStarFilter(0)">${t('stars_all')}</div>
+        <div class="filter-star-btn${mapMinStars===3?' active':''}" onclick="selectMapStarFilter(3)">3+ ★</div>
+        <div class="filter-star-btn${mapMinStars===4?' active':''}" onclick="selectMapStarFilter(4)">4+ ★</div>
+        <div class="filter-star-btn${mapMinStars===5?' active':''}" onclick="selectMapStarFilter(5)">5 ★</div>
+      </div></div><div class="filter-divider"></div>`;
+    }
+  }
+
+  function selectMapFilterChip(val) {
+    mapSubcatFilter = val;
+    document.querySelectorAll('#mapFilterSheetContent .filter-chip').forEach(c => c.classList.toggle('active', c.textContent === val));
+  }
+
+  function selectMapStarFilter(val) {
+    mapMinStars = val;
+    document.querySelectorAll('#mapFilterSheetContent .filter-star-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+
+  function closeMapFilterSheet() {
+    document.getElementById('mapFilterSheetOverlay').classList.remove('visible');
+  }
+
+  function applyMapFilter() {
+    closeMapFilterSheet();
+    const subBtn = document.getElementById('mapFilterSubBtn');
+    const starBtn = document.getElementById('mapFilterStarBtn');
+    if (mapSubcatFilter !== 'Alle') {
+      subBtn.classList.add('active');
+      document.getElementById('mapFilterSubLabel').textContent = mapSubcatFilter;
+    } else {
+      subBtn.classList.remove('active');
+      document.getElementById('mapFilterSubLabel').textContent = 'Typ';
+    }
+    if (mapMinStars > 0) {
+      starBtn.classList.add('active');
+      document.getElementById('mapFilterStarLabel').textContent = mapMinStars + '+ ★';
+    } else {
+      starBtn.classList.remove('active');
+      document.getElementById('mapFilterStarLabel').textContent = '★';
+    }
+    renderMap();
   }
 
   function useMyLocation() {
