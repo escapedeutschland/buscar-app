@@ -1267,9 +1267,6 @@
     } else { showScreen('screenAuth'); }
   });
 
-  // Apply language on load
-  document.addEventListener('DOMContentLoaded', () => applyLang());
-
   function updateGreeting() {
     const searchEl = document.querySelector('#searchInput');
     if (searchEl) searchEl.placeholder = t('search_placeholder');
@@ -2533,6 +2530,8 @@
   const searchClear = document.getElementById('searchClear');
   searchInput.addEventListener('input', e => { searchQuery = e.target.value; searchClear.classList.toggle('visible', searchQuery.length > 0); renderListings(); });
   searchClear.addEventListener('click', () => { searchInput.value = ''; searchQuery = ''; searchClear.classList.remove('visible'); renderListings(); });
+  // Apply saved language on startup
+  applyLang();
 </script>
 </body>
 </html>
