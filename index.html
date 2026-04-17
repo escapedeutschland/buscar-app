@@ -988,7 +988,7 @@
 
 </div>
 <script>
-  const ADMIN_EMAIL = 'maximechristalle@gmail.com';
+  const ADMIN_EMAIL = 'DEINE-EMAIL@gmail.com';
 
   let currentLang = localStorage.getItem('buscar_lang') || 'de';
 
@@ -2063,7 +2063,7 @@
     try {
       const snap = await db.collection('listings').where('verified', '==', false).get();
       const pending = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      document.getElementById('adminSub').textContent = pending.length + ' offen';
+      // Don't overwrite tabs - just update title if needed
       if (!pending.length) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-icon">&#10003;</div><div class="admin-empty-text">Alles geprüft!</div><div class="admin-empty-sub">Keine offenen Einträge.</div></div>'; return; }
       const photoSnaps = await Promise.all(pending.map(l =>
         db.collection('listing_photos').where('listing_id','==',l.id).where('pending','==',true).get()
