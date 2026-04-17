@@ -891,7 +891,10 @@
   <div class="filter-sheet-overlay" id="filterSheetOverlay" onclick="if(event.target.id==='filterSheetOverlay')closeFilterSheet()">
     <div class="filter-sheet">
       <div class="filter-sheet-handle"></div>
-      <div class="filter-sheet-title" id="filterSheetTitle">Filter</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 20px 16px">
+        <div class="filter-sheet-title" id="filterSheetTitle" style="padding:0">Filter</div>
+        <button onclick="closeFilterSheet()" style="width:32px;height:32px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-2)">✕</button>
+      </div>
       <div id="filterSheetContent"></div>
       <button class="filter-apply-btn" onclick="applyFilter()">Anwenden</button>
     </div>
@@ -901,7 +904,10 @@
   <div class="city-sheet-overlay" id="citySheetOverlay" onclick="if(event.target.id==='citySheetOverlay')closeCitySheet()">
     <div class="city-sheet">
       <div class="city-sheet-handle"></div>
-      <div class="city-sheet-title">Stadt wählen</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 20px 16px">
+        <div class="city-sheet-title" style="padding:0">Stadt wählen</div>
+        <button onclick="closeCitySheet()" style="width:32px;height:32px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-2)">✕</button>
+      </div>
       <div class="city-sheet-search">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="citySearchInput" placeholder="Stadt suchen..." oninput="filterCitySheet()">
@@ -914,7 +920,10 @@
   <div class="city-sheet-overlay" id="mapCitySheetOverlay" onclick="if(event.target.id==='mapCitySheetOverlay')closeMapCitySheet()">
     <div class="city-sheet">
       <div class="city-sheet-handle"></div>
-      <div class="city-sheet-title">Stadt auf Karte</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 20px 16px">
+        <div class="city-sheet-title" style="padding:0">Stadt auf Karte</div>
+        <button onclick="closeMapCitySheet()" style="width:32px;height:32px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-2)">✕</button>
+      </div>
       <div class="city-sheet-search">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="mapCitySearchInput" placeholder="Stadt suchen..." oninput="filterMapCitySheet()">
@@ -927,7 +936,10 @@
   <div class="filter-sheet-overlay" id="mapFilterSheetOverlay" onclick="if(event.target.id==='mapFilterSheetOverlay')closeMapFilterSheet()">
     <div class="filter-sheet">
       <div class="filter-sheet-handle"></div>
-      <div class="filter-sheet-title" id="mapFilterSheetTitle">Filter</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 20px 16px">
+        <div class="filter-sheet-title" id="mapFilterSheetTitle" style="padding:0">Filter</div>
+        <button onclick="closeMapFilterSheet()" style="width:32px;height:32px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-2)">✕</button>
+      </div>
       <div id="mapFilterSheetContent"></div>
       <button class="filter-apply-btn" onclick="applyMapFilter()">Anwenden</button>
     </div>
@@ -1019,6 +1031,8 @@
       min_stars: 'Minimum Sterne', stars_all: 'Alle',
       apply_filter: 'Anwenden',
       cancel: 'Abbrechen',
+      approve: 'Genehmigen',
+      reject: 'Ablehnen',
     },
     es: {
       // Navegación
@@ -1096,6 +1110,8 @@
       min_stars: 'Estrellas mínimas', stars_all: 'Todas',
       apply_filter: 'Aplicar',
       cancel: 'Cancelar',
+      approve: 'Aprobar',
+      reject: 'Rechazar',
     }
   };
 
@@ -1144,32 +1160,27 @@
 
     const targetLang = currentLang === 'es' ? 'es' : 'de';
 
-    // Collect listing description cards
-    const descCards = document.querySelectorAll('.listing-desc[data-original]');
-    for (const el of descCards) {
-      const original = el.dataset.original;
-      if (!original || original.length < 4) continue;
-      const translated = await detectAndTranslate(original, targetLang);
-      if (translated) el.textContent = translated;
-      await new Promise(r => setTimeout(r, 120));
-    }
+    // Collect all elements needing translation
+    const allEls = [
+      ...document.querySelectorAll('.listing-desc[data-original]'),
+      ...document.querySelectorAll('.review-item-text[data-original]'),
+      ...document.querySelectorAll('.comment-item-text[data-original]'),
+      ...document.querySelectorAll('.reply-item-text[data-original]'),
+    ].filter(el => el.dataset.original && el.dataset.original.length > 3);
 
-    // Detail description
     const detailDesc = document.getElementById('detailDesc');
     if (detailDesc && detailDesc.dataset.original && detailDesc.dataset.original.length > 3) {
-      const translated = await detectAndTranslate(detailDesc.dataset.original, targetLang);
-      if (translated) detailDesc.textContent = translated;
-      await new Promise(r => setTimeout(r, 120));
+      allEls.unshift(detailDesc);
     }
 
-    // Reviews, comments, replies
-    const textEls = document.querySelectorAll('.review-item-text[data-original], .comment-item-text[data-original], .reply-item-text[data-original]');
-    for (const el of textEls) {
-      const original = el.dataset.original;
-      if (!original || original.length < 4) continue;
-      const translated = await detectAndTranslate(original, targetLang);
-      if (translated) el.textContent = translated;
-      await new Promise(r => setTimeout(r, 120));
+    // Translate in parallel batches of 4
+    const batchSize = 4;
+    for (let i = 0; i < allEls.length; i += batchSize) {
+      const batch = allEls.slice(i, i + batchSize);
+      await Promise.all(batch.map(async el => {
+        const translated = await detectAndTranslate(el.dataset.original, targetLang);
+        if (translated) el.textContent = translated;
+      }));
     }
 
     btn.textContent = origText;
@@ -1941,13 +1952,29 @@
   async function loadAdmin() {
     showScreen('screenAdmin');
     const body = document.getElementById('adminBody');
-    // Add tabs if not present
+
+    // Count pending claims for badge
+    let claimCount = 0;
+    try {
+      const claimSnap = await db.collection('claims').where('status','==','pending').get();
+      claimCount = claimSnap.size;
+    } catch(e) {}
+
+    const claimBadge = claimCount > 0 ? `<span style="background:var(--red);color:white;border-radius:20px;padding:1px 7px;font-size:11px;font-weight:700;margin-left:6px">${claimCount}</span>` : '';
+
     if (!document.getElementById('adminTabListings')) {
       document.getElementById('adminSub').innerHTML = `
         <div style="display:flex;gap:12px;margin-top:8px">
           <span id="adminTabListings" onclick="loadAdminListings()" style="cursor:pointer;font-weight:700;color:white;border-bottom:2px solid white;padding-bottom:2px">Einträge</span>
-          <span id="adminTabClaims" onclick="loadAdminClaims()" style="cursor:pointer;color:rgba(255,255,255,0.6)">Inhaber-Anfragen</span>
+          <span id="adminTabClaims" onclick="loadAdminClaims()" style="cursor:pointer;color:rgba(255,255,255,0.6)">Inhaber-Anfragen${claimBadge}</span>
         </div>`;
+    } else {
+      // Update badge if tab already exists
+      const claimsTab = document.getElementById('adminTabClaims');
+      if (claimsTab) {
+        const baseText = 'Inhaber-Anfragen';
+        claimsTab.innerHTML = baseText + claimBadge;
+      }
     }
     loadAdminListings();
   }
@@ -1970,7 +1997,7 @@
       body.innerHTML = pending.map((l, idx) => {
         const photos = photoSnaps[idx].docs.map(d => d.data());
         const photoHTML = photos.length ? `<div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto">${photos.map(p => `<img src="${p.url}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0">`).join('')}</div>` : '';
-        return `<div class="admin-card" id="adminCard_${l.id}"><div class="admin-card-name">${l.name||'Ohne Name'}</div><div class="admin-card-meta">${catNames[l.category_id]||''} &middot; ${l.city||'Unbekannt'}</div>${photoHTML}<div class="admin-card-desc">${l.description||'Keine Beschreibung'}</div><div class="admin-card-info">${l.phone?`<div class="admin-info-pill">${l.phone}</div>`:''}${l.website?`<div class="admin-info-pill">${l.website}</div>`:''}${l.opening_hours?`<div class="admin-info-pill">${l.opening_hours}</div>`:''}</div><div class="admin-actions"><button class="admin-btn approve" onclick="approveEntry('${l.id}')">Genehmigen</button><button class="admin-btn reject" onclick="rejectEntry('${l.id}')">Ablehnen</button></div></div>`;
+        return `<div class="admin-card" id="adminCard_${l.id}"><div class="admin-card-name">${l.name||'Ohne Name'}</div><div class="admin-card-meta">${catNames[l.category_id]||''} &middot; ${l.city||'Unbekannt'}</div>${photoHTML}<div class="admin-card-desc">${l.description||'Keine Beschreibung'}</div><div class="admin-card-info">${l.phone?`<div class="admin-info-pill">${l.phone}</div>`:''}${l.website?`<div class="admin-info-pill">${l.website}</div>`:''}${l.opening_hours?`<div class="admin-info-pill">${l.opening_hours}</div>`:''}</div><div class="admin-actions"><button class="admin-btn approve" onclick="approveEntry('${l.id}')">${t('approve')||'Genehmigen'}</button><button class="admin-btn reject" onclick="rejectEntry('${l.id}')">${t('reject')||'Ablehnen'}</button></div></div>`;
       }).join('');
     } catch (err) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-text">Fehler beim Laden</div></div>'; }
   }
@@ -2247,8 +2274,10 @@
     try {
       await db.collection('users').doc(currentUser.uid).update({ username });
       document.getElementById('profilName').textContent = username;
-      document.getElementById('headerAvatar').textContent = username.charAt(0).toUpperCase();
-      document.getElementById('profilAvatar').textContent = username.charAt(0).toUpperCase();
+      // Get current avatar url to preserve it
+      const userDoc = await db.collection('users').doc(currentUser.uid).get();
+      const avatarUrl = userDoc.exists ? userDoc.data().avatar_url : null;
+      setAvatarDisplay(avatarUrl, username.charAt(0).toUpperCase());
       okEl.textContent = 'Benutzername erfolgreich geändert!';
       okEl.style.display = 'block';
     } catch(e) {
