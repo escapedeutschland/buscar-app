@@ -2043,21 +2043,13 @@
 
     const claimBadge = claimCount > 0 ? `<span style="background:var(--red);color:white;border-radius:20px;padding:1px 7px;font-size:11px;font-weight:700;margin-left:6px">${claimCount}</span>` : '';
 
-    if (!document.getElementById('adminTabListings')) {
-      document.getElementById('adminSub').innerHTML = `
-        <div style="display:flex;gap:12px;margin-top:8px">
-          <span id="adminTabListings" onclick="loadAdminListings()" style="cursor:pointer;font-weight:700;color:white;border-bottom:2px solid white;padding-bottom:2px">Einträge</span>
-          <span id="adminTabClaims" onclick="loadAdminClaims()" style="cursor:pointer;color:rgba(255,255,255,0.6)">Inhaber-Anfragen${claimBadge}</span>
-          <span onclick="loadAdminDeals()" style="cursor:pointer;color:rgba(255,255,255,0.6)">🏷 Deals</span>
-        </div>`;
-    } else {
-      // Update badge if tab already exists
-      const claimsTab = document.getElementById('adminTabClaims');
-      if (claimsTab) {
-        const baseText = 'Inhaber-Anfragen';
-        claimsTab.innerHTML = baseText + claimBadge;
-      }
-    }
+    // Always rebuild tabs
+    document.getElementById('adminSub').innerHTML = `
+      <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
+        <span id="adminTabListings" onclick="loadAdminListings()" style="cursor:pointer;font-weight:700;color:white;border-bottom:2px solid white;padding-bottom:2px">Einträge</span>
+        <span id="adminTabClaims" onclick="loadAdminClaims()" style="cursor:pointer;color:rgba(255,255,255,0.6)">Inhaber-Anfragen${claimBadge}</span>
+        <span id="adminTabDeals" onclick="loadAdminDeals()" style="cursor:pointer;color:rgba(255,255,255,0.6)">🏷 Deals</span>
+      </div>`;
     loadAdminListings();
   }
 
