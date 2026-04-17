@@ -460,7 +460,7 @@
       </div>
       <div id="authError" class="auth-error"></div>
       <form class="auth-form" id="formLogin" onsubmit="handleLogin(event)">
-        <div><label class="field-label">E-Mail</label><input class="field-input" type="email" id="loginEmail" placeholder="maximechristalle@gmail.com" required></div>
+        <div><label class="field-label">E-Mail</label><input class="field-input" type="email" id="loginEmail" placeholder="deine@email.de" required></div>
         <div><label class="field-label">Passwort</label><input class="field-input" type="password" id="loginPassword" placeholder="min. 6 Zeichen" required></div>
         <button class="auth-btn" type="submit" id="loginBtn">Einloggen</button>
         <div class="auth-divider"><span style="color:var(--yellow);cursor:pointer;font-weight:600" onclick="showForgotPassword()">Passwort vergessen?</span></div>
@@ -475,7 +475,7 @@
           <div style="font-size:11px;color:var(--text-3)">Wird oeffentlich angezeigt. Nur Buchstaben, Zahlen und _</div>
           <div id="usernameError" style="font-size:12px;color:var(--red);display:none;margin-top:3px"></div>
         </div>
-        <div><label class="field-label">E-Mail</label><input class="field-input" type="email" id="regEmail" placeholder="maximechristalle@gmail.com" required></div>
+        <div><label class="field-label">E-Mail</label><input class="field-input" type="email" id="regEmail" placeholder="deine@email.de" required></div>
         <div><label class="field-label">Passwort</label><input class="field-input" type="password" id="regPassword" placeholder="min. 6 Zeichen" required minlength="6"></div>
         <button class="auth-btn" type="submit" id="registerBtn">Konto erstellen</button>
         <div class="auth-divider">Schon ein Konto? <span style="color:var(--yellow);cursor:pointer;font-weight:600" onclick="switchTab('login')">Einloggen</span></div>
@@ -988,7 +988,7 @@
 
 </div>
 <script>
-  const ADMIN_EMAIL = 'maximechristalle@gmail.com';
+  const ADMIN_EMAIL = 'DEINE-EMAIL@gmail.com';
 
   let currentLang = localStorage.getItem('buscar_lang') || 'de';
 
@@ -2069,7 +2069,7 @@
     const body = document.getElementById('adminBody');
     body.innerHTML = '<div style="text-align:center;padding:40px"><div style="width:28px;height:28px;border:3px solid #FFF8EC;border-top-color:#F5A623;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto"></div></div>';
     try {
-      const snap = await db.collection('listings').where('verified', '==', false).orderBy('created_at', 'desc').get();
+      const snap = await db.collection('listings').where('verified', '==', false).get();
       const pending = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       document.getElementById('adminSub').textContent = pending.length + ' offen';
       if (!pending.length) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-icon">&#10003;</div><div class="admin-empty-text">Alles geprüft!</div><div class="admin-empty-sub">Keine offenen Einträge.</div></div>'; return; }
