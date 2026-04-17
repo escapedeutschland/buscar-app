@@ -6,6 +6,10 @@
   <meta name="theme-color" content="#F5A623">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Buscar">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-touch-fullscreen" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <title>Buscar – Deutsche in Paraguay</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -252,6 +256,29 @@
     .map-chip-unterkunft.active  { background: #8B5CF6; border-color: #8B5CF6; color: white; }
     .map-chip-geschaefte.active  { background: #EF4444; border-color: #EF4444; color: white; }
 
+    /* DEAL SYSTEM */
+    .deal-badge { display: inline-flex; align-items: center; gap: 4px; background: linear-gradient(135deg, #FF6B35 0%, #F7C548 100%); color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.3px; flex-shrink: 0; }
+    .deal-badge svg { width: 10px; height: 10px; fill: white; stroke: none; }
+    .deal-card { background: linear-gradient(135deg, #FFF5F0 0%, #FFFBF0 100%); border: 1.5px solid #FFD4B8; border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; }
+    .deal-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .deal-card-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #FF6B35, #F7C548); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .deal-card-icon svg { width: 18px; height: 18px; fill: white; }
+    .deal-card-title { font-size: 13px; font-weight: 700; color: #C2410C; }
+    .deal-card-sub { font-size: 11px; color: #EA580C; margin-top: 1px; }
+    .deal-text { font-size: 14px; color: var(--text-1); font-weight: 500; line-height: 1.5; margin-bottom: 10px; }
+    .deal-code-wrap { display: flex; align-items: center; gap: 8px; background: white; border: 1.5px dashed #FFA07A; border-radius: 10px; padding: 10px 14px; }
+    .deal-code { font-size: 16px; font-weight: 800; color: #C2410C; letter-spacing: 2px; flex: 1; font-family: 'Fraunces', serif; }
+    .deal-copy-btn { padding: 7px 14px; background: linear-gradient(135deg, #FF6B35, #F7C548); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .deal-expiry { font-size: 11px; color: #EA580C; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
+    .deal-expiry svg { width: 11px; height: 11px; stroke: #EA580C; fill: none; }
+    .admin-deal-section { background: #FFF5F0; border: 1.5px solid #FFD4B8; border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+    .admin-deal-title { font-size: 12px; font-weight: 700; color: #C2410C; margin-bottom: 10px; }
+
+    /* OFFLINE */
+    .offline-banner { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: #1A1A1A; color: white; text-align: center; font-size: 12px; font-weight: 600; padding: 8px; z-index: 2000; display: none; }
+    .offline-banner.visible { display: block; }
+    .cache-info { font-size: 11px; color: var(--text-3); text-align: center; padding: 4px 0 8px; }
+
     /* CITY PICKER */
     .city-picker-btn { display: flex; align-items: center; gap: 8px; margin: 0 16px 10px; padding: 10px 14px; background: var(--card); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; border: 1.5px solid var(--border); transition: border-color 0.2s; }
     .city-picker-btn.active { border-color: var(--yellow); background: var(--yellow-light); }
@@ -413,6 +440,7 @@
   </style>
 </head>
 <body>
+<div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
 <div id="app">
 
   <!-- AUTH -->
@@ -533,6 +561,9 @@
       <div class="detail-cta" id="detailCta"></div>
 
       <div id="detailOwnerSection"></div>
+
+      <!-- DEAL -->
+      <div id="detailDealCard"></div>
 
       <!-- BEWERTUNGEN -->
       <div class="detail-card" id="detailRatingsCard">
@@ -1535,13 +1566,38 @@
     try {
       const snap = await db.collection('listings').where('verified', '==', true).get();
       allListings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      // Cache to localStorage for offline use
+      try { localStorage.setItem('buscar_listings', JSON.stringify(allListings)); localStorage.setItem('buscar_listings_ts', Date.now()); } catch(e) {}
       await loadAllRatings();
       buildCityChips();
       renderListings();
+      document.getElementById('offlineBanner').classList.remove('visible');
     } catch (err) {
+      // Try loading from cache
+      try {
+        const cached = localStorage.getItem('buscar_listings');
+        const ts = localStorage.getItem('buscar_listings_ts');
+        if (cached) {
+          allListings = JSON.parse(cached);
+          const mins = Math.round((Date.now() - parseInt(ts)) / 60000);
+          await loadAllRatings();
+          buildCityChips();
+          renderListings();
+          document.getElementById('offlineBanner').textContent = '📡 Offline – letzte Aktualisierung vor ' + (mins < 60 ? mins + ' Min.' : Math.round(mins/60) + ' Std.');
+          document.getElementById('offlineBanner').classList.add('visible');
+          return;
+        }
+      } catch(e) {}
       document.getElementById('listingsInner').innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-title">Verbindungsfehler</div></div>';
     }
   }
+
+  // Listen for online/offline events
+  window.addEventListener('online', () => { loadListings(); });
+  window.addEventListener('offline', () => {
+    document.getElementById('offlineBanner').textContent = '📡 Kein Internet – zeige gespeicherte Daten';
+    document.getElementById('offlineBanner').classList.add('visible');
+  });
 
   const ALL_PY_CITIES = [
     'Alle',
@@ -1718,7 +1774,7 @@
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
-    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>` + (l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : ''):''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
   }
 
   function showDetail(id) {
@@ -1747,6 +1803,24 @@
     if (l.phone) ctaHTML += `<a class="detail-cta-btn primary" href="tel:${l.phone}"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${t('call')}</a>`;
     if (l.lat && l.lng) ctaHTML += `<a class="detail-cta-btn secondary" href="https://maps.google.com/?q=${l.lat},${l.lng}" target="_blank"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>${t('route')}</a>`;
     document.getElementById('detailCta').innerHTML = ctaHTML;
+    // Render deal
+    const dealCard = document.getElementById('detailDealCard');
+    if (l.deal_text) {
+      const expiry = l.deal_expiry ? `<div class="deal-expiry"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Gültig bis: ${l.deal_expiry}</div>` : '';
+      const codeSection = l.deal_code ? `<div class="deal-code-wrap"><span class="deal-code">${l.deal_code}</span><button class="deal-copy-btn" onclick="copyDealCode('${l.deal_code}')">Kopieren</button></div>` : '';
+      dealCard.innerHTML = `<div class="deal-card">
+        <div class="deal-card-header">
+          <div class="deal-card-icon"><svg viewBox="0 0 24 24"><path d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z"/></svg></div>
+          <div><div class="deal-card-title">Exklusiver Buscar-Deal</div><div class="deal-card-sub">Nur für App-Nutzer</div></div>
+        </div>
+        <div class="deal-text">${l.deal_text}</div>
+        ${codeSection}
+        ${expiry}
+      </div>`;
+    } else {
+      dealCard.innerHTML = '';
+    }
+
     currentListingId = id;
     showScreen('screenDetail');
     loadReviews(id);
@@ -1974,6 +2048,7 @@
         <div style="display:flex;gap:12px;margin-top:8px">
           <span id="adminTabListings" onclick="loadAdminListings()" style="cursor:pointer;font-weight:700;color:white;border-bottom:2px solid white;padding-bottom:2px">Einträge</span>
           <span id="adminTabClaims" onclick="loadAdminClaims()" style="cursor:pointer;color:rgba(255,255,255,0.6)">Inhaber-Anfragen${claimBadge}</span>
+          <span onclick="loadAdminDeals()" style="cursor:pointer;color:rgba(255,255,255,0.6)">🏷 Deals</span>
         </div>`;
     } else {
       // Update badge if tab already exists
@@ -2063,6 +2138,58 @@
       document.getElementById('adminCard_'+id).remove();
       await loadListings();
     } catch (err) { alert('Fehler.'); }
+  }
+
+  async function loadAdminDeals() {
+    showScreen('screenAdmin');
+    // Switch to deals tab
+    document.getElementById('adminTabListings').style.color = 'rgba(255,255,255,0.6)';
+    document.getElementById('adminTabListings').style.borderBottom = 'none';
+    const body = document.getElementById('adminBody');
+    body.innerHTML = '<div style="text-align:center;padding:40px"><div style="width:28px;height:28px;border:3px solid #FFF8EC;border-top-color:#F5A623;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto"></div></div>';
+    try {
+      const snap = await db.collection('listings').where('verified','==',true).get();
+      const listings = snap.docs.map(d => ({id:d.id,...d.data()}));
+      body.innerHTML = `<div style="padding:12px 0 4px;font-size:12px;color:rgba(255,255,255,0.6);text-align:center">Deals für verifizierte Einträge verwalten</div>` +
+        listings.map(l => `<div class="admin-card" id="dealCard_${l.id}">
+          <div class="admin-card-name">${l.name}</div>
+          <div class="admin-card-meta">${l.city||''}</div>
+          ${l.deal_text ? `<div class="admin-deal-section"><div class="admin-deal-title">🏷 Aktiver Deal</div><div style="font-size:13px;color:var(--text-2);margin-bottom:6px">${l.deal_text}</div>${l.deal_code?`<div style="font-size:12px;font-weight:700;color:#C2410C">Code: ${l.deal_code}</div>`:''}</div>` : ''}
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+            <input class="field-input" type="text" id="dealText_${l.id}" placeholder="Deal-Beschreibung (z.B. 10% Rabatt für Buscar-Nutzer)" value="${l.deal_text||''}" style="font-size:13px;padding:10px 12px">
+            <input class="field-input" type="text" id="dealCode_${l.id}" placeholder="Gutscheincode (optional)" value="${l.deal_code||''}" style="font-size:13px;padding:10px 12px">
+            <input class="field-input" type="text" id="dealExpiry_${l.id}" placeholder="Gültig bis (z.B. 31.12.2025)" value="${l.deal_expiry||''}" style="font-size:13px;padding:10px 12px">
+            <div style="display:flex;gap:8px">
+              <button class="admin-btn approve" style="flex:2" onclick="saveDeal('${l.id}')">Deal speichern</button>
+              ${l.deal_text ? `<button class="admin-btn reject" style="flex:1" onclick="removeDeal('${l.id}')">Entfernen</button>` : ''}
+            </div>
+          </div>
+        </div>`).join('');
+    } catch(e) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-text">Fehler beim Laden</div></div>'; }
+  }
+
+  async function saveDeal(listingId) {
+    const text = document.getElementById('dealText_'+listingId).value.trim();
+    const code = document.getElementById('dealCode_'+listingId).value.trim();
+    const expiry = document.getElementById('dealExpiry_'+listingId).value.trim();
+    try {
+      await db.collection('listings').doc(listingId).update({
+        deal_text: text || null, deal_code: code || null, deal_expiry: expiry || null
+      });
+      await loadListings();
+      const btn = event.target;
+      btn.textContent = '✓ Gespeichert!';
+      setTimeout(() => { btn.textContent = 'Deal speichern'; }, 2000);
+    } catch(e) { alert('Fehler.'); }
+  }
+
+  async function removeDeal(listingId) {
+    if (!confirm('Deal wirklich entfernen?')) return;
+    try {
+      await db.collection('listings').doc(listingId).update({ deal_text: null, deal_code: null, deal_expiry: null });
+      await loadListings();
+      loadAdminDeals();
+    } catch(e) { alert('Fehler.'); }
   }
   async function rejectEntry(id) {
     if (!confirm('Eintrag wirklich löschen?')) return;
@@ -2878,6 +3005,17 @@
     renderMap();
   }
 
+  function copyDealCode(code) {
+    navigator.clipboard.writeText(code).then(() => {
+      const btn = event.target;
+      btn.textContent = '✓ Kopiert!';
+      btn.style.background = 'var(--green)';
+      setTimeout(() => { btn.textContent = 'Kopieren'; btn.style.background = ''; }, 2000);
+    }).catch(() => {
+      alert('Code: ' + code);
+    });
+  }
+
   function useMyLocation() {
     const btn = document.getElementById('locationBtn');
     const status = document.getElementById('locationStatus');
@@ -2928,6 +3066,15 @@
   searchClear.addEventListener('click', () => { searchInput.value = ''; searchQuery = ''; searchClear.classList.remove('visible'); renderListings(); });
   // Apply saved language on startup
   applyLang();
+
+  // Register Service Worker for PWA
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/buscar-app/sw.js')
+        .then(() => console.log('SW registered'))
+        .catch(e => console.log('SW failed:', e));
+    });
+  }
 </script>
 </body>
 </html>
