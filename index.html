@@ -234,6 +234,29 @@
     .translated-text.visible { display: block; }
     .translate-source { font-size: 10px; color: var(--text-3); margin-top: 4px; }
 
+    /* MAP COLORED CHIPS */
+    .map-chip { display: flex; align-items: center; gap: 5px; padding: 8px 16px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--bg); cursor: pointer; white-space: nowrap; font-size: 12px; font-weight: 600; color: var(--text-2); transition: all 0.2s ease; flex-shrink: 0; letter-spacing: -0.1px; }
+    .map-chip.active { color: white; border-color: transparent; transform: translateY(-1px); }
+    .map-chip-all.active { background: linear-gradient(135deg, #1A1A1A 0%, #3A3A3A 100%); box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
+    .map-chip-restaurants { }
+    .map-chip-restaurants.active { background: linear-gradient(135deg, #F5A623 0%, #D4841A 100%); box-shadow: 0 4px 16px rgba(245,166,35,0.45); }
+    .map-chip-dienstleistung { }
+    .map-chip-dienstleistung.active { background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%); box-shadow: 0 4px 16px rgba(59,130,246,0.4); }
+    .map-chip-orte { }
+    .map-chip-orte.active { background: linear-gradient(135deg, #22C55E 0%, #15803D 100%); box-shadow: 0 4px 16px rgba(34,197,94,0.4); }
+    .map-chip-unterkunft { }
+    .map-chip-unterkunft.active { background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%); box-shadow: 0 4px 16px rgba(139,92,246,0.4); }
+    .map-chip-geschaefte { }
+    .map-chip-geschaefte.active { background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%); box-shadow: 0 4px 16px rgba(239,68,68,0.4); }
+    /* Color dots on chips when not active */
+    .map-chip:not(.active) .chip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .map-chip.active .chip-dot { display: none; }
+    .map-chip-restaurants .chip-dot { background: #F5A623; }
+    .map-chip-dienstleistung .chip-dot { background: #3B82F6; }
+    .map-chip-orte .chip-dot { background: #22C55E; }
+    .map-chip-unterkunft .chip-dot { background: #8B5CF6; }
+    .map-chip-geschaefte .chip-dot { background: #EF4444; }
+
     /* CITY PICKER */
     .city-picker-btn { display: flex; align-items: center; gap: 8px; margin: 0 16px 10px; padding: 10px 14px; background: var(--card); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; border: 1.5px solid var(--border); transition: border-color 0.2s; }
     .city-picker-btn.active { border-color: var(--yellow); background: var(--yellow-light); }
@@ -553,12 +576,12 @@
     </div>
     <div class="map-filters">
       <div class="map-filter-row" id="mapCats">
-        <div class="map-chip active" data-cat="Alle">Alle</div>
-        <div class="map-chip" data-cat="kat-restaurants">Restaurants</div>
-        <div class="map-chip" data-cat="kat-dienstleistung">Dienst&shy;leistungen</div>
-        <div class="map-chip" data-cat="kat-orte">Orte</div>
-        <div class="map-chip" data-cat="kat-unterkunft">Unterkünfte</div>
-        <div class="map-chip" data-cat="kat-geschaefte">Geschäfte</div>
+        <div class="map-chip map-chip-all active" data-cat="Alle" data-i18n="cat_all">Alle</div>
+        <div class="map-chip map-chip-restaurants" data-cat="kat-restaurants"><span class="chip-dot"></span><span data-i18n="cat_restaurants">Restaurants</span></div>
+        <div class="map-chip map-chip-dienstleistung" data-cat="kat-dienstleistung"><span class="chip-dot"></span><span data-i18n="cat_services">Dienstleistungen</span></div>
+        <div class="map-chip map-chip-orte" data-cat="kat-orte"><span class="chip-dot"></span><span data-i18n="cat_places">Orte</span></div>
+        <div class="map-chip map-chip-unterkunft" data-cat="kat-unterkunft"><span class="chip-dot"></span><span data-i18n="cat_accommodation">Unterkünfte</span></div>
+        <div class="map-chip map-chip-geschaefte" data-cat="kat-geschaefte"><span class="chip-dot"></span><span data-i18n="cat_shops">Geschäfte</span></div>
       </div>
       <div class="map-filter-row" id="mapCities"></div>
     </div>
@@ -1245,7 +1268,9 @@
     document.querySelectorAll('#mapCats .map-chip').forEach(el => {
       const cat = el.dataset.cat;
       const catKeyMap = {'Alle':'cat_all','kat-restaurants':'cat_restaurants','kat-dienstleistung':'cat_services','kat-orte':'cat_places','kat-unterkunft':'cat_accommodation','kat-geschaefte':'cat_shops'};
-      if (cat && catKeyMap[cat]) el.textContent = t(catKeyMap[cat]);
+      if (!cat || !catKeyMap[cat]) return;
+      const span = el.querySelector('[data-i18n]') || el;
+      span.textContent = t(catKeyMap[cat]);
     });
 
     // Filter buttons
@@ -1821,7 +1846,9 @@
     const chip = e.target.closest('.map-chip');
     if (!chip || chip.classList.contains('city-chip')) return;
     document.querySelectorAll('#mapCats .map-chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active'); mapCategory = chip.dataset.cat; renderMap();
+    chip.classList.add('active');
+    mapCategory = chip.dataset.cat;
+    renderMap();
   });
 
   function hasEmoji(str) { return /\p{Emoji}/u.test(str); }
