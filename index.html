@@ -2039,12 +2039,19 @@
       }).addTo(leafletMap);
       L.control.attribution({ prefix: '© CartoDB · © OpenStreetMap' }).addTo(leafletMap);
 
-      // Load Paraguay GeoJSON from repo
-      fetch('/buscar-app/paraguay.geojson')
+      // Load Paraguay precise borders from Nominatim/OSM
+      fetch('https://nominatim.openstreetmap.org/search?q=Paraguay&polygon_geojson=1&format=geojson&limit=1', {
+        headers: {'Accept': 'application/json'}
+      })
         .then(r => r.json())
-        .then(addParaguayOverlay)
+        .then(data => {
+          if (data.features && data.features.length > 0) {
+            addParaguayOverlay(data);
+          }
+        })
         .catch(() => {
-          fetch('https://raw.githubusercontent.com/escapedeutschland/buscar-app/main/paraguay.geojson')
+          // Fallback: load from own repo
+          fetch('/buscar-app/paraguay.geojson')
             .then(r => r.json())
             .then(addParaguayOverlay)
             .catch(() => {});
