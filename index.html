@@ -2923,7 +2923,6 @@
     try {
       const snap = await db.collection('listing_photos')
         .where('listing_id', '==', listingId)
-        .where('pending', '==', false)
         .orderBy('created_at', 'asc').get();
       const photos = snap.docs.map(d => ({id: d.id, ...d.data()}));
       grid.innerHTML = photos.map(p => `
