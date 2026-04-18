@@ -1628,7 +1628,7 @@
   }
 
   function showScreen(id) {
-    const dbb = document.getElementById('detailBackBtn'); if(dbb) dbb.style.display='none';
+    const dbb = document.getElementById('detailBackBtn'); if(dbb) dbb.style.display = id==='screenDetail' ? 'flex' : 'none';
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     window.scrollTo(0, 0);
