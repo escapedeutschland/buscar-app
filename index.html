@@ -1994,30 +1994,6 @@
     });
   }
 
-  function addParaguayOverlay(data) {
-    if (!leafletMap) return;
-    const worldBounds = [[-90,-180],[-90,180],[90,180],[90,-180]];
-    const coords = data.features[0].geometry.coordinates[0];
-    // Convert [lng,lat] → [lat,lng] for Leaflet
-    const pyCoords = coords.map(c => [c[1], c[0]]);
-    // Dim outside Paraguay
-    L.polygon([worldBounds, pyCoords], {
-      color: 'transparent',
-      fillColor: '#1A1A2E',
-      fillOpacity: 0.40,
-      interactive: false
-    }).addTo(leafletMap);
-    // Golden dashed border
-    L.polygon(pyCoords, {
-      color: '#F5A623',
-      weight: 2,
-      opacity: 0.75,
-      fillOpacity: 0,
-      interactive: false,
-      dashArray: '6 3'
-    }).addTo(leafletMap);
-  }
-
   function renderMap() {
     // Init Leaflet map once
     if (!leafletMap) {
@@ -2039,23 +2015,7 @@
       }).addTo(leafletMap);
       L.control.attribution({ prefix: '© CartoDB · © OpenStreetMap' }).addTo(leafletMap);
 
-      // Load Paraguay precise borders from Nominatim/OSM
-      fetch('https://nominatim.openstreetmap.org/search?q=Paraguay&polygon_geojson=1&format=geojson&limit=1', {
-        headers: {'Accept': 'application/json'}
-      })
-        .then(r => r.json())
-        .then(data => {
-          if (data.features && data.features.length > 0) {
-            addParaguayOverlay(data);
-          }
-        })
-        .catch(() => {
-          // Fallback: load from own repo
-          fetch('/buscar-app/paraguay.geojson')
-            .then(r => r.json())
-            .then(addParaguayOverlay)
-            .catch(() => {});
-        });
+      // Paraguay overlay removed for stability
 
         // Add markers
     withCoords.forEach(l => {
@@ -2101,7 +2061,7 @@
     mapCategory = chip.dataset.cat;
     renderMap();
   });
-  } // end renderMap
+  }
 
   function hasEmoji(str) { return /\p{Emoji}/u.test(str); }
   function isValidPhone(str) { return !str || /^[0-9+\s\-().]+$/.test(str); }
