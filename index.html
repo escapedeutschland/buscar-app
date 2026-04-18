@@ -1761,6 +1761,7 @@
       setAvatarDisplay(avatarUrl, initial);
       document.getElementById('profilName').textContent = displayName;
       document.getElementById('profilEmail').textContent = user.email;
+      updateGreeting();
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
     } else {
       showScreen('screenAuth');
@@ -1802,7 +1803,8 @@
     const h = new Date().getHours();
     const el = document.getElementById('headerGreeting');
     if (!el) return;
-    const name = currentUser ? (document.getElementById('profilName')?.textContent || '').split(' ')[0] : '';
+    const rawName = currentUser ? (document.getElementById('profilName')?.textContent || currentUser.email.split('@')[0] || '') : '';
+    const name = rawName && rawName !== '-' ? rawName.split(' ')[0] : '';
     const suffix = name ? ', ' + name + '!' : '!';
     if (h >= 5 && h < 12) el.textContent = t('greet_morning') + suffix;
     else if (h >= 12 && h < 18) el.textContent = t('greet_day') + suffix;
