@@ -144,15 +144,16 @@
     /* DETAIL */
     .detail-screen { background: var(--bg); overflow-y: auto; }
     .detail-hero { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 52px 20px 28px; position: relative; overflow: hidden; transition: min-height 0.3s ease; }
-    .detail-hero.has-cover { min-height: 280px; display: flex; flex-direction: column; justify-content: flex-end; padding-top: 52px; }
+    .detail-hero.has-cover { height: 300px; min-height: 300px; display: flex; flex-direction: column; justify-content: flex-end; padding-top: 0; padding-bottom: 24px; }
     .detail-hero.has-cover .detail-hero-icon { display: none; }
+    .detail-hero.has-cover .detail-hero-content { margin-top: auto; }
     .detail-cover { position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;z-index:0; }
     .detail-cover-overlay { position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.1) 60%,transparent 100%);z-index:1; }
     .detail-hero-content { position:relative;z-index:2; }
     .detail-cover-upload { position:absolute;top:52px;right:16px;z-index:10;background:rgba(0,0,0,0.35);border:none;border-radius:10px;padding:6px 10px;color:white;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;backdrop-filter:blur(4px); }
     .detail-cover-upload svg { width:13px;height:13px;stroke:white;fill:none;stroke-width:2; }
     .detail-hero::before { content:''; position:absolute; top:-30px; right:-30px; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,0.07); pointer-events:none; }
-    .detail-back { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 20px; }
+    .detail-back { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 20px;  position: relative; z-index: 10; }
     .detail-back svg { width: 20px; height: 20px; stroke: white; }
     .detail-hero-icon { width: 68px; height: 68px; border-radius: 20px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
     .detail-hero-icon svg { width: 34px; height: 34px; stroke: white; }
@@ -362,7 +363,7 @@
     .city-sheet-empty { text-align: center; padding: 30px; color: var(--text-3); font-size: 13px; }
 
     /* FAVORITEN */
-    .fav-btn { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; top: 52px; right: 20px; }
+    .fav-btn { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; top: 52px; right: 20px;  position: relative; z-index: 10; }
     .fav-btn svg { width: 20px; height: 20px; transition: all 0.2s; }
     .fav-btn.active svg { fill: #EF4444; stroke: #EF4444; }
     .fav-btn:not(.active) svg { fill: none; stroke: white; }
