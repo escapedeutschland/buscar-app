@@ -366,7 +366,7 @@
     .map-popup-city { font-size: 12px; color: #AAAAAA; font-family: 'DM Sans', sans-serif; }
     .map-popup-cat { font-size: 11px; color: #D4841A; font-weight: 600; margin-top: 4px; font-family: 'DM Sans', sans-serif; }
     .leaflet-popup-tip-container { display: none; }
-    .map-list { position: absolute; bottom: 160px; left: 0; right: 0; padding: 0 12px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; z-index: 500; }
+    .map-list { position: absolute; bottom: 12px; left: 0; right: 0; padding: 0 12px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; z-index: 500; }
     .map-list::-webkit-scrollbar { display: none; }
     .map-card { background: var(--card); border-radius: 14px; padding: 12px 14px; min-width: 180px; max-width: 220px; box-shadow: var(--shadow-md); cursor: pointer; flex-shrink: 0; border: 1.5px solid transparent; transition: border-color 0.15s; }
     .map-card:active { border-color: var(--yellow); }
@@ -2004,13 +2004,13 @@
       leafletMap = L.map('leafletMap', {
         zoomControl: true,
         attributionControl: false,
-        minZoom: 4,
+        minZoom: 5,
         maxZoom: 18,
         maxBounds: paraguayBounds,
         maxBoundsViscosity: 0.3,
         zoomAnimationThreshold: 4,
         bounceAtZoomLimits: false
-      }).setView([-20.5, -58.0], 5);
+      }).setView([-18.0, -58.0], 5);
       leafletMap.options.paddingTopLeft = [0, 0];
       leafletMap.options.paddingBottomRight = [0, 140];
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -2018,17 +2018,14 @@
       }).addTo(leafletMap);
       L.control.attribution({ prefix: '© OpenStreetMap' }).addTo(leafletMap);
 
-      // Smooth slow bounce-back when zooming out too far
+      // Smooth snap-back on zoom out
       leafletMap.on('zoomend', function() {
-        const z = leafletMap.getZoom();
-        if (z < 5) {
-          setTimeout(() => {
-            leafletMap.flyTo([-19.5, -58.0], 5, {
-              animate: true,
-              duration: 2.5,
-              easeLinearity: 0.02
-            });
-          }, 600);
+        if (leafletMap.getZoom() < 5) {
+          leafletMap.flyTo(leafletMap.getCenter(), 5, {
+            animate: true,
+            duration: 0.8,
+            easeLinearity: 0.25
+          });
         }
       });
     }
@@ -2074,7 +2071,7 @@
     if (withCoords.length === 1) {
       leafletMap.setView([withCoords[0].lat, withCoords[0].lng], 14);
     } else if (mapCityFilter === 'Alle' && mapCategory === 'Alle') {
-      leafletMap.flyTo([-19.5, -58.0], 5, { animate: true, duration: 1.0 });
+      leafletMap.flyTo([-18.0, -58.0], 5, { animate: true, duration: 1.0 });
     } else {
       const bounds = L.latLngBounds(withCoords.map(l => [l.lat, l.lng]));
       leafletMap.fitBounds(bounds, { paddingTopLeft: [50, 50], paddingBottomRight: [50, 120], maxZoom: 14 });
