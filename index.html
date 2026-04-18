@@ -805,7 +805,40 @@
         </div>
         <div class="form-field">
           <label class="field-label">Öffnungszeiten</label>
-          <input class="field-input" type="text" id="newHours" placeholder="z.B. Mo-Fr 08:00-18:00">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:8px;align-items:center">
+              <select id="hoursDay" class="field-input" style="flex:1;padding:10px 12px">
+                <option value="">Tage wählen...</option>
+                <option value="täglich">Täglich</option>
+                <option value="Mo-Fr">Mo – Fr</option>
+                <option value="Mo-Sa">Mo – Sa</option>
+                <option value="Mo-So">Mo – So</option>
+                <option value="Sa-So">Sa – So</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <select id="hoursFrom" class="field-input" style="flex:1;padding:10px 12px">
+                <option value="">Von...</option>
+                <option>06:00</option><option>07:00</option><option>08:00</option>
+                <option>09:00</option><option>10:00</option><option>11:00</option>
+                <option>12:00</option><option>13:00</option><option>14:00</option>
+                <option>15:00</option><option>16:00</option><option>17:00</option>
+                <option>18:00</option><option>19:00</option><option>20:00</option>
+                <option>21:00</option><option>22:00</option><option>23:00</option>
+              </select>
+              <span style="color:var(--text-3);font-size:14px">–</span>
+              <select id="hoursTo" class="field-input" style="flex:1;padding:10px 12px">
+                <option value="">Bis...</option>
+                <option>12:00</option><option>13:00</option><option>14:00</option>
+                <option>15:00</option><option>16:00</option><option>17:00</option>
+                <option>18:00</option><option>19:00</option><option>20:00</option>
+                <option>21:00</option><option>22:00</option><option>23:00</option>
+                <option>00:00</option>
+              </select>
+            </div>
+          </div>
+          <!-- Hidden field stores formatted value -->
+          <input type="hidden" id="newHours">
         </div>
       </div>
       <div class="form-card">
@@ -1002,7 +1035,37 @@
         </div>
         <div class="form-field">
           <label class="field-label">Öffnungszeiten</label>
-          <input class="field-input" type="text" id="editHours" placeholder="z.B. Mo-Fr 08:00-18:00">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <select id="editHoursDay" class="field-input" style="padding:10px 12px">
+              <option value="">Tage wählen...</option>
+              <option value="täglich">Täglich</option>
+              <option value="Mo-Fr">Mo – Fr</option>
+              <option value="Mo-Sa">Mo – Sa</option>
+              <option value="Mo-So">Mo – So</option>
+              <option value="Sa-So">Sa – So</option>
+            </select>
+            <div style="display:flex;gap:8px;align-items:center">
+              <select id="editHoursFrom" class="field-input" style="flex:1;padding:10px 12px">
+                <option value="">Von...</option>
+                <option>06:00</option><option>07:00</option><option>08:00</option>
+                <option>09:00</option><option>10:00</option><option>11:00</option>
+                <option>12:00</option><option>13:00</option><option>14:00</option>
+                <option>15:00</option><option>16:00</option><option>17:00</option>
+                <option>18:00</option><option>19:00</option><option>20:00</option>
+                <option>21:00</option><option>22:00</option><option>23:00</option>
+              </select>
+              <span style="color:var(--text-3);font-size:14px">–</span>
+              <select id="editHoursTo" class="field-input" style="flex:1;padding:10px 12px">
+                <option value="">Bis...</option>
+                <option>12:00</option><option>13:00</option><option>14:00</option>
+                <option>15:00</option><option>16:00</option><option>17:00</option>
+                <option>18:00</option><option>19:00</option><option>20:00</option>
+                <option>21:00</option><option>22:00</option><option>23:00</option>
+                <option>00:00</option>
+              </select>
+            </div>
+          </div>
+          <input type="hidden" id="editHours">
         </div>
       </div>
       <div id="editListingError" style="display:none;background:var(--red-light);color:var(--red);padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:14px"></div>
@@ -1883,7 +1946,7 @@
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
-    container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>` + (l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : ''):''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+    container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
   }
 
   function showDetail(id) {
@@ -2141,7 +2204,7 @@
     const btn = document.getElementById('formSubmitBtn');
     btn.disabled = true; btn.textContent = 'Wird eingereicht...';
     try {
-      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: document.getElementById('newHours').value.trim()||null, lat: window._newLat||null, lng: window._newLng||null, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date() });
+      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: (()=>{ const d=document.getElementById('hoursDay').value; const f=document.getElementById('hoursFrom').value; const t=document.getElementById('hoursTo').value; if(d&&f&&t){document.getElementById('newHours').value=d+' '+f+'-'+t;} return document.getElementById('newHours').value.trim()||null; })(), lat: window._newLat||null, lng: window._newLng||null, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date() });
       if (pendingFormPhotos.length) await uploadFormPhotos(ref.id);
       document.getElementById('formSuccess').textContent = t('submit_success'); document.getElementById('formSuccess').classList.add('visible');
       pendingFormPhotos = [];
@@ -2950,6 +3013,20 @@
     document.getElementById('editWebsite').value = l.website || '';
     document.getElementById('editAddress').value = l.address || '';
     document.getElementById('editHours').value = l.opening_hours || '';
+      if (l.opening_hours) {
+        const hp = l.opening_hours.split(' ');
+        if (hp.length >= 2) {
+          const el = document.getElementById('editHoursDay');
+          if (el) el.value = hp[0] || '';
+          const times = hp[1] ? hp[1].split('-') : [];
+          if (times.length === 2) {
+            const ef = document.getElementById('editHoursFrom');
+            const et = document.getElementById('editHoursTo');
+            if (ef) ef.value = times[0] || '';
+            if (et) et.value = times[1] || '';
+          }
+        }
+      }
     document.getElementById('editListingError').style.display = 'none';
     document.getElementById('editListingSuccess').style.display = 'none';
     document.getElementById('editListingBack').onclick = () => showScreen('screenDetail');
@@ -2973,7 +3050,7 @@
         phone: document.getElementById('editPhone').value.trim() || null,
         website: document.getElementById('editWebsite').value.trim() || null,
         address: document.getElementById('editAddress').value.trim() || null,
-        opening_hours: document.getElementById('editHours').value.trim() || null,
+        opening_hours: (()=>{ const d=document.getElementById('editHoursDay').value; const f=document.getElementById('editHoursFrom').value; const t=document.getElementById('editHoursTo').value; if(d&&f&&t){document.getElementById('editHours').value=d+' '+f+'-'+t;} return document.getElementById('editHours').value.trim()||null; })(),
         updated_at: new Date()
       });
       // Update local cache
