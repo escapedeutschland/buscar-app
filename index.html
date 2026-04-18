@@ -144,7 +144,7 @@
     .listing-arrow svg { width: 18px; height: 18px; stroke: var(--text-3); }
 
     /* DETAIL */
-    .detail-screen { background: var(--bg); overflow-y: auto; }
+    .detail-screen { background: var(--bg); overflow-y: auto; overflow-x: hidden; position: fixed; inset: 0; z-index: 50; }
     .detail-hero { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top,44px),44px) 20px 28px; position: relative; transition: min-height 0.3s ease; }
     .detail-hero.has-cover { height: calc(300px + env(safe-area-inset-top,0px)); min-height: calc(300px + env(safe-area-inset-top,0px)); display: flex; flex-direction: column; justify-content: flex-end; padding-top: 0; padding-bottom: 24px; }
     .detail-hero.has-cover .detail-hero-icon { display: none; }
@@ -613,6 +613,8 @@
         <div class="cat-chip" data-cat="kat-unterkunft" data-i18n="cat_accommodation">Unterkünfte</div>
         <div class="cat-chip" data-cat="kat-geschaefte" data-i18n="cat_shops">Geschäfte</div>
         <div class="cat-chip" data-cat="kat-sport" data-i18n="cat_sport">Sport & Fitness</div>
+        <div class="cat-chip" data-cat="kat-tankstelle">Tankstellen</div>
+        <div class="cat-chip" data-cat="kat-beauty">Beauty & Wellness</div>
       </div>
       <div id="cityPickerBtn" class="city-picker-btn" onclick="openCitySheet()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -1614,7 +1616,9 @@
     'kat-unterkunft': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
     'kat-geschaefte': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
     'kat-sport': '<svg viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l4.24 4.24"/><path d="M14.83 9.17l4.24-4.24"/><path d="M14.83 14.83l4.24 4.24"/><path d="M9.17 14.83l-4.24 4.24"/></svg>',
-    'default': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
+    'kat-tankstelle': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 22V10a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12"/><path d="M3 10H1"/><path d="M13 10h2l2 5 2-5h2"/><line x1="3" y1="22" x2="13" y2="22"/></svg>',
+    'kat-beauty': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+        'default': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
   };
   const catNames = { 'kat-restaurants': 'Restaurants', 'kat-dienstleistung': 'Dienstleistungen', 'kat-orte': 'Orte', 'kat-unterkunft': 'Unterkünfte', 'kat-geschaefte': 'Geschäfte', 'kat-sport': 'Sport & Fitness' };
 
@@ -1627,8 +1631,11 @@
     });
   }
 
+  let screenHistory = [];
   function showScreen(id) {
     const dbb = document.getElementById('detailBackBtn'); if(dbb) dbb.style.display = id==='screenDetail' ? 'flex' : 'none';
+    const prev = document.querySelector('.screen.active');
+    if (prev && prev.id !== id) screenHistory.push(prev.id);
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     window.scrollTo(0, 0);
@@ -1769,8 +1776,9 @@
       const btn = document.getElementById('coverUploadBtn');
       if (btn) btn.textContent = 'Lädt...';
       try {
-        const ref = firebase.storage().ref(`covers/${currentListingId}_${Date.now()}`);
-        await ref.put(file);
+        const compressed = await compressImage(file, 1600, 0.8);
+        const ref = firebase.storage().ref(`covers/${currentListingId}_${Date.now()}.jpg`);
+        await ref.put(compressed, {contentType:'image/jpeg'});
         const url = await ref.getDownloadURL();
         await db.collection('listings').doc(currentListingId).update({ cover_url: url });
         // Update local
@@ -1888,6 +1896,8 @@
     'kat-unterkunft': ['Alle', 'Hotel', 'Hostel', 'Ferienwohnung', 'B&B', 'Camping'],
     'kat-geschaefte': ['Alle', 'Supermarkt', 'Markt', 'Apotheke', 'Elektronik', 'Kleidung', 'Baumarkt'],
     'kat-sport': ['Alle', 'Fitnessstudio', 'Kampfsport', 'Yoga & Pilates', 'Schwimmbad', 'Fußball', 'Tennis', 'Radfahren', 'Crossfit', 'Klettern'],
+    'kat-tankstelle': ['Alle', 'Tankstelle', 'Autowaschanlage', 'Reifenservice'],
+    'kat-beauty': ['Alle', 'Frisör', 'Beauty-Salon', 'Spa & Wellness', 'Nagelpflege', 'Barbershop', 'Massage'],
   };
 
   function openFilterSheet(mode) {
@@ -2038,6 +2048,12 @@
     container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name" style="flex:1;min-width:0">${esc(l.name)}</div><div style="display:flex;gap:4px;align-items:center;flex-shrink:0">${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div></div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${esc(l.description||'')}">${esc(l.description)}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
   }
 
+  function goBack() {
+    const prev = screenHistory.length > 0 ? screenHistory.pop() : 'screenHome';
+    showScreen(prev);
+    if (prev === 'screenMap') { setTimeout(() => renderMap(), 100); }
+  }
+
   function showDetail(id) {
     const l = allListings.find(x => x.id === id);
     if (!l) return;
@@ -2131,6 +2147,8 @@
     'kat-unterkunft': '#8B5CF6',
     'kat-geschaefte': '#EF4444',
     'kat-sport': '#06B6D4',
+    'kat-tankstelle': '#EF4444',
+    'kat-beauty': '#EC4899',
     'default': '#6B6B6B'
   };
 
@@ -2637,8 +2655,11 @@
         const parts = timeStr.trim().split('-');
         if (parts.length < 2) return false;
         const open = parseTime(parts[0]);
-        const close = parseTime(parts[1]);
-        return hm >= open && hm < close;
+        let close = parseTime(parts[1]);
+        // Handle midnight crossing (e.g. 07:00-01:00 means closes at 1am next day)
+        if (close < open) close += 24 * 60;
+        const hm2 = hm < open && close > 24*60 ? hm + 24*60 : hm;
+        return hm2 >= open && hm2 < close;
       }
 
       function dayMatches(prefix) {
@@ -2918,21 +2939,39 @@
     }
   }
 
+  async function compressImage(file, maxPx=1200, quality=0.75) {
+    return new Promise(resolve => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxPx || h > maxPx) {
+          if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; }
+          else { w = Math.round(w * maxPx / h); h = maxPx; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(blob => { URL.revokeObjectURL(url); resolve(blob); }, 'image/jpeg', quality);
+      };
+      img.src = url;
+    });
+  }
+
   async function uploadPhoto(event, listingId) {
-    const file = event.target.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { alert('Foto ist zu groß. Max. 5 MB.'); return; }
-    if (!file.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
+    const rawFile = event.target.files[0];
+    if (!rawFile) return;
+    if (!rawFile.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
 
     const progress = document.getElementById('photoProgress');
     progress.style.display = 'block';
     progress.textContent = 'Wird hochgeladen...';
 
-    const filename = Date.now() + '_' + currentUser.uid + '.' + file.name.split('.').pop();
-    const ref = storage.ref('listings/' + listingId + '/' + filename);
-
     try {
-      const snap = await ref.put(file);
+      const file = await compressImage(rawFile);
+      const filename = Date.now() + '_' + currentUser.uid + '.jpg';
+      const ref = storage.ref('listings/' + listingId + '/' + filename);
+      const snap = await ref.put(file, {contentType:'image/jpeg'});
       const url = await snap.ref.getDownloadURL();
       const name = await getUsername();
       await db.collection('listing_photos').add({
@@ -3599,6 +3638,6 @@
     });
   }
 </script>
-  <button class="detail-back" id="detailBackBtn" onclick="showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <button class="detail-back" id="detailBackBtn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
 </body>
 </html>
