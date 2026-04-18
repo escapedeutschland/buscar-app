@@ -2007,12 +2007,23 @@
         minZoom: 5,
         maxZoom: 18,
         maxBounds: paraguayBounds,
-        maxBoundsViscosity: 0.85
-      }).setView([-21.5, -58.0], 5);
+        maxBoundsViscosity: 0.3,
+        zoomAnimationThreshold: 4,
+        bounceAtZoomLimits: false
+      }).setView([-20.5, -58.0], 5);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19
       }).addTo(leafletMap);
       L.control.attribution({ prefix: '© OpenStreetMap' }).addTo(leafletMap);
+
+      // Smooth gentle bounce-back when zooming out too far
+      leafletMap.on('zoomend', function() {
+        if (leafletMap.getZoom() < 5) {
+          setTimeout(() => {
+            leafletMap.flyTo([-20.5, -58.0], 5, { animate: true, duration: 1.2, easeLinearity: 0.1 });
+          }, 300);
+        }
+      });
     }
 
     // Clear existing markers
@@ -2056,7 +2067,7 @@
     if (withCoords.length === 1) {
       leafletMap.setView([withCoords[0].lat, withCoords[0].lng], 14);
     } else if (mapCityFilter === 'Alle' && mapCategory === 'Alle') {
-      leafletMap.setView([-21.5, -58.0], 5);
+      leafletMap.setView([-20.5, -58.0], 5);
     } else {
       const bounds = L.latLngBounds(withCoords.map(l => [l.lat, l.lng]));
       leafletMap.fitBounds(bounds, { paddingTopLeft: [50, 50], paddingBottomRight: [50, 120], maxZoom: 14 });
