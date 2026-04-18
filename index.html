@@ -2059,6 +2059,27 @@
     if (activeMinStars > 0) filtered = filtered.filter(l => { const avg = getAvgRating(l.id); return avg && avg >= activeMinStars; });
     if (activeOpenNow) filtered = filtered.filter(l => isOpen(l.opening_hours) === true);
     if (searchQuery) { const q = searchQuery.toLowerCase(); filtered = filtered.filter(l => (l.name||'').toLowerCase().includes(q)||(l.description||'').toLowerCase().includes(q)||(l.city||'').toLowerCase().includes(q)); }
+
+    // Relevanz-Sortierung
+    if (!searchQuery) {
+      filtered = filtered.slice().sort((a, b) => {
+        function score(l) {
+          let s = 0;
+          if (l.verified) s += 40;
+          const avg = getAvgRating(l.id); const cnt = (ratingsCache[l.id]||[]).length;
+          if (avg && cnt) s += Math.min(avg * cnt * 2, 30);
+          if (isNew(l.created_at)) s += 15;
+          if (l.phone) s += 3;
+          if (l.opening_hours) s += 3;
+          if (l.cover_url) s += 4;
+          if (l.description && l.description.length > 30) s += 3;
+          if (l.website) s += 2;
+          return s;
+        }
+        return score(b) - score(a);
+      });
+    }
+
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
