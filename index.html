@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#F5A623">
+  <!-- Cache bust: 20260418 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Buscar">
@@ -3486,11 +3487,10 @@
   applyLang();
 
   // Register Service Worker for PWA
+  // Unregister any old service workers to force fresh load
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/buscar-app/sw.js')
-        .then(() => console.log('SW registered'))
-        .catch(e => console.log('SW failed:', e));
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      regs.forEach(reg => reg.unregister());
     });
   }
 </script>
