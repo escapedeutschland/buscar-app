@@ -1695,6 +1695,7 @@
   }
 
   auth.onAuthStateChanged(async user => {
+    document.getElementById('app').style.opacity = '1';
     currentUser = user;
     if (user) {
       let displayName = user.email.split('@')[0];
