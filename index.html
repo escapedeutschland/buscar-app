@@ -1994,6 +1994,30 @@
     });
   }
 
+  function addParaguayOverlay(data) {
+    if (!leafletMap) return;
+    const worldBounds = [[-90,-180],[-90,180],[90,180],[90,-180]];
+    const coords = data.features[0].geometry.coordinates[0];
+    // Convert [lng,lat] → [lat,lng] for Leaflet
+    const pyCoords = coords.map(c => [c[1], c[0]]);
+    // Dim outside Paraguay
+    L.polygon([worldBounds, pyCoords], {
+      color: 'transparent',
+      fillColor: '#1A1A2E',
+      fillOpacity: 0.40,
+      interactive: false
+    }).addTo(leafletMap);
+    // Golden dashed border
+    L.polygon(pyCoords, {
+      color: '#F5A623',
+      weight: 2,
+      opacity: 0.75,
+      fillOpacity: 0,
+      interactive: false,
+      dashArray: '6 3'
+    }).addTo(leafletMap);
+  }
+
   function renderMap() {
     // Init Leaflet map once
     if (!leafletMap) {
@@ -2015,130 +2039,18 @@
       }).addTo(leafletMap);
       L.control.attribution({ prefix: '© CartoDB · © OpenStreetMap' }).addTo(leafletMap);
 
-      // Load accurate Paraguay GeoJSON and add overlay
-      fetch('https://restcountries.com/v3.1/alpha/pry')
-        .then(() => {}) // just a test, use geojson instead
-        .catch(() => {});
-
-      fetch('https://raw.githubusercontent.com/Gab0/PY-GeoJson/master/DEPARTAMENTOS.json')
+      // Load Paraguay GeoJSON from repo
+      fetch('/buscar-app/paraguay.geojson')
         .then(r => r.json())
-        .then(data => {
-          // Use departamentos to build Paraguay outline
-          const worldBounds = [[-90, -180], [-90, 180], [90, 180], [90, -180]];
-          const pyLayer = L.geoJSON(data, { style: { opacity: 0, fillOpacity: 0 } });
-          const pyBounds = pyLayer.getBounds();
-          
-          // Get coordinates from all features combined
-          const allCoords = [];
-          data.features.forEach(f => {
-            const geo = f.geometry;
-            const polys = geo.type === 'Polygon' ? [geo.coordinates] : geo.coordinates;
-            polys.forEach(poly => {
-              poly[0].forEach(c => allCoords.push([c[1], c[0]]));
-            });
-          });
-
-          // Use convex hull approximation - just draw each departamento
-          L.geoJSON(data, {
-            style: {
-              color: '#F5A623',
-              weight: 0,
-              fillOpacity: 0
-            },
-            interactive: false
-          }).addTo(leafletMap);
-
-          // Create mask by drawing Paraguay with a hole
-          const dim = L.geoJSON(data, {
-            style: { opacity: 0, fillOpacity: 0 },
-            interactive: false
-          });
-
-          // Overlay: dark outside Paraguay, using GeoJSON inversion trick
-          const maskGeoJSON = {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [[-180,-90],[-180,90],[180,90],[180,-90],[-180,-90]],
-              ]
-            }
-          };
-          // Subtract Paraguay from world mask
-          data.features.forEach(f => {
-            const geo = f.geometry;
-            const polys = geo.type === 'Polygon' ? [geo.coordinates] : geo.coordinates;
-            polys.forEach(poly => {
-              maskGeoJSON.geometry.coordinates.push(poly[0]);
-            });
-          });
-          L.geoJSON(maskGeoJSON, {
-            style: {
-              fillColor: '#1A1A2E',
-              fillOpacity: 0.42,
-              color: 'transparent',
-              weight: 0
-            },
-            interactive: false
-          }).addTo(leafletMap);
-
-          // Golden border outline per departamento
-          L.geoJSON(data, {
-            style: {
-              color: '#F5A623',
-              weight: 1.5,
-              opacity: 0.5,
-              fillOpacity: 0,
-              dashArray: '4 3'
-            },
-            interactive: false
-          }).addTo(leafletMap);
-        })
+        .then(addParaguayOverlay)
         .catch(() => {
-          // Fallback: simple dim overlay without precise border
-          const worldBounds = [[-90, -180], [-90, 180], [90, 180], [90, -180]];
-          const fallbackPY = [
-            [-19.34,-59.45],[-19.34,-60.0],[-19.65,-61.73],[-20.15,-61.93],
-            [-20.56,-62.27],[-21.0,-62.64],[-22.0,-62.31],[-22.87,-61.84],
-            [-24.93,-60.01],[-26.87,-58.2],[-27.56,-56.85],[-27.33,-56.29],
-            [-26.83,-55.16],[-24.69,-54.29],[-23.27,-54.45],[-22.84,-55.05],
-            [-21.99,-55.87],[-20.76,-56.07],[-20.33,-57.55],[-19.53,-57.96],[-19.34,-59.45]
-          ];
-          L.polygon([worldBounds, fallbackPY], {
-            color:'transparent', fillColor:'#1A1A2E', fillOpacity:0.42, interactive:false
-          }).addTo(leafletMap);
-          L.polygon(fallbackPY, {
-            color:'#F5A623', weight:2, opacity:0.7, fillOpacity:0, interactive:false, dashArray:'6 4'
-          }).addTo(leafletMap);
+          fetch('https://raw.githubusercontent.com/escapedeutschland/buscar-app/main/paraguay.geojson')
+            .then(r => r.json())
+            .then(addParaguayOverlay)
+            .catch(() => {});
         });
-    }
 
-    // City filter is now a sheet - no longer needed here
-
-    // Clear existing markers
-    leafletMarkers.forEach(m => leafletMap.removeLayer(m));
-    leafletMarkers = [];
-
-    // Filter listings
-    let filtered = allListings;
-    if (mapCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === mapCategory);
-    if (mapCityFilter !== 'Alle') filtered = filtered.filter(l => l.city === mapCityFilter);
-    if (mapSubcatFilter !== 'Alle') filtered = filtered.filter(l => (l.subcategory||'') === mapSubcatFilter);
-    if (mapMinStars > 0) filtered = filtered.filter(l => { const avg = getAvgRating(l.id); return avg && avg >= mapMinStars; });
-
-    const withCoords = filtered.filter(l => l.lat && l.lng);
-    const noCoords = filtered.filter(l => !l.lat || !l.lng);
-
-    // Update header
-    document.getElementById('mapHeaderSub').textContent = withCoords.length + ' Orte auf der Karte';
-    document.getElementById('mapNoCoords').style.display = noCoords.length ? 'block' : 'none';
-
-    if (!withCoords.length) {
-      document.getElementById('mapList').innerHTML = '';
-      return;
-    }
-
-    // Add markers
+        // Add markers
     withCoords.forEach(l => {
       const color = catColors[l.category_id] || catColors['default'];
       const marker = L.marker([l.lat, l.lng], { icon: makeMarkerIcon(color) });
