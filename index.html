@@ -2012,7 +2012,7 @@
         zoomDelta: 0.5,
         wheelPxPerZoomLevel: 120,
         bounceAtZoomLimits: false
-      }).setView([-17.0, -58.0], 5);
+      }).setView([-14.0, -60.5], 5);
       leafletMap.options.paddingTopLeft = [0, 0];
       leafletMap.options.paddingBottomRight = [0, 140];
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -2020,16 +2020,19 @@
       }).addTo(leafletMap);
       L.control.attribution({ prefix: '© OpenStreetMap' }).addTo(leafletMap);
 
-      // Smooth snap-back using moveend for smoother feel
-      leafletMap.on('moveend zoomend', function() {
+      // Smooth elastic snap-back
+      let snapTimeout = null;
+      leafletMap.on('zoomend', function() {
         const z = leafletMap.getZoom();
-        if (z < 4.8) {
-          leafletMap.flyTo(leafletMap.getCenter(), 5, {
-            animate: true,
-            duration: 0.6,
-            easeLinearity: 0.5,
-            noMoveStart: true
-          });
+        if (z < 5) {
+          clearTimeout(snapTimeout);
+          snapTimeout = setTimeout(() => {
+            leafletMap.flyTo(leafletMap.getCenter(), 5, {
+              animate: true,
+              duration: 1.0,
+              easeLinearity: 0.15
+            });
+          }, 100);
         }
       });
     }
@@ -2075,7 +2078,7 @@
     if (withCoords.length === 1) {
       leafletMap.setView([withCoords[0].lat, withCoords[0].lng], 14);
     } else if (mapCityFilter === 'Alle' && mapCategory === 'Alle') {
-      leafletMap.setView([-17.0, -58.0], 5, { animate: false });
+      leafletMap.setView([-14.0, -60.5], 5, { animate: false });
     } else {
       const bounds = L.latLngBounds(withCoords.map(l => [l.lat, l.lng]));
       leafletMap.fitBounds(bounds, { paddingTopLeft: [50, 50], paddingBottomRight: [50, 120], maxZoom: 14 });
