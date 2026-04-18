@@ -1997,11 +1997,17 @@
   function renderMap() {
     // Init Leaflet map once
     if (!leafletMap) {
+      const paraguayBounds = L.latLngBounds(
+        L.latLng(-35.0, -70.0),
+        L.latLng(-10.0, -45.0)
+      );
       leafletMap = L.map('leafletMap', {
         zoomControl: true,
         attributionControl: false,
-        minZoom: 3,
+        minZoom: 5,
         maxZoom: 18,
+        maxBounds: paraguayBounds,
+        maxBoundsViscosity: 1.0,
         zoomSnap: 0,
         zoomDelta: 0.5,
         wheelPxPerZoomLevel: 100,
