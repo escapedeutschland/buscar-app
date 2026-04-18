@@ -812,7 +812,7 @@
         </div>
         <div class="form-field">
           <label class="field-label">Kategorie *</label>
-          <select class="field-select" id="newCategory" onchange="updateSubcatOptions()">
+          <select class="field-select" id="newCategory" onchange="updateSubcatOptions();this.classList.remove('error')">
             <option value="">Bitte wählen...</option>
             <option value="kat-restaurants">Restaurants und Cafés</option>
             <option value="kat-dienstleistung">Dienstleistungen</option>
@@ -830,7 +830,8 @@
         </div>
         <div class="form-field">
           <label class="field-label">Stadt *</label>
-          <input class="field-input" type="text" id="newCity" placeholder="z.B. Asunción, Encarnación">
+          <input class="field-input" type="text" id="newCity" placeholder="z.B. Asunción, Encarnación" oninput="this.classList.remove('error')">
+          <span class="field-error" id="cityError" style="display:none;color:#dc2626;font-size:12px;margin-top:4px">Stadt ist ein Pflichtfeld.</span>
         </div>
       </div>
       <div class="form-card">
@@ -2377,11 +2378,15 @@
     document.getElementById('phoneError').classList.remove('visible');
     document.getElementById('formError').classList.remove('visible');
     document.getElementById('formSuccess').classList.remove('visible');
+    document.getElementById('catError').style.display = 'none';
+    document.getElementById('cityError').style.display = 'none';
 
     if (hasEmoji(name)) { document.getElementById('nameError').classList.add('visible'); document.getElementById('newName').classList.add('error'); valid = false; } else { document.getElementById('newName').classList.remove('error'); }
     if (desc.length < 50) { document.getElementById('descError').classList.add('visible'); document.getElementById('newDesc').classList.add('error'); valid = false; } else { document.getElementById('newDesc').classList.remove('error'); }
     if (!isValidPhone(phone)) { document.getElementById('phoneError').classList.add('visible'); document.getElementById('newPhone').classList.add('error'); valid = false; } else { document.getElementById('newPhone').classList.remove('error'); }
-    if (!name || !cat || !city || !desc) { document.getElementById('formError').textContent = t('fill_all'); document.getElementById('formError').classList.add('visible'); valid = false; }
+    if (!cat) { document.getElementById('catError').style.display = 'block'; document.getElementById('newCategory').classList.add('error'); valid = false; } else { document.getElementById('newCategory').classList.remove('error'); }
+    if (!city) { document.getElementById('cityError').style.display = 'block'; document.getElementById('newCity').classList.add('error'); valid = false; } else { document.getElementById('newCity').classList.remove('error'); }
+    if (!name || !cat || !city || !desc) { if (name && cat && city) { document.getElementById('formError').textContent = t('fill_all'); document.getElementById('formError').classList.add('visible'); } valid = false; }
     if (!valid) return;
 
     const btn = document.getElementById('formSubmitBtn');
