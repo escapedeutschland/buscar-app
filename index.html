@@ -35,7 +35,7 @@
     .screen.active { display: flex; }
 
     /* AUTH */
-    .auth-header { background: linear-gradient(135deg, var(--yellow) 0%, var(--yellow-dark) 100%); padding: 70px 32px 40px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; }
+    .auth-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 70px 32px 40px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
     .auth-logo-icon { width: 64px; height: 64px; background: rgba(255,255,255,0.22); border-radius: 18px; display: flex; align-items: center; justify-content: center; }
     .auth-logo-icon svg { width: 34px; height: 34px; }
     .auth-logo-name { font-family: 'Fraunces', Georgia, serif; font-size: 36px; font-weight: 900; color: white; letter-spacing: -1px; }
@@ -330,7 +330,7 @@
 
     /* KARTE */
     .map-screen { background: var(--bg); overflow: hidden; display: none; flex-direction: column; }
-    .map-header { background: linear-gradient(135deg, var(--yellow) 0%, var(--yellow-dark) 100%); padding: 52px 20px 16px; flex-shrink: 0; }
+    .map-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 52px 20px 16px; flex-shrink: 0; position: relative; overflow: hidden; }
     .map-header-title { font-size: 20px; font-weight: 700; color: white; margin-bottom: 4px; }
     .map-header-sub { font-size: 13px; color: rgba(255,255,255,0.8); }
     .map-filters { background: rgba(255,255,255,0.85); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-bottom: 0.5px solid rgba(0,0,0,0.06); flex-shrink: 0; }
@@ -402,7 +402,7 @@
     .admin-empty-sub { font-size: 13px; color: var(--text-2); }
 
     /* PROFIL */
-    .profil-header { background: linear-gradient(135deg, var(--yellow) 0%, var(--yellow-dark) 100%); padding: 60px 24px 32px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 60px 24px 32px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
     .profil-avatar { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 32px; font-weight: 900; color: white; }
     .profil-name { font-size: 20px; font-weight: 700; color: white; }
     .profil-email { font-size: 13px; color: rgba(255,255,255,0.8); }
@@ -449,12 +449,32 @@
   <!-- AUTH -->
   <div class="screen active" id="screenAuth">
     <div class="auth-header">
-      <div style="position:absolute;top:16px;right:16px">
+      <!-- Lang toggle -->
+      <div style="position:absolute;top:16px;right:16px;z-index:2">
         <button id="langToggleAuth" onclick="toggleLangAuth()" style="background:rgba(255,255,255,0.22);border:1.5px solid rgba(255,255,255,0.4);border-radius:20px;padding:5px 12px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:white;cursor:pointer;letter-spacing:0.5px">ES</button>
       </div>
-      <div class="auth-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></div>
-      <div class="auth-logo-name">Buscar</div>
-      <div class="auth-tagline" data-i18n="tagline">Dein Guide in Paraguay</div>
+      <!-- Floating category icon bubbles -->
+      <div style="position:absolute;top:18px;left:18px;width:44px;height:44px;background:rgba(255,255,255,0.13);border-radius:14px;display:flex;align-items:center;justify-content:center;transform:rotate(-12deg)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="22" height="22"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+      </div>
+      <div style="position:absolute;top:55px;left:52px;width:34px;height:34px;background:rgba(255,255,255,0.10);border-radius:10px;display:flex;align-items:center;justify-content:center;transform:rotate(8deg)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="16" height="16"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+      </div>
+      <div style="position:absolute;bottom:30px;left:24px;width:38px;height:38px;background:rgba(255,255,255,0.10);border-radius:12px;display:flex;align-items:center;justify-content:center;transform:rotate(-6deg)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="18" height="18"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <div style="position:absolute;bottom:48px;right:28px;width:40px;height:40px;background:rgba(255,255,255,0.10);border-radius:12px;display:flex;align-items:center;justify-content:center;transform:rotate(10deg)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="19" height="19"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div style="position:absolute;top:30px;right:64px;width:30px;height:30px;background:rgba(255,255,255,0.08);border-radius:8px;display:flex;align-items:center;justify-content:center;transform:rotate(-15deg)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+      </div>
+      <!-- Logo -->
+      <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:12px">
+        <div class="auth-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></div>
+        <div class="auth-logo-name">Buscar</div>
+        <div class="auth-tagline" data-i18n="tagline">Dein Guide in Paraguay</div>
+      </div>
     </div>
     <div class="auth-body">
       <div class="auth-tabs">
@@ -599,8 +619,29 @@
   <!-- KARTE -->
   <div class="screen map-screen" id="screenMap">
     <div class="map-header">
-      <div class="map-header-title" data-i18n="map_title">Karte</div>
-      <div class="map-header-sub" id="mapHeaderSub" data-i18n="map_sub_all">Alle Orte in Paraguay</div>
+      <!-- Decorative grid/coordinate pattern -->
+      <svg style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0.08;pointer-events:none" viewBox="0 0 400 120" preserveAspectRatio="xMidYMid slice">
+        <!-- Grid lines -->
+        <line x1="0" y1="30" x2="400" y2="30" stroke="white" stroke-width="1"/>
+        <line x1="0" y1="60" x2="400" y2="60" stroke="white" stroke-width="1"/>
+        <line x1="0" y1="90" x2="400" y2="90" stroke="white" stroke-width="1"/>
+        <line x1="80" y1="0" x2="80" y2="120" stroke="white" stroke-width="1"/>
+        <line x1="160" y1="0" x2="160" y2="120" stroke="white" stroke-width="1"/>
+        <line x1="240" y1="0" x2="240" y2="120" stroke="white" stroke-width="1"/>
+        <line x1="320" y1="0" x2="320" y2="120" stroke="white" stroke-width="1"/>
+        <!-- Map pins -->
+        <circle cx="80" cy="60" r="4" fill="white"/>
+        <circle cx="200" cy="30" r="3" fill="white"/>
+        <circle cx="300" cy="75" r="4" fill="white"/>
+        <circle cx="150" cy="90" r="2.5" fill="white"/>
+        <!-- Dotted route -->
+        <line x1="80" y1="60" x2="200" y2="30" stroke="white" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="200" y1="30" x2="300" y2="75" stroke="white" stroke-width="1.5" stroke-dasharray="4 4"/>
+      </svg>
+      <div style="position:relative;z-index:1">
+        <div class="map-header-title" data-i18n="map_title">Karte</div>
+        <div class="map-header-sub" id="mapHeaderSub" data-i18n="map_sub_all">Alle Orte in Paraguay</div>
+      </div>
     </div>
     <div class="map-filters">
       <div class="map-filter-row" id="mapCats">
@@ -642,7 +683,20 @@
 
   <!-- EINTRAG FORM -->
   <div class="screen form-screen" id="screenForm">
-    <div class="form-header">
+    <div class="form-header" style="position:relative;overflow:hidden">
+      <!-- Decorative pencil/plus elements -->
+      <div style="position:absolute;right:-10px;top:-10px;opacity:0.08;pointer-events:none">
+        <svg viewBox="0 0 120 120" width="120" height="120">
+          <path d="M80 10 L100 30 L40 90 L20 90 L20 70 Z" fill="white"/>
+          <rect x="85" y="5" width="20" height="8" rx="2" fill="white" transform="rotate(45 95 9)"/>
+        </svg>
+      </div>
+      <div style="position:absolute;left:20px;bottom:-8px;opacity:0.06;pointer-events:none">
+        <svg viewBox="0 0 60 60" width="60" height="60">
+          <line x1="30" y1="5" x2="30" y2="55" stroke="white" stroke-width="6" stroke-linecap="round"/>
+          <line x1="5" y1="30" x2="55" y2="30" stroke="white" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      </div>
       <button class="form-back" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       <div class="form-title" data-i18n="suggest_entry">Eintrag vorschlagen</div>
       <div class="form-sub" data-i18n="after_review">Wird nach Prüfung veröffentlicht</div>
@@ -750,6 +804,16 @@
   <!-- PROFIL -->
   <div class="screen" id="screenProfil">
     <div class="profil-header">
+      <!-- Decorative rings -->
+      <svg style="position:absolute;top:-20px;right:-20px;opacity:0.07;pointer-events:none" viewBox="0 0 160 160" width="160" height="160">
+        <circle cx="80" cy="80" r="70" fill="none" stroke="white" stroke-width="2"/>
+        <circle cx="80" cy="80" r="50" fill="none" stroke="white" stroke-width="2"/>
+        <circle cx="80" cy="80" r="30" fill="none" stroke="white" stroke-width="2"/>
+      </svg>
+      <svg style="position:absolute;bottom:-30px;left:-20px;opacity:0.06;pointer-events:none" viewBox="0 0 120 120" width="120" height="120">
+        <circle cx="60" cy="60" r="55" fill="none" stroke="white" stroke-width="2"/>
+        <circle cx="60" cy="60" r="35" fill="none" stroke="white" stroke-width="2"/>
+      </svg>
       <div style="position:relative;display:inline-block;cursor:pointer" onclick="document.getElementById('avatarFileInput').click()">
         <div class="profil-avatar" id="profilAvatar" style="overflow:hidden">?</div>
         <div style="position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:var(--yellow);border:2px solid white;display:flex;align-items:center;justify-content:center">
@@ -765,7 +829,7 @@
       <div class="profil-email" id="profilEmail">-</div>
       <div id="avatarProgress" style="font-size:12px;color:rgba(255,255,255,0.8);display:none">Wird hochgeladen...</div>
     </div>
-    <div class="profil-body">
+<div class="profil-body">
       <div class="profil-section">
         <div class="profil-row" onclick="setNav('navHome');showScreen('screenHome')">
           <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><span class="profil-row-label" data-i18n="to_home">Zur Startseite</span></div>
