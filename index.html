@@ -2009,11 +2009,10 @@
         maxBounds: paraguayBounds,
         maxBoundsViscosity: 0.85
       }).setView([-23.0, -58.0], 5);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
-        subdomains: 'abcd'
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
       }).addTo(leafletMap);
-      L.control.attribution({ prefix: '© CartoDB · © OpenStreetMap' }).addTo(leafletMap);
+      L.control.attribution({ prefix: '© OpenStreetMap' }).addTo(leafletMap);
     }
 
     // Clear existing markers
