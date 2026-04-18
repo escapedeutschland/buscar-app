@@ -37,6 +37,17 @@
     .screen { display: none; flex-direction: column; min-height: 100vh; }
     .screen.active { display: flex; }
 
+    /* SPLASH */
+    #splash { position: fixed; inset: 0; background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 99999; transition: opacity 0.4s ease; }
+    #splash.hidden { opacity: 0; pointer-events: none; }
+    .splash-icon { width: 80px; height: 80px; background: rgba(255,255,255,0.22); border-radius: 22px; display: flex; align-items: center; justify-content: center; }
+    .splash-icon svg { width: 40px; height: 40px; stroke: white; }
+    .splash-name { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 700; color: white; letter-spacing: -0.5px; }
+    .splash-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.6); animation: splashPulse 1.2s ease-in-out infinite; }
+    .splash-dot:nth-child(2) { animation-delay: 0.2s; }
+    .splash-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes splashPulse { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+
     /* AUTH */
     .auth-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top), 50px) 32px 40px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
     .auth-logo-icon { width: 64px; height: 64px; background: rgba(255,255,255,0.22); border-radius: 18px; display: flex; align-items: center; justify-content: center; }
@@ -479,7 +490,12 @@
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
-<div id="app">
+  <div id="splash">
+    <div class="splash-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></div>
+    <div class="splash-name">Buscar</div>
+    <div style="display:flex;gap:8px;margin-top:8px"><div class="splash-dot"></div><div class="splash-dot"></div><div class="splash-dot"></div></div>
+  </div>
+<div id="app" style="visibility:hidden">
 
   <!-- AUTH -->
   <div class="screen active" id="screenAuth">
@@ -1695,7 +1711,10 @@
   }
 
   auth.onAuthStateChanged(async user => {
-    document.getElementById('app').style.opacity = '1';
+    document.getElementById('app').style.visibility = 'visible';
+    const splash = document.getElementById('splash');
+    splash.classList.add('hidden');
+    setTimeout(() => splash.style.display = 'none', 420);
     currentUser = user;
     if (user) {
       let displayName = user.email.split('@')[0];
