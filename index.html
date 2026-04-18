@@ -653,6 +653,46 @@
     </nav>
   </div>
 
+  <!-- LEGAL SCREENS -->
+  <div class="screen" id="screenImpressum">
+    <div class="header" style="padding-bottom:20px">
+      <div class="header-top">
+        <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <div id="impressumTitle" style="color:white;font-weight:700;font-size:17px">Impressum</div>
+        <div style="width:38px"></div>
+      </div>
+    </div>
+    <div style="padding:20px;overflow-y:auto;flex:1">
+      <div class="detail-card" id="impressumBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screenDatenschutz">
+    <div class="header" style="padding-bottom:20px">
+      <div class="header-top">
+        <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <div id="datenschutzTitle" style="color:white;font-weight:700;font-size:17px">Datenschutz</div>
+        <div style="width:38px"></div>
+      </div>
+    </div>
+    <div style="padding:20px;overflow-y:auto;flex:1">
+      <div class="detail-card" id="datenschutzBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screenAGB">
+    <div class="header" style="padding-bottom:20px">
+      <div class="header-top">
+        <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <div id="agbTitle" style="color:white;font-weight:700;font-size:17px">Nutzungsbedingungen</div>
+        <div style="width:38px"></div>
+      </div>
+    </div>
+    <div style="padding:20px;overflow-y:auto;flex:1">
+      <div class="detail-card" id="agbBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div>
+    </div>
+  </div>
+
   <!-- DETAIL -->
   <div class="screen detail-screen" id="screenDetail">
     <div class="detail-hero" id="detailHero">
@@ -987,6 +1027,20 @@
             </div>
             <span class="profil-row-label" data-i18n="my_favorites">Meine Favoriten</span>
           </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+      <div class="profil-section" style="margin-bottom:16px">
+        <div class="profil-row" onclick="showScreen('screenImpressum')">
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="profil-row-label">Impressum</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="profil-row" onclick="showScreen('screenDatenschutz')">
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="profil-row-label">Datenschutz</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="profil-row" onclick="showScreen('screenAGB')">
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="profil-row-label">Nutzungsbedingungen</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
@@ -1400,6 +1454,7 @@
 
   function toggleLang() {
     currentLang = currentLang === 'de' ? 'es' : 'de';
+    renderLegalScreens();
     localStorage.setItem('buscar_lang', currentLang);
     contentTranslated = false;
     applyLang();
@@ -1755,7 +1810,7 @@
     currentUser = user;
     if (user) {
       // Switch screen immediately - no waiting for Firestore
-      updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings();
+      updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
       // Reveal app NOW before Firestore fetch
       const splash = document.getElementById('splash');
       splash.style.display = 'none';
@@ -1809,6 +1864,70 @@
       input.value = '';
     });
   })();
+
+  function renderLegalScreens() {
+    const de = currentLang === 'de';
+
+    // Impressum
+    const it = document.getElementById('impressumTitle');
+    const ib = document.getElementById('impressumBody');
+    if (it) it.textContent = de ? 'Impressum' : 'Aviso Legal';
+    if (ib) ib.innerHTML = de ? `
+      <p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Angaben gemäß § 5 TMG</p>
+      <p><strong>Verantwortlich:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay</p><br>
+      <p><strong>Kontakt:</strong><br>E-Mail: maximechristalle@gmail.com</p><br>
+      <p><strong>Hinweis:</strong><br>Buscar ist ein privates Informationsprojekt ohne kommerziellen Charakter. Die App befindet sich im Aufbau und erhebt keinen Anspruch auf Vollständigkeit der gelisteten Einträge.</p>
+    ` : `
+      <p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Aviso Legal</p>
+      <p><strong>Responsable:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay</p><br>
+      <p><strong>Contacto:</strong><br>Correo: maximechristalle@gmail.com</p><br>
+      <p><strong>Nota:</strong><br>Buscar es un proyecto de información privado sin fines comerciales. La app está en desarrollo y no garantiza la exhaustividad de los registros listados.</p>
+    `;
+
+    // Datenschutz
+    const dt = document.getElementById('datenschutzTitle');
+    const db2 = document.getElementById('datenschutzBody');
+    if (dt) dt.textContent = de ? 'Datenschutz' : 'Privacidad';
+    if (db2) db2.innerHTML = de ? `
+      <p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Datenschutzerklärung</p>
+      <p><strong>1. Verantwortlicher</strong><br>Maxime Christalle, San Bernardino, Paraguay<br>maximechristalle@gmail.com</p><br>
+      <p><strong>2. Erhobene Daten</strong><br>Bei der Registrierung erheben wir E-Mail-Adresse und Benutzernamen. Hochgeladene Fotos und Einträge werden gespeichert. Keine Weitergabe an Dritte ohne Einwilligung.</p><br>
+      <p><strong>3. Firebase / Google</strong><br>Wir nutzen Firebase (Google LLC) für Authentifizierung, Datenbank und Speicher. Weitere Infos: <a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br>
+      <p><strong>4. Deine Rechte</strong><br>Du hast das Recht auf Auskunft, Berichtigung und Löschung deiner Daten. Kontakt: maximechristalle@gmail.com</p><br>
+      <p><strong>5. Fotos</strong><br>Hochgeladene Fotos sind öffentlich sichtbar. Lade nur Bilder hoch, für die du die Rechte besitzt.</p><br>
+      <p><strong>6. Cookies</strong><br>Die App verwendet keine Tracking-Cookies. Firebase nutzt technisch notwendige Speichermechanismen.</p>
+    ` : `
+      <p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Política de Privacidad</p>
+      <p><strong>1. Responsable</strong><br>Maxime Christalle, San Bernardino, Paraguay<br>maximechristalle@gmail.com</p><br>
+      <p><strong>2. Datos recopilados</strong><br>Al registrarse recopilamos correo electrónico y nombre de usuario. Las fotos y entradas subidas se almacenan. No se comparten datos con terceros sin consentimiento.</p><br>
+      <p><strong>3. Firebase / Google</strong><br>Usamos Firebase (Google LLC) para autenticación, base de datos y almacenamiento. Más info: <a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br>
+      <p><strong>4. Tus derechos</strong><br>Tienes derecho a acceder, corregir y eliminar tus datos. Contacto: maximechristalle@gmail.com</p><br>
+      <p><strong>5. Fotos</strong><br>Las fotos subidas son visibles públicamente. Sube solo imágenes sobre las que tengas derechos.</p><br>
+      <p><strong>6. Cookies</strong><br>La app no usa cookies de seguimiento. Firebase usa mecanismos de almacenamiento técnicamente necesarios.</p>
+    `;
+
+    // AGB
+    const at = document.getElementById('agbTitle');
+    const ab = document.getElementById('agbBody');
+    if (at) at.textContent = de ? 'Nutzungsbedingungen' : 'Términos de Uso';
+    if (ab) ab.innerHTML = de ? `
+      <p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Nutzungsbedingungen</p>
+      <p><strong>1. Geltungsbereich</strong><br>Diese Bedingungen gelten für die Nutzung der App Buscar.</p><br>
+      <p><strong>2. Nutzung</strong><br>Buscar ist ein offenes Verzeichnis für Deutsche und Deutschsprachige in Paraguay. Die Nutzung ist kostenlos. Keine falschen, irreführenden oder beleidigenden Inhalte.</p><br>
+      <p><strong>3. Einträge</strong><br>Jeder registrierte Nutzer kann Einträge erstellen. Der Betreiber behält sich vor, Einträge ohne Angabe von Gründen zu entfernen.</p><br>
+      <p><strong>4. Fotos</strong><br>Du bist verantwortlich für deine hochgeladenen Inhalte. Keine Bilder von Personen ohne Einwilligung.</p><br>
+      <p><strong>5. Haftung</strong><br>Buscar übernimmt keine Gewähr für die Richtigkeit der Einträge. Nutzung auf eigene Verantwortung.</p><br>
+      <p><strong>6. Änderungen</strong><br>Diese Bedingungen können jederzeit angepasst werden.</p>
+    ` : `
+      <p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Términos de Uso</p>
+      <p><strong>1. Ámbito</strong><br>Estos términos aplican al uso de la app Buscar.</p><br>
+      <p><strong>2. Uso</strong><br>Buscar es un directorio abierto para alemanes y germanohablantes en Paraguay. El uso es gratuito. No se permite contenido falso, engañoso u ofensivo.</p><br>
+      <p><strong>3. Entradas</strong><br>Cualquier usuario registrado puede crear entradas. El administrador se reserva el derecho de eliminar entradas sin justificación.</p><br>
+      <p><strong>4. Fotos</strong><br>Eres responsable del contenido que subes. No subas fotos de personas sin su consentimiento.</p><br>
+      <p><strong>5. Responsabilidad</strong><br>Buscar no garantiza la exactitud de las entradas. El uso es bajo tu propia responsabilidad.</p><br>
+      <p><strong>6. Cambios</strong><br>Estos términos pueden modificarse en cualquier momento.</p>
+    `;
+  }
 
   function updateGreeting() {
     const searchEl = document.querySelector('#searchInput');
