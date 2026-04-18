@@ -2016,6 +2016,29 @@
       L.control.attribution({ prefix: '© CartoDB · © OpenStreetMap' }).addTo(leafletMap);
     }
 
+    // Clear existing markers
+    leafletMarkers.forEach(m => leafletMap.removeLayer(m));
+    leafletMarkers = [];
+
+    // Filter listings
+    let filtered = allListings;
+    if (mapCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === mapCategory);
+    if (mapCityFilter !== 'Alle') filtered = filtered.filter(l => l.city === mapCityFilter);
+    if (mapSubcatFilter !== 'Alle') filtered = filtered.filter(l => (l.subcategory||'') === mapSubcatFilter);
+    if (mapMinStars > 0) filtered = filtered.filter(l => { const avg = getAvgRating(l.id); return avg && avg >= mapMinStars; });
+
+    const withCoords = filtered.filter(l => l.lat && l.lng);
+    const noCoords = filtered.filter(l => !l.lat || !l.lng);
+
+    // Update header
+    document.getElementById('mapHeaderSub').textContent = withCoords.length + ' ' + t('map_sub_all').replace('Alle Orte in Paraguay','Orte auf der Karte').replace('Todos los lugares en Paraguay','lugares en el mapa');
+    document.getElementById('mapNoCoords').style.display = noCoords.length ? 'block' : 'none';
+
+    if (!withCoords.length) {
+      document.getElementById('mapList').innerHTML = '';
+      return;
+    }
+
     // Add markers
     withCoords.forEach(l => {
       const color = catColors[l.category_id] || catColors['default'];
