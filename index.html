@@ -155,7 +155,7 @@
     .detail-cover-upload { position:absolute;top:max(env(safe-area-inset-top,44px),44px);right:16px;z-index:10;background:rgba(0,0,0,0.35);border:none;border-radius:10px;padding:6px 10px;color:white;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;backdrop-filter:blur(4px); }
     .detail-cover-upload svg { width:13px;height:13px;stroke:white;fill:none;stroke-width:2; }
     .detail-hero::before { content:''; position:absolute; top:-30px; right:-30px; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,0.07); pointer-events:none; }
-    .detail-back { width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.30); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; top: max(env(safe-area-inset-top,0px),16px); left: 16px; z-index: 100; }
+    .detail-back { width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.35); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: none; display: none; align-items: center; justify-content: center; cursor: pointer; position: fixed; top: 56px; left: 16px; z-index: 99999; }
     .detail-back.visible { display: flex; }
     .detail-back svg { width: 20px; height: 20px; stroke: white; }
     .detail-hero-icon { width: 68px; height: 68px; border-radius: 20px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
@@ -644,7 +644,6 @@
     <div class="detail-hero" id="detailHero">
       <div class="detail-cover" id="detailCover"></div>
       <div class="detail-cover-overlay" id="detailCoverOverlay" style="display:none"></div>
-      <button class="detail-back" onclick="showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       <button class="fav-btn" id="favBtn" onclick="toggleFavorite()"><svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
       <div class="detail-hero-content">
       <div class="detail-hero-icon" id="detailIcon"></div>
@@ -3599,5 +3598,6 @@
     });
   }
 </script>
+  <button class="detail-back" id="detailBackBtn" onclick="showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
 </body>
 </html>
