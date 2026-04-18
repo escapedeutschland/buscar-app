@@ -2012,7 +2012,7 @@
         zoomDelta: 0.5,
         wheelPxPerZoomLevel: 100,
         bounceAtZoomLimits: false
-      }).setView([-22.0, -57.5], 5.8);
+      }).setView([-24.5, -57.5], 5.8);
       leafletMap.options.paddingTopLeft = [0, 0];
       leafletMap.options.paddingBottomRight = [0, 140];
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -2064,7 +2064,7 @@
     if (withCoords.length === 1) {
       leafletMap.setView([withCoords[0].lat, withCoords[0].lng], 14);
     } else if (mapCityFilter === 'Alle' && mapCategory === 'Alle') {
-      leafletMap.setView([-22.0, -57.5], 5.8, { animate: false });
+      leafletMap.setView([-24.5, -57.5], 5.8, { animate: false });
     } else {
       const bounds = L.latLngBounds(withCoords.map(l => [l.lat, l.lng]));
       leafletMap.fitBounds(bounds, { paddingTopLeft: [50, 50], paddingBottomRight: [50, 120], maxZoom: 14 });
