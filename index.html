@@ -1711,10 +1711,6 @@
   }
 
   auth.onAuthStateChanged(async user => {
-    document.getElementById('app').style.visibility = 'visible';
-    const splash = document.getElementById('splash');
-    splash.classList.add('hidden');
-    setTimeout(() => splash.style.display = 'none', 420);
     currentUser = user;
     if (user) {
       let displayName = user.email.split('@')[0];
@@ -1734,6 +1730,11 @@
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
       updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings();
     } else { showScreen('screenAuth'); }
+    // Now reveal app - correct screen is already set
+    document.getElementById('app').style.visibility = 'visible';
+    const splash = document.getElementById('splash');
+    splash.classList.add('hidden');
+    setTimeout(() => splash.style.display = 'none', 420);
   });
 
   function updateGreeting() {
