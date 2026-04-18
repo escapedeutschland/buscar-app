@@ -2014,10 +2014,9 @@
         subdomains: 'abcd'
       }).addTo(leafletMap);
       L.control.attribution({ prefix: '© CartoDB · © OpenStreetMap' }).addTo(leafletMap);
+    }
 
-      // Paraguay overlay removed for stability
-
-        // Add markers
+    // Add markers
     withCoords.forEach(l => {
       const color = catColors[l.category_id] || catColors['default'];
       const marker = L.marker([l.lat, l.lng], { icon: makeMarkerIcon(color) });
@@ -2061,7 +2060,6 @@
     mapCategory = chip.dataset.cat;
     renderMap();
   });
-  }
 
   function hasEmoji(str) { return /\p{Emoji}/u.test(str); }
   function isValidPhone(str) { return !str || /^[0-9+\s\-().]+$/.test(str); }
