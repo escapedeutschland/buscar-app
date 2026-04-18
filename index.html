@@ -259,6 +259,26 @@
     .map-chip-geschaefte.active  { background: #EF4444; border-color: #EF4444; color: white; }
     .map-chip-sport.active       { background: #06B6D4; border-color: #06B6D4; color: white; }
 
+    /* DUPLICATE WARNING */
+    .dupe-warning { background: #FFF8EC; border: 1.5px solid var(--yellow); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; display: none; }
+    .dupe-warning.visible { display: block; }
+    .dupe-warning-title { font-size: 13px; font-weight: 700; color: var(--yellow-dark); margin-bottom: 6px; }
+    .dupe-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 0.5px solid var(--border); }
+    .dupe-item:last-child { border-bottom: none; }
+    .dupe-item-name { font-size: 13px; font-weight: 600; color: var(--text-1); }
+    .dupe-item-city { font-size: 11px; color: var(--text-3); }
+    .dupe-view-btn { font-size: 11px; font-weight: 700; color: var(--yellow-dark); background: var(--yellow-light); border: 1px solid var(--yellow); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+    .form-search-wrap { background: var(--card); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; border: 1.5px solid var(--border); }
+    .form-search-title { font-size: 12px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+    .form-search-box { display: flex; align-items: center; background: var(--bg); border-radius: 12px; padding: 0 14px; gap: 8px; height: 44px; }
+    .form-search-box svg { width: 15px; height: 15px; stroke: var(--text-3); flex-shrink: 0; fill: none; }
+    .form-search-box input { flex: 1; border: none; outline: none; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-1); background: transparent; }
+    .form-search-results { margin-top: 8px; }
+    .form-search-result { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 0.5px solid var(--border); cursor: pointer; }
+    .form-search-result:last-child { border-bottom: none; }
+    .admin-similar { background: #FFF8EC; border: 1px solid var(--yellow); border-radius: 10px; padding: 10px 12px; margin-top: 8px; font-size: 12px; }
+    .admin-similar-title { font-weight: 700; color: var(--yellow-dark); margin-bottom: 6px; }
+
     /* DEAL SYSTEM */
     .deal-badge { display: inline-flex; align-items: center; gap: 4px; background: linear-gradient(135deg, #FF6B35 0%, #F7C548 100%); color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.3px; flex-shrink: 0; }
     .deal-badge svg { width: 10px; height: 10px; fill: white; stroke: none; }
@@ -716,8 +736,9 @@
         <div class="form-card-title">Grundinfos</div>
         <div class="form-field">
           <label class="field-label">Name des Ortes *</label>
-          <input class="field-input" type="text" id="newName" placeholder="z.B. Dr. Müller, Café Central" maxlength="60">
+          <input class="field-input" type="text" id="newName" placeholder="z.B. Dr. Müller, Café Central" maxlength="60" oninput="checkDuplicate();updateCounter('newName','nameCounter',60)">
           <div class="field-counter" id="nameCounter">0 / 60</div>
+          <div class="dupe-warning" id="dupeWarning"><div class="dupe-warning-title">⚠️ Ähnliche Einträge gefunden – bitte prüfen:</div><div id="dupeList"></div></div>
           <div class="field-error" id="nameError">Name darf keine Emojis enthalten.</div>
         </div>
         <div class="form-field">
@@ -2147,7 +2168,19 @@
       body.innerHTML = pending.map((l, idx) => {
         const photos = photoSnaps[idx].docs.map(d => d.data());
         const photoHTML = photos.length ? `<div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto">${photos.map(p => `<img src="${p.url}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0">`).join('')}</div>` : '';
-        return `<div class="admin-card" id="adminCard_${l.id}"><div class="admin-card-name">${l.name||'Ohne Name'}</div><div class="admin-card-meta">${catNames[l.category_id]||''} &middot; ${l.city||'Unbekannt'}</div>${photoHTML}<div class="admin-card-desc">${l.description||'Keine Beschreibung'}</div><div class="admin-card-info">${l.phone?`<div class="admin-info-pill">${l.phone}</div>`:''}${l.website?`<div class="admin-info-pill">${l.website}</div>`:''}${l.opening_hours?`<div class="admin-info-pill">${l.opening_hours}</div>`:''}</div><div class="admin-actions"><button class="admin-btn approve" onclick="approveEntry('${l.id}')">${t('approve')||'Genehmigen'}</button><button class="admin-btn reject" onclick="rejectEntry('${l.id}')">${t('reject')||'Ablehnen'}</button></div></div>`;
+        // Find similar existing listings
+        const lName = (l.name||'').toLowerCase();
+        const similar = allListings.filter(ex =>
+          ex.id !== l.id &&
+          ((ex.name||'').toLowerCase().includes(lName.slice(0,6)) ||
+           lName.includes((ex.name||'').toLowerCase().slice(0,6))) &&
+          ex.city === l.city
+        ).slice(0, 2);
+        const similarHTML = similar.length ? `<div class="admin-similar">
+          <div class="admin-similar-title">⚠️ Ähnliche Einträge in ${l.city}:</div>
+          ${similar.map(s => `<div style="font-size:12px;color:var(--text-1);padding:2px 0">${s.name}</div>`).join('')}
+        </div>` : '';
+        return `<div class="admin-card" id="adminCard_${l.id}"><div class="admin-card-name">${l.name||'Ohne Name'}</div><div class="admin-card-meta">${catNames[l.category_id]||''} &middot; ${l.city||'Unbekannt'}</div>${photoHTML}<div class="admin-card-desc">${l.description||'Keine Beschreibung'}</div>${similarHTML}<div class="admin-card-info">${l.phone?`<div class="admin-info-pill">${l.phone}</div>`:''}${l.website?`<div class="admin-info-pill">${l.website}</div>`:''}${l.opening_hours?`<div class="admin-info-pill">${l.opening_hours}</div>`:''}</div><div class="admin-actions"><button class="admin-btn approve" onclick="approveEntry('${l.id}')">${t('approve')||'Genehmigen'}</button><button class="admin-btn reject" onclick="rejectEntry('${l.id}')">${t('reject')||'Ablehnen'}</button></div></div>`;
       }).join('');
     } catch (err) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-text">Fehler beim Laden</div></div>'; }
   }
@@ -3124,6 +3157,56 @@
     }).catch(() => {
       alert('Code: ' + code);
     });
+  }
+
+  // Pre-search in form
+  function searchExisting(query) {
+    const results = document.getElementById('formPreSearchResults');
+    if (!query || query.length < 2) { results.innerHTML = ''; return; }
+    const q = query.toLowerCase();
+    const matches = allListings.filter(l =>
+      (l.name || '').toLowerCase().includes(q)
+    ).slice(0, 5);
+    if (!matches.length) {
+      results.innerHTML = '<div style="font-size:12px;color:var(--text-3);padding:8px 0">Keine Treffer – dieser Ort scheint neu zu sein ✓</div>';
+      return;
+    }
+    results.innerHTML = matches.map(l => `
+      <div class="form-search-result" onclick="showDetail('${l.id}');showScreen('screenDetail')">
+        <div>
+          <div class="dupe-item-name">${l.name}</div>
+          <div class="dupe-item-city">${l.city || ''} · ${l.category_id ? l.category_id.replace('kat-','') : ''}</div>
+        </div>
+        <span class="dupe-view-btn">Ansehen →</span>
+      </div>`).join('');
+  }
+
+  // Real-time duplicate check while typing name
+  function checkDuplicate() {
+    const name = (document.getElementById('newName').value || '').toLowerCase().trim();
+    const city = (document.getElementById('newCity') ? document.getElementById('newCity').value : '').toLowerCase();
+    const warning = document.getElementById('dupeWarning');
+    const list = document.getElementById('dupeList');
+    if (name.length < 3) { warning.classList.remove('visible'); return; }
+
+    const matches = allListings.filter(l => {
+      const ln = (l.name || '').toLowerCase();
+      // Check if name is similar (contains or starts with)
+      return ln.includes(name) || name.includes(ln) ||
+        (ln.split(' ').some(word => word.length > 3 && name.includes(word)));
+    }).slice(0, 3);
+
+    if (!matches.length) { warning.classList.remove('visible'); return; }
+
+    warning.classList.add('visible');
+    list.innerHTML = matches.map(l => `
+      <div class="dupe-item">
+        <div>
+          <div class="dupe-item-name">${l.name}</div>
+          <div class="dupe-item-city">${l.city || ''}</div>
+        </div>
+        <button class="dupe-view-btn" onclick="showDetail('${l.id}');showScreen('screenDetail')">Ansehen</button>
+      </div>`).join('');
   }
 
   function useMyLocation() {
