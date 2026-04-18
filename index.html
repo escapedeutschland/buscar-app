@@ -105,7 +105,7 @@
     #listingsInner { display: block; }
     .listings::-webkit-scrollbar { display: none; }
     .section-title { font-size: 12px; font-weight: 600; color: var(--text-3); letter-spacing: 1px; text-transform: uppercase; margin: 12px 0 10px; }
-    .listing-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px 16px 16px 20px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 14px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; border: 1px solid rgba(0,0,0,0.03); position: relative; overflow: hidden; }
+    .listing-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px 16px 16px 20px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 14px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; border: 1px solid rgba(0,0,0,0.03); position: relative; overflow: hidden; min-height: 100px; align-items: stretch; }
     .listing-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--cat-color, var(--yellow)); border-radius: 0; }
     @keyframes heartPop { 0%{transform:scale(1)} 30%{transform:scale(1.5)} 60%{transform:scale(0.9)} 100%{transform:scale(1)} }
     .fav-pop { animation: heartPop 0.4s ease; }
@@ -116,7 +116,7 @@
     .open-badge.closed { background:rgba(239,68,68,0.12);color:#dc2626; }
     @media (hover: hover) { .listing-card:active { transform: scale(0.982); box-shadow: var(--shadow-md); } }
     .listing-card { -webkit-tap-highlight-color: transparent; }
-    .listing-icon-wrap { width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, #FFF3D6 0%, var(--yellow-light) 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(245,166,35,0.15); }
+    .listing-icon-wrap { width: 56px; height: 56px; border-radius: 16px; align-self: center; background: linear-gradient(135deg, #FFF3D6 0%, var(--yellow-light) 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(245,166,35,0.15); }
     .listing-icon-wrap svg { width: 26px; height: 26px; stroke: var(--yellow); }
     .listing-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
     .listing-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 3px; }
