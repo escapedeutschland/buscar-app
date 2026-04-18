@@ -1803,6 +1803,7 @@
   // Filter state
   let activeSubcat = 'Alle';
   let activeMinStars = 0;
+  let activeOpenNow = false;
   let filterMode = 'sub';
 
   const subcats = {
@@ -1833,7 +1834,12 @@
         <div class="filter-star-btn${activeMinStars===3?' active':''}" onclick="selectStarFilter(3)">3+ ★</div>
         <div class="filter-star-btn${activeMinStars===4?' active':''}" onclick="selectStarFilter(4)">4+ ★</div>
         <div class="filter-star-btn${activeMinStars===5?' active':''}" onclick="selectStarFilter(5)">5 ★</div>
-      </div></div><div class="filter-divider"></div>`;
+      </div></div><div class="filter-divider"></div>
+        <div class="filter-section"><div class="filter-section-label">Öffnungszeiten</div>
+        <div style="display:flex;gap:8px">
+          <div class="filter-star-btn${!activeOpenNow?' active':''}" onclick="activeOpenNow=false;renderFilterSheet();renderListings()" style="flex:1">Alle</div>
+          <div class="filter-star-btn${activeOpenNow?' active':''}" onclick="activeOpenNow=true;renderFilterSheet();renderListings()" style="flex:1.5">🟢 Jetzt geöffnet</div>
+        </div></div>`;
     }
   }
 
@@ -1943,6 +1949,7 @@
     if (activeCity !== 'Alle') filtered = filtered.filter(l => l.city === activeCity);
     if (activeSubcat !== 'Alle') filtered = filtered.filter(l => (l.subcategory||'') === activeSubcat);
     if (activeMinStars > 0) filtered = filtered.filter(l => { const avg = getAvgRating(l.id); return avg && avg >= activeMinStars; });
+    if (activeOpenNow) filtered = filtered.filter(l => isOpen(l.opening_hours) === true);
     if (searchQuery) { const q = searchQuery.toLowerCase(); filtered = filtered.filter(l => (l.name||'').toLowerCase().includes(q)||(l.description||'').toLowerCase().includes(q)||(l.city||'').toLowerCase().includes(q)); }
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
