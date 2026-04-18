@@ -143,7 +143,9 @@
 
     /* DETAIL */
     .detail-screen { background: var(--bg); overflow-y: auto; }
-    .detail-hero { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 52px 20px 28px; position: relative; overflow: hidden; }
+    .detail-hero { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 52px 20px 28px; position: relative; overflow: hidden; transition: min-height 0.3s ease; }
+    .detail-hero.has-cover { min-height: 280px; display: flex; flex-direction: column; justify-content: flex-end; padding-top: 52px; }
+    .detail-hero.has-cover .detail-hero-icon { display: none; }
     .detail-cover { position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;z-index:0; }
     .detail-cover-overlay { position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.1) 60%,transparent 100%);z-index:1; }
     .detail-hero-content { position:relative;z-index:2; }
@@ -2043,10 +2045,12 @@
       cover.style.backgroundImage = `url(${l.cover_url})`;
       overlay.style.display = 'block';
       hero.style.background = 'none';
+      hero.classList.add('has-cover');
     } else {
       cover.style.backgroundImage = '';
       overlay.style.display = 'none';
       hero.style.background = 'linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%)';
+      hero.classList.remove('has-cover');
     }
     document.getElementById('detailIcon').innerHTML = catIcons[l.category_id]||catIcons['default'];
     const svg = document.getElementById('detailIcon').querySelector('svg');
