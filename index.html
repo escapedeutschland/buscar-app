@@ -2575,7 +2575,7 @@
 
       function dayMatches(prefix) {
         const p = prefix.toLowerCase().trim();
-        if (!p || p.includes('täglich') || p.includes('daily')) return true;
+        if (!p || p.includes('täglich') || p.includes('daily') || p.includes('24/7') || p.includes('durchgehend') || p.includes('immer')) return true;
         if (p.includes('mo') && p.includes('fr') && day >= 1 && day <= 5) return true;
         if (p.includes('mo') && p.includes('sa') && day >= 1 && day <= 6) return true;
         if (p.includes('mo') && p.includes('so') && day >= 1) return true;
@@ -2584,6 +2584,9 @@
         return false;
       }
 
+      // Special cases
+      const h24 = hours.toLowerCase().trim();
+      if (h24 === '24/7' || h24 === '24h' || h24 === 'täglich 24h' || h24 === 'durchgehend') return true;
       // Normalize dashes and split on &
       const normalized = hours.replace(/[–—]/g, '-');
       const blocks = normalized.split('&');
