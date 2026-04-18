@@ -1802,10 +1802,12 @@
     const h = new Date().getHours();
     const el = document.getElementById('headerGreeting');
     if (!el) return;
-    if (h >= 5 && h < 12) el.textContent = t('greet_morning');
-    else if (h >= 12 && h < 18) el.textContent = t('greet_day');
-    else if (h >= 18 && h < 22) el.textContent = t('greet_evening');
-    else el.textContent = t('greet_night');
+    const name = currentUser ? (document.getElementById('profilName')?.textContent || '').split(' ')[0] : '';
+    const suffix = name ? ', ' + name + '!' : '!';
+    if (h >= 5 && h < 12) el.textContent = t('greet_morning') + suffix;
+    else if (h >= 12 && h < 18) el.textContent = t('greet_day') + suffix;
+    else if (h >= 18 && h < 22) el.textContent = t('greet_evening') + suffix;
+    else el.textContent = t('greet_night') + suffix;
   }
 
   function setAvatarDisplay(url, initial) {
