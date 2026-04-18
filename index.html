@@ -155,7 +155,7 @@
     .detail-cover-upload { position:absolute;top:max(env(safe-area-inset-top,44px),44px);right:16px;z-index:10;background:rgba(0,0,0,0.35);border:none;border-radius:10px;padding:6px 10px;color:white;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;backdrop-filter:blur(4px); }
     .detail-cover-upload svg { width:13px;height:13px;stroke:white;fill:none;stroke-width:2; }
     .detail-hero::before { content:''; position:absolute; top:-30px; right:-30px; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,0.07); pointer-events:none; }
-    .detail-back { width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.35); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: none; display: none; align-items: center; justify-content: center; cursor: pointer; position: fixed; top: 56px; left: 16px; z-index: 99999; }
+    .detail-back { width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.15); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: none; display: none; align-items: center; justify-content: center; cursor: pointer; position: fixed; top: 56px; left: 16px; z-index: 99999; }
     .detail-back.visible { display: flex; }
     .detail-back svg { width: 20px; height: 20px; stroke: white; }
     .detail-hero-icon { width: 68px; height: 68px; border-radius: 20px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
@@ -366,7 +366,7 @@
     .city-sheet-empty { text-align: center; padding: 30px; color: var(--text-3); font-size: 13px; }
 
     /* FAVORITEN */
-    .fav-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.30); backdrop-filter: blur(8px); border: 1.5px solid rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; bottom: 24px; right: 20px; z-index: 10; flex-shrink: 0; }
+    .fav-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.15); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; bottom: 24px; right: 20px; z-index: 10; flex-shrink: 0; }
     .fav-btn svg { width: 20px; height: 20px; transition: all 0.2s; }
     .fav-btn.active svg { fill: #EF4444; stroke: #EF4444; }
     .fav-btn:not(.active) svg { fill: none; stroke: white; }
