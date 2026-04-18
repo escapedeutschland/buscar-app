@@ -1997,16 +1997,22 @@
   function renderMap() {
     // Init Leaflet map once
     if (!leafletMap) {
+      const paraguayBounds = L.latLngBounds(
+        L.latLng(-35.0, -70.0),
+        L.latLng(-10.0, -45.0)
+      );
       leafletMap = L.map('leafletMap', {
         zoomControl: true,
         attributionControl: false,
-        minZoom: 3,
+        minZoom: 5,
         maxZoom: 18,
+        maxBounds: paraguayBounds,
+        maxBoundsViscosity: 0.0,
         zoomSnap: 0,
-        zoomDelta: 0.3,
-        wheelPxPerZoomLevel: 80,
+        zoomDelta: 0.5,
+        wheelPxPerZoomLevel: 100,
         bounceAtZoomLimits: false
-      }).setView([-23.0, -58.0], 6);
+      }).setView([-22.0, -58.0], 6);
       leafletMap.options.paddingTopLeft = [0, 0];
       leafletMap.options.paddingBottomRight = [0, 140];
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -2014,27 +2020,7 @@
       }).addTo(leafletMap);
       L.control.attribution({ prefix: '© OpenStreetMap' }).addTo(leafletMap);
 
-      // Elastic rubber-band: snap back smoothly when too far out
-      const HOME = { lat: -23.0, lng: -58.0, zoom: 6 };
-      leafletMap.on('zoomend moveend', function() {
-        const z = leafletMap.getZoom();
-        const c = leafletMap.getCenter();
-        const tooFarOut = z < 5;
-        const tooFarNorth = c.lat > -10;
-        const tooFarSouth = c.lat < -35;
-        const tooFarWest = c.lng < -70;
-        const tooFarEast = c.lng > -45;
-        if (tooFarOut || tooFarNorth || tooFarSouth || tooFarWest || tooFarEast) {
-          const targetZoom = tooFarOut ? HOME.zoom : z;
-          const targetLat = tooFarNorth ? -10 : tooFarSouth ? -35 : c.lat;
-          const targetLng = tooFarWest ? -70 : tooFarEast ? -45 : c.lng;
-          leafletMap.flyTo([targetLat, targetLng], targetZoom, {
-            animate: true,
-            duration: 0.7,
-            easeLinearity: 0.1
-          });
-        }
-      });
+
     }
 
     // Clear existing markers
@@ -2078,7 +2064,7 @@
     if (withCoords.length === 1) {
       leafletMap.setView([withCoords[0].lat, withCoords[0].lng], 14);
     } else if (mapCityFilter === 'Alle' && mapCategory === 'Alle') {
-      leafletMap.setView([-23.0, -58.0], 6, { animate: false });
+      leafletMap.setView([-22.0, -58.0], 6, { animate: false });
     } else {
       const bounds = L.latLngBounds(withCoords.map(l => [l.lat, l.lng]));
       leafletMap.fitBounds(bounds, { paddingTopLeft: [50, 50], paddingBottomRight: [50, 120], maxZoom: 14 });
