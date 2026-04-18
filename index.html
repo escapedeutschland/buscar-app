@@ -38,8 +38,8 @@
     .screen.active { display: flex; }
 
     /* SPLASH */
-    #splash { position: fixed; inset: 0; background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 99999; transition: opacity 0.4s ease; }
-    #splash.hidden { opacity: 0; pointer-events: none; }
+    #splash { position: fixed; inset: 0; background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 99999; }
+    #splash.fade { transition: opacity 0.35s ease; opacity: 0; pointer-events: none; }
     .splash-icon { width: 80px; height: 80px; background: rgba(255,255,255,0.22); border-radius: 22px; display: flex; align-items: center; justify-content: center; }
     .splash-icon svg { width: 40px; height: 40px; stroke: white; }
     .splash-name { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 700; color: white; letter-spacing: -0.5px; }
@@ -495,7 +495,7 @@
     <div class="splash-name">Buscar</div>
     <div style="display:flex;gap:8px;margin-top:8px"><div class="splash-dot"></div><div class="splash-dot"></div><div class="splash-dot"></div></div>
   </div>
-<div id="app" style="visibility:hidden">
+<div id="app">
 
   <!-- AUTH -->
   <div class="screen active" id="screenAuth">
@@ -1716,10 +1716,8 @@
       // Switch screen immediately - no waiting for Firestore
       updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings();
       // Reveal app NOW before Firestore fetch
-      document.getElementById('app').style.visibility = 'visible';
       const splash = document.getElementById('splash');
-      splash.classList.add('hidden');
-      setTimeout(() => splash.style.display = 'none', 420);
+      splash.style.display = 'none';
       // Load profile data in background
       let displayName = user.email.split('@')[0];
       let avatarUrl = null;
@@ -1738,10 +1736,9 @@
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
     } else {
       showScreen('screenAuth');
-      document.getElementById('app').style.visibility = 'visible';
       const splash = document.getElementById('splash');
-      splash.classList.add('hidden');
-      setTimeout(() => splash.style.display = 'none', 420);
+      splash.classList.add('fade');
+      setTimeout(() => splash.style.display = 'none', 380);
     }
   });
 
