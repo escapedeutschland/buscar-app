@@ -2305,18 +2305,18 @@
   }
 
   async function saveDeal(listingId) {
-    const text = document.getElementById('dealText_'+listingId).value.trim();
-    const code = document.getElementById('dealCode_'+listingId).value.trim();
-    const expiry = document.getElementById('dealExpiry_'+listingId).value.trim();
+    const dealText = document.getElementById('dealText_'+listingId).value.trim();
+    const dealCode = document.getElementById('dealCode_'+listingId).value.trim();
+    const dealExpiry = document.getElementById('dealExpiry_'+listingId).value.trim();
     try {
       await db.collection('listings').doc(listingId).update({
-        deal_text: text || null, deal_code: code || null, deal_expiry: expiry || null
+        deal_text: dealText || null, deal_code: dealCode || null, deal_expiry: dealExpiry || null
       });
       await loadListings();
       const btn = event.target;
       btn.textContent = '✓ Gespeichert!';
       setTimeout(() => { btn.textContent = 'Deal speichern'; }, 2000);
-    } catch(e) { alert('Fehler.'); }
+    } catch(e) { alert('Fehler: ' + (e.message || e)); }
   }
 
   async function removeDeal(listingId) {
