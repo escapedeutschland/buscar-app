@@ -1628,6 +1628,7 @@
   }
 
   function showScreen(id) {
+    const gbb = document.getElementById('globalBackBtn'); if (gbb) gbb.style.display = id === 'screenDetail' ? 'flex' : 'none';
     if (id !== 'screenDetail') document.querySelector('.detail-back')?.classList.remove('visible');
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
@@ -2039,7 +2040,8 @@
   }
 
   function showDetail(id) {
-    document.getElementById('globalBackBtn').style.display = 'flex';
+    const gbb = document.getElementById('globalBackBtn');
+    if (gbb) gbb.style.display = 'flex';
     document.querySelector('.detail-back').classList.add('visible');
     const l = allListings.find(x => x.id === id);
     if (!l) return;
