@@ -2008,7 +2008,7 @@
         maxZoom: 18,
         maxBounds: paraguayBounds,
         maxBoundsViscosity: 0.85
-      }).setView([-23.0, -58.0], 5);
+      }).setView([-21.5, -58.0], 5);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19
       }).addTo(leafletMap);
@@ -2056,10 +2056,10 @@
     if (withCoords.length === 1) {
       leafletMap.setView([withCoords[0].lat, withCoords[0].lng], 14);
     } else if (mapCityFilter === 'Alle' && mapCategory === 'Alle') {
-      leafletMap.setView([-23.0, -58.0], 5);
+      leafletMap.setView([-21.5, -58.0], 5);
     } else {
       const bounds = L.latLngBounds(withCoords.map(l => [l.lat, l.lng]));
-      leafletMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
+      leafletMap.fitBounds(bounds, { paddingTopLeft: [50, 50], paddingBottomRight: [50, 120], maxZoom: 14 });
     }
 
     // Bottom cards
