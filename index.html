@@ -2008,12 +2008,42 @@
         maxZoom: 18,
         maxBounds: paraguayBounds,
         maxBoundsViscosity: 0.85
-      }).setView([-23.5, -58.0], 6);
+      }).setView([-22.5, -58.0], 6);
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
         subdomains: 'abcd'
       }).addTo(leafletMap);
       L.control.attribution({ prefix: '© CartoDB · © OpenStreetMap' }).addTo(leafletMap);
+
+      // Paraguay outline + dim outside
+      const paraguayCoords = [
+        [-22.0, -57.9], [-19.6, -57.8], [-19.3, -59.3], [-20.1, -61.7],
+        [-20.8, -62.0], [-22.2, -62.6], [-22.9, -62.3], [-23.8, -62.0],
+        [-24.0, -61.2], [-25.2, -60.6], [-26.4, -60.0], [-27.1, -58.6],
+        [-27.6, -56.8], [-27.4, -55.7], [-26.8, -55.1], [-25.1, -54.6],
+        [-24.1, -54.3], [-22.9, -55.0], [-22.0, -55.8], [-21.0, -55.9],
+        [-20.2, -58.1], [-20.5, -57.8], [-21.0, -57.9], [-22.0, -57.9]
+      ];
+
+      // Darken everything outside Paraguay using an inverse mask
+      const worldBounds = [[-90, -180], [-90, 180], [90, 180], [90, -180]];
+      const paraguayHole = paraguayCoords.map(c => [c[0], c[1]]);
+      L.polygon([worldBounds, paraguayHole], {
+        color: 'transparent',
+        fillColor: '#1A1A2E',
+        fillOpacity: 0.42,
+        interactive: false
+      }).addTo(leafletMap);
+
+      // Golden border around Paraguay
+      L.polygon(paraguayCoords, {
+        color: '#F5A623',
+        weight: 2,
+        opacity: 0.7,
+        fillOpacity: 0,
+        interactive: false,
+        dashArray: '6 4'
+      }).addTo(leafletMap);
     }
 
     // City filter is now a sheet - no longer needed here
@@ -2059,7 +2089,7 @@
     if (withCoords.length === 1) {
       leafletMap.setView([withCoords[0].lat, withCoords[0].lng], 14);
     } else if (mapCityFilter === 'Alle' && mapCategory === 'Alle') {
-      leafletMap.setView([-23.5, -58.0], 7);
+      leafletMap.setView([-22.5, -58.0], 6);
     } else {
       const bounds = L.latLngBounds(withCoords.map(l => [l.lat, l.lng]));
       leafletMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
