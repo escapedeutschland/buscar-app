@@ -95,8 +95,8 @@
     .cats-scroll::-webkit-scrollbar { display: none; }
     .cat-chip { display: flex; align-items: center; gap: 5px; padding: 8px 16px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--card); cursor: pointer; white-space: nowrap; font-size: 13px; font-weight: 600; color: var(--text-2); transition: all 0.18s ease; flex-shrink: 0; letter-spacing: -0.1px; }
     .cat-chip.active { background: var(--yellow); border-color: var(--yellow); color: white; box-shadow: 0 4px 16px rgba(245,166,35,0.4); transform: translateY(-1px); }
-    .cat-chip[data-cat="kat-sport"] { color: #0E7490; border-color: #67E8F9; background: #CFFAFE; }
-    .cat-chip[data-cat="kat-sport"].active { background: #06B6D4; border-color: #06B6D4; color: white; box-shadow: 0 4px 16px rgba(6,182,212,0.4); }
+    .cat-chip-sport { color: #0E7490 !important; border-color: #67E8F9 !important; background: #CFFAFE !important; }
+    .cat-chip-sport.active { background: #06B6D4 !important; border-color: #06B6D4 !important; color: white !important; box-shadow: 0 4px 16px rgba(6,182,212,0.4) !important; }
 
     /* LISTINGS */
     .listings { flex: 1; overflow-y: auto; padding: 4px 16px 100px; scrollbar-width: none; }
@@ -526,7 +526,7 @@
         <div class="cat-chip" data-cat="kat-orte" data-i18n="cat_places">Orte</div>
         <div class="cat-chip" data-cat="kat-unterkunft" data-i18n="cat_accommodation">Unterkünfte</div>
         <div class="cat-chip" data-cat="kat-geschaefte" data-i18n="cat_shops">Geschäfte</div>
-        <div class="cat-chip" data-cat="kat-sport" data-i18n="cat_sport">Sport & Fitness</div>
+        <div class="cat-chip" data-cat="kat-sport" data-i18n="cat_sport" class="cat-chip cat-chip-sport">Sport & Fitness</div>
       </div>
       <div id="cityPickerBtn" class="city-picker-btn" onclick="openCitySheet()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
