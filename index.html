@@ -258,6 +258,7 @@
     .filter-btn.active { background: var(--text-1); border-color: var(--text-1); color: white; }
     .filter-btn.active-open { background: #16a34a; border-color: #16a34a; color: white; }
     .filter-btn.active-open svg { stroke: white; }
+    #filterOpenBtn.active-open span { color: white; }
     .filter-btn.active svg { stroke: white; }
     .filter-sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
     .filter-sheet-overlay.visible { display: flex; }
@@ -1228,6 +1229,8 @@
       cat_all: 'Alle', cat_restaurants: 'Restaurants', cat_services: 'Dienstleistungen',
       cat_places: 'Orte', cat_accommodation: 'Unterkünfte', cat_shops: 'Geschäfte',
       cat_sport: 'Sport & Fitness',
+      cat_tankstelle: 'Tankstellen',
+      cat_beauty: 'Beauty & Wellness',
       // City picker
       city_select: 'Stadt wählen...', city_all: '🌍 Alle Städte',
       // Listings
@@ -1305,6 +1308,8 @@
       cat_all: 'Todos', cat_restaurants: 'Restaurantes', cat_services: 'Servicios',
       cat_places: 'Lugares', cat_accommodation: 'Alojamientos', cat_shops: 'Tiendas',
       cat_sport: 'Deporte & Fitness',
+      cat_tankstelle: 'Gasolineras',
+      cat_beauty: 'Belleza & Bienestar',
       // Selector de ciudad
       city_select: 'Seleccionar ciudad...', city_all: '🌍 Todas las ciudades',
       // Listados
@@ -1943,10 +1948,13 @@
   function toggleOpenNowFilter() {
     activeOpenNow = !activeOpenNow;
     const btn = document.getElementById('filterOpenBtn');
+    const label = document.getElementById('filterOpenLabel');
     if (activeOpenNow) {
       btn.classList.add('active-open');
+      if (label) label.textContent = t('open_now');
     } else {
       btn.classList.remove('active-open');
+      if (label) label.textContent = 'Geöffnet';
     }
     renderListings();
   }
