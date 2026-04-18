@@ -2558,15 +2558,16 @@
         return false;
       }
 
-      // Split on & for two blocks
-      const blocks = hours.split('&');
+      // Normalize dashes and split on &
+      const normalized = hours.replace(/[–—]/g, '-');
+      const blocks = normalized.split('&');
       const dayPart = blocks[0].trim().split(' ')[0];
       if (!dayMatches(dayPart)) return false;
 
       for (let block of blocks) {
         block = block.trim();
         // Remove day prefix from first block
-        const timeStr = block.replace(/^[A-Za-zÄÖÜäöü\-]+\s*/, '');
+        const timeStr = block.replace(/^[A-Za-zÄÖÜäöü-]+\s*/, '');
         if (checkBlock(timeStr)) return true;
       }
       return false;
