@@ -238,10 +238,10 @@
     .photo-upload-btn svg { width: 22px; height: 22px; stroke: var(--text-3); }
     .photo-upload-btn span { font-size: 11px; color: var(--text-3); font-weight: 500; }
     .photo-upload-progress { padding: 8px 16px; font-size: 12px; color: var(--text-2); display: none; }
-    .photo-lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 999; display: none; align-items: center; justify-content: center; }
+    .photo-lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 999999; display: none; align-items: center; justify-content: center; }
     .photo-lightbox.visible { display: flex; }
     .photo-lightbox img { max-width: 95%; max-height: 90vh; object-fit: contain; border-radius: 8px; }
-    .photo-lightbox-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .photo-lightbox-close { position: absolute; top: 16px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; }
     .photo-lightbox-close svg { width: 18px; height: 18px; stroke: white; }
 
     /* FILTER PANEL */
@@ -1198,7 +1198,7 @@
 
   <!-- LIGHTBOX -->
   <div class="photo-lightbox" id="photoLightbox" onclick="closeLightbox()">
-    <button class="photo-lightbox-close" onclick="closeLightbox()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <button class="photo-lightbox-close" onclick="event.stopPropagation();closeLightbox()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     <img id="lightboxImg" src="" alt="">
   </div>
 
@@ -3003,6 +3003,7 @@
   function closeLightbox() {
     document.getElementById('photoLightbox').classList.remove('visible');
     document.getElementById('lightboxImg').src = '';
+    // Don't affect screenHistory - we're still on detail screen
   }
 
   function handleFormPhotos(event) {
