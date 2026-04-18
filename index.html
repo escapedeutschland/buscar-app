@@ -466,7 +466,9 @@
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
-<div id="app">
+<!-- Status bar yellow fill -->
+  <div style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,44px);background:#F5A623;z-index:9999;pointer-events:none"></div>
+  <div id="app">
 
   <!-- AUTH -->
   <div class="screen active" id="screenAuth">
