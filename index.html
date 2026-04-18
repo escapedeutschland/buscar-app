@@ -1997,22 +1997,16 @@
   function renderMap() {
     // Init Leaflet map once
     if (!leafletMap) {
-      const paraguayBounds = L.latLngBounds(
-        L.latLng(-29.0, -64.0),
-        L.latLng(-18.0, -53.0)
-      );
       leafletMap = L.map('leafletMap', {
         zoomControl: true,
         attributionControl: false,
-        minZoom: 5,
+        minZoom: 3,
         maxZoom: 18,
-        maxBounds: paraguayBounds,
-        maxBoundsViscosity: 0.05,
         zoomSnap: 0,
-        zoomDelta: 0.5,
-        wheelPxPerZoomLevel: 120,
+        zoomDelta: 0.3,
+        wheelPxPerZoomLevel: 80,
         bounceAtZoomLimits: false
-      }).setView([-14.0, -60.5], 5);
+      }).setView([-23.0, -58.0], 6);
       leafletMap.options.paddingTopLeft = [0, 0];
       leafletMap.options.paddingBottomRight = [0, 140];
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -2020,19 +2014,25 @@
       }).addTo(leafletMap);
       L.control.attribution({ prefix: '© OpenStreetMap' }).addTo(leafletMap);
 
-      // Smooth elastic snap-back
-      let snapTimeout = null;
-      leafletMap.on('zoomend', function() {
+      // Elastic rubber-band: snap back smoothly when too far out
+      const HOME = { lat: -23.0, lng: -58.0, zoom: 6 };
+      leafletMap.on('zoomend moveend', function() {
         const z = leafletMap.getZoom();
-        if (z < 5) {
-          clearTimeout(snapTimeout);
-          snapTimeout = setTimeout(() => {
-            leafletMap.flyTo(leafletMap.getCenter(), 5, {
-              animate: true,
-              duration: 1.0,
-              easeLinearity: 0.15
-            });
-          }, 100);
+        const c = leafletMap.getCenter();
+        const tooFarOut = z < 5;
+        const tooFarNorth = c.lat > -10;
+        const tooFarSouth = c.lat < -35;
+        const tooFarWest = c.lng < -70;
+        const tooFarEast = c.lng > -45;
+        if (tooFarOut || tooFarNorth || tooFarSouth || tooFarWest || tooFarEast) {
+          const targetZoom = tooFarOut ? HOME.zoom : z;
+          const targetLat = tooFarNorth ? -10 : tooFarSouth ? -35 : c.lat;
+          const targetLng = tooFarWest ? -70 : tooFarEast ? -45 : c.lng;
+          leafletMap.flyTo([targetLat, targetLng], targetZoom, {
+            animate: true,
+            duration: 0.7,
+            easeLinearity: 0.1
+          });
         }
       });
     }
@@ -2078,7 +2078,7 @@
     if (withCoords.length === 1) {
       leafletMap.setView([withCoords[0].lat, withCoords[0].lng], 14);
     } else if (mapCityFilter === 'Alle' && mapCategory === 'Alle') {
-      leafletMap.setView([-14.0, -60.5], 5, { animate: false });
+      leafletMap.setView([-23.0, -58.0], 6, { animate: false });
     } else {
       const bounds = L.latLngBounds(withCoords.map(l => [l.lat, l.lng]));
       leafletMap.fitBounds(bounds, { paddingTopLeft: [50, 50], paddingBottomRight: [50, 120], maxZoom: 14 });
