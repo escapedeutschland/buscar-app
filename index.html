@@ -727,6 +727,8 @@
         <div class="map-chip map-chip-unterkunft" data-cat="kat-unterkunft"><span class="chip-dot"></span><span data-i18n="cat_accommodation">Unterkünfte</span></div>
         <div class="map-chip map-chip-geschaefte" data-cat="kat-geschaefte"><span class="chip-dot"></span><span data-i18n="cat_shops">Geschäfte</span></div>
         <div class="map-chip map-chip-sport" data-cat="kat-sport"><span class="chip-dot"></span><span data-i18n="cat_sport">Sport</span></div>
+        <div class="map-chip map-chip-tankstelle" data-cat="kat-tankstelle"><span class="chip-dot"></span><span>Tankstellen</span></div>
+        <div class="map-chip map-chip-beauty" data-cat="kat-beauty"><span class="chip-dot"></span><span>Beauty</span></div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;padding:6px 16px 10px">
         <div id="mapCityPickerBtn" onclick="openMapCitySheet()" style="flex:1;display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-2)">
@@ -2970,7 +2972,7 @@
     try {
       const file = await compressImage(rawFile);
       const filename = Date.now() + '_' + currentUser.uid + '.jpg';
-      const ref = storage.ref('listings/' + listingId + '/' + filename);
+      const ref = storage.ref('listing_photos/' + listingId + '_' + filename);
       const snap = await ref.put(file, {contentType:'image/jpeg'});
       const url = await snap.ref.getDownloadURL();
       const name = await getUsername();
