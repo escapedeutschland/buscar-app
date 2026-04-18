@@ -233,7 +233,10 @@
 
     /* FOTOS */
     .photos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 12px 16px 16px; }
-    .photo-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; cursor: pointer; }
+    .photo-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; cursor: pointer; display: block; }
+    .photo-thumb-wrap { position: relative; display: inline-block; width: 100%; aspect-ratio: 1; }
+    .photo-thumb-wrap .photo-thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; }
+    .photo-delete-btn { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: rgba(0,0,0,0.6); color: white; border: none; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
     .photo-upload-btn { width: 100%; aspect-ratio: 1; border: 1.5px dashed var(--border); border-radius: 8px; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; gap: 4px; }
     .photo-upload-btn svg { width: 22px; height: 22px; stroke: var(--text-3); }
     .photo-upload-btn span { font-size: 11px; color: var(--text-3); font-weight: 500; }
@@ -2929,9 +2932,11 @@
         .where('listing_id', '==', listingId)
         .orderBy('created_at', 'asc').get();
       const photos = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      grid.innerHTML = photos.map(p => `
-        <img class="photo-thumb" src="${p.url}" alt="Foto" onclick="openLightbox('${p.url}')">`
-      ).join('');
+      grid.innerHTML = photos.map(p => {
+        const canDelete = currentUser && (currentUser.email === ADMIN_EMAIL || p.uploaded_by === currentUser.uid);
+        const delBtn = canDelete ? `<button class="photo-delete-btn" onclick="event.stopPropagation();deletePhoto('${p.id}','${p.url}','${listingId}')" title="Löschen">✕</button>` : '';
+        return `<div class="photo-thumb-wrap"><img class="photo-thumb" src="${p.url}" alt="Foto" onclick="openLightbox('${p.url}')">${delBtn}</div>`;
+      }).join('');
       grid.innerHTML += `
         <label class="photo-upload-btn" for="photoFileInput">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -2946,6 +2951,18 @@
         </label>
         <input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="uploadPhoto(event,'${listingId}')">`;
     }
+  }
+
+  async function deletePhoto(photoId, url, listingId) {
+    if (!confirm('Foto löschen?')) return;
+    try {
+      await db.collection('listing_photos').doc(photoId).delete();
+      try {
+        const ref = firebase.storage().refFromURL(url);
+        await ref.delete();
+      } catch(e) {}
+      await loadPhotos(listingId);
+    } catch(e) { alert('Fehler beim Löschen.'); }
   }
 
   async function compressImage(file, maxPx=1200, quality=0.75) {
