@@ -139,7 +139,7 @@
 
     /* DETAIL */
     .detail-screen { background: var(--bg); overflow-y: auto; }
-    .detail-hero { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top,0px),52px) 20px 32px; position: relative; overflow: hidden; min-height: 220px; }
+    .detail-hero { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top,0px),52px) 20px 40px; position: relative; overflow: hidden; min-height: 240px; }
     .detail-hero::before { content:''; position:absolute; top:-30px; right:-30px; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,0.07); pointer-events:none; }
         .detail-back { width: 38px; height: 38px; border-radius: 50%; background: rgba(0,0,0,0.25); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 16px; position: relative; z-index: 10; flex-shrink:0; }
     .detail-back svg { width: 20px; height: 20px; stroke: white; }
@@ -149,7 +149,7 @@
     .detail-hero.has-cover .detail-hero-icon { display:none; }
     .detail-hero.has-cover .detail-title { color:white; }
     .detail-hero.has-cover .detail-city { color:rgba(255,255,255,0.85); }
-    .detail-cover-upload { position:absolute;bottom:60px;right:16px;z-index:10;background:rgba(0,0,0,0.4);border:none;border-radius:10px;padding:6px 10px;color:white;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px; }
+    .detail-cover-upload { background:rgba(0,0,0,0.35);border:none;border-radius:10px;padding:6px 10px;color:white;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px); }
     .detail-hero-icon { width: 68px; height: 68px; border-radius: 20px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
     .detail-hero-icon svg { width: 34px; height: 34px; stroke: white; }
     .detail-title { font-size: 24px; font-weight: 700; color: white; margin-bottom: 6px; }
@@ -2047,17 +2047,23 @@
     var oldCovBtn=document.getElementById('coverUploadBtn');if(oldCovBtn)oldCovBtn.remove();
     if(currentUser&&(currentUser.email===ADMIN_EMAIL||(l.owner_id&&l.owner_id===currentUser.uid))){
       var covBtn=document.createElement('button');covBtn.id='coverUploadBtn';covBtn.className='detail-cover-upload';
-      covBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> '+(l.cover_url?'Titelbild ändern':'Titelbild');
-      covBtn.onclick=function(){document.getElementById('coverFileInput').click();};
-      hero.appendChild(covBtn);
+      covBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Titelbild';
       if(l.cover_url){
         var delCovBtn=document.createElement('button');
         delCovBtn.className='detail-cover-upload';
-        delCovBtn.style.cssText='background:rgba(180,30,30,0.7);bottom:60px;right:130px;';
-        delCovBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg> Löschen';
+        delCovBtn.style.marginRight='8px';
+        delCovBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>';
         delCovBtn.onclick=function(){deleteCoverImage(currentListingId);};
-        hero.appendChild(delCovBtn);
+        var wrap=document.createElement('div');
+        wrap.style.cssText='position:absolute;bottom:16px;right:16px;z-index:10;display:flex;gap:6px;align-items:center;';
+        wrap.appendChild(delCovBtn);
+        wrap.appendChild(covBtn);
+        hero.appendChild(wrap);
+      } else {
+        hero.appendChild(covBtn);
       }
+      covBtn.onclick=function(){document.getElementById('coverFileInput').click();};
+
     }
     document.getElementById('detailIcon').innerHTML = catIcons[l.category_id]||catIcons['default'];
     const svg = document.getElementById('detailIcon').querySelector('svg');
