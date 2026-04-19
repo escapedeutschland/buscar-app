@@ -139,7 +139,7 @@
 
     /* DETAIL */
     .detail-screen { background: var(--bg); overflow-y: auto; }
-    .detail-hero { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top,0px),52px) 20px 40px; position: relative; overflow: hidden; min-height: 240px; }
+    .detail-hero { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top,0px),52px) 20px 48px; position: relative; overflow: hidden; min-height: 250px; }
     .detail-hero::before { content:''; position:absolute; top:-30px; right:-30px; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,0.07); pointer-events:none; }
         .detail-back { width: 38px; height: 38px; border-radius: 50%; background: rgba(0,0,0,0.25); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 16px; position: relative; z-index: 10; flex-shrink:0; }
     .detail-back svg { width: 20px; height: 20px; stroke: white; }
@@ -2045,6 +2045,7 @@
     else{cov.style.backgroundImage='';covOv.style.display='none';hero.classList.remove('has-cover');}
     // Cover upload btn
     var oldCovBtn=document.getElementById('coverUploadBtn');if(oldCovBtn)oldCovBtn.remove();
+    var oldWrap=document.getElementById('coverBtnWrap');if(oldWrap)oldWrap.remove();
     if(currentUser&&(currentUser.email===ADMIN_EMAIL||(l.owner_id&&l.owner_id===currentUser.uid))){
       var covBtn=document.createElement('button');covBtn.id='coverUploadBtn';covBtn.className='detail-cover-upload';
       covBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Titelbild';
@@ -2054,7 +2055,9 @@
         delCovBtn.style.marginRight='8px';
         delCovBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>';
         delCovBtn.onclick=function(){deleteCoverImage(currentListingId);};
+        var oldWrap=document.getElementById('coverBtnWrap');if(oldWrap)oldWrap.remove();
         var wrap=document.createElement('div');
+        wrap.id='coverBtnWrap';
         wrap.style.cssText='position:absolute;bottom:16px;right:16px;z-index:10;display:flex;gap:6px;align-items:center;';
         wrap.appendChild(delCovBtn);
         wrap.appendChild(covBtn);
