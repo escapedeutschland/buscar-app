@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#F5A623">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
   <!-- Cache bust: 20260418 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -38,19 +36,14 @@
     #app { display: flex; flex-direction: column; height: 100%; min-height: 100vh; max-width: 430px; margin: 0 auto; background: var(--bg); }
     .screen { display: none; flex-direction: column; min-height: 100vh; }
     .screen.active { display: flex; }
-    .screen { background: var(--bg); }
 
-    /* SPLASH */
-    #splash { position: fixed; inset: 0; background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 99999; }
-    #splash.fade { transition: opacity 0.35s ease; opacity: 0; pointer-events: none; }
-    .splash-icon { width: 80px; height: 80px; background: rgba(255,255,255,0.22); border-radius: 22px; display: flex; align-items: center; justify-content: center; }
-    .splash-icon svg { width: 40px; height: 40px; stroke: white; }
-    .splash-name { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 700; color: white; letter-spacing: -0.5px; }
-    .splash-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.6); animation: splashPulse 1.2s ease-in-out infinite; }
-    .splash-dot:nth-child(2) { animation-delay: 0.2s; }
-    .splash-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes splashPulse { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
-
+    #splash { position:fixed;inset:0;background:linear-gradient(150deg,#F5A623 0%,#D4841A 60%,#B8661A 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:99999; }
+    #splash.fade { transition:opacity 0.35s ease;opacity:0;pointer-events:none; }
+    .splash-icon { width:80px;height:80px;background:rgba(255,255,255,0.22);border-radius:22px;display:flex;align-items:center;justify-content:center; }
+    .splash-name { font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:white;letter-spacing:-0.5px; }
+    .splash-dot { width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.6);animation:splashPulse 1.2s ease-in-out infinite; }
+    .splash-dot:nth-child(2){animation-delay:0.2s}.splash-dot:nth-child(3){animation-delay:0.4s}
+    @keyframes splashPulse{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
     /* AUTH */
     .auth-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top), 50px) 32px 40px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
     .auth-logo-icon { width: 64px; height: 64px; background: rgba(255,255,255,0.22); border-radius: 18px; display: flex; align-items: center; justify-content: center; }
@@ -119,8 +112,7 @@
     #listingsInner { display: block; }
     .listings::-webkit-scrollbar { display: none; }
     .section-title { font-size: 12px; font-weight: 600; color: var(--text-3); letter-spacing: 1px; text-transform: uppercase; margin: 12px 0 10px; }
-    .listing-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px 16px 16px 20px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 14px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; border: 1px solid rgba(0,0,0,0.03); position: relative; overflow: hidden; min-height: 100px; align-items: stretch; }
-    .listing-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--cat-color, var(--yellow)); border-radius: 0; }
+    .listing-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 14px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; border: 1px solid rgba(0,0,0,0.03); }
     @keyframes heartPop { 0%{transform:scale(1)} 30%{transform:scale(1.5)} 60%{transform:scale(0.9)} 100%{transform:scale(1)} }
     .fav-pop { animation: heartPop 0.4s ease; }
     @keyframes starPulse { 0%{transform:scale(1)} 50%{transform:scale(1.3)} 100%{transform:scale(1)} }
@@ -128,15 +120,14 @@
     .open-badge { display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:6px; }
     .open-badge.open { background:rgba(34,197,94,0.15);color:#16a34a; }
     .open-badge.closed { background:rgba(239,68,68,0.12);color:#dc2626; }
-    @media (hover: hover) { .listing-card:active { transform: scale(0.982); box-shadow: var(--shadow-md); } }
-    .listing-card { -webkit-tap-highlight-color: transparent; }
-    .listing-icon-wrap { width: 56px; height: 56px; border-radius: 16px; align-self: center; background: linear-gradient(135deg, #FFF3D6 0%, var(--yellow-light) 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(245,166,35,0.15); }
+    .listing-card:active { transform: scale(0.982); box-shadow: var(--shadow-md); }
+    .listing-icon-wrap { width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, #FFF3D6 0%, var(--yellow-light) 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(245,166,35,0.15); }
     .listing-icon-wrap svg { width: 26px; height: 26px; stroke: var(--yellow); }
-    .listing-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-    .listing-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 3px; }
+    .listing-body { flex: 1; min-width: 0; }
+    .listing-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
     .listing-name { font-size: 15px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .badge-geprüft { font-size: 10px; font-weight: 700; color: var(--green); background: var(--green-light); padding: 2px 7px; border-radius: 6px; flex-shrink: 0; }
-    .badge-neu { font-size: 10px; font-weight: 700; color: #2563EB; background: #DBEAFE; padding: 2px 7px; border-radius: 6px; flex-shrink: 0; }
+    .badge-neu { font-size:10px;font-weight:700;color:#2563EB;background:#DBEAFE;padding:2px 7px;border-radius:6px;flex-shrink:0; }
     .listing-city { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--text-3); margin-bottom: 5px; }
     .listing-city svg { width: 11px; height: 11px; stroke: var(--text-3); }
     .listing-desc { font-size: 13px; color: var(--text-2); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -146,19 +137,10 @@
     .listing-arrow svg { width: 18px; height: 18px; stroke: var(--text-3); }
 
     /* DETAIL */
-    .detail-screen { background: var(--bg); overflow-y: auto; overflow-x: hidden; position: fixed; inset: 0; z-index: 50; }
-    .detail-hero { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top,44px),44px) 20px 28px; position: relative; transition: min-height 0.3s ease; }
-    .detail-hero.has-cover { height: calc(300px + env(safe-area-inset-top,0px)); min-height: calc(300px + env(safe-area-inset-top,0px)); display: flex; flex-direction: column; justify-content: flex-end; padding-top: 0; padding-bottom: 24px; }
-    .detail-hero.has-cover .detail-hero-icon { display: none; }
-    .detail-hero.has-cover .detail-hero-content { margin-top: auto; }
-    .detail-cover { position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;z-index:0;pointer-events:none; }
-    .detail-cover-overlay { position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.1) 60%,transparent 100%);z-index:1;pointer-events:none; }
-    .detail-hero-content { position:relative;z-index:2; }
-    .detail-cover-upload { position:absolute;top:max(env(safe-area-inset-top,44px),44px);right:16px;z-index:10;background:rgba(0,0,0,0.35);border:none;border-radius:10px;padding:6px 10px;color:white;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;backdrop-filter:blur(4px); }
-    .detail-cover-upload svg { width:13px;height:13px;stroke:white;fill:none;stroke-width:2; }
+    .detail-screen { background: var(--bg); overflow-y: auto; }
+    .detail-hero { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 52px 20px 28px; position: relative; overflow: hidden; }
     .detail-hero::before { content:''; position:absolute; top:-30px; right:-30px; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,0.07); pointer-events:none; }
-    .detail-back { width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.15); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: none; display: none; align-items: center; justify-content: center; cursor: pointer; position: fixed; top: 56px; left: 16px; z-index: 99999; }
-    .detail-back.visible { display: flex; }
+    .detail-back { width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.25);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;position:fixed;top:56px;left:16px;z-index:99999; }
     .detail-back svg { width: 20px; height: 20px; stroke: white; }
     .detail-hero-icon { width: 68px; height: 68px; border-radius: 20px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
     .detail-hero-icon svg { width: 34px; height: 34px; stroke: white; }
@@ -178,9 +160,6 @@
     .detail-badge-row { padding: 12px 16px; display: flex; gap: 8px; }
     .detail-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
     .detail-badge.green { background: var(--green-light); color: var(--green); }
-    .detail-badge.blue { background: #DBEAFE; color: #2563EB; }
-    .detail-badge.open-status { background: #DCFCE7; color: #15803D; }
-    .detail-badge.closed-status { background: #F1F5F9; color: #94A3B8; }
     .detail-cta { display: flex; gap: 10px; margin-top: 6px; }
     .detail-cta-btn { flex: 1; padding: 15px; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
     .detail-cta-btn.primary { background: var(--yellow); color: white; }
@@ -238,18 +217,15 @@
 
     /* FOTOS */
     .photos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 12px 16px 16px; }
-    .photo-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; cursor: pointer; display: block; }
-    .photo-thumb-wrap { position: relative; display: inline-block; width: 100%; aspect-ratio: 1; }
-    .photo-thumb-wrap .photo-thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; }
-    .photo-delete-btn { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: rgba(0,0,0,0.6); color: white; border: none; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+    .photo-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; cursor: pointer; }
     .photo-upload-btn { width: 100%; aspect-ratio: 1; border: 1.5px dashed var(--border); border-radius: 8px; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; gap: 4px; }
     .photo-upload-btn svg { width: 22px; height: 22px; stroke: var(--text-3); }
     .photo-upload-btn span { font-size: 11px; color: var(--text-3); font-weight: 500; }
     .photo-upload-progress { padding: 8px 16px; font-size: 12px; color: var(--text-2); display: none; }
-    .photo-lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 999999; display: none; align-items: center; justify-content: center; }
+    .photo-lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 999; display: none; align-items: center; justify-content: center; }
     .photo-lightbox.visible { display: flex; }
     .photo-lightbox img { max-width: 95%; max-height: 90vh; object-fit: contain; border-radius: 8px; }
-    .photo-lightbox-close { position: absolute; top: 16px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; }
+    .photo-lightbox-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .photo-lightbox-close svg { width: 18px; height: 18px; stroke: white; }
 
     /* FILTER PANEL */
@@ -259,7 +235,6 @@
     .filter-btn.active { background: var(--text-1); border-color: var(--text-1); color: white; }
     .filter-btn.active-open { background: #16a34a; border-color: #16a34a; color: white; }
     .filter-btn.active-open svg { stroke: white; }
-    #filterOpenBtn.active-open span { color: white; }
     .filter-btn.active svg { stroke: white; }
     .filter-sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
     .filter-sheet-overlay.visible { display: flex; }
@@ -304,10 +279,10 @@
     .map-chip-unterkunft.active  { background: #8B5CF6; border-color: #8B5CF6; color: white; }
     .map-chip-geschaefte.active  { background: #EF4444; border-color: #EF4444; color: white; }
     .map-chip-sport.active       { background: #06B6D4; border-color: #06B6D4; color: white; }
-    .map-chip-tankstelle { background: #FEE2E2; border: 1.5px solid #FCA5A5; color: #991B1B; }
-    .map-chip-tankstelle.active { background: #EF4444; border-color: #EF4444; color: white; }
-    .map-chip-beauty { background: #FCE7F3; border: 1.5px solid #F9A8D4; color: #9D174D; }
-    .map-chip-beauty.active { background: #EC4899; border-color: #EC4899; color: white; }
+    .map-chip-tankstelle { background:#FEE2E2;border:1.5px solid #FCA5A5;color:#991B1B; }
+    .map-chip-tankstelle.active { background:#EF4444;border-color:#EF4444;color:white; }
+    .map-chip-beauty { background:#FCE7F3;border:1.5px solid #F9A8D4;color:#9D174D; }
+    .map-chip-beauty.active { background:#EC4899;border-color:#EC4899;color:white; }
 
     /* DUPLICATE WARNING */
     .dupe-warning { background: #FFF8EC; border: 1.5px solid var(--yellow); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; display: none; }
@@ -379,7 +354,7 @@
     .city-sheet-empty { text-align: center; padding: 30px; color: var(--text-3); font-size: 13px; }
 
     /* FAVORITEN */
-    .fav-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.15); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; bottom: 24px; right: 20px; z-index: 10; flex-shrink: 0; }
+    .fav-btn { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; top: 52px; right: 20px; }
     .fav-btn svg { width: 20px; height: 20px; transition: all 0.2s; }
     .fav-btn.active svg { fill: #EF4444; stroke: #EF4444; }
     .fav-btn:not(.active) svg { fill: none; stroke: white; }
@@ -472,7 +447,7 @@
     .admin-empty-sub { font-size: 13px; color: var(--text-2); }
 
     /* PROFIL */
-    .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top,44px),44px) 24px 40px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
+    .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 60px 24px 32px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
     .profil-avatar { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 32px; font-weight: 900; color: white; }
     .profil-name { font-size: 20px; font-weight: 700; color: white; }
     .profil-email { font-size: 13px; color: rgba(255,255,255,0.8); }
@@ -514,11 +489,7 @@
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
-  <div id="splash">
-    <div class="splash-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></div>
-    <div class="splash-name">Buscar</div>
-    <div style="display:flex;gap:8px;margin-top:8px"><div class="splash-dot"></div><div class="splash-dot"></div><div class="splash-dot"></div></div>
-  </div>
+  <div id="splash"><div class="splash-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></div><div class="splash-name">Buscar</div><div style="display:flex;gap:8px;margin-top:8px"><div class="splash-dot"></div><div class="splash-dot"></div><div class="splash-dot"></div></div></div>
 <div id="app">
 
   <!-- AUTH -->
@@ -612,10 +583,6 @@
         <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         <span id="filterStarLabel" data-i18n="rating_filter">Bewertung</span>
       </button>
-      <button class="filter-btn" id="filterOpenBtn" onclick="toggleOpenNowFilter()">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span id="filterOpenLabel">Geöffnet</span>
-      </button>
     </div>
     <div class="cats-wrap">
       <div class="cats-scroll" id="catsScroll">
@@ -656,55 +623,37 @@
 
   <!-- LEGAL SCREENS -->
   <div class="screen" id="screenImpressum">
-    <div class="header" style="padding-bottom:20px">
-      <div class="header-top">
-        <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <div id="impressumTitle" style="color:white;font-weight:700;font-size:17px">Impressum</div>
-        <div style="width:38px"></div>
-      </div>
-    </div>
-    <div style="padding:20px;overflow-y:auto;flex:1">
-      <div class="detail-card" id="impressumBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div>
-    </div>
+    <div class="header" style="padding-bottom:20px"><div class="header-top">
+      <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div id="impressumTitle" style="color:white;font-weight:700;font-size:17px">Impressum</div>
+      <div style="width:38px"></div>
+    </div></div>
+    <div style="padding:20px;overflow-y:auto;flex:1"><div class="detail-card" id="impressumBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div></div>
   </div>
-
   <div class="screen" id="screenDatenschutz">
-    <div class="header" style="padding-bottom:20px">
-      <div class="header-top">
-        <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <div id="datenschutzTitle" style="color:white;font-weight:700;font-size:17px">Datenschutz</div>
-        <div style="width:38px"></div>
-      </div>
-    </div>
-    <div style="padding:20px;overflow-y:auto;flex:1">
-      <div class="detail-card" id="datenschutzBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div>
-    </div>
+    <div class="header" style="padding-bottom:20px"><div class="header-top">
+      <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div id="datenschutzTitle" style="color:white;font-weight:700;font-size:17px">Datenschutz</div>
+      <div style="width:38px"></div>
+    </div></div>
+    <div style="padding:20px;overflow-y:auto;flex:1"><div class="detail-card" id="datenschutzBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div></div>
   </div>
-
   <div class="screen" id="screenAGB">
-    <div class="header" style="padding-bottom:20px">
-      <div class="header-top">
-        <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <div id="agbTitle" style="color:white;font-weight:700;font-size:17px">Nutzungsbedingungen</div>
-        <div style="width:38px"></div>
-      </div>
-    </div>
-    <div style="padding:20px;overflow-y:auto;flex:1">
-      <div class="detail-card" id="agbBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div>
-    </div>
+    <div class="header" style="padding-bottom:20px"><div class="header-top">
+      <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div id="agbTitle" style="color:white;font-weight:700;font-size:17px">Nutzungsbedingungen</div>
+      <div style="width:38px"></div>
+    </div></div>
+    <div style="padding:20px;overflow-y:auto;flex:1"><div class="detail-card" id="agbBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div></div>
   </div>
-
   <!-- DETAIL -->
   <div class="screen detail-screen" id="screenDetail">
-    <div class="detail-hero" id="detailHero">
-      <div class="detail-cover" id="detailCover"></div>
-      <div class="detail-cover-overlay" id="detailCoverOverlay" style="display:none"></div>
+    <div class="detail-hero">
+      <button class="detail-back" onclick="showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       <button class="fav-btn" id="favBtn" onclick="toggleFavorite()"><svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-      <div class="detail-hero-content">
       <div class="detail-hero-icon" id="detailIcon"></div>
       <div class="detail-title" id="detailTitle">-</div>
       <div class="detail-city" id="detailCity"></div>
-      </div><!-- /detail-hero-content -->
     </div>
     <div class="detail-body">
       <div id="detailBadges" class="detail-card" style="display:none"><div class="detail-badge-row" id="detailBadgeRow"></div></div>
@@ -853,7 +802,7 @@
         </div>
         <div class="form-field">
           <label class="field-label">Kategorie *</label>
-          <select class="field-select" id="newCategory" onchange="updateSubcatOptions();this.classList.remove('error')">
+          <select class="field-select" id="newCategory" onchange="updateSubcatOptions()">
             <option value="">Bitte wählen...</option>
             <option value="kat-restaurants">Restaurants und Cafés</option>
             <option value="kat-dienstleistung">Dienstleistungen</option>
@@ -871,8 +820,7 @@
         </div>
         <div class="form-field">
           <label class="field-label">Stadt *</label>
-          <input class="field-input" type="text" id="newCity" placeholder="z.B. Asunción, Encarnación" oninput="this.classList.remove('error')">
-          <span class="field-error" id="cityError" style="display:none;color:#dc2626;font-size:12px;margin-top:4px">Stadt ist ein Pflichtfeld.</span>
+          <input class="field-input" type="text" id="newCity" placeholder="z.B. Asunción, Encarnación">
         </div>
       </div>
       <div class="form-card">
@@ -1032,18 +980,9 @@
         </div>
       </div>
       <div class="profil-section" style="margin-bottom:16px">
-        <div class="profil-row" onclick="showScreen('screenImpressum')">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="profil-row-label">Impressum</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-        <div class="profil-row" onclick="showScreen('screenDatenschutz')">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="profil-row-label">Datenschutz</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-        <div class="profil-row" onclick="showScreen('screenAGB')">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="profil-row-label">Nutzungsbedingungen</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
+        <div class="profil-row" onclick="showScreen('screenImpressum')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="profil-row-label">Impressum</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="profil-row" onclick="showScreen('screenDatenschutz')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="profil-row-label">Datenschutz</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="profil-row" onclick="showScreen('screenAGB')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="profil-row-label">Nutzungsbedingungen</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div>
       </div>
       <button class="logout-btn" onclick="handleLogout()" data-i18n="logout">Ausloggen</button>
     </div>
@@ -1262,7 +1201,7 @@
 
   <!-- LIGHTBOX -->
   <div class="photo-lightbox" id="photoLightbox" onclick="closeLightbox()">
-    <button class="photo-lightbox-close" onclick="event.stopPropagation();closeLightbox()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <button class="photo-lightbox-close" onclick="closeLightbox()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     <img id="lightboxImg" src="" alt="">
   </div>
 
@@ -1285,8 +1224,6 @@
       cat_all: 'Alle', cat_restaurants: 'Restaurants', cat_services: 'Dienstleistungen',
       cat_places: 'Orte', cat_accommodation: 'Unterkünfte', cat_shops: 'Geschäfte',
       cat_sport: 'Sport & Fitness',
-      cat_tankstelle: 'Tankstellen',
-      cat_beauty: 'Beauty & Wellness',
       // City picker
       city_select: 'Stadt wählen...', city_all: '🌍 Alle Städte',
       // Listings
@@ -1364,8 +1301,6 @@
       cat_all: 'Todos', cat_restaurants: 'Restaurantes', cat_services: 'Servicios',
       cat_places: 'Lugares', cat_accommodation: 'Alojamientos', cat_shops: 'Tiendas',
       cat_sport: 'Deporte & Fitness',
-      cat_tankstelle: 'Gasolineras',
-      cat_beauty: 'Belleza & Bienestar',
       // Selector de ciudad
       city_select: 'Seleccionar ciudad...', city_all: '🌍 Todas las ciudades',
       // Listados
@@ -1691,9 +1626,7 @@
     'kat-unterkunft': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
     'kat-geschaefte': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
     'kat-sport': '<svg viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l4.24 4.24"/><path d="M14.83 9.17l4.24-4.24"/><path d="M14.83 14.83l4.24 4.24"/><path d="M9.17 14.83l-4.24 4.24"/></svg>',
-    'kat-tankstelle': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 22V10a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12"/><path d="M3 10H1"/><path d="M13 10h2l2 5 2-5h2"/><line x1="3" y1="22" x2="13" y2="22"/></svg>',
-    'kat-beauty': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
-        'default': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
+    'default': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
   };
   const catNames = { 'kat-restaurants': 'Restaurants', 'kat-dienstleistung': 'Dienstleistungen', 'kat-orte': 'Orte', 'kat-unterkunft': 'Unterkünfte', 'kat-geschaefte': 'Geschäfte', 'kat-sport': 'Sport & Fitness' };
 
@@ -1707,8 +1640,14 @@
   }
 
   let screenHistory = [];
+  function goBack() {
+    const prev = screenHistory.length > 0 ? screenHistory.pop() : 'screenHome';
+    showScreen(prev);
+    if (prev === 'screenMap') setTimeout(() => renderMap(), 100);
+  }
   function showScreen(id) {
-    const dbb = document.getElementById('detailBackBtn'); if(dbb) dbb.style.display = id==='screenDetail' ? 'flex' : 'none';
+    const dbb = document.getElementById('detailBackBtn');
+    if (dbb) dbb.style.display = id === 'screenDetail' ? 'flex' : 'none';
     const prev = document.querySelector('.screen.active');
     if (prev && prev.id !== id) screenHistory.push(prev.id);
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1810,12 +1749,9 @@
   auth.onAuthStateChanged(async user => {
     currentUser = user;
     if (user) {
-      // Switch screen immediately - no waiting for Firestore
       updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
-      // Reveal app NOW before Firestore fetch
       const splash = document.getElementById('splash');
-      splash.style.display = 'none';
-      // Load profile data in background
+      if (splash) splash.style.display = 'none';
       let displayName = user.email.split('@')[0];
       let avatarUrl = null;
       try {
@@ -1832,104 +1768,22 @@
       document.getElementById('profilEmail').textContent = user.email;
       updateGreeting();
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
-    } else {
-      showScreen('screenAuth');
-      const splash = document.getElementById('splash');
-      splash.classList.add('fade');
-      setTimeout(() => splash.style.display = 'none', 380);
-    }
+      updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings();
+    } else { showScreen('screenAuth'); const splash=document.getElementById('splash'); if(splash){splash.classList.add('fade');setTimeout(()=>splash.style.display='none',380);} }
   });
-
-  // Cover image upload
-  (function() {
-    const input = document.createElement('input');
-    input.type = 'file'; input.id = 'coverFileInput'; input.accept = 'image/*';
-    input.style.display = 'none';
-    document.body.appendChild(input);
-    input.addEventListener('change', async () => {
-      const file = input.files[0];
-      if (!file || !currentListingId) return;
-      const btn = document.getElementById('coverUploadBtn');
-      if (btn) btn.textContent = 'Lädt...';
-      try {
-        const compressed = await compressImage(file, 1600, 0.8);
-        const ref = firebase.storage().ref(`covers/${currentListingId}_${Date.now()}.jpg`);
-        await ref.put(compressed, {contentType:'image/jpeg'});
-        const url = await ref.getDownloadURL();
-        await db.collection('listings').doc(currentListingId).update({ cover_url: url });
-        // Update local
-        const idx = allListings.findIndex(l => l.id === currentListingId);
-        if (idx > -1) allListings[idx].cover_url = url;
-        showDetail(currentListingId);
-      } catch(e) { alert('Fehler beim Upload: ' + e.message); }
-      input.value = '';
-    });
-  })();
 
   function renderLegalScreens() {
     const de = currentLang === 'de';
-
-    // Impressum
-    const it = document.getElementById('impressumTitle');
-    const ib = document.getElementById('impressumBody');
-    if (it) it.textContent = de ? 'Impressum' : 'Aviso Legal';
-    if (ib) ib.innerHTML = de ? `
-      <p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Angaben gemäß § 5 TMG</p>
-      <p><strong>Verantwortlich:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay</p><br>
-      <p><strong>Kontakt:</strong><br>E-Mail: maximechristalle@gmail.com</p><br>
-      <p><strong>Hinweis:</strong><br>Buscar ist ein privates Informationsprojekt ohne kommerziellen Charakter. Die App befindet sich im Aufbau und erhebt keinen Anspruch auf Vollständigkeit der gelisteten Einträge.</p>
-    ` : `
-      <p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Aviso Legal</p>
-      <p><strong>Responsable:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay</p><br>
-      <p><strong>Contacto:</strong><br>Correo: maximechristalle@gmail.com</p><br>
-      <p><strong>Nota:</strong><br>Buscar es un proyecto de información privado sin fines comerciales. La app está en desarrollo y no garantiza la exhaustividad de los registros listados.</p>
-    `;
-
-    // Datenschutz
-    const dt = document.getElementById('datenschutzTitle');
-    const db2 = document.getElementById('datenschutzBody');
-    if (dt) dt.textContent = de ? 'Datenschutz' : 'Privacidad';
-    if (db2) db2.innerHTML = de ? `
-      <p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Datenschutzerklärung</p>
-      <p><strong>1. Verantwortlicher</strong><br>Maxime Christalle, San Bernardino, Paraguay<br>maximechristalle@gmail.com</p><br>
-      <p><strong>2. Erhobene Daten</strong><br>Bei der Registrierung erheben wir E-Mail-Adresse und Benutzernamen. Hochgeladene Fotos und Einträge werden gespeichert. Keine Weitergabe an Dritte ohne Einwilligung.</p><br>
-      <p><strong>3. Firebase / Google</strong><br>Wir nutzen Firebase (Google LLC) für Authentifizierung, Datenbank und Speicher. Weitere Infos: <a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br>
-      <p><strong>4. Deine Rechte</strong><br>Du hast das Recht auf Auskunft, Berichtigung und Löschung deiner Daten. Kontakt: maximechristalle@gmail.com</p><br>
-      <p><strong>5. Fotos</strong><br>Hochgeladene Fotos sind öffentlich sichtbar. Lade nur Bilder hoch, für die du die Rechte besitzt.</p><br>
-      <p><strong>6. Cookies</strong><br>Die App verwendet keine Tracking-Cookies. Firebase nutzt technisch notwendige Speichermechanismen.</p>
-    ` : `
-      <p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Política de Privacidad</p>
-      <p><strong>1. Responsable</strong><br>Maxime Christalle, San Bernardino, Paraguay<br>maximechristalle@gmail.com</p><br>
-      <p><strong>2. Datos recopilados</strong><br>Al registrarse recopilamos correo electrónico y nombre de usuario. Las fotos y entradas subidas se almacenan. No se comparten datos con terceros sin consentimiento.</p><br>
-      <p><strong>3. Firebase / Google</strong><br>Usamos Firebase (Google LLC) para autenticación, base de datos y almacenamiento. Más info: <a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br>
-      <p><strong>4. Tus derechos</strong><br>Tienes derecho a acceder, corregir y eliminar tus datos. Contacto: maximechristalle@gmail.com</p><br>
-      <p><strong>5. Fotos</strong><br>Las fotos subidas son visibles públicamente. Sube solo imágenes sobre las que tengas derechos.</p><br>
-      <p><strong>6. Cookies</strong><br>La app no usa cookies de seguimiento. Firebase usa mecanismos de almacenamiento técnicamente necesarios.</p>
-    `;
-
-    // AGB
-    const at = document.getElementById('agbTitle');
-    const ab = document.getElementById('agbBody');
-    if (at) at.textContent = de ? 'Nutzungsbedingungen' : 'Términos de Uso';
-    if (ab) ab.innerHTML = de ? `
-      <p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Nutzungsbedingungen</p>
-      <p><strong>1. Geltungsbereich</strong><br>Diese Bedingungen gelten für die Nutzung der App Buscar.</p><br>
-      <p><strong>2. Nutzung</strong><br>Buscar ist ein offenes Verzeichnis für Deutsche und Deutschsprachige in Paraguay. Die Nutzung ist kostenlos. Keine falschen, irreführenden oder beleidigenden Inhalte.</p><br>
-      <p><strong>3. Einträge</strong><br>Jeder registrierte Nutzer kann Einträge erstellen. Der Betreiber behält sich vor, Einträge ohne Angabe von Gründen zu entfernen.</p><br>
-      <p><strong>4. Fotos</strong><br>Du bist verantwortlich für deine hochgeladenen Inhalte. Keine Bilder von Personen ohne Einwilligung.</p><br>
-      <p><strong>5. Haftung</strong><br>Buscar übernimmt keine Gewähr für die Richtigkeit der Einträge. Nutzung auf eigene Verantwortung.</p><br>
-      <p><strong>6. Änderungen</strong><br>Diese Bedingungen können jederzeit angepasst werden.</p>
-    ` : `
-      <p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Términos de Uso</p>
-      <p><strong>1. Ámbito</strong><br>Estos términos aplican al uso de la app Buscar.</p><br>
-      <p><strong>2. Uso</strong><br>Buscar es un directorio abierto para alemanes y germanohablantes en Paraguay. El uso es gratuito. No se permite contenido falso, engañoso u ofensivo.</p><br>
-      <p><strong>3. Entradas</strong><br>Cualquier usuario registrado puede crear entradas. El administrador se reserva el derecho de eliminar entradas sin justificación.</p><br>
-      <p><strong>4. Fotos</strong><br>Eres responsable del contenido que subes. No subas fotos de personas sin su consentimiento.</p><br>
-      <p><strong>5. Responsabilidad</strong><br>Buscar no garantiza la exactitud de las entradas. El uso es bajo tu propia responsabilidad.</p><br>
-      <p><strong>6. Cambios</strong><br>Estos términos pueden modificarse en cualquier momento.</p>
-    `;
+    const it=document.getElementById('impressumTitle'); const ib=document.getElementById('impressumBody');
+    if(it) it.textContent=de?'Impressum':'Aviso Legal';
+    if(ib) ib.innerHTML=de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Impressum</p><p><strong>Verantwortlich:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay</p><br><p><strong>Kontakt:</strong><br>maximechristalle@gmail.com</p><br><p>Buscar ist ein privates Informationsprojekt ohne kommerziellen Charakter.</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Aviso Legal</p><p><strong>Responsable:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay</p><br><p><strong>Contacto:</strong><br>maximechristalle@gmail.com</p><br><p>Buscar es un proyecto de información privado sin fines comerciales.</p>';
+    const dt=document.getElementById('datenschutzTitle'); const db2=document.getElementById('datenschutzBody');
+    if(dt) dt.textContent=de?'Datenschutz':'Privacidad';
+    if(db2) db2.innerHTML=de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Datenschutzerklärung</p><p><strong>1. Verantwortlicher</strong><br>Maxime Christalle, San Bernardino, Paraguay<br>maximechristalle@gmail.com</p><br><p><strong>2. Erhobene Daten</strong><br>E-Mail, Benutzername, Fotos und Einträge. Keine Weitergabe ohne Einwilligung.</p><br><p><strong>3. Firebase/Google</strong><br>Wir nutzen Firebase (Google LLC). Info: <a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>4. Rechte</strong><br>Auskunft, Berichtigung, Löschung: maximechristalle@gmail.com</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Política de Privacidad</p><p><strong>1. Responsable</strong><br>Maxime Christalle, San Bernardino, Paraguay<br>maximechristalle@gmail.com</p><br><p><strong>2. Datos</strong><br>Correo, nombre de usuario, fotos y entradas. Sin cesión a terceros.</p><br><p><strong>3. Firebase/Google</strong><br>Usamos Firebase (Google LLC). Info: <a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>4. Derechos</strong><br>Acceso, corrección, eliminación: maximechristalle@gmail.com</p>';
+    const at=document.getElementById('agbTitle'); const ab=document.getElementById('agbBody');
+    if(at) at.textContent=de?'Nutzungsbedingungen':'Términos de Uso';
+    if(ab) ab.innerHTML=de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Nutzungsbedingungen</p><p><strong>1.</strong> Diese Bedingungen gelten für Buscar.</p><br><p><strong>2.</strong> Kostenlose Nutzung. Keine falschen oder beleidigenden Inhalte.</p><br><p><strong>3.</strong> Einträge können ohne Angabe entfernt werden.</p><br><p><strong>4.</strong> Du bist für deine hochgeladenen Inhalte verantwortlich.</p><br><p><strong>5.</strong> Keine Gewähr für Richtigkeit der Einträge.</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Términos de Uso</p><p><strong>1.</strong> Estos términos aplican al uso de Buscar.</p><br><p><strong>2.</strong> Uso gratuito. No se permite contenido falso u ofensivo.</p><br><p><strong>3.</strong> Las entradas pueden eliminarse sin justificación.</p><br><p><strong>4.</strong> Eres responsable del contenido que subes.</p><br><p><strong>5.</strong> No se garantiza la exactitud de las entradas.</p>';
   }
-
   function updateGreeting() {
     const searchEl = document.querySelector('#searchInput');
     if (searchEl) searchEl.placeholder = t('search_placeholder');
@@ -2039,8 +1893,8 @@
     'kat-unterkunft': ['Alle', 'Hotel', 'Hostel', 'Ferienwohnung', 'B&B', 'Camping'],
     'kat-geschaefte': ['Alle', 'Supermarkt', 'Markt', 'Apotheke', 'Elektronik', 'Kleidung', 'Baumarkt'],
     'kat-sport': ['Alle', 'Fitnessstudio', 'Kampfsport', 'Yoga & Pilates', 'Schwimmbad', 'Fußball', 'Tennis', 'Radfahren', 'Crossfit', 'Klettern'],
-    'kat-tankstelle': ['Alle', 'Tankstelle', 'Autowaschanlage', 'Reifenservice'],
-    'kat-beauty': ['Alle', 'Frisör', 'Beauty-Salon', 'Spa & Wellness', 'Nagelpflege', 'Barbershop', 'Massage'],
+    'kat-tankstelle': ['Alle','Tankstelle','Autowaschanlage','Reifenservice'],
+    'kat-beauty': ['Alle','Frisör','Beauty-Salon','Spa & Wellness','Nagelpflege','Barbershop','Massage'],
   };
 
   function openFilterSheet(mode) {
@@ -2062,20 +1916,22 @@
         <div class="filter-star-btn${activeMinStars===3?' active':''}" onclick="selectStarFilter(3)">3+ ★</div>
         <div class="filter-star-btn${activeMinStars===4?' active':''}" onclick="selectStarFilter(4)">4+ ★</div>
         <div class="filter-star-btn${activeMinStars===5?' active':''}" onclick="selectStarFilter(5)">5 ★</div>
-      </div></div><div class="filter-divider"></div>`;
+      </div></div><div class="filter-divider"></div>
+        <div class="filter-section"><div class="filter-section-label">Öffnungszeiten</div>
+        <div style="display:flex;gap:8px">
+          <div class="filter-star-btn${!activeOpenNow?' active':''}" onclick="activeOpenNow=false;renderFilterSheet();renderListings()" style="flex:1">Alle</div>
+          <div class="filter-star-btn${activeOpenNow?' active':''}" onclick="activeOpenNow=true;renderFilterSheet();renderListings()" style="flex:1.5">🟢 Jetzt geöffnet</div>
+        </div></div>`;
     }
   }
 
   function toggleOpenNowFilter() {
     activeOpenNow = !activeOpenNow;
     const btn = document.getElementById('filterOpenBtn');
-    const label = document.getElementById('filterOpenLabel');
     if (activeOpenNow) {
       btn.classList.add('active-open');
-      if (label) label.textContent = t('open_now');
     } else {
       btn.classList.remove('active-open');
-      if (label) label.textContent = 'Geöffnet';
     }
     renderListings();
   }
@@ -2188,58 +2044,17 @@
     if (activeMinStars > 0) filtered = filtered.filter(l => { const avg = getAvgRating(l.id); return avg && avg >= activeMinStars; });
     if (activeOpenNow) filtered = filtered.filter(l => isOpen(l.opening_hours) === true);
     if (searchQuery) { const q = searchQuery.toLowerCase(); filtered = filtered.filter(l => (l.name||'').toLowerCase().includes(q)||(l.description||'').toLowerCase().includes(q)||(l.city||'').toLowerCase().includes(q)); }
-
-    // Relevanz-Sortierung
-    if (!searchQuery) {
-      filtered = filtered.slice().sort((a, b) => {
-        function score(l) {
-          let s = 0;
-          if (l.verified) s += 40;
-          const avg = getAvgRating(l.id); const cnt = (ratingsCache[l.id]||[]).length;
-          if (avg && cnt) s += Math.min(avg * cnt * 2, 30);
-          if (isNew(l.created_at)) s += 15;
-          if (l.phone) s += 3;
-          if (l.opening_hours) s += 3;
-          if (l.cover_url) s += 4;
-          if (l.description && l.description.length > 30) s += 3;
-          if (l.website) s += 2;
-          return s;
-        }
-        return score(b) - score(a);
-      });
-    }
-
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
-    container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name" style="flex:1;min-width:0">${esc(l.name)}</div><div style="display:flex;gap:4px;align-items:center;flex-shrink:0">${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}${isNew(l.created_at)?'<span class="badge-neu">Neu</span>':''}</div></div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${esc(l.description||'')}">${esc(l.description)}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
-  }
-
-  function goBack() {
-    const prev = screenHistory.length > 0 ? screenHistory.pop() : 'screenHome';
-    showScreen(prev);
-    if (prev === 'screenMap') { setTimeout(() => renderMap(), 100); }
+    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
   }
 
   function showDetail(id) {
+    const dbb = document.getElementById('detailBackBtn');
+    if (dbb) dbb.style.display = 'flex';
     const l = allListings.find(x => x.id === id);
     if (!l) return;
-    const dbb = document.getElementById('detailBackBtn'); if(dbb) dbb.style.display='flex';
-    // Cover image
-    const cover = document.getElementById('detailCover');
-    const overlay = document.getElementById('detailCoverOverlay');
-    const hero = document.getElementById('detailHero');
-    if (l.cover_url) {
-      cover.style.backgroundImage = `url(${l.cover_url})`;
-      overlay.style.display = 'block';
-      hero.style.background = 'none';
-      hero.classList.add('has-cover');
-    } else {
-      cover.style.backgroundImage = '';
-      overlay.style.display = 'none';
-      hero.style.background = 'linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%)';
-      hero.classList.remove('has-cover');
-    }
     document.getElementById('detailIcon').innerHTML = catIcons[l.category_id]||catIcons['default'];
     const svg = document.getElementById('detailIcon').querySelector('svg');
     if (svg) { svg.style.width='34px'; svg.style.height='34px'; svg.style.stroke='white'; }
@@ -2250,22 +2065,8 @@
     descEl.innerHTML = descContent || t('no_description');
     descEl.dataset.original = descContent;
     const badges = document.getElementById('detailBadges');
-    // Cover upload button for admin/owner
-    const heroEl = document.getElementById('detailHero');
-    let oldUploadBtn = document.getElementById('coverUploadBtn');
-    if (oldUploadBtn) oldUploadBtn.remove();
-    if (currentUser && (currentUser.email === ADMIN_EMAIL || (l.owner_id && l.owner_id === currentUser.uid))) {
-      const uploadBtn = document.createElement('button');
-      uploadBtn.id = 'coverUploadBtn';
-      uploadBtn.className = 'detail-cover-upload';
-      uploadBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Titelbild';
-      uploadBtn.onclick = () => document.getElementById('coverFileInput').click();
-      heroEl.appendChild(uploadBtn);
-    }
-    const openStatus = isOpen(l.opening_hours);
-    const openBadge = openStatus === true ? `<span class='detail-badge open-status'>${t('open_now')}</span>` : openStatus === false ? `<span class='detail-badge closed-status'>${t('closed_now')}</span>` : '';
-    document.getElementById('detailBadgeRow').innerHTML = (l.verified?`<span class='detail-badge green'>${t('verified')}</span>`:'') + (isNew(l.created_at)?`<span class='detail-badge blue'>Neu</span>`:'') + openBadge;
-    badges.style.display = (l.verified || isNew(l.created_at) || openStatus !== null) ? 'block' : 'none';
+    document.getElementById('detailBadgeRow').innerHTML = l.verified?`<span class='detail-badge green'>${t('verified')}</span>`:'';
+    badges.style.display = l.verified?'block':'none';
     let infoHTML = '';
     if (l.phone) infoHTML += `<a class="detail-row" href="tel:${l.phone}"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Telefon</div><div class="detail-row-value">${l.phone}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
     if (l.website) infoHTML += `<a class="detail-row" href="https://${l.website}" target="_blank"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Website</div><div class="detail-row-value">${l.website}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
@@ -2498,15 +2299,11 @@
     document.getElementById('phoneError').classList.remove('visible');
     document.getElementById('formError').classList.remove('visible');
     document.getElementById('formSuccess').classList.remove('visible');
-    document.getElementById('catError').style.display = 'none';
-    document.getElementById('cityError').style.display = 'none';
 
     if (hasEmoji(name)) { document.getElementById('nameError').classList.add('visible'); document.getElementById('newName').classList.add('error'); valid = false; } else { document.getElementById('newName').classList.remove('error'); }
     if (desc.length < 50) { document.getElementById('descError').classList.add('visible'); document.getElementById('newDesc').classList.add('error'); valid = false; } else { document.getElementById('newDesc').classList.remove('error'); }
     if (!isValidPhone(phone)) { document.getElementById('phoneError').classList.add('visible'); document.getElementById('newPhone').classList.add('error'); valid = false; } else { document.getElementById('newPhone').classList.remove('error'); }
-    if (!cat) { document.getElementById('catError').style.display = 'block'; document.getElementById('newCategory').classList.add('error'); valid = false; } else { document.getElementById('newCategory').classList.remove('error'); }
-    if (!city) { document.getElementById('cityError').style.display = 'block'; document.getElementById('newCity').classList.add('error'); valid = false; } else { document.getElementById('newCity').classList.remove('error'); }
-    if (!name || !cat || !city || !desc) { if (name && cat && city) { document.getElementById('formError').textContent = t('fill_all'); document.getElementById('formError').classList.add('visible'); } valid = false; }
+    if (!name || !cat || !city || !desc) { document.getElementById('formError').textContent = t('fill_all'); document.getElementById('formError').classList.add('visible'); valid = false; }
     if (!valid) return;
 
     const btn = document.getElementById('formSubmitBtn');
@@ -2803,18 +2600,6 @@
   })(); }); // end window.load
 
   // Check if a place is open now - supports two time blocks
-  function isNew(createdAt) {
-    if (!createdAt) return false;
-    const created = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
-    const days = (Date.now() - created.getTime()) / (1000 * 60 * 60 * 24);
-    return days <= 14;
-  }
-
-  function esc(str) {
-    if (!str) return '';
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
   function isOpen(hours) {
     if (!hours) return null;
     try {
@@ -2835,16 +2620,13 @@
         const parts = timeStr.trim().split('-');
         if (parts.length < 2) return false;
         const open = parseTime(parts[0]);
-        let close = parseTime(parts[1]);
-        // Handle midnight crossing (e.g. 07:00-01:00 means closes at 1am next day)
-        if (close < open) close += 24 * 60;
-        const hm2 = hm < open && close > 24*60 ? hm + 24*60 : hm;
-        return hm2 >= open && hm2 < close;
+        const close = parseTime(parts[1]);
+        return hm >= open && hm < close;
       }
 
       function dayMatches(prefix) {
         const p = prefix.toLowerCase().trim();
-        if (!p || p.includes('täglich') || p.includes('daily') || p.includes('24/7') || p.includes('durchgehend') || p.includes('immer')) return true;
+        if (!p || p.includes('täglich') || p.includes('daily')) return true;
         if (p.includes('mo') && p.includes('fr') && day >= 1 && day <= 5) return true;
         if (p.includes('mo') && p.includes('sa') && day >= 1 && day <= 6) return true;
         if (p.includes('mo') && p.includes('so') && day >= 1) return true;
@@ -2853,19 +2635,15 @@
         return false;
       }
 
-      // Special cases
-      const h24 = hours.toLowerCase().trim();
-      if (h24 === '24/7' || h24 === '24h' || h24 === 'täglich 24h' || h24 === 'durchgehend') return true;
-      // Normalize dashes and split on &
-      const normalized = hours.replace(/[–—]/g, '-');
-      const blocks = normalized.split('&');
+      // Split on & for two blocks
+      const blocks = hours.split('&');
       const dayPart = blocks[0].trim().split(' ')[0];
       if (!dayMatches(dayPart)) return false;
 
       for (let block of blocks) {
         block = block.trim();
         // Remove day prefix from first block
-        const timeStr = block.replace(/^[A-Za-zÄÖÜäöü-]+\s*/, '');
+        const timeStr = block.replace(/^[A-Za-zÄÖÜäöü\-]+\s*/, '');
         if (checkBlock(timeStr)) return true;
       }
       return false;
@@ -3097,13 +2875,12 @@
     try {
       const snap = await db.collection('listing_photos')
         .where('listing_id', '==', listingId)
+        .where('pending', '==', false)
         .orderBy('created_at', 'asc').get();
       const photos = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      grid.innerHTML = photos.map(p => {
-        const canDelete = currentUser && (currentUser.email === ADMIN_EMAIL || p.uploaded_by === currentUser.uid);
-        const delBtn = canDelete ? `<button class="photo-delete-btn" onclick="event.stopPropagation();deletePhoto('${p.id}','${p.url}','${listingId}')" title="Löschen">✕</button>` : '';
-        return `<div class="photo-thumb-wrap"><img class="photo-thumb" src="${p.url}" alt="Foto" onclick="openLightbox('${p.url}')">${delBtn}</div>`;
-      }).join('');
+      grid.innerHTML = photos.map(p => `
+        <img class="photo-thumb" src="${p.url}" alt="Foto" onclick="openLightbox('${p.url}')">`
+      ).join('');
       grid.innerHTML += `
         <label class="photo-upload-btn" for="photoFileInput">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -3124,47 +2901,40 @@
     if (!confirm('Foto löschen?')) return;
     try {
       await db.collection('listing_photos').doc(photoId).delete();
-      try {
-        const ref = firebase.storage().refFromURL(url);
-        await ref.delete();
-      } catch(e) {}
+      try { const ref=firebase.storage().refFromURL(url); await ref.delete(); } catch(e){}
       await loadPhotos(listingId);
     } catch(e) { alert('Fehler beim Löschen.'); }
   }
-
   async function compressImage(file, maxPx=1200, quality=0.75) {
     return new Promise(resolve => {
       const img = new Image();
       const url = URL.createObjectURL(file);
       img.onload = () => {
-        let w = img.width, h = img.height;
-        if (w > maxPx || h > maxPx) {
-          if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; }
-          else { w = Math.round(w * maxPx / h); h = maxPx; }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        canvas.toBlob(blob => { URL.revokeObjectURL(url); resolve(blob); }, 'image/jpeg', quality);
+        let w=img.width, h=img.height;
+        if (w>maxPx||h>maxPx) { if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;} }
+        const canvas=document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        canvas.toBlob(blob=>{URL.revokeObjectURL(url);resolve(blob);},'image/jpeg',quality);
       };
-      img.src = url;
+      img.src=url;
     });
   }
-
   async function uploadPhoto(event, listingId) {
-    const rawFile = event.target.files[0];
-    if (!rawFile) return;
-    if (!rawFile.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { alert('Foto ist zu groß. Max. 5 MB.'); return; }
+    if (!file.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
 
     const progress = document.getElementById('photoProgress');
     progress.style.display = 'block';
     progress.textContent = 'Wird hochgeladen...';
 
+    const filename = Date.now() + '_' + currentUser.uid + '.' + file.name.split('.').pop();
+    const ref = storage.ref('listings/' + listingId + '/' + filename);
+
     try {
-      const file = await compressImage(rawFile);
-      const filename = Date.now() + '_' + currentUser.uid + '.jpg';
-      const ref = storage.ref('listing_photos/' + listingId + '_' + filename);
-      const snap = await ref.put(file, {contentType:'image/jpeg'});
+      const snap = await ref.put(file);
       const url = await snap.ref.getDownloadURL();
       const name = await getUsername();
       await db.collection('listing_photos').add({
@@ -3191,7 +2961,6 @@
   function closeLightbox() {
     document.getElementById('photoLightbox').classList.remove('visible');
     document.getElementById('lightboxImg').src = '';
-    // Don't affect screenHistory - we're still on detail screen
   }
 
   function handleFormPhotos(event) {
@@ -3506,7 +3275,7 @@
           <div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div>
           <div class="listing-body">
             <div class="listing-name">${l.name||''}</div>
-            ${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" width="11" height="11"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(l.city)}</div>`:''}
+            ${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" width="11" height="11"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}</div>`:''}
             <div class="listing-desc">${l.description||''}</div>
           </div>
           <div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
@@ -3832,1274 +3601,6 @@
     });
   }
 </script>
-  <button class="detail-back" id="detailBackBtn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-</body>
-</html><!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#F5A623">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <!-- Cache bust: 20260418 -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Buscar">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-touch-fullscreen" content="yes">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <title>Buscar – Deutsche in Paraguay</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --yellow: #F5A623; --yellow-dark: #D4841A; --yellow-light: #FFF8EC;
-      --bg: #F2EFE9; --card: #FFFFFF; --text-1: #111111; --text-2: #5A5A5A;
-      --text-3: #AAAAAA; --green: #22C55E; --green-light: #DCFCE7;
-      --red: #EF4444; --red-light: #FEE2E2; --border: #EAEAEA;
-      --radius-md: 18px; --radius-lg: 24px;
-      --shadow-sm: 0 2px 16px rgba(0,0,0,0.07); --shadow-md: 0 8px 32px rgba(0,0,0,0.10);
-      --shadow-lg: 0 16px 48px rgba(0,0,0,0.14);
-    }
-    html { background: #F5A623; margin: 0; padding: 0; }
-    html, body { height: 100%; font-family: 'DM Sans', -apple-system, sans-serif; background: var(--bg); color: var(--text-1); -webkit-font-smoothing: antialiased; margin: 0; padding: 0; }
-    #app { display: flex; flex-direction: column; height: 100%; min-height: 100vh; max-width: 430px; margin: 0 auto; background: var(--bg); }
-    .screen { display: none; flex-direction: column; min-height: 100vh; }
-    .screen.active { display: flex; }
-    .screen { background: var(--bg); }
-
-    /* SPLASH */
-    #splash { position: fixed; inset: 0; background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 99999; }
-    #splash.fade { transition: opacity 0.35s ease; opacity: 0; pointer-events: none; }
-    .splash-icon { width: 80px; height: 80px; background: rgba(255,255,255,0.22); border-radius: 22px; display: flex; align-items: center; justify-content: center; }
-    .splash-icon svg { width: 40px; height: 40px; stroke: white; }
-    .splash-name { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 700; color: white; letter-spacing: -0.5px; }
-    .splash-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.6); animation: splashPulse 1.2s ease-in-out infinite; }
-    .splash-dot:nth-child(2) { animation-delay: 0.2s; }
-    .splash-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes splashPulse { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
-
-    /* AUTH */
-    .auth-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top), 50px) 32px 40px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
-    .auth-logo-icon { width: 64px; height: 64px; background: rgba(255,255,255,0.22); border-radius: 18px; display: flex; align-items: center; justify-content: center; }
-    .auth-logo-icon svg { width: 34px; height: 34px; }
-    .auth-logo-name { font-family: 'Fraunces', Georgia, serif; font-size: 36px; font-weight: 900; color: white; letter-spacing: -1px; }
-    .auth-tagline { font-size: 14px; color: rgba(255,255,255,0.8); }
-    .auth-body { padding: 32px 24px; flex: 1; background: var(--card); }
-    .auth-tabs { display: flex; background: var(--bg); border-radius: 12px; padding: 4px; margin-bottom: 28px; }
-    .auth-tab { flex: 1; padding: 10px; text-align: center; border-radius: 9px; font-size: 14px; font-weight: 500; color: var(--text-2); cursor: pointer; transition: all 0.2s; }
-    .auth-tab.active { background: var(--card); color: var(--text-1); box-shadow: var(--shadow-sm); }
-    .auth-form { display: flex; flex-direction: column; gap: 14px; }
-    .auth-form.hidden { display: none; }
-    .field-label { font-size: 13px; font-weight: 500; color: var(--text-2); margin-bottom: 6px; display: block; }
-    .field-input { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-1); background: var(--card); outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
-    .field-input:focus { border-color: var(--yellow); }
-    .field-input.error { border-color: var(--red); }
-    .field-select { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-1); background: var(--card); outline: none; -webkit-appearance: none; appearance: none; cursor: pointer; }
-    .field-select:focus { border-color: var(--yellow); }
-    .field-textarea { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-1); background: var(--card); outline: none; resize: none; min-height: 110px; -webkit-appearance: none; }
-    .field-textarea:focus { border-color: var(--yellow); }
-    .field-textarea.error { border-color: var(--red); }
-    .field-counter { font-size: 11px; color: var(--text-3); text-align: right; margin-top: 4px; }
-    .field-counter.warn { color: var(--red); }
-    .field-error { font-size: 12px; color: var(--red); margin-top: 4px; display: none; }
-    .field-error.visible { display: block; }
-    .auth-btn { width: 100%; padding: 16px; background: var(--yellow); color: white; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 6px; transition: background 0.2s; }
-    .auth-btn:active { background: var(--yellow-dark); }
-    .auth-btn:disabled { background: var(--text-3); cursor: not-allowed; }
-    .auth-error { background: var(--red-light); color: var(--red); padding: 12px 16px; border-radius: 10px; font-size: 13px; display: none; }
-    .auth-error.visible { display: block; }
-    .auth-divider { text-align: center; font-size: 13px; color: var(--text-3); margin: 4px 0; }
-
-    /* HEADER */
-    .header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding-left: 22px; padding-right: 22px; padding-bottom: 0; padding-top: max(env(safe-area-inset-top, 44px), 44px); flex-shrink: 0; position: relative; overflow: hidden; }
-    .header::before { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; border-radius:50%; background:rgba(255,255,255,0.07); pointer-events:none; }
-    .header::after { content:''; position:absolute; bottom:-60px; left:-30px; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,0.05); pointer-events:none; }
-    .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .logo { display: flex; align-items: center; gap: 10px; }
-    .logo-icon { width: 38px; height: 38px; background: rgba(255,255,255,0.22); border-radius: 12px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-    .logo-icon svg { width: 20px; height: 20px; }
-    .logo-name { font-family: 'Fraunces', Georgia, serif; font-size: 28px; font-weight: 900; color: white; letter-spacing: -0.5px; text-shadow: 0 2px 8px rgba(0,0,0,0.12); }
-    .header-avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.22); border: 2px solid rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; font-weight: 700; color: white; backdrop-filter: blur(4px); overflow: hidden; }
-    .header-hero { padding-bottom: 28px; }
-    .header-greeting { font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 4px; letter-spacing: 0.3px; }
-    .header-sub { font-size: 22px; font-weight: 700; color: white; letter-spacing: -0.5px; text-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-
-    /* SEARCH */
-    .search-wrap { padding: 0 16px 10px; flex-shrink: 0; margin-top: -22px; position: relative; z-index: 10; }
-    .search-box { display: flex; align-items: center; background: var(--card); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); padding: 0 16px; gap: 10px; height: 52px; border: 1px solid rgba(255,255,255,0.8); }
-    .search-box svg { width: 18px; height: 18px; stroke: var(--yellow); flex-shrink: 0; }
-    .search-box input { flex: 1; border: none; outline: none; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-1); background: transparent; }
-    .search-box input::placeholder { color: var(--text-3); }
-    .search-clear { width: 20px; height: 20px; border-radius: 50%; background: var(--border); border: none; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 11px; color: var(--text-2); }
-    .search-clear.visible { display: flex; }
-
-    /* CATS */
-    .cats-wrap { padding: 0 0 10px; flex-shrink: 0; }
-    .cats-scroll { display: flex; gap: 8px; padding: 4px 16px; overflow-x: auto; scrollbar-width: none; }
-    .cats-scroll::-webkit-scrollbar { display: none; }
-    .cat-chip { display: flex; align-items: center; gap: 5px; padding: 8px 16px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--card); cursor: pointer; white-space: nowrap; font-size: 13px; font-weight: 600; color: var(--text-2); transition: all 0.18s ease; flex-shrink: 0; letter-spacing: -0.1px; }
-    .cat-chip.active { background: var(--yellow); border-color: var(--yellow); color: white; box-shadow: 0 4px 16px rgba(245,166,35,0.4); transform: translateY(-1px); }
-
-
-    /* LISTINGS */
-    .listings { flex: 1; overflow-y: auto; padding: 4px 16px 100px; scrollbar-width: none; display: block; }
-    #listingsInner { display: block; }
-    .listings::-webkit-scrollbar { display: none; }
-    .section-title { font-size: 12px; font-weight: 600; color: var(--text-3); letter-spacing: 1px; text-transform: uppercase; margin: 12px 0 10px; }
-    .listing-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px 16px 16px 20px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 14px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; border: 1px solid rgba(0,0,0,0.03); position: relative; overflow: hidden; min-height: 100px; align-items: stretch; }
-    .listing-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--cat-color, var(--yellow)); border-radius: 0; }
-    @keyframes heartPop { 0%{transform:scale(1)} 30%{transform:scale(1.5)} 60%{transform:scale(0.9)} 100%{transform:scale(1)} }
-    .fav-pop { animation: heartPop 0.4s ease; }
-    @keyframes starPulse { 0%{transform:scale(1)} 50%{transform:scale(1.3)} 100%{transform:scale(1)} }
-    .star-pulse { animation: starPulse 0.25s ease; }
-    .open-badge { display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:6px; }
-    .open-badge.open { background:rgba(34,197,94,0.15);color:#16a34a; }
-    .open-badge.closed { background:rgba(239,68,68,0.12);color:#dc2626; }
-    @media (hover: hover) { .listing-card:active { transform: scale(0.982); box-shadow: var(--shadow-md); } }
-    .listing-card { -webkit-tap-highlight-color: transparent; }
-    .listing-icon-wrap { width: 56px; height: 56px; border-radius: 16px; align-self: center; background: linear-gradient(135deg, #FFF3D6 0%, var(--yellow-light) 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(245,166,35,0.15); }
-    .listing-icon-wrap svg { width: 26px; height: 26px; stroke: var(--yellow); }
-    .listing-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-    .listing-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 3px; }
-    .listing-name { font-size: 15px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .badge-geprüft { font-size: 10px; font-weight: 700; color: var(--green); background: var(--green-light); padding: 2px 7px; border-radius: 6px; flex-shrink: 0; }
-    .badge-neu { font-size: 10px; font-weight: 700; color: #2563EB; background: #DBEAFE; padding: 2px 7px; border-radius: 6px; flex-shrink: 0; }
-    .listing-city { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--text-3); margin-bottom: 5px; }
-    .listing-city svg { width: 11px; height: 11px; stroke: var(--text-3); }
-    .listing-desc { font-size: 13px; color: var(--text-2); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .listing-phone { display: flex; align-items: center; gap: 4px; margin-top: 7px; font-size: 12px; font-weight: 500; color: var(--yellow-dark); }
-    .listing-phone svg { width: 11px; height: 11px; stroke: var(--yellow-dark); }
-    .listing-arrow { flex-shrink: 0; align-self: center; }
-    .listing-arrow svg { width: 18px; height: 18px; stroke: var(--text-3); }
-
-    /* DETAIL */
-    .detail-screen { background: var(--bg); overflow-y: auto; overflow-x: hidden; position: fixed; inset: 0; z-index: 50; }
-    .detail-hero { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top,44px),44px) 20px 28px; position: relative; transition: min-height 0.3s ease; }
-    .detail-hero.has-cover { height: calc(300px + env(safe-area-inset-top,0px)); min-height: calc(300px + env(safe-area-inset-top,0px)); display: flex; flex-direction: column; justify-content: flex-end; padding-top: 0; padding-bottom: 24px; }
-    .detail-hero.has-cover .detail-hero-icon { display: none; }
-    .detail-hero.has-cover .detail-hero-content { margin-top: auto; }
-    .detail-cover { position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;z-index:0;pointer-events:none; }
-    .detail-cover-overlay { position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.1) 60%,transparent 100%);z-index:1;pointer-events:none; }
-    .detail-hero-content { position:relative;z-index:2; }
-    .detail-cover-upload { position:absolute;top:max(env(safe-area-inset-top,44px),44px);right:16px;z-index:10;background:rgba(0,0,0,0.35);border:none;border-radius:10px;padding:6px 10px;color:white;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;backdrop-filter:blur(4px); }
-    .detail-cover-upload svg { width:13px;height:13px;stroke:white;fill:none;stroke-width:2; }
-    .detail-hero::before { content:''; position:absolute; top:-30px; right:-30px; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,0.07); pointer-events:none; }
-    .detail-back { width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.15); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: none; display: none; align-items: center; justify-content: center; cursor: pointer; position: fixed; top: 56px; left: 16px; z-index: 99999; }
-    .detail-back.visible { display: flex; }
-    .detail-back svg { width: 20px; height: 20px; stroke: white; }
-    .detail-hero-icon { width: 68px; height: 68px; border-radius: 20px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
-    .detail-hero-icon svg { width: 34px; height: 34px; stroke: white; }
-    .detail-title { font-size: 24px; font-weight: 700; color: white; margin-bottom: 6px; }
-    .detail-city { display: flex; align-items: center; gap: 5px; font-size: 13px; color: rgba(255,255,255,0.8); }
-    .detail-city svg { width: 13px; height: 13px; stroke: rgba(255,255,255,0.8); }
-    .detail-body { padding: 20px 16px 120px; }
-    .detail-card { background: var(--card); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 14px; border: 1px solid rgba(0,0,0,0.04); box-shadow: var(--shadow-sm); }
-    .detail-section-title { font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: 1.5px; text-transform: uppercase; padding: 16px 16px 8px; }
-    .detail-desc { font-size: 14px; color: var(--text-2); line-height: 1.65; padding: 0 16px 16px; }
-    .detail-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-top: 0.5px solid var(--border); cursor: pointer; text-decoration: none; color: inherit; }
-    .detail-row-left { display: flex; align-items: center; gap: 12px; }
-    .detail-row-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--yellow-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .detail-row-icon svg { width: 18px; height: 18px; stroke: var(--yellow); }
-    .detail-row-label { font-size: 11px; color: var(--text-3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-    .detail-row-value { font-size: 14px; color: var(--text-1); font-weight: 500; margin-top: 1px; }
-    .detail-badge-row { padding: 12px 16px; display: flex; gap: 8px; }
-    .detail-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .detail-badge.green { background: var(--green-light); color: var(--green); }
-    .detail-badge.blue { background: #DBEAFE; color: #2563EB; }
-    .detail-badge.open-status { background: #DCFCE7; color: #15803D; }
-    .detail-badge.closed-status { background: #F1F5F9; color: #94A3B8; }
-    .detail-cta { display: flex; gap: 10px; margin-top: 6px; }
-    .detail-cta-btn { flex: 1; padding: 15px; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
-    .detail-cta-btn.primary { background: var(--yellow); color: white; }
-    .detail-cta-btn.secondary { background: var(--card); color: var(--text-1); border: 1.5px solid var(--border); }
-    .detail-cta-btn.primary svg { stroke: white; width: 18px; height: 18px; fill: none; }
-    .detail-cta-btn.secondary svg { stroke: var(--text-1); width: 18px; height: 18px; fill: none; }
-
-    /* BEWERTUNGEN & KOMMENTARE */
-    .stars-row { display: flex; gap: 4px; align-items: center; }
-    .star { font-size: 22px; cursor: pointer; color: #E0E0E0; transition: color 0.15s; line-height: 1; }
-    .star.active { color: var(--yellow); }
-    .rating-summary { display: flex; align-items: center; gap: 10px; padding: 14px 16px; }
-    .rating-avg { font-size: 36px; font-weight: 700; color: var(--text-1); font-family: 'Fraunces', serif; }
-    .rating-meta { display: flex; flex-direction: column; gap: 3px; }
-    .rating-stars-small { display: flex; gap: 2px; }
-    .rating-stars-small span { font-size: 14px; color: var(--yellow); }
-    .rating-count { font-size: 12px; color: var(--text-3); }
-    .review-form { padding: 14px 16px; border-top: 0.5px solid var(--border); }
-    .review-form-title { font-size: 13px; font-weight: 600; color: var(--text-1); margin-bottom: 10px; }
-    .review-stars { display: flex; gap: 6px; margin-bottom: 10px; }
-    .review-textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-1); background: var(--bg); outline: none; resize: none; min-height: 80px; -webkit-appearance: none; }
-    .review-textarea:focus { border-color: var(--yellow); }
-    .review-submit { margin-top: 8px; padding: 11px 20px; background: var(--yellow); color: white; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .review-submit:disabled { background: var(--text-3); cursor: not-allowed; }
-    .review-item { padding: 14px 16px; border-top: 0.5px solid var(--border); }
-    .review-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-    .review-item-name { font-size: 13px; font-weight: 600; color: var(--text-1); }
-    .review-item-stars { display: flex; gap: 2px; }
-    .review-item-stars span { font-size: 12px; color: var(--yellow); }
-    .review-item-text { font-size: 13px; color: var(--text-2); line-height: 1.5; margin-top: 4px; }
-    .review-item-date { font-size: 11px; color: var(--text-3); margin-top: 4px; }
-    .comment-item { padding: 12px 16px; border-top: 0.5px solid var(--border); }
-    .comment-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-    .comment-item-name { font-size: 13px; font-weight: 600; color: var(--text-1); }
-    .comment-item-date { font-size: 11px; color: var(--text-3); }
-    .comment-item-text { font-size: 13px; color: var(--text-2); line-height: 1.5; }
-    .comment-reply-btn { font-size: 11px; color: var(--yellow-dark); font-weight: 600; background: none; border: none; cursor: pointer; margin-top: 5px; padding: 0; }
-    .comment-replies { margin-top: 8px; padding-left: 14px; border-left: 2px solid var(--yellow-light); }
-    .reply-item { padding: 8px 0; border-top: 0.5px solid var(--border); }
-    .reply-item:first-child { border-top: none; }
-    .reply-item-name { font-size: 12px; font-weight: 600; color: var(--text-1); }
-    .reply-item-text { font-size: 12px; color: var(--text-2); line-height: 1.5; }
-    .reply-item-date { font-size: 10px; color: var(--text-3); }
-    .reply-form { margin-top: 8px; display: none; }
-    .reply-form.visible { display: block; }
-    .reply-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-1); background: var(--bg); outline: none; -webkit-appearance: none; }
-    .reply-input:focus { border-color: var(--yellow); }
-    .reply-submit { margin-top: 6px; padding: 9px 16px; background: var(--yellow); color: white; border: none; border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; }
-    .comment-form { padding: 14px 16px; border-top: 0.5px solid var(--border); display: flex; gap: 8px; align-items: flex-end; }
-    .comment-input { flex: 1; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-1); background: var(--bg); outline: none; resize: none; min-height: 44px; max-height: 100px; -webkit-appearance: none; }
-    .comment-input:focus { border-color: var(--yellow); }
-    .comment-send { width: 44px; height: 44px; border-radius: 12px; background: var(--yellow); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .comment-send svg { width: 18px; height: 18px; stroke: white; }
-    .own-review-note { font-size: 12px; color: var(--text-3); padding: 10px 16px; font-style: italic; }
-
-    /* FOTOS */
-    .photos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 12px 16px 16px; }
-    .photo-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; cursor: pointer; display: block; }
-    .photo-thumb-wrap { position: relative; display: inline-block; width: 100%; aspect-ratio: 1; }
-    .photo-thumb-wrap .photo-thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; cursor: pointer; }
-    .photo-delete-btn { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: rgba(0,0,0,0.6); color: white; border: none; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
-    .photo-upload-btn { width: 100%; aspect-ratio: 1; border: 1.5px dashed var(--border); border-radius: 8px; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; gap: 4px; }
-    .photo-upload-btn svg { width: 22px; height: 22px; stroke: var(--text-3); }
-    .photo-upload-btn span { font-size: 11px; color: var(--text-3); font-weight: 500; }
-    .photo-upload-progress { padding: 8px 16px; font-size: 12px; color: var(--text-2); display: none; }
-    .photo-lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 999999; display: none; align-items: center; justify-content: center; }
-    .photo-lightbox.visible { display: flex; }
-    .photo-lightbox img { max-width: 95%; max-height: 90vh; object-fit: contain; border-radius: 8px; }
-    .photo-lightbox-close { position: absolute; top: 16px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; }
-    .photo-lightbox-close svg { width: 18px; height: 18px; stroke: white; }
-
-    /* FILTER PANEL */
-    .filter-bar { display: flex; align-items: center; gap: 8px; padding: 0 16px 10px; flex-shrink: 0; }
-    .filter-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--card); cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-2); white-space: nowrap; transition: all 0.18s; }
-    .filter-btn svg { width: 13px; height: 13px; stroke: var(--text-2); fill: none; }
-    .filter-btn.active { background: var(--text-1); border-color: var(--text-1); color: white; }
-    .filter-btn.active-open { background: #16a34a; border-color: #16a34a; color: white; }
-    .filter-btn.active-open svg { stroke: white; }
-    #filterOpenBtn.active-open span { color: white; }
-    .filter-btn.active svg { stroke: white; }
-    .filter-sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
-    .filter-sheet-overlay.visible { display: flex; }
-    .filter-sheet { background: var(--card); border-radius: 24px 24px 0 0; width: 100%; max-width: 430px; padding: 0 0 32px; }
-    .filter-sheet-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 20px; }
-    .filter-sheet-title { font-size: 16px; font-weight: 700; padding: 0 20px 16px; color: var(--text-1); }
-    .filter-section { padding: 0 20px 20px; }
-    .filter-section-label { font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
-    .filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-    .filter-chip { padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--bg); font-size: 13px; font-weight: 500; color: var(--text-2); cursor: pointer; transition: all 0.15s; }
-    .filter-chip.active { background: var(--yellow); border-color: var(--yellow); color: white; }
-    .filter-star-row { display: flex; gap: 8px; }
-    .filter-star-btn { flex: 1; padding: 10px; border: 1.5px solid var(--border); border-radius: 12px; background: var(--bg); font-size: 13px; font-weight: 600; color: var(--text-2); cursor: pointer; text-align: center; transition: all 0.15s; }
-    .filter-star-btn.active { background: var(--yellow); border-color: var(--yellow); color: white; }
-    .filter-apply-btn { margin: 0 20px; width: calc(100% - 40px); padding: 16px; background: var(--yellow); color: white; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
-    .filter-divider { height: 0.5px; background: var(--border); margin: 0 20px 20px; }
-
-    /* TRANSLATE */
-    .translate-btn { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; padding: 4px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; font-size: 11px; font-weight: 600; color: var(--text-3); cursor: pointer; transition: all 0.15s; }
-    .translate-btn:active { background: var(--yellow-light); color: var(--yellow-dark); border-color: var(--yellow); }
-    .translate-btn svg { width: 11px; height: 11px; stroke: currentColor; fill: none; }
-    .translated-text { font-size: 13px; color: var(--text-2); line-height: 1.55; margin-top: 6px; padding: 8px 12px; background: var(--yellow-light); border-radius: 10px; border-left: 3px solid var(--yellow); display: none; }
-    .translated-text.visible { display: block; }
-    .translate-source { font-size: 10px; color: var(--text-3); margin-top: 4px; }
-
-    /* MAP COLORED GLASS CHIPS */
-    .map-chip { display: flex; align-items: center; gap: 5px; padding: 8px 16px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-size: 12px; font-weight: 600; transition: all 0.22s ease; flex-shrink: 0; letter-spacing: -0.1px; }
-    .map-chip .chip-dot { display: none; }
-    /* Inactive – tinted frosted pill */
-    .map-chip-all         { background: #F0F0F0; border: 1.5px solid #DCDCDC; color: #3A3A3A; }
-    .map-chip-restaurants { background: #FEF3DC; border: 1.5px solid #F5C97A; color: #92520A; }
-    .map-chip-dienstleistung { background: #DBEAFE; border: 1.5px solid #93C5FD; color: #1D4ED8; }
-    .map-chip-orte        { background: #DCFCE7; border: 1.5px solid #86EFAC; color: #15803D; }
-    .map-chip-unterkunft  { background: #EDE9FE; border: 1.5px solid #C4B5FD; color: #6D28D9; }
-    .map-chip-geschaefte  { background: #FEE2E2; border: 1.5px solid #FCA5A5; color: #B91C1C; }
-    .map-chip-sport       { background: #CFFAFE; border: 1.5px solid #67E8F9; color: #0E7490; }
-    /* Active – saturated solid with white text */
-    .map-chip-all.active         { background: #1A1A1A; border-color: #1A1A1A; color: white; }
-    .map-chip-restaurants.active { background: #F5A623; border-color: #F5A623; color: white; }
-    .map-chip-dienstleistung.active { background: #3B82F6; border-color: #3B82F6; color: white; }
-    .map-chip-orte.active        { background: #22C55E; border-color: #22C55E; color: white; }
-    .map-chip-unterkunft.active  { background: #8B5CF6; border-color: #8B5CF6; color: white; }
-    .map-chip-geschaefte.active  { background: #EF4444; border-color: #EF4444; color: white; }
-    .map-chip-sport.active       { background: #06B6D4; border-color: #06B6D4; color: white; }
-    .map-chip-tankstelle { background: #FEE2E2; border: 1.5px solid #FCA5A5; color: #991B1B; }
-    .map-chip-tankstelle.active { background: #EF4444; border-color: #EF4444; color: white; }
-    .map-chip-beauty { background: #FCE7F3; border: 1.5px solid #F9A8D4; color: #9D174D; }
-    .map-chip-beauty.active { background: #EC4899; border-color: #EC4899; color: white; }
-
-    /* DUPLICATE WARNING */
-    .dupe-warning { background: #FFF8EC; border: 1.5px solid var(--yellow); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; display: none; }
-    .dupe-warning.visible { display: block; }
-    .dupe-warning-title { font-size: 13px; font-weight: 700; color: var(--yellow-dark); margin-bottom: 6px; }
-    .dupe-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 0.5px solid var(--border); }
-    .dupe-item:last-child { border-bottom: none; }
-    .dupe-item-name { font-size: 13px; font-weight: 600; color: var(--text-1); }
-    .dupe-item-city { font-size: 11px; color: var(--text-3); }
-    .dupe-view-btn { font-size: 11px; font-weight: 700; color: var(--yellow-dark); background: var(--yellow-light); border: 1px solid var(--yellow); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
-    .form-search-wrap { background: var(--card); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; border: 1.5px solid var(--border); }
-    .form-search-title { font-size: 12px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
-    .form-search-box { display: flex; align-items: center; background: var(--bg); border-radius: 12px; padding: 0 14px; gap: 8px; height: 44px; }
-    .form-search-box svg { width: 15px; height: 15px; stroke: var(--text-3); flex-shrink: 0; fill: none; }
-    .form-search-box input { flex: 1; border: none; outline: none; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-1); background: transparent; }
-    .form-search-results { margin-top: 8px; }
-    .form-search-result { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 0.5px solid var(--border); cursor: pointer; }
-    .form-search-result:last-child { border-bottom: none; }
-    .admin-similar { background: #FFF8EC; border: 1px solid var(--yellow); border-radius: 10px; padding: 10px 12px; margin-top: 8px; font-size: 12px; }
-    .admin-similar-title { font-weight: 700; color: var(--yellow-dark); margin-bottom: 6px; }
-
-    /* DEAL SYSTEM */
-    .deal-badge { display: inline-flex; align-items: center; gap: 4px; background: linear-gradient(135deg, #FF6B35 0%, #F7C548 100%); color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.3px; flex-shrink: 0; }
-    .deal-badge svg { width: 10px; height: 10px; fill: white; stroke: none; }
-    .deal-card { background: linear-gradient(135deg, #FFF5F0 0%, #FFFBF0 100%); border: 1.5px solid #FFD4B8; border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; }
-    .deal-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-    .deal-card-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #FF6B35, #F7C548); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-    .deal-card-icon svg { width: 18px; height: 18px; fill: white; }
-    .deal-card-title { font-size: 13px; font-weight: 700; color: #C2410C; }
-    .deal-card-sub { font-size: 11px; color: #EA580C; margin-top: 1px; }
-    .deal-text { font-size: 14px; color: var(--text-1); font-weight: 500; line-height: 1.5; margin-bottom: 10px; }
-    .deal-code-wrap { display: flex; align-items: center; gap: 8px; background: white; border: 1.5px dashed #FFA07A; border-radius: 10px; padding: 10px 14px; }
-    .deal-code { font-size: 16px; font-weight: 800; color: #C2410C; letter-spacing: 2px; flex: 1; font-family: 'Fraunces', serif; }
-    .deal-copy-btn { padding: 7px 14px; background: linear-gradient(135deg, #FF6B35, #F7C548); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; }
-    .deal-expiry { font-size: 11px; color: #EA580C; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
-    .deal-expiry svg { width: 11px; height: 11px; stroke: #EA580C; fill: none; }
-    .admin-deal-section { background: #FFF5F0; border: 1.5px solid #FFD4B8; border-radius: 12px; padding: 14px; margin-bottom: 14px; }
-    .admin-deal-title { font-size: 12px; font-weight: 700; color: #C2410C; margin-bottom: 10px; }
-
-    /* OFFLINE */
-    .offline-banner { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: #1A1A1A; color: white; text-align: center; font-size: 12px; font-weight: 600; padding: 8px; z-index: 2000; display: none; }
-    .offline-banner.visible { display: block; }
-    .cache-info { font-size: 11px; color: var(--text-3); text-align: center; padding: 4px 0 8px; }
-
-    /* CITY PICKER */
-    .city-picker-btn { display: flex; align-items: center; gap: 8px; margin: 0 16px 10px; padding: 10px 14px; background: var(--card); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; border: 1.5px solid var(--border); transition: border-color 0.2s; }
-    .city-picker-btn.active { border-color: var(--yellow); background: var(--yellow-light); }
-    .city-picker-btn svg { width: 16px; height: 16px; stroke: var(--text-3); flex-shrink: 0; }
-    .city-picker-btn.active svg { stroke: var(--yellow-dark); }
-    .city-picker-label { flex: 1; font-size: 14px; color: var(--text-3); font-weight: 500; }
-    .city-picker-btn.active .city-picker-label { color: var(--yellow-dark); font-weight: 600; }
-    .city-picker-clear { width: 20px; height: 20px; border-radius: 50%; background: var(--yellow); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; color: white; flex-shrink: 0; }
-    .city-sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
-    .city-sheet-overlay.visible { display: flex; }
-    .city-sheet { background: var(--card); border-radius: 24px 24px 0 0; width: 100%; max-width: 430px; max-height: 80vh; display: flex; flex-direction: column; padding-bottom: 24px; }
-    .city-sheet-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 16px; }
-    .city-sheet-title { font-size: 16px; font-weight: 700; color: var(--text-1); padding: 0 20px 12px; }
-    .city-sheet-search { margin: 0 16px 12px; display: flex; align-items: center; background: var(--bg); border-radius: 12px; padding: 0 14px; gap: 8px; height: 44px; }
-    .city-sheet-search svg { width: 16px; height: 16px; stroke: var(--text-3); flex-shrink: 0; }
-    .city-sheet-search input { flex: 1; border: none; outline: none; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-1); background: transparent; }
-    .city-sheet-list { overflow-y: auto; flex: 1; padding: 0 8px; }
-    .city-sheet-item { display: flex; align-items: center; gap: 10px; padding: 12px 12px; border-radius: 10px; cursor: pointer; transition: background 0.15s; }
-    .city-sheet-item:active { background: var(--yellow-light); }
-    .city-sheet-item svg { width: 14px; height: 14px; stroke: var(--text-3); flex-shrink: 0; }
-    .city-sheet-item span { font-size: 14px; color: var(--text-1); }
-    .city-sheet-item.selected { background: var(--yellow-light); }
-    .city-sheet-item.selected svg { stroke: var(--yellow-dark); }
-    .city-sheet-item.selected span { color: var(--yellow-dark); font-weight: 600; }
-    .city-sheet-empty { text-align: center; padding: 30px; color: var(--text-3); font-size: 13px; }
-
-    /* FAVORITEN */
-    .fav-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.15); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; bottom: 24px; right: 20px; z-index: 10; flex-shrink: 0; }
-    .fav-btn svg { width: 20px; height: 20px; transition: all 0.2s; }
-    .fav-btn.active svg { fill: #EF4444; stroke: #EF4444; }
-    .fav-btn:not(.active) svg { fill: none; stroke: white; }
-    .profil-fav-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 14px; cursor: pointer; }
-
-    /* CLAIMED LISTING */
-    .owner-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #FFF8EC; color: #D4841A; border: 1px solid #F5A623; }
-    .claim-btn { width: 100%; padding: 14px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--text-2); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; }
-    .claim-btn svg { width: 18px; height: 18px; stroke: var(--text-2); }
-    .owner-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
-    .owner-edit-btn { width: 100%; padding: 14px; background: var(--yellow); color: white; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .owner-edit-btn svg { width: 18px; height: 18px; stroke: white; fill: none; }
-    .edit-listing-screen { background: var(--bg); overflow-y: auto; }
-    .admin-claim-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
-    .admin-claim-name { font-size: 16px; font-weight: 700; color: var(--text-1); margin-bottom: 4px; }
-    .admin-claim-meta { font-size: 12px; color: var(--text-3); margin-bottom: 8px; }
-    .admin-claim-reason { font-size: 13px; color: var(--text-2); line-height: 1.5; margin-bottom: 14px; background: var(--bg); padding: 10px 12px; border-radius: 10px; }
-
-    /* KARTE */
-    .map-screen { background: var(--bg); overflow: hidden; display: none; flex-direction: column; }
-    .map-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 52px 20px 16px; flex-shrink: 0; position: relative; overflow: hidden; }
-    .map-header-title { font-size: 20px; font-weight: 700; color: white; margin-bottom: 4px; }
-    .map-header-sub { font-size: 13px; color: rgba(255,255,255,0.8); }
-    .map-filters { background: rgba(255,255,255,0.85); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-bottom: 0.5px solid rgba(0,0,0,0.06); flex-shrink: 0; }
-    .map-filter-row { display: flex; gap: 8px; padding: 10px 16px 6px; overflow-x: auto; scrollbar-width: none; }
-    .map-filter-row::-webkit-scrollbar { display: none; }
-    .map-chip.city-chip.active { background: var(--text-1); border-color: var(--text-1); color: white; }
-    .map-container { flex: 1; position: relative; min-height: 0; margin-bottom: 80px; }
-    #leafletMap { width: 100%; height: 100%; }
-    .leaflet-popup-content-wrapper { border-radius: 14px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important; padding: 0 !important; overflow: hidden; }
-    .leaflet-popup-content { margin: 0 !important; width: auto !important; }
-    .map-popup { padding: 12px 16px; min-width: 160px; cursor: pointer; }
-    .map-popup-name { font-size: 14px; font-weight: 700; color: #1A1A1A; margin-bottom: 2px; font-family: 'DM Sans', sans-serif; }
-    .map-popup-city { font-size: 12px; color: #AAAAAA; font-family: 'DM Sans', sans-serif; }
-    .map-popup-cat { font-size: 11px; color: #D4841A; font-weight: 600; margin-top: 4px; font-family: 'DM Sans', sans-serif; }
-    .leaflet-popup-tip-container { display: none; }
-    .map-list { position: absolute; bottom: 12px; left: 0; right: 0; padding: 0 12px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; z-index: 500; }
-    .map-list::-webkit-scrollbar { display: none; }
-    .map-card { background: var(--card); border-radius: 14px; padding: 12px 14px; min-width: 180px; max-width: 220px; box-shadow: var(--shadow-md); cursor: pointer; flex-shrink: 0; border: 1.5px solid transparent; transition: border-color 0.15s; }
-    .map-card:active { border-color: var(--yellow); }
-    .map-card-name { font-size: 13px; font-weight: 700; color: var(--text-1); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .map-card-city { font-size: 11px; color: var(--text-3); margin-bottom: 4px; }
-    .map-card-cat { font-size: 11px; color: var(--yellow-dark); font-weight: 600; }
-    .map-no-coords { position: absolute; bottom: 80px; left: 16px; right: 16px; background: var(--card); border-radius: 12px; padding: 10px 14px; font-size: 12px; color: var(--text-2); text-align: center; z-index: 500; box-shadow: var(--shadow-sm); display: none; }
-
-    /* FORM */
-    .form-screen { background: var(--bg); overflow-y: auto; }
-    .form-header { background: linear-gradient(135deg, var(--yellow) 0%, var(--yellow-dark) 100%); padding: 52px 20px 24px; }
-    .form-back { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 16px; }
-    .form-back svg { width: 20px; height: 20px; stroke: white; }
-    .form-title { font-size: 22px; font-weight: 700; color: white; margin-bottom: 4px; }
-    .form-sub { font-size: 13px; color: rgba(255,255,255,0.8); }
-    .form-body { padding: 20px 16px 120px; }
-    .form-card { background: var(--card); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 14px; }
-    .form-card-title { font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
-    .form-field { margin-bottom: 14px; }
-    .form-field:last-child { margin-bottom: 0; }
-    .form-hint { font-size: 12px; color: var(--text-3); margin-top: 5px; }
-    .form-rules { background: var(--yellow-light); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
-    .form-rules-title { font-size: 12px; font-weight: 700; color: var(--yellow-dark); margin-bottom: 8px; }
-    .form-rule { font-size: 12px; color: var(--yellow-dark); line-height: 1.8; }
-    .form-submit { width: 100%; padding: 16px; background: var(--yellow); color: white; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; }
-    .form-submit:disabled { background: var(--text-3); cursor: not-allowed; }
-    .form-success { background: var(--green-light); color: var(--green); padding: 16px; border-radius: 12px; font-size: 14px; font-weight: 500; text-align: center; display: none; margin-bottom: 14px; }
-    .form-success.visible { display: block; }
-    .form-error-msg { background: var(--red-light); color: var(--red); padding: 12px 16px; border-radius: 10px; font-size: 13px; display: none; margin-bottom: 14px; }
-    .form-error-msg.visible { display: block; }
-
-    /* ADMIN */
-    .admin-screen { background: var(--bg); overflow-y: auto; }
-    .admin-header { background: #1A1A1A; padding: 52px 20px 24px; }
-    .admin-back { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 16px; }
-    .admin-back svg { width: 20px; height: 20px; stroke: white; }
-    .admin-title { font-size: 22px; font-weight: 700; color: white; margin-bottom: 4px; }
-    .admin-sub { font-size: 13px; color: rgba(255,255,255,0.6); }
-    .admin-body { padding: 20px 16px 120px; }
-    .admin-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
-    .admin-card-name { font-size: 16px; font-weight: 700; color: var(--text-1); margin-bottom: 4px; }
-    .admin-card-meta { font-size: 12px; color: var(--text-3); margin-bottom: 8px; }
-    .admin-card-desc { font-size: 13px; color: var(--text-2); line-height: 1.5; margin-bottom: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-    .admin-card-info { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-    .admin-info-pill { background: var(--bg); padding: 5px 10px; border-radius: 20px; font-size: 12px; color: var(--text-2); }
-    .admin-actions { display: flex; gap: 8px; }
-    .admin-btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .admin-btn.approve { background: var(--green-light); color: var(--green); }
-    .admin-btn.reject { background: var(--red-light); color: var(--red); }
-    .admin-empty { text-align: center; padding: 60px 20px; }
-    .admin-empty-icon { font-size: 40px; margin-bottom: 12px; }
-    .admin-empty-text { font-size: 15px; font-weight: 600; color: var(--text-1); margin-bottom: 6px; }
-    .admin-empty-sub { font-size: 13px; color: var(--text-2); }
-
-    /* PROFIL */
-    .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top,44px),44px) 24px 40px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
-    .profil-avatar { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 32px; font-weight: 900; color: white; }
-    .profil-name { font-size: 20px; font-weight: 700; color: white; }
-    .profil-email { font-size: 13px; color: rgba(255,255,255,0.8); }
-    .profil-body { padding: 24px; flex: 1; padding-bottom: 120px; }
-    .profil-section { background: var(--card); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 16px; }
-    .profil-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 0.5px solid var(--border); cursor: pointer; }
-    .profil-row:last-child { border-bottom: none; }
-    .profil-row-left { display: flex; align-items: center; gap: 12px; }
-    .profil-row-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--yellow-light); display: flex; align-items: center; justify-content: center; }
-    .profil-row-icon svg { width: 18px; height: 18px; stroke: var(--yellow); }
-    .profil-row-icon.dark { background: #1A1A1A; }
-    .profil-row-icon.dark svg { stroke: white; }
-    .profil-row-label { font-size: 14px; font-weight: 500; }
-    .logout-btn { width: 100%; padding: 16px; background: var(--red-light); color: var(--red); border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; }
-
-    /* SKELETON */
-    .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
-    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .skeleton-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 10px; display: flex; gap: 14px; }
-    .skel-icon { width: 54px; height: 54px; border-radius: 14px; flex-shrink: 0; }
-    .skel-body { flex: 1; display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
-    .skel-line { height: 12px; }
-    .skel-line.w-60 { width: 60%; } .skel-line.w-40 { width: 40%; } .skel-line.w-80 { width: 80%; }
-    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 12px; text-align: center; }
-    .empty-icon { width: 72px; height: 72px; border-radius: 50%; background: var(--yellow-light); display: flex; align-items: center; justify-content: center; }
-    .empty-icon svg { width: 34px; height: 34px; stroke: var(--yellow); }
-    .empty-title { font-size: 16px; font-weight: 600; }
-    .empty-sub { font-size: 13px; color: var(--text-2); }
-
-    /* BOTTOM NAV */
-    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 0.5px solid rgba(0,0,0,0.06); display: flex; padding: 8px 0 24px; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); }
-    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 6px 0; }
-    .nav-item svg { width: 22px; height: 22px; stroke: var(--text-3); transition: all 0.2s; fill: none; }
-    .nav-item span { font-size: 10px; font-weight: 600; color: var(--text-3); transition: color 0.2s; letter-spacing: 0.2px; }
-    .nav-item.active svg { stroke: var(--yellow); transform: translateY(-1px); }
-    .nav-item.active span { color: var(--yellow); }
-  </style>
-</head>
-<body>
-<div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
-  <div id="splash">
-    <div class="splash-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></div>
-    <div class="splash-name">Buscar</div>
-    <div style="display:flex;gap:8px;margin-top:8px"><div class="splash-dot"></div><div class="splash-dot"></div><div class="splash-dot"></div></div>
-  </div>
-<div id="app">
-
-  <!-- AUTH -->
-  <div class="screen active" id="screenAuth">
-    <div class="auth-header">
-      <!-- Lang toggle -->
-      <div style="position:absolute;top:16px;right:16px;z-index:2">
-        <button id="langToggleAuth" onclick="toggleLangAuth()" style="background:rgba(255,255,255,0.22);border:1.5px solid rgba(255,255,255,0.4);border-radius:20px;padding:5px 12px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:white;cursor:pointer;letter-spacing:0.5px">ES</button>
-      </div>
-      <!-- Floating category icon bubbles -->
-      <div style="position:absolute;top:18px;left:18px;width:44px;height:44px;background:rgba(255,255,255,0.13);border-radius:14px;display:flex;align-items:center;justify-content:center;transform:rotate(-12deg)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="22" height="22"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
-      </div>
-      <div style="position:absolute;top:55px;left:52px;width:34px;height:34px;background:rgba(255,255,255,0.10);border-radius:10px;display:flex;align-items:center;justify-content:center;transform:rotate(8deg)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="16" height="16"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
-      </div>
-      <div style="position:absolute;bottom:30px;left:24px;width:38px;height:38px;background:rgba(255,255,255,0.10);border-radius:12px;display:flex;align-items:center;justify-content:center;transform:rotate(-6deg)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="18" height="18"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      </div>
-      <div style="position:absolute;bottom:48px;right:28px;width:40px;height:40px;background:rgba(255,255,255,0.10);border-radius:12px;display:flex;align-items:center;justify-content:center;transform:rotate(10deg)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="19" height="19"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      </div>
-      <div style="position:absolute;top:30px;right:64px;width:30px;height:30px;background:rgba(255,255,255,0.08);border-radius:8px;display:flex;align-items:center;justify-content:center;transform:rotate(-15deg)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
-      </div>
-      <!-- Logo -->
-      <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:12px">
-        <div class="auth-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></div>
-        <div class="auth-logo-name">Buscar</div>
-        <div class="auth-tagline" data-i18n="tagline">Dein Guide in Paraguay</div>
-      </div>
-    </div>
-    <div class="auth-body">
-      <div class="auth-tabs">
-        <div class="auth-tab active" id="tabLogin" onclick="switchTab('login')" data-i18n="login">Einloggen</div>
-        <div class="auth-tab" id="tabRegister" onclick="switchTab('register')" data-i18n="register">Registrieren</div>
-      </div>
-      <div id="authError" class="auth-error"></div>
-      <form class="auth-form" id="formLogin" onsubmit="handleLogin(event)">
-        <div><label class="field-label">E-Mail</label><input class="field-input" type="email" id="loginEmail" placeholder="deine@email.de" required></div>
-        <div><label class="field-label">Passwort</label><input class="field-input" type="password" id="loginPassword" placeholder="min. 6 Zeichen" required></div>
-        <button class="auth-btn" type="submit" id="loginBtn">Einloggen</button>
-        <div class="auth-divider"><span style="color:var(--yellow);cursor:pointer;font-weight:600" onclick="showForgotPassword()">Passwort vergessen?</span></div>
-        <div id="forgotMsg" style="display:none;background:var(--green-light);color:var(--green);padding:10px 14px;border-radius:10px;font-size:13px;text-align:center"></div>
-        <div class="auth-divider">Noch kein Konto? <span style="color:var(--yellow);cursor:pointer;font-weight:600" onclick="switchTab('register')">Registrieren</span></div>
-      </form>
-      <form class="auth-form hidden" id="formRegister" onsubmit="handleRegister(event)">
-        <div><label class="field-label">Name</label><input class="field-input" type="text" id="regName" placeholder="Dein Name" required></div>
-        <div>
-          <label class="field-label">Benutzername *</label>
-          <input class="field-input" type="text" id="regUsername" placeholder="z.B. max_py, deutscherpypy" required maxlength="30" style="margin-bottom:4px">
-          <div style="font-size:11px;color:var(--text-3)">Wird oeffentlich angezeigt. Nur Buchstaben, Zahlen und _</div>
-          <div id="usernameError" style="font-size:12px;color:var(--red);display:none;margin-top:3px"></div>
-        </div>
-        <div><label class="field-label">E-Mail</label><input class="field-input" type="email" id="regEmail" placeholder="deine@email.de" required></div>
-        <div><label class="field-label">Passwort</label><input class="field-input" type="password" id="regPassword" placeholder="min. 6 Zeichen" required minlength="6"></div>
-        <button class="auth-btn" type="submit" id="registerBtn">Konto erstellen</button>
-        <div class="auth-divider">Schon ein Konto? <span style="color:var(--yellow);cursor:pointer;font-weight:600" onclick="switchTab('login')">Einloggen</span></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- HOME -->
-  <div class="screen" id="screenHome">
-    <div class="header">
-      <div class="header-top">
-        <div class="logo"><div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></div><span class="logo-name">Buscar</span></div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <button id="langToggle" onclick="toggleLang()" style="background:rgba(255,255,255,0.22);border:1.5px solid rgba(255,255,255,0.4);border-radius:20px;padding:5px 12px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:white;cursor:pointer;letter-spacing:0.5px">ES</button>
-          <div class="header-avatar" id="headerAvatar" onclick="setNav('navProfil');showScreen('screenProfil')">?</div>
-        </div>
-      </div>
-      <div class="header-hero">
-        <div class="header-greeting" id="headerGreeting">Guten Tag</div>
-        <div class="header-sub">Was suchst du heute?</div>
-      </div>
-    </div>
-    <div class="search-wrap">
-      <div class="search-box">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="searchInput" placeholder="Arzt, Restaurant, Anwalt...">
-        <button class="search-clear" id="searchClear">x</button>
-      </div>
-    </div>
-    <div id="filterBar" class="filter-bar" style="display:none">
-      <button class="filter-btn" id="filterSubBtn" onclick="openFilterSheet('sub')">
-        <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        <span id="filterSubLabel" data-i18n="subcategory">Unterkategorie</span>
-      </button>
-      <button class="filter-btn" id="filterStarBtn" onclick="openFilterSheet('stars')">
-        <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <span id="filterStarLabel" data-i18n="rating_filter">Bewertung</span>
-      </button>
-      <button class="filter-btn" id="filterOpenBtn" onclick="toggleOpenNowFilter()">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span id="filterOpenLabel">Geöffnet</span>
-      </button>
-    </div>
-    <div class="cats-wrap">
-      <div class="cats-scroll" id="catsScroll">
-        <div class="cat-chip active" data-cat="Alle" data-i18n="cat_all">Alle</div>
-        <div class="cat-chip" data-cat="kat-restaurants" data-i18n="cat_restaurants">Restaurants</div>
-        <div class="cat-chip" data-cat="kat-dienstleistung" data-i18n="cat_services">Dienstleistungen</div>
-        <div class="cat-chip" data-cat="kat-orte" data-i18n="cat_places">Orte</div>
-        <div class="cat-chip" data-cat="kat-unterkunft" data-i18n="cat_accommodation">Unterkünfte</div>
-        <div class="cat-chip" data-cat="kat-geschaefte" data-i18n="cat_shops">Geschäfte</div>
-        <div class="cat-chip" data-cat="kat-sport" data-i18n="cat_sport">Sport & Fitness</div>
-        <div class="cat-chip" data-cat="kat-tankstelle">Tankstellen</div>
-        <div class="cat-chip" data-cat="kat-beauty">Beauty & Wellness</div>
-      </div>
-      <div id="cityPickerBtn" class="city-picker-btn" onclick="openCitySheet()">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span class="city-picker-label" id="cityPickerLabel" data-i18n="city_select">Stadt wählen...</span>
-      </div>
-    </div>
-    <div class="listings">
-      <div id="pullIndicator" style="text-align:center;height:0;overflow:hidden;transition:height 0.2s;color:var(--text-3);font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16" id="pullArrow" style="transition:transform 0.2s"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-        <span id="pullText">Aktualisieren</span>
-      </div>
-      <div class="section-title" id="sectionTitle">Alle Einträge</div>
-      <div id="listingsInner">
-        <div class="skeleton-card"><div class="skeleton skel-icon"></div><div class="skel-body"><div class="skeleton skel-line w-60"></div><div class="skeleton skel-line w-40"></div><div class="skeleton skel-line w-80"></div></div></div>
-        <div class="skeleton-card"><div class="skeleton skel-icon"></div><div class="skel-body"><div class="skeleton skel-line w-60"></div><div class="skeleton skel-line w-40"></div><div class="skeleton skel-line w-80"></div></div></div>
-        <div class="skeleton-card"><div class="skeleton skel-icon"></div><div class="skel-body"><div class="skeleton skel-line w-60"></div><div class="skeleton skel-line w-40"></div><div class="skeleton skel-line w-80"></div></div></div>
-      </div>
-    </div>
-    <nav class="bottom-nav">
-      <div class="nav-item active" id="navHome" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span data-i18n="nav_home">Home</span></div>
-      <div class="nav-item" id="navMap" onclick="setNav('navMap');showScreen('screenMap');renderMap()"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span data-i18n="nav_map">Karte</span></div>
-      <div class="nav-item" id="navForm" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span data-i18n="nav_entry">Eintrag</span></div>
-      <div class="nav-item" id="navProfil" onclick="setNav('navProfil');showScreen('screenProfil')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span data-i18n="nav_profile">Profil</span></div>
-    </nav>
-  </div>
-
-  <!-- LEGAL SCREENS -->
-  <div class="screen" id="screenImpressum">
-    <div class="header" style="padding-bottom:20px">
-      <div class="header-top">
-        <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <div id="impressumTitle" style="color:white;font-weight:700;font-size:17px">Impressum</div>
-        <div style="width:38px"></div>
-      </div>
-    </div>
-    <div style="padding:20px;overflow-y:auto;flex:1">
-      <div class="detail-card" id="impressumBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div>
-    </div>
-  </div>
-
-  <div class="screen" id="screenDatenschutz">
-    <div class="header" style="padding-bottom:20px">
-      <div class="header-top">
-        <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <div id="datenschutzTitle" style="color:white;font-weight:700;font-size:17px">Datenschutz</div>
-        <div style="width:38px"></div>
-      </div>
-    </div>
-    <div style="padding:20px;overflow-y:auto;flex:1">
-      <div class="detail-card" id="datenschutzBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div>
-    </div>
-  </div>
-
-  <div class="screen" id="screenAGB">
-    <div class="header" style="padding-bottom:20px">
-      <div class="header-top">
-        <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <div id="agbTitle" style="color:white;font-weight:700;font-size:17px">Nutzungsbedingungen</div>
-        <div style="width:38px"></div>
-      </div>
-    </div>
-    <div style="padding:20px;overflow-y:auto;flex:1">
-      <div class="detail-card" id="agbBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div>
-    </div>
-  </div>
-
-  <!-- DETAIL -->
-  <div class="screen detail-screen" id="screenDetail">
-    <div class="detail-hero" id="detailHero">
-      <div class="detail-cover" id="detailCover"></div>
-      <div class="detail-cover-overlay" id="detailCoverOverlay" style="display:none"></div>
-      <button class="fav-btn" id="favBtn" onclick="toggleFavorite()"><svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-      <div class="detail-hero-content">
-      <div class="detail-hero-icon" id="detailIcon"></div>
-      <div class="detail-title" id="detailTitle">-</div>
-      <div class="detail-city" id="detailCity"></div>
-      </div><!-- /detail-hero-content -->
-    </div>
-    <div class="detail-body">
-      <div id="detailBadges" class="detail-card" style="display:none"><div class="detail-badge-row" id="detailBadgeRow"></div></div>
-      <div class="detail-card"><div class="detail-section-title" data-i18n="description">Beschreibung</div><div class="detail-desc" id="detailDesc">-</div></div>
-      <div class="detail-card" id="detailInfoCard" style="display:none"></div>
-      <div class="detail-cta" id="detailCta"></div>
-
-      <div id="detailOwnerSection"></div>
-
-      <!-- DEAL -->
-      <div id="detailDealCard"></div>
-
-      <!-- BEWERTUNGEN -->
-      <div class="detail-card" id="detailRatingsCard">
-        <div class="detail-section-title" data-i18n="ratings">Bewertungen</div>
-        <div id="ratingSummary"></div>
-        <div id="reviewForm"></div>
-        <div id="reviewsList"></div>
-      </div>
-
-      <!-- FOTOS -->
-      <div class="detail-card" id="detailPhotosCard">
-        <div class="detail-section-title" data-i18n="photos">Fotos</div>
-        <div class="photos-grid" id="photosGrid"></div>
-        <div class="photo-upload-progress" id="photoProgress">Wird hochgeladen...</div>
-      </div>
-
-      <!-- KOMMENTARE -->
-      <div class="detail-card" id="detailCommentsCard">
-        <div class="detail-section-title" data-i18n="discussion">Diskussion</div>
-        <div id="commentsList"></div>
-        <div class="comment-form">
-          <textarea class="comment-input" id="commentInput" placeholder="Schreib einen Kommentar..." data-i18n-ph="comment_placeholder" rows="1"></textarea>
-          <button class="comment-send" onclick="submitComment()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- KARTE -->
-  <div class="screen map-screen" id="screenMap">
-    <div class="map-header">
-      <!-- Decorative grid/coordinate pattern -->
-      <svg style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0.08;pointer-events:none" viewBox="0 0 400 120" preserveAspectRatio="xMidYMid slice">
-        <!-- Grid lines -->
-        <line x1="0" y1="30" x2="400" y2="30" stroke="white" stroke-width="1"/>
-        <line x1="0" y1="60" x2="400" y2="60" stroke="white" stroke-width="1"/>
-        <line x1="0" y1="90" x2="400" y2="90" stroke="white" stroke-width="1"/>
-        <line x1="80" y1="0" x2="80" y2="120" stroke="white" stroke-width="1"/>
-        <line x1="160" y1="0" x2="160" y2="120" stroke="white" stroke-width="1"/>
-        <line x1="240" y1="0" x2="240" y2="120" stroke="white" stroke-width="1"/>
-        <line x1="320" y1="0" x2="320" y2="120" stroke="white" stroke-width="1"/>
-        <!-- Map pins -->
-        <circle cx="80" cy="60" r="4" fill="white"/>
-        <circle cx="200" cy="30" r="3" fill="white"/>
-        <circle cx="300" cy="75" r="4" fill="white"/>
-        <circle cx="150" cy="90" r="2.5" fill="white"/>
-        <!-- Dotted route -->
-        <line x1="80" y1="60" x2="200" y2="30" stroke="white" stroke-width="1.5" stroke-dasharray="4 4"/>
-        <line x1="200" y1="30" x2="300" y2="75" stroke="white" stroke-width="1.5" stroke-dasharray="4 4"/>
-      </svg>
-      <div style="position:relative;z-index:1">
-        <div class="map-header-title" data-i18n="map_title">Karte</div>
-        <div class="map-header-sub" id="mapHeaderSub" data-i18n="map_sub_all">Alle Orte in Paraguay</div>
-      </div>
-    </div>
-    <div class="map-filters">
-      <div class="map-filter-row" id="mapCats">
-        <div class="map-chip map-chip-all active" data-cat="Alle" data-i18n="cat_all">Alle</div>
-        <div class="map-chip map-chip-restaurants" data-cat="kat-restaurants"><span class="chip-dot"></span><span data-i18n="cat_restaurants">Restaurants</span></div>
-        <div class="map-chip map-chip-dienstleistung" data-cat="kat-dienstleistung"><span class="chip-dot"></span><span data-i18n="cat_services">Dienstleistungen</span></div>
-        <div class="map-chip map-chip-orte" data-cat="kat-orte"><span class="chip-dot"></span><span data-i18n="cat_places">Orte</span></div>
-        <div class="map-chip map-chip-unterkunft" data-cat="kat-unterkunft"><span class="chip-dot"></span><span data-i18n="cat_accommodation">Unterkünfte</span></div>
-        <div class="map-chip map-chip-geschaefte" data-cat="kat-geschaefte"><span class="chip-dot"></span><span data-i18n="cat_shops">Geschäfte</span></div>
-        <div class="map-chip map-chip-sport" data-cat="kat-sport"><span class="chip-dot"></span><span data-i18n="cat_sport">Sport</span></div>
-        <div class="map-chip map-chip-tankstelle" data-cat="kat-tankstelle"><span class="chip-dot"></span><span>Tankstellen</span></div>
-        <div class="map-chip map-chip-beauty" data-cat="kat-beauty"><span class="chip-dot"></span><span>Beauty</span></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;padding:6px 16px 10px">
-        <div id="mapCityPickerBtn" onclick="openMapCitySheet()" style="flex:1;display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-2)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="13" height="13"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <span id="mapCityPickerLabel">Stadt wählen...</span>
-        </div>
-        <button class="filter-btn" id="mapFilterSubBtn" onclick="openMapFilterSheet('sub')" style="white-space:nowrap">
-          <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          <span id="mapFilterSubLabel">Typ</span>
-        </button>
-        <button class="filter-btn" id="mapFilterStarBtn" onclick="openMapFilterSheet('stars')" style="white-space:nowrap">
-          <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <span id="mapFilterStarLabel">★</span>
-        </button>
-      </div>
-    </div>
-    <div class="map-container">
-      <div id="leafletMap"></div>
-      <div class="map-list" id="mapList"></div>
-      <div class="map-no-coords" id="mapNoCoords">Einige Orte haben noch keine Koordinaten</div>
-    </div>
-    <nav class="bottom-nav">
-      <div class="nav-item" id="navHome2" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
-      <div class="nav-item active" id="navMap2" onclick="setNav('navMap');showScreen('screenMap');renderMap()"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span>Karte</span></div>
-      <div class="nav-item" id="navForm2" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Eintrag</span></div>
-      <div class="nav-item" id="navProfil2" onclick="setNav('navProfil');showScreen('screenProfil')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profil</span></div>
-    </nav>
-  </div>
-
-  <!-- EINTRAG FORM -->
-  <div class="screen form-screen" id="screenForm">
-    <div class="form-header" style="position:relative;overflow:hidden">
-      <!-- Decorative pencil/plus elements -->
-      <div style="position:absolute;right:-10px;top:-10px;opacity:0.08;pointer-events:none">
-        <svg viewBox="0 0 120 120" width="120" height="120">
-          <path d="M80 10 L100 30 L40 90 L20 90 L20 70 Z" fill="white"/>
-          <rect x="85" y="5" width="20" height="8" rx="2" fill="white" transform="rotate(45 95 9)"/>
-        </svg>
-      </div>
-      <div style="position:absolute;left:20px;bottom:-8px;opacity:0.06;pointer-events:none">
-        <svg viewBox="0 0 60 60" width="60" height="60">
-          <line x1="30" y1="5" x2="30" y2="55" stroke="white" stroke-width="6" stroke-linecap="round"/>
-          <line x1="5" y1="30" x2="55" y2="30" stroke="white" stroke-width="6" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <button class="form-back" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <div class="form-title" data-i18n="suggest_entry">Eintrag vorschlagen</div>
-      <div class="form-sub" data-i18n="after_review">Wird nach Prüfung veröffentlicht</div>
-    </div>
-    <div class="form-body">
-      <div class="form-rules">
-        <div class="form-rules-title">Regeln für Einträge</div>
-        <div class="form-rule">• Keine Emojis im Titel</div>
-        <div class="form-rule">• Name: max. 60 Zeichen</div>
-        <div class="form-rule">• Beschreibung: min. 50, max. 500 Zeichen</div>
-        <div class="form-rule">• Nur echte Orte in Paraguay</div>
-        <div class="form-rule">• Keine Werbung oder Spam</div>
-      </div>
-      <div id="formSuccess" class="form-success">Danke! Dein Eintrag wurde eingereicht und wird geprüft.</div>
-      <div id="formError" class="form-error-msg"></div>
-      <div class="form-card">
-        <div class="form-card-title">Grundinfos</div>
-        <div class="form-field">
-          <label class="field-label">Name des Ortes *</label>
-          <input class="field-input" type="text" id="newName" placeholder="z.B. Dr. Müller, Café Central" maxlength="60" oninput="checkDuplicate();updateCounter('newName','nameCounter',60)">
-          <div class="field-counter" id="nameCounter">0 / 60</div>
-          <div class="dupe-warning" id="dupeWarning"><div class="dupe-warning-title">⚠️ Ähnliche Einträge gefunden – bitte prüfen:</div><div id="dupeList"></div></div>
-          <div class="field-error" id="nameError">Name darf keine Emojis enthalten.</div>
-        </div>
-        <div class="form-field">
-          <label class="field-label">Kategorie *</label>
-          <select class="field-select" id="newCategory" onchange="updateSubcatOptions();this.classList.remove('error')">
-            <option value="">Bitte wählen...</option>
-            <option value="kat-restaurants">Restaurants und Cafés</option>
-            <option value="kat-dienstleistung">Dienstleistungen</option>
-            <option value="kat-orte">Orte und Sehenswürdigkeiten</option>
-            <option value="kat-unterkunft">Unterkünfte</option>
-            <option value="kat-geschaefte">Geschäfte und Märkte</option>
-          <option value="kat-sport">Sport & Fitness</option>
-          </select>
-        </div>
-        <div class="form-field" id="subcatField" style="display:none">
-          <label class="field-label">Unterkategorie</label>
-          <select class="field-select" id="newSubcategory">
-            <option value="">Bitte wählen...</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label class="field-label">Stadt *</label>
-          <input class="field-input" type="text" id="newCity" placeholder="z.B. Asunción, Encarnación" oninput="this.classList.remove('error')">
-          <span class="field-error" id="cityError" style="display:none;color:#dc2626;font-size:12px;margin-top:4px">Stadt ist ein Pflichtfeld.</span>
-        </div>
-      </div>
-      <div class="form-card">
-        <div class="form-card-title">Beschreibung</div>
-        <div class="form-field">
-          <label class="field-label">Deine Erfahrung *</label>
-          <textarea class="field-textarea" id="newDesc" placeholder="Beschreibe den Ort für andere Deutsche. Was macht ihn besonders? Worauf sollte man achten?" maxlength="500"></textarea>
-          <div class="field-counter" id="descCounter">0 / 500</div>
-          <div class="field-error" id="descError">Mindestens 50 Zeichen erforderlich.</div>
-        </div>
-      </div>
-      <div class="form-card">
-        <div class="form-card-title">Kontakt (optional)</div>
-        <div class="form-field">
-          <label class="field-label">Telefon</label>
-          <input class="field-input" type="tel" id="newPhone" placeholder="+595 21 ...">
-          <div class="field-error" id="phoneError">Nur Zahlen, +, Leerzeichen und - erlaubt.</div>
-        </div>
-        <div class="form-field">
-          <label class="field-label">Website</label>
-          <input class="field-input" type="text" id="newWebsite" placeholder="www.beispiel.com">
-        </div>
-        <div class="form-field">
-          <label class="field-label">Adresse</label>
-          <input class="field-input" type="text" id="newAddress" placeholder="Straße, Stadtviertel">
-          <button type="button" onclick="useMyLocation()" id="locationBtn" style="margin-top:8px;width:100%;padding:12px;background:var(--yellow-light);color:var(--yellow-dark);border:1.5px solid var(--yellow);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Meinen Standort verwenden</button><div id="locationStatus" style="font-size:12px;margin-top:6px;display:none"></div>
-        </div>
-        <div class="form-field">
-          <label class="field-label">Öffnungszeiten</label>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <select id="hoursDay" class="field-input" style="padding:10px 12px">
-              <option value="">Tage wählen...</option>
-              <option value="täglich">Täglich</option>
-              <option value="Mo-Fr">Mo – Fr</option>
-              <option value="Mo-Sa">Mo – Sa</option>
-              <option value="Mo-So">Mo – So</option>
-              <option value="Sa-So">Sa – So</option>
-            </select>
-            <div style="font-size:12px;font-weight:600;color:var(--text-3)">1. Zeitblock</div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <select id="hoursFrom" class="field-input" style="flex:1;padding:10px 12px">
-                <option value="">Von...</option>
-                <option>06:00</option><option>07:00</option><option>08:00</option><option>09:00</option><option>10:00</option><option>11:00</option><option>12:00</option><option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option><option>18:00</option><option>19:00</option><option>20:00</option><option>21:00</option><option>22:00</option><option>23:00</option>
-              </select>
-              <span style="color:var(--text-3);font-size:14px">–</span>
-              <select id="hoursTo" class="field-input" style="flex:1;padding:10px 12px">
-                <option value="">Bis...</option>
-                <option>11:00</option><option>12:00</option><option>13:00</option><option>14:00</option><option>15:00</option><option>15:30</option><option>16:00</option><option>17:00</option><option>18:00</option><option>19:00</option><option>20:00</option><option>21:00</option><option>22:00</option><option>23:00</option><option>23:30</option><option>00:00</option>
-              </select>
-            </div>
-            <div style="font-size:12px;font-weight:600;color:var(--text-3)">2. Zeitblock (optional)</div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <select id="hoursFrom2" class="field-input" style="flex:1;padding:10px 12px">
-                <option value="">Von...</option>
-                <option>11:00</option><option>12:00</option><option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option><option>18:00</option><option>19:00</option><option>20:00</option><option>21:00</option><option>22:00</option><option>23:00</option>
-              </select>
-              <span style="color:var(--text-3);font-size:14px">–</span>
-              <select id="hoursTo2" class="field-input" style="flex:1;padding:10px 12px">
-                <option value="">Bis...</option>
-                <option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option><option>18:00</option><option>19:00</option><option>20:00</option><option>21:00</option><option>22:00</option><option>23:00</option><option>23:30</option><option>00:00</option>
-              </select>
-            </div>
-          </div>
-          <input type="hidden" id="newHours">
-        </div>
-      </div>
-      <div class="form-card">
-        <div class="form-card-title">Fotos (optional, max. 3)</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px" id="formPhotoGrid">
-          <label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput">
-            <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            <span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span>
-          </label>
-          <input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">
-        </div>
-        <div style="font-size:11px;color:var(--text-3)">Fotos helfen bei der Prüfung und werden nach Genehmigung sichtbar.</div>
-        <div id="formPhotoProgress" style="font-size:12px;color:var(--text-2);margin-top:6px;display:none"></div>
-      </div>
-      <button class="form-submit" id="formSubmitBtn" onclick="submitListing()" data-i18n="submit_btn">Eintrag einreichen</button>
-    </div>
-  </div>
-
-  <!-- ADMIN -->
-  <div class="screen admin-screen" id="screenAdmin">
-    <div class="admin-header">
-      <button class="admin-back" onclick="showScreen('screenProfil')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <div class="admin-title">Admin Panel</div>
-      <div class="admin-sub" id="adminSub">Einträge prüfen</div>
-    </div>
-    <div class="admin-body" id="adminBody">
-      <div class="admin-empty"><div class="admin-empty-icon">✓</div><div class="admin-empty-text">Alles geprüft!</div><div class="admin-empty-sub">Keine offenen Einträge.</div></div>
-    </div>
-  </div>
-
-  <!-- PROFIL -->
-  <div class="screen" id="screenProfil">
-    <div class="profil-header">
-      <!-- Decorative rings -->
-      <svg style="position:absolute;top:-20px;right:-20px;opacity:0.07;pointer-events:none" viewBox="0 0 160 160" width="160" height="160">
-        <circle cx="80" cy="80" r="70" fill="none" stroke="white" stroke-width="2"/>
-        <circle cx="80" cy="80" r="50" fill="none" stroke="white" stroke-width="2"/>
-        <circle cx="80" cy="80" r="30" fill="none" stroke="white" stroke-width="2"/>
-      </svg>
-      <svg style="position:absolute;bottom:-30px;left:-20px;opacity:0.06;pointer-events:none" viewBox="0 0 120 120" width="120" height="120">
-        <circle cx="60" cy="60" r="55" fill="none" stroke="white" stroke-width="2"/>
-        <circle cx="60" cy="60" r="35" fill="none" stroke="white" stroke-width="2"/>
-      </svg>
-      <div style="position:relative;display:inline-block;cursor:pointer" onclick="document.getElementById('avatarFileInput').click()">
-        <div class="profil-avatar" id="profilAvatar" style="overflow:hidden">?</div>
-        <div style="position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:var(--yellow);border:2px solid white;display:flex;align-items:center;justify-content:center">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 0 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        </div>
-      </div>
-      <input type="file" id="avatarFileInput" accept="image/*" style="display:none" onchange="uploadAvatar(event)">
-      <button id="avatarDeleteBtn" onclick="deleteAvatar()" style="display:none;margin-top:-8px;background:rgba(255,255,255,0.22);border:1.5px solid rgba(255,255,255,0.4);border-radius:20px;padding:4px 12px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:white;cursor:pointer;align-items:center;gap:4px">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="11" height="11"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-        Foto entfernen
-      </button>
-      <div class="profil-name" id="profilName">-</div>
-      <div class="profil-email" id="profilEmail">-</div>
-      <div id="avatarProgress" style="font-size:12px;color:rgba(255,255,255,0.8);display:none">Wird hochgeladen...</div>
-    </div>
-<div class="profil-body">
-      <div class="profil-section">
-        <div class="profil-row" onclick="setNav('navHome');showScreen('screenHome')">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><span class="profil-row-label" data-i18n="to_home">Zur Startseite</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-        <div class="profil-row" onclick="setNav('navForm');showScreen('screenForm')">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div><span class="profil-row-label" data-i18n="suggest_entry_prof">Eintrag vorschlagen</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-        <div class="profil-row" id="adminRow" style="display:none" onclick="loadAdmin()">
-          <div class="profil-row-left"><div class="profil-row-icon dark"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="profil-row-label" data-i18n="admin_panel">Admin Panel</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-      </div>
-      <div class="profil-section" style="margin-bottom:16px">
-        <div class="profil-row" onclick="showEditUsername()">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="profil-row-label" data-i18n="change_username">Benutzername ändern</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-        <div class="profil-row" onclick="showEditPassword()">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><span class="profil-row-label" data-i18n="change_password">Passwort ändern</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-      </div>
-      <div class="profil-section" style="margin-bottom:16px">
-        <div class="profil-row" onclick="showFavorites()">
-          <div class="profil-row-left">
-            <div class="profil-row-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            </div>
-            <span class="profil-row-label" data-i18n="my_favorites">Meine Favoriten</span>
-          </div>
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-      </div>
-      <div class="profil-section" style="margin-bottom:16px">
-        <div class="profil-row" onclick="showScreen('screenImpressum')">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="profil-row-label">Impressum</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-        <div class="profil-row" onclick="showScreen('screenDatenschutz')">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="profil-row-label">Datenschutz</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-        <div class="profil-row" onclick="showScreen('screenAGB')">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="profil-row-label">Nutzungsbedingungen</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-      </div>
-      <button class="logout-btn" onclick="handleLogout()" data-i18n="logout">Ausloggen</button>
-    </div>
-    <nav class="bottom-nav">
-      <div class="nav-item" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
-      <div class="nav-item" onclick="setNav('navMap');showScreen('screenMap');renderMap()"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span>Karte</span></div>
-      <div class="nav-item" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Eintrag</span></div>
-      <div class="nav-item active"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profil</span></div>
-    </nav>
-  </div>
-
-  <!-- BENUTZERNAME AENDERN -->
-  <div class="screen" id="screenEditUsername">
-    <div class="form-header">
-      <button class="form-back" onclick="showScreen('screenProfil')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <div class="form-title">Benutzername</div>
-      <div class="form-sub">Öffentlich sichtbar in der App</div>
-    </div>
-    <div class="form-body">
-      <div class="form-card">
-        <div class="form-card-title">Neuer Benutzername</div>
-        <div class="form-field">
-          <label class="field-label">Benutzername</label>
-          <input class="field-input" type="text" id="newUsername" placeholder="z.B. max_py" maxlength="30">
-          <div style="font-size:11px;color:var(--text-3);margin-top:4px">Min. 3 Zeichen, nur Buchstaben, Zahlen und _</div>
-        </div>
-        <div id="usernameChangeError" style="display:none;background:var(--red-light);color:var(--red);padding:10px 14px;border-radius:10px;font-size:13px;margin-top:10px"></div>
-        <div id="usernameChangeSuccess" style="display:none;background:var(--green-light);color:var(--green);padding:10px 14px;border-radius:10px;font-size:13px;margin-top:10px"></div>
-      </div>
-      <button class="form-submit" onclick="saveUsername()">Speichern</button>
-    </div>
-  </div>
-
-  <!-- PASSWORT AENDERN -->
-  <div class="screen" id="screenEditPassword">
-    <div class="form-header">
-      <button class="form-back" onclick="showScreen('screenProfil')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <div class="form-title">Passwort ändern</div>
-      <div class="form-sub">Mindestens 6 Zeichen</div>
-    </div>
-    <div class="form-body">
-      <div class="form-card">
-        <div class="form-card-title">Neues Passwort</div>
-        <div class="form-field">
-          <label class="field-label">Aktuelles Passwort</label>
-          <input class="field-input" type="password" id="currentPassword" placeholder="Dein aktuelles Passwort">
-        </div>
-        <div class="form-field">
-          <label class="field-label">Neues Passwort</label>
-          <input class="field-input" type="password" id="newPassword" placeholder="Min. 6 Zeichen" minlength="6">
-        </div>
-        <div class="form-field">
-          <label class="field-label">Neues Passwort wiederholen</label>
-          <input class="field-input" type="password" id="newPasswordConfirm" placeholder="Passwort bestätigen">
-        </div>
-        <div id="passwordChangeError" style="display:none;background:var(--red-light);color:var(--red);padding:10px 14px;border-radius:10px;font-size:13px;margin-top:10px"></div>
-        <div id="passwordChangeSuccess" style="display:none;background:var(--green-light);color:var(--green);padding:10px 14px;border-radius:10px;font-size:13px;margin-top:10px"></div>
-      </div>
-      <button class="form-submit" onclick="savePassword()">Passwort ändern</button>
-    </div>
-  </div>
-
-  <!-- EINTRAG BEARBEITEN -->
-  <div class="screen edit-listing-screen" id="screenEditListing">
-    <div class="form-header">
-      <button class="form-back" id="editListingBack"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <div class="form-title">Eintrag bearbeiten</div>
-      <div class="form-sub">Nur für verifizierte Inhaber</div>
-    </div>
-    <div class="form-body">
-      <div class="form-card">
-        <div class="form-card-title">Grundinfos</div>
-        <div class="form-field">
-          <label class="field-label">Name</label>
-          <input class="field-input" type="text" id="editName" maxlength="60">
-        </div>
-        <div class="form-field">
-          <label class="field-label">Stadt</label>
-          <input class="field-input" type="text" id="editCity">
-        </div>
-      </div>
-      <div class="form-card">
-        <div class="form-card-title">Beschreibung</div>
-        <div class="form-field">
-          <textarea class="field-textarea" id="editDesc" maxlength="500"></textarea>
-        </div>
-      </div>
-      <div class="form-card">
-        <div class="form-card-title">Kontakt</div>
-        <div class="form-field">
-          <label class="field-label">Telefon</label>
-          <input class="field-input" type="tel" id="editPhone" placeholder="+595 21 ...">
-        </div>
-        <div class="form-field">
-          <label class="field-label">Website</label>
-          <input class="field-input" type="text" id="editWebsite" placeholder="www.beispiel.com">
-        </div>
-        <div class="form-field">
-          <label class="field-label">Adresse</label>
-          <input class="field-input" type="text" id="editAddress">
-        </div>
-        <div class="form-field">
-          <label class="field-label">Öffnungszeiten</label>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <select id="editHoursDay" class="field-input" style="padding:10px 12px">
-              <option value="">Tage wählen...</option>
-              <option value="täglich">Täglich</option>
-              <option value="Mo-Fr">Mo – Fr</option>
-              <option value="Mo-Sa">Mo – Sa</option>
-              <option value="Mo-So">Mo – So</option>
-              <option value="Sa-So">Sa – So</option>
-            </select>
-            <div style="display:flex;gap:8px;align-items:center">
-              <select id="editHoursFrom" class="field-input" style="flex:1;padding:10px 12px">
-                <option value="">Von...</option>
-                <option>06:00</option><option>07:00</option><option>08:00</option>
-                <option>09:00</option><option>10:00</option><option>11:00</option>
-                <option>12:00</option><option>13:00</option><option>14:00</option>
-                <option>15:00</option><option>16:00</option><option>17:00</option>
-                <option>18:00</option><option>19:00</option><option>20:00</option>
-                <option>21:00</option><option>22:00</option><option>23:00</option>
-              </select>
-              <span style="color:var(--text-3);font-size:14px">–</span>
-              <select id="editHoursTo" class="field-input" style="flex:1;padding:10px 12px">
-                <option value="">Bis...</option>
-                <option>12:00</option><option>13:00</option><option>14:00</option>
-                <option>15:00</option><option>16:00</option><option>17:00</option>
-                <option>18:00</option><option>19:00</option><option>20:00</option>
-                <option>21:00</option><option>22:00</option><option>23:00</option>
-                <option>00:00</option>
-              </select>
-            </div>
-          </div>
-          <input type="hidden" id="editHours">
-        </div>
-      </div>
-      <div id="editListingError" style="display:none;background:var(--red-light);color:var(--red);padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:14px"></div>
-      <div id="editListingSuccess" style="display:none;background:var(--green-light);color:var(--green);padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:14px">Änderungen gespeichert!</div>
-      <button class="form-submit" onclick="saveListingEdits()">Änderungen speichern</button>
-    </div>
-  </div>
-
-  <!-- FAVORITEN -->
-  <div class="screen" id="screenFavorites">
-    <div class="form-header">
-      <button class="form-back" onclick="showScreen('screenProfil')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <div class="form-title">Meine Favoriten</div>
-      <div class="form-sub">Gespeicherte Orte</div>
-    </div>
-    <div style="padding:16px 16px 100px" id="favoritesBody">
-      <div class="empty-state">
-        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
-        <div class="empty-title">Noch keine Favoriten</div>
-        <div class="empty-sub">Tippe auf das Herz in der Detailansicht</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- FILTER SHEET -->
-  <div class="filter-sheet-overlay" id="filterSheetOverlay" onclick="if(event.target.id==='filterSheetOverlay')closeFilterSheet()">
-    <div class="filter-sheet">
-      <div class="filter-sheet-handle"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 20px 16px">
-        <div class="filter-sheet-title" id="filterSheetTitle" style="padding:0">Filter</div>
-        <button onclick="closeFilterSheet()" style="width:32px;height:32px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-2)">✕</button>
-      </div>
-      <div id="filterSheetContent"></div>
-      <button class="filter-apply-btn" onclick="applyFilter()">Anwenden</button>
-    </div>
-  </div>
-
-  <!-- CITY SHEET -->
-  <div class="city-sheet-overlay" id="citySheetOverlay" onclick="if(event.target.id==='citySheetOverlay')closeCitySheet()">
-    <div class="city-sheet">
-      <div class="city-sheet-handle"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 20px 16px">
-        <div class="city-sheet-title" style="padding:0">Stadt wählen</div>
-        <button onclick="closeCitySheet()" style="width:32px;height:32px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-2)">✕</button>
-      </div>
-      <div class="city-sheet-search">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="citySearchInput" placeholder="Stadt suchen..." oninput="filterCitySheet()">
-      </div>
-      <div class="city-sheet-list" id="citySheetList"></div>
-    </div>
-  </div>
-
-  <!-- MAP CITY SHEET -->
-  <div class="city-sheet-overlay" id="mapCitySheetOverlay" onclick="if(event.target.id==='mapCitySheetOverlay')closeMapCitySheet()">
-    <div class="city-sheet">
-      <div class="city-sheet-handle"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 20px 16px">
-        <div class="city-sheet-title" style="padding:0">Stadt auf Karte</div>
-        <button onclick="closeMapCitySheet()" style="width:32px;height:32px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-2)">✕</button>
-      </div>
-      <div class="city-sheet-search">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="mapCitySearchInput" placeholder="Stadt suchen..." oninput="filterMapCitySheet()">
-      </div>
-      <div class="city-sheet-list" id="mapCitySheetList"></div>
-    </div>
-  </div>
-
-  <!-- MAP FILTER SHEET -->
-  <div class="filter-sheet-overlay" id="mapFilterSheetOverlay" onclick="if(event.target.id==='mapFilterSheetOverlay')closeMapFilterSheet()">
-    <div class="filter-sheet">
-      <div class="filter-sheet-handle"></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 20px 16px">
-        <div class="filter-sheet-title" id="mapFilterSheetTitle" style="padding:0">Filter</div>
-        <button onclick="closeMapFilterSheet()" style="width:32px;height:32px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-2)">✕</button>
-      </div>
-      <div id="mapFilterSheetContent"></div>
-      <button class="filter-apply-btn" onclick="applyMapFilter()">Anwenden</button>
-    </div>
-  </div>
-
-  <!-- LIGHTBOX -->
-  <div class="photo-lightbox" id="photoLightbox" onclick="closeLightbox()">
-    <button class="photo-lightbox-close" onclick="event.stopPropagation();closeLightbox()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    <img id="lightboxImg" src="" alt="">
-  </div>
-
-</div>
-
-  <button class="detail-back" id="detailBackBtn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <button class="detail-back" id="detailBackBtn" onclick="goBack()" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
 </body>
 </html>
