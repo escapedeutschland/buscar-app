@@ -133,6 +133,12 @@
     .detail-screen { background: var(--bg); overflow-y: auto; }
     .detail-hero { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 52px 20px 28px; position: relative; overflow: hidden; }
     .detail-hero::before { content:''; position:absolute; top:-30px; right:-30px; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,0.07); pointer-events:none; }
+
+    .detail-cover { position:absolute;inset:0;background-size:cover;background-position:center;z-index:0;pointer-events:none; }
+    .detail-cover-overlay { position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.1) 60%,transparent 100%);z-index:1;pointer-events:none; }
+    .detail-hero.has-cover { height:300px;min-height:300px;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:24px; }
+    .detail-hero.has-cover .detail-hero-icon { display:none; }
+    .detail-cover-upload { position:absolute;bottom:70px;right:16px;z-index:10;background:rgba(0,0,0,0.35);border:none;border-radius:10px;padding:6px 10px;color:white;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px; }
     .detail-back { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 20px; }
     .detail-back svg { width: 20px; height: 20px; stroke: white; }
     .detail-hero-icon { width: 68px; height: 68px; border-radius: 20px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
@@ -153,6 +159,9 @@
     .detail-badge-row { padding: 12px 16px; display: flex; gap: 8px; }
     .detail-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
     .detail-badge.green { background: var(--green-light); color: var(--green); }
+    .detail-badge.blue { background: #DBEAFE; color: #2563EB; }
+    .detail-badge.open-status { background: #DCFCE7; color: #15803D; }
+    .detail-badge.closed-status { background: #F1F5F9; color: #94A3B8; }
     .detail-cta { display: flex; gap: 10px; margin-top: 6px; }
     .detail-cta-btn { flex: 1; padding: 15px; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
     .detail-cta-btn.primary { background: var(--yellow); color: white; }
@@ -211,6 +220,9 @@
     /* FOTOS */
     .photos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 12px 16px 16px; }
     .photo-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; cursor: pointer; }
+    .photo-thumb-wrap { position:relative;display:inline-block;width:100%;aspect-ratio:1; }
+    .photo-thumb-wrap .photo-thumb { width:100%;height:100%;object-fit:cover;border-radius:8px;cursor:pointer;display:block; }
+    .photo-delete-btn { position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.6);color:white;border:none;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center; }
     .photo-upload-btn { width: 100%; aspect-ratio: 1; border: 1.5px dashed var(--border); border-radius: 8px; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; gap: 4px; }
     .photo-upload-btn svg { width: 22px; height: 22px; stroke: var(--text-3); }
     .photo-upload-btn span { font-size: 11px; color: var(--text-3); font-weight: 500; }
@@ -634,7 +646,9 @@
   </div>
   <!-- DETAIL -->
   <div class="screen detail-screen" id="screenDetail">
-    <div class="detail-hero">
+    <div class="detail-hero" id="detailHero">
+      <div class="detail-cover" id="detailCover"></div>
+      <div class="detail-cover-overlay" id="detailCoverOverlay" style="display:none"></div>
       <button class="detail-back" onclick="showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       <button class="fav-btn" id="favBtn" onclick="toggleFavorite()"><svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
       <div class="detail-hero-icon" id="detailIcon"></div>
@@ -1759,6 +1773,30 @@
       : '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Términos de Uso</p><p><strong>1.</strong> Estos términos aplican al uso de Buscar.</p><br><p><strong>2.</strong> Uso gratuito. No se permite contenido falso u ofensivo.</p><br><p><strong>3.</strong> Las entradas pueden eliminarse sin justificación.</p><br><p><strong>4.</strong> Eres responsable del contenido que subes.</p><br><p><strong>5.</strong> No se garantiza la exactitud.</p>';
   }
 
+  // Cover upload
+  (function(){
+    const input = document.createElement('input');
+    input.type='file'; input.id='coverFileInput'; input.accept='image/*'; input.style.display='none';
+    document.body.appendChild(input);
+    input.addEventListener('change', async () => {
+      const file = input.files[0];
+      if (!file || !currentListingId) return;
+      const btn = document.getElementById('coverUploadBtn');
+      if (btn) btn.textContent = 'Lädt...';
+      try {
+        const compressed = await compressImage(file, 1600, 0.8);
+        const ref = firebase.storage().ref('covers/' + currentListingId + '_' + Date.now() + '.jpg');
+        await ref.put(compressed, {contentType:'image/jpeg'});
+        const url = await ref.getDownloadURL();
+        await db.collection('listings').doc(currentListingId).update({cover_url: url});
+        const idx = allListings.findIndex(l => l.id === currentListingId);
+        if (idx > -1) allListings[idx].cover_url = url;
+        showDetail(currentListingId);
+      } catch(e) { alert('Fehler: ' + e.message); }
+      input.value = '';
+    });
+  })();
+
   function updateGreeting() {
     const searchEl = document.querySelector('#searchInput');
     if (searchEl) searchEl.placeholder = t('search_placeholder');
@@ -2023,6 +2061,29 @@
   function showDetail(id) {
     const l = allListings.find(x => x.id === id);
     if (!l) return;
+    // Cover image
+    const hero = document.getElementById('detailHero');
+    const cover = document.getElementById('detailCover');
+    const coverOverlay = document.getElementById('detailCoverOverlay');
+    if (l.cover_url) {
+      cover.style.backgroundImage = `url(${l.cover_url})`;
+      coverOverlay.style.display = 'block';
+      hero.classList.add('has-cover');
+    } else {
+      cover.style.backgroundImage = '';
+      coverOverlay.style.display = 'none';
+      hero.classList.remove('has-cover');
+    }
+    // Cover upload button for admin/owner
+    let oldBtn = document.getElementById('coverUploadBtn');
+    if (oldBtn) oldBtn.remove();
+    if (currentUser && (currentUser.email === ADMIN_EMAIL || (l.owner_id && l.owner_id === currentUser.uid))) {
+      const btn = document.createElement('button');
+      btn.id = 'coverUploadBtn'; btn.className = 'detail-cover-upload';
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Titelbild';
+      btn.onclick = () => document.getElementById('coverFileInput').click();
+      hero.appendChild(btn);
+    }
     document.getElementById('detailIcon').innerHTML = catIcons[l.category_id]||catIcons['default'];
     const svg = document.getElementById('detailIcon').querySelector('svg');
     if (svg) { svg.style.width='34px'; svg.style.height='34px'; svg.style.stroke='white'; }
@@ -2033,7 +2094,11 @@
     descEl.innerHTML = descContent || t('no_description');
     descEl.dataset.original = descContent;
     const badges = document.getElementById('detailBadges');
-    document.getElementById('detailBadgeRow').innerHTML = l.verified?`<span class='detail-badge green'>${t('verified')}</span>`:'';
+    const openStatus = isOpen(l.opening_hours);
+    const openBadge = openStatus === true ? `<span class='detail-badge open-status'>${t('open_now')}</span>` : openStatus === false ? `<span class='detail-badge closed-status'>${t('closed_now')}</span>` : '';
+    const badges = document.getElementById('detailBadges');
+    document.getElementById('detailBadgeRow').innerHTML = (l.verified?`<span class='detail-badge green'>${t('verified')}</span>`:'') + (isNew(l.created_at)?`<span class='detail-badge blue'>Neu</span>`:'') + openBadge;
+    badges.style.display = (l.verified || isNew(l.created_at) || openStatus !== null) ? 'block' : 'none';
     badges.style.display = l.verified?'block':'none';
     let infoHTML = '';
     if (l.phone) infoHTML += `<a class="detail-row" href="tel:${l.phone}"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Telefon</div><div class="detail-row-value">${l.phone}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
@@ -2841,12 +2906,13 @@
     try {
       const snap = await db.collection('listing_photos')
         .where('listing_id', '==', listingId)
-        .where('pending', '==', false)
         .orderBy('created_at', 'asc').get();
       const photos = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      grid.innerHTML = photos.map(p => `
-        <img class="photo-thumb" src="${p.url}" alt="Foto" onclick="openLightbox('${p.url}')">`
-      ).join('');
+      grid.innerHTML = photos.map(p => {
+        const canDelete = currentUser && (currentUser.email === ADMIN_EMAIL || p.uploaded_by === currentUser.uid);
+        const delBtn = canDelete ? `<button class="photo-delete-btn" onclick="event.stopPropagation();deletePhoto('${p.id}','${p.url}','${listingId}')" title="Löschen">✕</button>` : '';
+        return `<div class="photo-thumb-wrap"><img class="photo-thumb" src="${p.url}" alt="Foto" onclick="openLightbox('${p.url}')">${delBtn}</div>`;
+      }).join('');
       grid.innerHTML += `
         <label class="photo-upload-btn" for="photoFileInput">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -2863,21 +2929,44 @@
     }
   }
 
+  async function deletePhoto(photoId, url, listingId) {
+    if (!confirm('Foto löschen?')) return;
+    try {
+      await db.collection('listing_photos').doc(photoId).delete();
+      try { const ref=firebase.storage().refFromURL(url); await ref.delete(); } catch(e){}
+      await loadPhotos(listingId);
+    } catch(e) { alert('Fehler beim Löschen.'); }
+  }
+  async function compressImage(file, maxPx=1200, quality=0.75) {
+    return new Promise(resolve => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        let w=img.width, h=img.height;
+        if(w>maxPx||h>maxPx){if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;}}
+        const canvas=document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        canvas.toBlob(blob=>{URL.revokeObjectURL(url);resolve(blob);},'image/jpeg',quality);
+      };
+      img.src=url;
+    });
+  }
   async function uploadPhoto(event, listingId) {
-    const file = event.target.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { alert('Foto ist zu groß. Max. 5 MB.'); return; }
+    const rawFile = event.target.files[0];
+    if (!rawFile) return;
+    if (!rawFile.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
     if (!file.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
 
     const progress = document.getElementById('photoProgress');
     progress.style.display = 'block';
     progress.textContent = 'Wird hochgeladen...';
 
-    const filename = Date.now() + '_' + currentUser.uid + '.' + file.name.split('.').pop();
-    const ref = storage.ref('listings/' + listingId + '/' + filename);
-
     try {
-      const snap = await ref.put(file);
+      const file = await compressImage(rawFile);
+      const filename = Date.now() + '_' + currentUser.uid + '.jpg';
+      const ref = storage.ref('listing_photos/' + listingId + '_' + filename);
+      const snap = await ref.put(file, {contentType:'image/jpeg'});
       const url = await snap.ref.getDownloadURL();
       const name = await getUsername();
       await db.collection('listing_photos').add({
