@@ -120,6 +120,7 @@
     .listing-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
     .listing-name { font-size: 15px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .badge-geprüft { font-size: 10px; font-weight: 700; color: var(--green); background: var(--green-light); padding: 2px 7px; border-radius: 6px; flex-shrink: 0; }
+    .badge-neu { font-size:10px;font-weight:700;color:#2563EB;background:#DBEAFE;padding:2px 7px;border-radius:6px;flex-shrink:0; }
     .listing-city { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--text-3); margin-bottom: 5px; }
     .listing-city svg { width: 11px; height: 11px; stroke: var(--text-3); }
     .listing-desc { font-size: 13px; color: var(--text-2); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -606,6 +607,31 @@
     </nav>
   </div>
 
+  <!-- LEGAL SCREENS -->
+  <div class="screen" id="screenImpressum">
+    <div class="header" style="padding-bottom:20px"><div class="header-top">
+      <button onclick="showScreen('screenProfil')" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div id="impressumTitle" style="color:white;font-weight:700;font-size:17px">Impressum</div>
+      <div style="width:38px"></div>
+    </div></div>
+    <div style="padding:20px;overflow-y:auto;flex:1"><div class="detail-card" id="impressumBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div></div>
+  </div>
+  <div class="screen" id="screenDatenschutz">
+    <div class="header" style="padding-bottom:20px"><div class="header-top">
+      <button onclick="showScreen('screenProfil')" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div id="datenschutzTitle" style="color:white;font-weight:700;font-size:17px">Datenschutz</div>
+      <div style="width:38px"></div>
+    </div></div>
+    <div style="padding:20px;overflow-y:auto;flex:1"><div class="detail-card" id="datenschutzBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div></div>
+  </div>
+  <div class="screen" id="screenAGB">
+    <div class="header" style="padding-bottom:20px"><div class="header-top">
+      <button onclick="showScreen('screenProfil')" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div id="agbTitle" style="color:white;font-weight:700;font-size:17px">Nutzungsbedingungen</div>
+      <div style="width:38px"></div>
+    </div></div>
+    <div style="padding:20px;overflow-y:auto;flex:1"><div class="detail-card" id="agbBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div></div>
+  </div>
   <!-- DETAIL -->
   <div class="screen detail-screen" id="screenDetail">
     <div class="detail-hero">
@@ -936,6 +962,11 @@
           </div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
+      </div>
+      <div class="profil-section" style="margin-bottom:16px">
+        <div class="profil-row" onclick="showScreen('screenImpressum')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="profil-row-label">Impressum</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="profil-row" onclick="showScreen('screenDatenschutz')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="profil-row-label">Datenschutz</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="profil-row" onclick="showScreen('screenAGB')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="profil-row-label">Nutzungsbedingungen</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div>
       </div>
       <button class="logout-btn" onclick="handleLogout()" data-i18n="logout">Ausloggen</button>
     </div>
@@ -1343,6 +1374,7 @@
 
   function toggleLang() {
     currentLang = currentLang === 'de' ? 'es' : 'de';
+    renderLegalScreens();
     localStorage.setItem('buscar_lang', currentLang);
     contentTranslated = false;
     applyLang();
@@ -1706,9 +1738,26 @@
       document.getElementById('profilName').textContent = displayName;
       document.getElementById('profilEmail').textContent = user.email;
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
-      updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings();
+      updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
     } else { showScreen('screenAuth'); }
   });
+
+  function renderLegalScreens() {
+    const de = currentLang === 'de';
+    const el = (id) => document.getElementById(id);
+    if(el('impressumTitle')) el('impressumTitle').textContent = de ? 'Impressum' : 'Aviso Legal';
+    if(el('impressumBody')) el('impressumBody').innerHTML = de
+      ? '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Impressum</p><p><strong>Verantwortlich:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay<br>maximechristalle@gmail.com</p><br><p>Buscar ist ein privates Informationsprojekt ohne kommerziellen Charakter.</p>'
+      : '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Aviso Legal</p><p><strong>Responsable:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay<br>maximechristalle@gmail.com</p><br><p>Buscar es un proyecto de información privado sin fines comerciales.</p>';
+    if(el('datenschutzTitle')) el('datenschutzTitle').textContent = de ? 'Datenschutz' : 'Privacidad';
+    if(el('datenschutzBody')) el('datenschutzBody').innerHTML = de
+      ? '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Datenschutzerklärung</p><p><strong>1. Verantwortlicher:</strong><br>Maxime Christalle, San Bernardino, Paraguay<br>maximechristalle@gmail.com</p><br><p><strong>2. Daten:</strong><br>E-Mail, Benutzername, Fotos. Keine Weitergabe ohne Einwilligung.</p><br><p><strong>3. Firebase/Google:</strong><br><a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>4. Rechte:</strong><br>Auskunft, Berichtigung, Löschung: maximechristalle@gmail.com</p>'
+      : '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Política de Privacidad</p><p><strong>1. Responsable:</strong><br>Maxime Christalle, San Bernardino, Paraguay<br>maximechristalle@gmail.com</p><br><p><strong>2. Datos:</strong><br>Correo, nombre, fotos. Sin cesión a terceros.</p><br><p><strong>3. Firebase/Google:</strong><br><a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>4. Derechos:</strong><br>Acceso, corrección, eliminación: maximechristalle@gmail.com</p>';
+    if(el('agbTitle')) el('agbTitle').textContent = de ? 'Nutzungsbedingungen' : 'Términos de Uso';
+    if(el('agbBody')) el('agbBody').innerHTML = de
+      ? '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Nutzungsbedingungen</p><p><strong>1.</strong> Diese Bedingungen gelten für Buscar.</p><br><p><strong>2.</strong> Kostenlose Nutzung. Keine falschen oder beleidigenden Inhalte.</p><br><p><strong>3.</strong> Einträge können ohne Angabe entfernt werden.</p><br><p><strong>4.</strong> Du bist für deine hochgeladenen Inhalte verantwortlich.</p><br><p><strong>5.</strong> Keine Gewähr für Richtigkeit.</p>'
+      : '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Términos de Uso</p><p><strong>1.</strong> Estos términos aplican al uso de Buscar.</p><br><p><strong>2.</strong> Uso gratuito. No se permite contenido falso u ofensivo.</p><br><p><strong>3.</strong> Las entradas pueden eliminarse sin justificación.</p><br><p><strong>4.</strong> Eres responsable del contenido que subes.</p><br><p><strong>5.</strong> No se garantiza la exactitud.</p>';
+  }
 
   function updateGreeting() {
     const searchEl = document.querySelector('#searchInput');
