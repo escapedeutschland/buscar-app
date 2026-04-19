@@ -105,7 +105,7 @@
     #listingsInner { display: block; }
     .listings::-webkit-scrollbar { display: none; }
     .section-title { font-size: 12px; font-weight: 600; color: var(--text-3); letter-spacing: 1px; text-transform: uppercase; margin: 12px 0 10px; }
-    .listing-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 14px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; border: 1px solid rgba(0,0,0,0.03); }
+    .listing-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px 16px 16px 20px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 14px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; border: 1px solid rgba(0,0,0,0.03); border-left: 4px solid var(--cat-color, var(--yellow)); }
     @keyframes heartPop { 0%{transform:scale(1)} 30%{transform:scale(1.5)} 60%{transform:scale(0.9)} 100%{transform:scale(1)} }
     .fav-pop { animation: heartPop 0.4s ease; }
     @keyframes starPulse { 0%{transform:scale(1)} 50%{transform:scale(1.3)} 100%{transform:scale(1)} }
@@ -116,7 +116,7 @@
     .listing-card:active { transform: scale(0.982); box-shadow: var(--shadow-md); }
     .listing-icon-wrap { width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, #FFF3D6 0%, var(--yellow-light) 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(245,166,35,0.15); }
     .listing-icon-wrap svg { width: 26px; height: 26px; stroke: var(--yellow); }
-    .listing-body { flex: 1; min-width: 0; display:flex;flex-direction:column;gap:3px; }
+    .listing-body { flex: 1; min-width: 0; }
     .listing-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
     .listing-name { font-size: 15px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .badge-geprüft { font-size: 10px; font-weight: 700; color: var(--green); background: var(--green-light); padding: 2px 7px; border-radius: 6px; flex-shrink: 0; }
@@ -135,6 +135,11 @@
     .detail-hero::before { content:''; position:absolute; top:-30px; right:-30px; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,0.07); pointer-events:none; }
     .detail-back { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 20px; }
     .detail-back svg { width: 20px; height: 20px; stroke: white; }
+    .detail-cover { position:absolute;inset:0;background-size:cover;background-position:center;z-index:0;pointer-events:none; }
+    .detail-cover-overlay { position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.5) 0%,transparent 100%);z-index:1;pointer-events:none; }
+    .detail-hero.has-cover { height:280px;min-height:280px;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:20px; }
+    .detail-hero.has-cover .detail-hero-icon { display:none; }
+    .detail-cover-upload { position:absolute;bottom:60px;right:16px;z-index:10;background:rgba(0,0,0,0.4);border:none;border-radius:10px;padding:6px 10px;color:white;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px; }
     .detail-hero-icon { width: 68px; height: 68px; border-radius: 20px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
     .detail-hero-icon svg { width: 34px; height: 34px; stroke: white; }
     .detail-title { font-size: 24px; font-weight: 700; color: white; margin-bottom: 6px; }
@@ -153,6 +158,9 @@
     .detail-badge-row { padding: 12px 16px; display: flex; gap: 8px; }
     .detail-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
     .detail-badge.green { background: var(--green-light); color: var(--green); }
+    .detail-badge.blue { background:#DBEAFE;color:#2563EB; }
+    .detail-badge.open-status { background:#DCFCE7;color:#15803D; }
+    .detail-badge.closed-status { background:#F1F5F9;color:#94A3B8; }
     .detail-cta { display: flex; gap: 10px; margin-top: 6px; }
     .detail-cta-btn { flex: 1; padding: 15px; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
     .detail-cta-btn.primary { background: var(--yellow); color: white; }
@@ -211,6 +219,9 @@
     /* FOTOS */
     .photos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 12px 16px 16px; }
     .photo-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; cursor: pointer; }
+    .photo-thumb-wrap { position:relative;display:inline-block;width:100%;aspect-ratio:1; }
+    .photo-thumb-wrap .photo-thumb { width:100%;height:100%;object-fit:cover;border-radius:8px;cursor:pointer;display:block; }
+    .photo-delete-btn { position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.6);color:white;border:none;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center; }
     .photo-upload-btn { width: 100%; aspect-ratio: 1; border: 1.5px dashed var(--border); border-radius: 8px; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; gap: 4px; }
     .photo-upload-btn svg { width: 22px; height: 22px; stroke: var(--text-3); }
     .photo-upload-btn span { font-size: 11px; color: var(--text-3); font-weight: 500; }
@@ -226,6 +237,7 @@
     .filter-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--card); cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-2); white-space: nowrap; transition: all 0.18s; }
     .filter-btn svg { width: 13px; height: 13px; stroke: var(--text-2); fill: none; }
     .filter-btn.active { background: var(--text-1); border-color: var(--text-1); color: white; }
+    .filter-btn.active-open { background: #16a34a; border-color: #16a34a; color: white; }
     .filter-btn.active-open { background: #16a34a; border-color: #16a34a; color: white; }
     .filter-btn.active-open svg { stroke: white; }
     .filter-btn.active svg { stroke: white; }
@@ -272,6 +284,10 @@
     .map-chip-unterkunft.active  { background: #8B5CF6; border-color: #8B5CF6; color: white; }
     .map-chip-geschaefte.active  { background: #EF4444; border-color: #EF4444; color: white; }
     .map-chip-sport.active       { background: #06B6D4; border-color: #06B6D4; color: white; }
+    .map-chip-tankstelle { background:#FEE2E2;border:1.5px solid #FCA5A5;color:#991B1B; }
+    .map-chip-tankstelle.active { background:#EF4444;border-color:#EF4444;color:white; }
+    .map-chip-beauty { background:#FCE7F3;border:1.5px solid #F9A8D4;color:#9D174D; }
+    .map-chip-beauty.active { background:#EC4899;border-color:#EC4899;color:white; }
 
     /* DUPLICATE WARNING */
     .dupe-warning { background: #FFF8EC; border: 1.5px solid var(--yellow); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; display: none; }
@@ -436,7 +452,7 @@
     .admin-empty-sub { font-size: 13px; color: var(--text-2); }
 
     /* PROFIL */
-    .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 60px 24px 32px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
+    .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top,44px),52px) 24px 40px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
     .profil-avatar { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 32px; font-weight: 900; color: white; }
     .profil-name { font-size: 20px; font-weight: 700; color: white; }
     .profil-email { font-size: 13px; color: rgba(255,255,255,0.8); }
@@ -571,6 +587,10 @@
         <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         <span id="filterStarLabel" data-i18n="rating_filter">Bewertung</span>
       </button>
+      <button class="filter-btn" id="filterOpenBtn" onclick="toggleOpenNowFilter()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span id="filterOpenLabel">Geöffnet</span>
+      </button>
     </div>
     <div class="cats-wrap">
       <div class="cats-scroll" id="catsScroll">
@@ -581,6 +601,8 @@
         <div class="cat-chip" data-cat="kat-unterkunft" data-i18n="cat_accommodation">Unterkünfte</div>
         <div class="cat-chip" data-cat="kat-geschaefte" data-i18n="cat_shops">Geschäfte</div>
         <div class="cat-chip" data-cat="kat-sport" data-i18n="cat_sport">Sport & Fitness</div>
+        <div class="cat-chip" data-cat="kat-tankstelle">Tankstellen</div>
+        <div class="cat-chip" data-cat="kat-beauty">Beauty & Wellness</div>
       </div>
       <div id="cityPickerBtn" class="city-picker-btn" onclick="openCitySheet()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -613,7 +635,9 @@
   <div class="screen" id="screenAGB"><div class="header" style="padding-bottom:20px"><div class="header-top"><button onclick="showScreen('screenProfil')" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button><div id="agbTitle" style="color:white;font-weight:700;font-size:17px">Nutzungsbedingungen</div><div style="width:38px"></div></div></div><div style="padding:20px;overflow-y:auto;flex:1"><div class="detail-card" id="agbBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div></div></div>
   <!-- DETAIL -->
   <div class="screen detail-screen" id="screenDetail">
-    <div class="detail-hero">
+    <div class="detail-hero" id="detailHero">
+      <div class="detail-cover" id="detailCover"></div>
+      <div class="detail-cover-overlay" id="detailCoverOverlay" style="display:none"></div>
       <button class="detail-back" onclick="showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       <button class="fav-btn" id="favBtn" onclick="toggleFavorite()"><svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
       <div class="detail-hero-icon" id="detailIcon"></div>
@@ -694,6 +718,8 @@
         <div class="map-chip map-chip-unterkunft" data-cat="kat-unterkunft"><span class="chip-dot"></span><span data-i18n="cat_accommodation">Unterkünfte</span></div>
         <div class="map-chip map-chip-geschaefte" data-cat="kat-geschaefte"><span class="chip-dot"></span><span data-i18n="cat_shops">Geschäfte</span></div>
         <div class="map-chip map-chip-sport" data-cat="kat-sport"><span class="chip-dot"></span><span data-i18n="cat_sport">Sport</span></div>
+        <div class="map-chip map-chip-tankstelle" data-cat="kat-tankstelle"><span class="chip-dot"></span><span>Tankstellen</span></div>
+        <div class="map-chip map-chip-beauty" data-cat="kat-beauty"><span class="chip-dot"></span><span>Beauty</span></div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;padding:6px 16px 10px">
         <div id="mapCityPickerBtn" onclick="openMapCitySheet()" style="flex:1;display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-2)">
@@ -1585,7 +1611,9 @@
     'kat-unterkunft': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
     'kat-geschaefte': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
     'kat-sport': '<svg viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l4.24 4.24"/><path d="M14.83 9.17l4.24-4.24"/><path d="M14.83 14.83l4.24 4.24"/><path d="M9.17 14.83l-4.24 4.24"/></svg>',
-    'default': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
+    'kat-tankstelle': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 22V10a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12"/><rect x="3" y="10" width="10" height="12"/><path d="M13 6h2l2 5h2"/><line x1="3" y1="22" x2="13" y2="22"/></svg>',
+    'kat-beauty': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+        'default': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
   };
   const catNames = { 'kat-restaurants': 'Restaurants', 'kat-dienstleistung': 'Dienstleistungen', 'kat-orte': 'Orte', 'kat-unterkunft': 'Unterkünfte', 'kat-geschaefte': 'Geschäfte', 'kat-sport': 'Sport & Fitness' };
 
@@ -1823,6 +1851,8 @@
     'kat-unterkunft': ['Alle', 'Hotel', 'Hostel', 'Ferienwohnung', 'B&B', 'Camping'],
     'kat-geschaefte': ['Alle', 'Supermarkt', 'Markt', 'Apotheke', 'Elektronik', 'Kleidung', 'Baumarkt'],
     'kat-sport': ['Alle', 'Fitnessstudio', 'Kampfsport', 'Yoga & Pilates', 'Schwimmbad', 'Fußball', 'Tennis', 'Radfahren', 'Crossfit', 'Klettern'],
+    'kat-tankstelle': ['Alle', 'Tankstelle', 'Autowaschanlage', 'Reifenservice'],
+    'kat-beauty': ['Alle', 'Frisör', 'Beauty-Salon', 'Spa & Wellness', 'Nagelpflege', 'Barbershop', 'Massage'],
   };
 
   function openFilterSheet(mode) {
@@ -1861,6 +1891,14 @@
     } else {
       btn.classList.remove('active-open');
     }
+    renderListings();
+  }
+
+  function toggleOpenNowFilter() {
+    activeOpenNow = !activeOpenNow;
+    const btn = document.getElementById('filterOpenBtn');
+    if (activeOpenNow) { btn.classList.add('active-open'); }
+    else { btn.classList.remove('active-open'); }
     renderListings();
   }
 
@@ -1975,12 +2013,26 @@
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
-    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div>${isNew(l.created_at)?`<span class='badge-neu'>Neu</span>`:''}${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+    container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}${isNew(l.created_at)?`<span class='badge-neu'>Neu</span>`:''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
   }
 
   function showDetail(id) {
     const l = allListings.find(x => x.id === id);
     if (!l) return;
+    // Cover
+    const hero=document.getElementById('detailHero');
+    const cov=document.getElementById('detailCover');
+    const covOv=document.getElementById('detailCoverOverlay');
+    if(l.cover_url){cov.style.backgroundImage='url('+l.cover_url+')';covOv.style.display='block';hero.classList.add('has-cover');}
+    else{cov.style.backgroundImage='';covOv.style.display='none';hero.classList.remove('has-cover');}
+    // Cover upload btn
+    var oldCovBtn=document.getElementById('coverUploadBtn');if(oldCovBtn)oldCovBtn.remove();
+    if(currentUser&&(currentUser.email===ADMIN_EMAIL||(l.owner_id&&l.owner_id===currentUser.uid))){
+      var covBtn=document.createElement('button');covBtn.id='coverUploadBtn';covBtn.className='detail-cover-upload';
+      covBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Titelbild';
+      covBtn.onclick=function(){document.getElementById('coverFileInput').click();};
+      hero.appendChild(covBtn);
+    }
     document.getElementById('detailIcon').innerHTML = catIcons[l.category_id]||catIcons['default'];
     const svg = document.getElementById('detailIcon').querySelector('svg');
     if (svg) { svg.style.width='34px'; svg.style.height='34px'; svg.style.stroke='white'; }
@@ -1991,8 +2043,10 @@
     descEl.innerHTML = descContent || t('no_description');
     descEl.dataset.original = descContent;
     const badges = document.getElementById('detailBadges');
-    document.getElementById('detailBadgeRow').innerHTML = l.verified?`<span class='detail-badge green'>${t('verified')}</span>`:'';
-    badges.style.display = l.verified?'block':'none';
+    const openStatus = isOpen(l.opening_hours);
+    const openBadge = openStatus===true ? '<span class="detail-badge open-status">'+t('open_now')+'</span>' : openStatus===false ? '<span class="detail-badge closed-status">'+t('closed_now')+'</span>' : '';
+    document.getElementById('detailBadgeRow').innerHTML = (l.verified?'<span class="detail-badge green">'+t('verified')+'</span>':'') + (isNew(l.created_at)?'<span class="detail-badge blue">Neu</span>':'') + openBadge;
+    badges.style.display = (l.verified || isNew(l.created_at) || openStatus!==null) ? 'block' : 'none';
     let infoHTML = '';
     if (l.phone) infoHTML += `<a class="detail-row" href="tel:${l.phone}"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Telefon</div><div class="detail-row-value">${l.phone}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
     if (l.website) infoHTML += `<a class="detail-row" href="https://${l.website}" target="_blank"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Website</div><div class="detail-row-value">${l.website}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
@@ -2043,6 +2097,8 @@
     'kat-unterkunft': '#8B5CF6',
     'kat-geschaefte': '#EF4444',
     'kat-sport': '#06B6D4',
+    'kat-tankstelle': '#EF4444',
+    'kat-beauty': '#EC4899',
     'default': '#6B6B6B'
   };
 
@@ -2812,12 +2868,13 @@
     try {
       const snap = await db.collection('listing_photos')
         .where('listing_id', '==', listingId)
-        .where('pending', '==', false)
         .orderBy('created_at', 'asc').get();
-      const photos = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      grid.innerHTML = photos.map(p => `
-        <img class="photo-thumb" src="${p.url}" alt="Foto" onclick="openLightbox('${p.url}')">`
-      ).join('');
+      const photos = snap.docs.map(d => ({id:d.id,...d.data()}));
+      grid.innerHTML = photos.map(p => {
+        const canDel = currentUser&&(currentUser.email===ADMIN_EMAIL||p.uploaded_by===currentUser.uid);
+        const del = canDel?`<button class="photo-delete-btn" onclick="event.stopPropagation();deletePhoto('${p.id}','${p.url}','${listingId}')" title="Löschen">✕</button>`:'';
+        return `<div class="photo-thumb-wrap"><img class="photo-thumb" src="${p.url}" alt="Foto" onclick="openLightbox('${p.url}')">${del}</div>`;
+      }).join('');
       grid.innerHTML += `
         <label class="photo-upload-btn" for="photoFileInput">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -2834,21 +2891,40 @@
     }
   }
 
+  async function compressImage(file, maxPx, quality) {
+    maxPx=maxPx||1200; quality=quality||0.75;
+    return new Promise(function(resolve){
+      var img=new Image(), url=URL.createObjectURL(file);
+      img.onload=function(){
+        var w=img.width,h=img.height;
+        if(w>maxPx||h>maxPx){if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;}}
+        var c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        c.toBlob(function(b){URL.revokeObjectURL(url);resolve(b);},'image/jpeg',quality);
+      };img.src=url;
+    });
+  }
+  async function deletePhoto(photoId, url, listingId) {
+    if(!confirm('Foto löschen?')) return;
+    try {
+      await db.collection('listing_photos').doc(photoId).delete();
+      try{await firebase.storage().refFromURL(url).delete();}catch(e){}
+      await loadPhotos(listingId);
+    } catch(e){alert('Fehler beim Löschen.');}
+  }
   async function uploadPhoto(event, listingId) {
-    const file = event.target.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { alert('Foto ist zu groß. Max. 5 MB.'); return; }
-    if (!file.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
+    const rawFile = event.target.files[0];
+    if (!rawFile) return;
+    if (!rawFile.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
 
     const progress = document.getElementById('photoProgress');
     progress.style.display = 'block';
     progress.textContent = 'Wird hochgeladen...';
 
-    const filename = Date.now() + '_' + currentUser.uid + '.' + file.name.split('.').pop();
-    const ref = storage.ref('listings/' + listingId + '/' + filename);
-
     try {
-      const snap = await ref.put(file);
+      const file = await compressImage(rawFile);
+      const ref = storage.ref('listing_photos/' + listingId + '_' + Date.now() + '.jpg');
+      const snap = await ref.put(file, {contentType:'image/jpeg'});
       const url = await snap.ref.getDownloadURL();
       const name = await getUsername();
       await db.collection('listing_photos').add({
@@ -3508,6 +3584,28 @@
   applyLang();
 
   // Register Service Worker for PWA
+  // Cover file input
+  window.addEventListener('load', function(){
+    var inp=document.createElement('input');
+    inp.type='file';inp.id='coverFileInput';inp.accept='image/*';inp.style.display='none';
+    document.body.appendChild(inp);
+    inp.addEventListener('change', async function(){
+      var f=inp.files[0]; if(!f||!currentListingId) return;
+      var btn=document.getElementById('coverUploadBtn'); if(btn) btn.textContent='Lädt...';
+      try{
+        var comp=await compressImage(f,1600,0.8);
+        var ref=firebase.storage().ref('covers/'+currentListingId+'_'+Date.now()+'.jpg');
+        await ref.put(comp,{contentType:'image/jpeg'});
+        var url=await ref.getDownloadURL();
+        await db.collection('listings').doc(currentListingId).update({cover_url:url});
+        var ix=allListings.findIndex(function(l){return l.id===currentListingId;});
+        if(ix>-1) allListings[ix].cover_url=url;
+        showDetail(currentListingId);
+      }catch(e){alert('Fehler: '+e.message);}
+      inp.value='';
+    });
+  });
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/buscar-app/sw.js')
