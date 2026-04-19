@@ -2096,7 +2096,6 @@
     const badges = document.getElementById('detailBadges');
     const openStatus = isOpen(l.opening_hours);
     const openBadge = openStatus === true ? `<span class='detail-badge open-status'>${t('open_now')}</span>` : openStatus === false ? `<span class='detail-badge closed-status'>${t('closed_now')}</span>` : '';
-    const badges = document.getElementById('detailBadges');
     document.getElementById('detailBadgeRow').innerHTML = (l.verified?`<span class='detail-badge green'>${t('verified')}</span>`:'') + (isNew(l.created_at)?`<span class='detail-badge blue'>Neu</span>`:'') + openBadge;
     badges.style.display = (l.verified || isNew(l.created_at) || openStatus !== null) ? 'block' : 'none';
     let infoHTML = '';
