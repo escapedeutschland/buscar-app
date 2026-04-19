@@ -1274,7 +1274,7 @@
       create_account: 'Konto erstellen', logging_in: 'Einloggen...',
       forgot_pw: 'Passwort vergessen?', no_account: 'Noch kein Konto?',
       has_account: 'Schon ein Konto?',
-      tagline: 'Dein Guide in Paraguay', open_now: 'Geöffnet', closed_now: 'Geschlossen',
+      tagline: 'Dein Guide in Paraguay', open_now: 'Geöffnet', closed_now: 'Geschlossen', badge_new: 'Neu',
       // Profile
       to_home: 'Zur Startseite', suggest_entry_prof: 'Eintrag vorschlagen',
       admin_panel: 'Admin Panel', change_username: 'Benutzername ändern',
@@ -1354,7 +1354,7 @@
       create_account: 'Crear cuenta', logging_in: 'Iniciando...',
       forgot_pw: '¿Olvidaste tu contraseña?', no_account: '¿No tienes cuenta?',
       has_account: '¿Ya tienes cuenta?',
-      tagline: 'Tu guía en Paraguay', open_now: 'Abierto', closed_now: 'Cerrado',
+      tagline: 'Tu guía en Paraguay', open_now: 'Abierto', closed_now: 'Cerrado', badge_new: 'Nuevo',
       // Perfil
       to_home: 'Ir al inicio', suggest_entry_prof: 'Sugerir lugar',
       admin_panel: 'Panel admin', change_username: 'Cambiar usuario',
@@ -1897,12 +1897,7 @@
         <div class="filter-star-btn${activeMinStars===3?' active':''}" onclick="selectStarFilter(3)">3+ ★</div>
         <div class="filter-star-btn${activeMinStars===4?' active':''}" onclick="selectStarFilter(4)">4+ ★</div>
         <div class="filter-star-btn${activeMinStars===5?' active':''}" onclick="selectStarFilter(5)">5 ★</div>
-      </div></div><div class="filter-divider"></div>
-        <div class="filter-section"><div class="filter-section-label">Öffnungszeiten</div>
-        <div style="display:flex;gap:8px">
-          <div class="filter-star-btn${!activeOpenNow?' active':''}" onclick="activeOpenNow=false;renderFilterSheet();renderListings()" style="flex:1">Alle</div>
-          <div class="filter-star-btn${activeOpenNow?' active':''}" onclick="activeOpenNow=true;renderFilterSheet();renderListings()" style="flex:1.5">🟢 Jetzt geöffnet</div>
-        </div></div>`;
+      </div></div>`;
     }
   }
 
@@ -3599,6 +3594,20 @@
       </div>`).join('');
   }
 
+  function removeLocation() {
+    window._newLat = null;
+    window._newLng = null;
+    const btn = document.getElementById('locationBtn');
+    const status = document.getElementById('locationStatus');
+    const removeBtn = document.getElementById('locationRemoveBtn');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Meinen Standort verwenden';
+    btn.style.background = ''; btn.style.borderColor = ''; btn.style.color = '';
+    btn.dataset.saved = '';
+    btn.disabled = false;
+    status.style.display = 'none';
+    if (removeBtn) removeBtn.style.display = 'none';
+  }
+
   function useMyLocation() {
     const btn = document.getElementById('locationBtn');
     const status = document.getElementById('locationStatus');
@@ -3616,6 +3625,8 @@
         btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg> Standort gespeichert';
         btn.style.background = 'var(--green-light)'; btn.style.borderColor = 'var(--green)'; btn.style.color = 'var(--green)';
         btn.dataset.saved = 'true';
+        const removeBtn = document.getElementById('locationRemoveBtn');
+        if (removeBtn) removeBtn.style.display = 'inline-block';
       },
       err => {
         status.style.color = 'var(--red)'; status.style.display = 'block';
