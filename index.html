@@ -857,7 +857,7 @@
           <label class="field-label">Öffnungszeiten</label>
           <div style="display:flex;flex-direction:column;gap:10px">
             <select id="hoursDay" class="field-input" style="padding:10px 12px">
-              <option value="">Tage wählen...</option>
+              <option value="" data-i18n="days_select">Tage wählen...</option>
               <option value="täglich">Täglich</option>
               <option value="Mo-Fr">Mo – Fr</option>
               <option value="Mo-Sa">Mo – Sa</option>
@@ -984,7 +984,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
-      <div class="profil-section" style="margin-bottom:16px"><div class="profil-row" onclick="showScreen('screenImpressum')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="profil-row-label" data-i18n="impressum_title">Impressum</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div><div class="profil-row" onclick="showScreen('screenDatenschutz')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="profil-row-label" data-i18n="datenschutz_title">Datenschutz</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div><div class="profil-row" onclick="showScreen('screenAGB')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="profil-row-label" data-i18n="agb_title">Nutzungsbedingungen</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      <div class="profil-section" style="margin-bottom:16px"><div class="profil-row" onclick="showScreen('screenImpressum')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="profil-row-label" id="profilImpressumLabel">Impressum</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div><div class="profil-row" onclick="showScreen('screenDatenschutz')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="profil-row-label" id="profilDatenschutzLabel">Datenschutz</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div><div class="profil-row" onclick="showScreen('screenAGB')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="profil-row-label" id="profilAgbLabel">Nutzungsbedingungen</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div></div>
       <button class="logout-btn" onclick="handleLogout()" data-i18n="logout">Ausloggen</button>
     </div>
     <nav class="bottom-nav">
@@ -1089,7 +1089,7 @@
           <label class="field-label">Öffnungszeiten</label>
           <div style="display:flex;flex-direction:column;gap:8px">
             <select id="editHoursDay" class="field-input" style="padding:10px 12px">
-              <option value="">Tage wählen...</option>
+              <option value="" data-i18n="days_select">Tage wählen...</option>
               <option value="täglich">Täglich</option>
               <option value="Mo-Fr">Mo – Fr</option>
               <option value="Mo-Sa">Mo – Sa</option>
@@ -1241,7 +1241,7 @@
       rate_optional: 'Deine Erfahrung (optional)',
       your_rating: 'Deine Bewertung', edit: 'Bearbeiten', delete: 'Löschen',
       reply: 'Antworten', comment_placeholder: 'Schreib einen Kommentar...',
-      add_photo: 'Foto hinzufügen', uploading: 'Wird hochgeladen...',
+      add_photo: 'Foto hinzufügen', uploading: 'Wird hochgeladen...', days_select: 'Tage wählen...', from_time: 'Von...', to_time: 'Bis...', photo_add_label: 'Foto hinzufügen',
       claim_btn: 'Ich bin der Inhaber dieses Ortes',
       claim_info: 'Als verifizierter Inhaber kannst du diesen Eintrag selbst verwalten.',
       owner_badge: '⭐ Verifizierter Inhaber', pending_claim: '✓ Dein Claim wird geprüft...',
@@ -1318,7 +1318,7 @@
       rate_optional: 'Tu experiencia (opcional)',
       your_rating: 'Tu valoración', edit: 'Editar', delete: 'Eliminar',
       reply: 'Responder', comment_placeholder: 'Escribe un comentario...',
-      add_photo: 'Agregar foto', uploading: 'Subiendo...',
+      add_photo: 'Agregar foto', uploading: 'Subiendo...', days_select: 'Seleccionar día...', from_time: 'Desde...', to_time: 'Hasta...', photo_add_label: 'Agregar foto',
       claim_btn: 'Soy el propietario de este lugar',
       claim_info: 'Como propietario verificado puedes gestionar este listado.',
       owner_badge: '⭐ Propietario verificado', pending_claim: '✓ Tu solicitud está siendo revisada...',
@@ -1454,7 +1454,9 @@
 
     // Update all elements with data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
-      el.textContent = t(el.getAttribute('data-i18n'));
+      const val = t(el.getAttribute('data-i18n'));
+      if (el.tagName === 'OPTION') el.text = val;
+      else el.textContent = val;
     });
 
     // Update placeholders
@@ -2646,13 +2648,16 @@
 
   function renderLegalScreens() {
     var de = currentLang === 'de';
+    var pil=document.getElementById('profilImpressumLabel'); if(pil) pil.textContent=de?'Impressum':'Aviso Legal';
+    var pdl=document.getElementById('profilDatenschutzLabel'); if(pdl) pdl.textContent=de?'Datenschutz':'Privacidad';
+    var pal=document.getElementById('profilAgbLabel'); if(pal) pal.textContent=de?'Nutzungsbedingungen':'Términos de Uso';
     var el = function(id){return document.getElementById(id);};
     if(el('impressumTitle')) el('impressumTitle').textContent = de?'Impressum':'Aviso Legal';
     if(el('impressumBody')) el('impressumBody').innerHTML = de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Impressum</p><p><strong>Verantwortlich:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay<br>maximechristalle@gmail.com</p><br><p>Buscar ist ein privates Informationsprojekt ohne kommerziellen Charakter.</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Aviso Legal</p><p><strong>Responsable:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay<br>maximechristalle@gmail.com</p><br><p>Buscar es un proyecto de información privado sin fines comerciales.</p>';
     if(el('datenschutzTitle')) el('datenschutzTitle').textContent = de?'Datenschutz':'Privacidad';
     if(el('datenschutzBody')) el('datenschutzBody').innerHTML = de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Datenschutzerklärung</p><p><strong>Verantwortlicher:</strong><br>Maxime Christalle, San Bernardino, Paraguay, maximechristalle@gmail.com</p><br><p><strong>Daten:</strong><br>E-Mail, Benutzername, Fotos. Keine Weitergabe ohne Einwilligung.</p><br><p><strong>Firebase:</strong><br><a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>Rechte:</strong><br>maximechristalle@gmail.com</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Política de Privacidad</p><p><strong>Responsable:</strong><br>Maxime Christalle, San Bernardino, Paraguay, maximechristalle@gmail.com</p><br><p><strong>Datos:</strong><br>Correo, nombre, fotos. Sin cesión a terceros.</p><br><p><strong>Firebase:</strong><br><a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>Derechos:</strong><br>maximechristalle@gmail.com</p>';
     if(el('agbTitle')) el('agbTitle').textContent = de?'Nutzungsbedingungen':'Términos de Uso';
-    if(el('agbBody')) el('agbBody').innerHTML = de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Nutzungsbedingungen</p><p><strong>1.</strong> Kostenlose Nutzung. Keine falschen Inhalte.</p><br><p><strong>2.</strong> Einträge können entfernt werden.</p><br><p><strong>3.</strong> Du bist für deine Inhalte verantwortlich.</p><br><p><strong>4.</strong> Keine Gewähr für Richtigkeit.</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Términos de Uso</p><p><strong>1.</strong> Uso gratuito. No se permite contenido falso.</p><br><p><strong>2.</strong> Las entradas pueden eliminarse.</p><br><p><strong>3.</strong> Eres responsable del contenido que subes.</p><br><p><strong>4.</strong> No se garantiza la exactitud.</p>';
+    if(el('agbBody')) el('agbBody').innerHTML = de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Nutzungsbedingungen</p><p><strong>1. Geltungsbereich</strong><br>Diese Nutzungsbedingungen gelten für die Verwendung der App Buscar, erreichbar unter escapedeutschland.github.io/buscar-app. Mit der Nutzung der App erklärt sich der Nutzer mit diesen Bedingungen einverstanden.</p><br><p><strong>2. Nutzung der App</strong><br>Buscar ist ein kostenloses Informationsverzeichnis für deutschsprachige Personen in Paraguay. Die Nutzung ist für alle registrierten Nutzer kostenlos. Jeder Nutzer verpflichtet sich, keine falschen, irreführenden, beleidigenden oder rechtswidrigen Inhalte einzustellen.</p><br><p><strong>3. Einträge und Inhalte</strong><br>Jeder registrierte Nutzer kann Einträge erstellen und Fotos hochladen. Der Betreiber behält sich vor, Einträge, Fotos oder Kommentare ohne Angabe von Gründen zu entfernen. Spam, unerwünschte Werbung und missbräuchliche Nutzung sind nicht gestattet.</p><br><p><strong>4. Verantwortung der Nutzer</strong><br>Jeder Nutzer ist für die von ihm erstellten Inhalte selbst verantwortlich. Es dürfen keine Bilder von Personen ohne deren Einwilligung hochgeladen werden. Urheberrechtlich geschütztes Material darf nicht ohne Erlaubnis verwendet werden.</p><br><p><strong>5. Haftungsausschluss</strong><br>Buscar übernimmt keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der gelisteten Einträge. Die Nutzung erfolgt auf eigene Verantwortung des Nutzers.</p><br><p><strong>6. Datenschutz</strong><br>Die Verarbeitung personenbezogener Daten erfolgt gemäß unserer Datenschutzerklärung, die in der App einsehbar ist.</p><br><p><strong>7. Änderungen</strong><br>Der Betreiber behält sich vor, diese Nutzungsbedingungen jederzeit zu ändern. Die jeweils aktuelle Version ist in der App einsehbar.</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Términos de Uso</p><p><strong>1. Ámbito de aplicación</strong><br>Estos términos de uso aplican al uso de la aplicación Buscar, disponible en escapedeutschland.github.io/buscar-app. Al usar la app, el usuario acepta estos términos.</p><br><p><strong>2. Uso de la aplicación</strong><br>Buscar es un directorio de información gratuito para personas de habla alemana en Paraguay. El uso es gratuito para todos los usuarios registrados. Cada usuario se compromete a no publicar contenido falso, engañoso, ofensivo o ilegal.</p><br><p><strong>3. Entradas y contenido</strong><br>Cualquier usuario registrado puede crear entradas y subir fotos. El administrador se reserva el derecho de eliminar entradas, fotos o comentarios sin justificación. No se permite el spam, publicidad no solicitada ni el uso abusivo.</p><br><p><strong>4. Responsabilidad del usuario</strong><br>Cada usuario es responsable del contenido que publica. No se deben subir imágenes de personas sin su consentimiento. No se puede utilizar material protegido por derechos de autor sin autorización.</p><br><p><strong>5. Limitación de responsabilidad</strong><br>Buscar no garantiza la exactitud, integridad ni actualidad de las entradas listadas. El uso es bajo la propia responsabilidad del usuario.</p><br><p><strong>6. Privacidad</strong><br>El tratamiento de datos personales se realiza conforme a nuestra política de privacidad, disponible en la aplicación.</p><br><p><strong>7. Modificaciones</strong><br>El administrador se reserva el derecho de modificar estos términos en cualquier momento. La versión actualizada estará siempre disponible en la aplicación.</p>';
   }
 
   function isOpen(hours) {
