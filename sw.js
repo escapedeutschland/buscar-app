@@ -1,4 +1,4 @@
-const CACHE_NAME = 'buscar-v82';
+const CACHE_NAME = 'buscar-v83';
 const STATIC_ASSETS = [
   '/buscar-app/',
   '/buscar-app/index.html',
