@@ -1774,7 +1774,7 @@
   }
 
   // Cover upload
-  (function(){
+  document.addEventListener('DOMContentLoaded', function(){
     const input = document.createElement('input');
     input.type='file'; input.id='coverFileInput'; input.accept='image/*'; input.style.display='none';
     document.body.appendChild(input);
@@ -1795,7 +1795,7 @@
       } catch(e) { alert('Fehler: ' + e.message); }
       input.value = '';
     });
-  })();
+  });
 
   function updateGreeting() {
     const searchEl = document.querySelector('#searchInput');
