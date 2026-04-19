@@ -3508,10 +3508,11 @@
   applyLang();
 
   // Register Service Worker for PWA
-  // Unregister any old service workers to force fresh load
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(regs => {
-      regs.forEach(reg => reg.unregister());
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/buscar-app/sw.js')
+        .then(() => console.log('SW registered'))
+        .catch(e => console.log('SW failed:', e));
     });
   }
 </script>
