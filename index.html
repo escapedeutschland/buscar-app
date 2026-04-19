@@ -37,6 +37,13 @@
     .screen { display: none; flex-direction: column; min-height: 100vh; }
     .screen.active { display: flex; }
 
+    #splash { position:fixed;inset:0;background:linear-gradient(150deg,#F5A623 0%,#D4841A 60%,#B8661A 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:99999; }
+    #splash.hidden { display:none; }
+    .splash-icon { width:80px;height:80px;background:rgba(255,255,255,0.22);border-radius:22px;display:flex;align-items:center;justify-content:center; }
+    .splash-name { font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:white; }
+    .splash-dot { width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.6);animation:splashPulse 1.2s ease-in-out infinite; }
+    .splash-dot:nth-child(2){animation-delay:0.2s}.splash-dot:nth-child(3){animation-delay:0.4s}
+    @keyframes splashPulse{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
     /* AUTH */
     .auth-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top), 50px) 32px 40px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
     .auth-logo-icon { width: 64px; height: 64px; background: rgba(255,255,255,0.22); border-radius: 18px; display: flex; align-items: center; justify-content: center; }
@@ -105,7 +112,8 @@
     #listingsInner { display: block; }
     .listings::-webkit-scrollbar { display: none; }
     .section-title { font-size: 12px; font-weight: 600; color: var(--text-3); letter-spacing: 1px; text-transform: uppercase; margin: 12px 0 10px; }
-    .listing-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px 16px 16px 20px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 14px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; border: 1px solid rgba(0,0,0,0.03); border-left: 4px solid var(--cat-color, var(--yellow)); }
+    .listing-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px 16px 16px 20px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 14px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; border: 1px solid rgba(0,0,0,0.03); position: relative; overflow: hidden; min-height: 90px; align-items: stretch; }
+    .listing-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--cat-color, var(--yellow)); border-radius:0; }
     @keyframes heartPop { 0%{transform:scale(1)} 30%{transform:scale(1.5)} 60%{transform:scale(0.9)} 100%{transform:scale(1)} }
     .fav-pop { animation: heartPop 0.4s ease; }
     @keyframes starPulse { 0%{transform:scale(1)} 50%{transform:scale(1.3)} 100%{transform:scale(1)} }
@@ -117,7 +125,7 @@
     .listing-icon-wrap { width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, #FFF3D6 0%, var(--yellow-light) 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(245,166,35,0.15); }
     .listing-icon-wrap svg { width: 26px; height: 26px; stroke: var(--yellow); }
     .listing-body { flex: 1; min-width: 0; }
-    .listing-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
+    .listing-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 3px; }
     .listing-name { font-size: 15px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .badge-geprüft { font-size: 10px; font-weight: 700; color: var(--green); background: var(--green-light); padding: 2px 7px; border-radius: 6px; flex-shrink: 0; }
     .badge-neu { font-size:10px;font-weight:700;color:#2563EB;background:#DBEAFE;padding:2px 7px;border-radius:6px;flex-shrink:0; }
@@ -452,7 +460,8 @@
     .admin-empty-sub { font-size: 13px; color: var(--text-2); }
 
     /* PROFIL */
-    .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top,44px),52px) 24px 40px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
+    .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top,0px),0px) 0 0; position: relative; overflow: hidden; }
+    .profil-header-inner { padding: 60px 24px 36px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; } display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
     .profil-avatar { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 32px; font-weight: 900; color: white; }
     .profil-name { font-size: 20px; font-weight: 700; color: white; }
     .profil-email { font-size: 13px; color: rgba(255,255,255,0.8); }
@@ -494,6 +503,7 @@
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
+  <div id="splash"><div class="splash-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></div><div class="splash-name">Buscar</div><div style="display:flex;gap:8px;margin-top:8px"><div class="splash-dot"></div><div class="splash-dot"></div><div class="splash-dot"></div></div></div>
 <div id="app">
 
   <!-- AUTH -->
@@ -907,6 +917,7 @@
   <!-- PROFIL -->
   <div class="screen" id="screenProfil">
     <div class="profil-header">
+      <div class="profil-header-inner">
       <!-- Decorative rings -->
       <svg style="position:absolute;top:-20px;right:-20px;opacity:0.07;pointer-events:none" viewBox="0 0 160 160" width="160" height="160">
         <circle cx="80" cy="80" r="70" fill="none" stroke="white" stroke-width="2"/>
@@ -1742,7 +1753,8 @@
       document.getElementById('profilEmail').textContent = user.email;
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
       updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
-    } else { showScreen('screenAuth'); }
+      var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden');
+    } else { showScreen('screenAuth'); var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden'); }
   });
 
   function updateGreeting() {
@@ -2013,7 +2025,7 @@
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
-    container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}${isNew(l.created_at)?`<span class='badge-neu'>Neu</span>`:''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+    container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.name||''}</div><div style="display:flex;gap:3px;align-items:center;flex-shrink:0">${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}${isNew(l.created_at)?`<span class='badge-neu'>Neu</span>`:''}</div></div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
   }
 
   function showDetail(id) {
