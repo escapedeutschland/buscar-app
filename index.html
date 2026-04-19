@@ -37,13 +37,6 @@
     .screen { display: none; flex-direction: column; min-height: 100vh; }
     .screen.active { display: flex; }
 
-    #splash { position:fixed;inset:0;background:linear-gradient(150deg,#F5A623 0%,#D4841A 60%,#B8661A 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:99999; }
-    #splash.fade { transition:opacity 0.35s ease;opacity:0;pointer-events:none; }
-    .splash-icon { width:80px;height:80px;background:rgba(255,255,255,0.22);border-radius:22px;display:flex;align-items:center;justify-content:center; }
-    .splash-name { font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:white;letter-spacing:-0.5px; }
-    .splash-dot { width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.6);animation:splashPulse 1.2s ease-in-out infinite; }
-    .splash-dot:nth-child(2){animation-delay:0.2s}.splash-dot:nth-child(3){animation-delay:0.4s}
-    @keyframes splashPulse{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
     /* AUTH */
     .auth-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: max(env(safe-area-inset-top), 50px) 32px 40px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
     .auth-logo-icon { width: 64px; height: 64px; background: rgba(255,255,255,0.22); border-radius: 18px; display: flex; align-items: center; justify-content: center; }
@@ -127,7 +120,6 @@
     .listing-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
     .listing-name { font-size: 15px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .badge-geprüft { font-size: 10px; font-weight: 700; color: var(--green); background: var(--green-light); padding: 2px 7px; border-radius: 6px; flex-shrink: 0; }
-    .badge-neu { font-size:10px;font-weight:700;color:#2563EB;background:#DBEAFE;padding:2px 7px;border-radius:6px;flex-shrink:0; }
     .listing-city { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--text-3); margin-bottom: 5px; }
     .listing-city svg { width: 11px; height: 11px; stroke: var(--text-3); }
     .listing-desc { font-size: 13px; color: var(--text-2); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -140,7 +132,7 @@
     .detail-screen { background: var(--bg); overflow-y: auto; }
     .detail-hero { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 52px 20px 28px; position: relative; overflow: hidden; }
     .detail-hero::before { content:''; position:absolute; top:-30px; right:-30px; width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,0.07); pointer-events:none; }
-    .detail-back { width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.25);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;position:fixed;top:56px;left:16px;z-index:99999; }
+    .detail-back { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 20px; }
     .detail-back svg { width: 20px; height: 20px; stroke: white; }
     .detail-hero-icon { width: 68px; height: 68px; border-radius: 20px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
     .detail-hero-icon svg { width: 34px; height: 34px; stroke: white; }
@@ -279,10 +271,6 @@
     .map-chip-unterkunft.active  { background: #8B5CF6; border-color: #8B5CF6; color: white; }
     .map-chip-geschaefte.active  { background: #EF4444; border-color: #EF4444; color: white; }
     .map-chip-sport.active       { background: #06B6D4; border-color: #06B6D4; color: white; }
-    .map-chip-tankstelle { background:#FEE2E2;border:1.5px solid #FCA5A5;color:#991B1B; }
-    .map-chip-tankstelle.active { background:#EF4444;border-color:#EF4444;color:white; }
-    .map-chip-beauty { background:#FCE7F3;border:1.5px solid #F9A8D4;color:#9D174D; }
-    .map-chip-beauty.active { background:#EC4899;border-color:#EC4899;color:white; }
 
     /* DUPLICATE WARNING */
     .dupe-warning { background: #FFF8EC; border: 1.5px solid var(--yellow); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; display: none; }
@@ -489,7 +477,6 @@
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
-  <div id="splash"><div class="splash-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></div><div class="splash-name">Buscar</div><div style="display:flex;gap:8px;margin-top:8px"><div class="splash-dot"></div><div class="splash-dot"></div><div class="splash-dot"></div></div></div>
 <div id="app">
 
   <!-- AUTH -->
@@ -593,8 +580,6 @@
         <div class="cat-chip" data-cat="kat-unterkunft" data-i18n="cat_accommodation">Unterkünfte</div>
         <div class="cat-chip" data-cat="kat-geschaefte" data-i18n="cat_shops">Geschäfte</div>
         <div class="cat-chip" data-cat="kat-sport" data-i18n="cat_sport">Sport & Fitness</div>
-        <div class="cat-chip" data-cat="kat-tankstelle">Tankstellen</div>
-        <div class="cat-chip" data-cat="kat-beauty">Beauty & Wellness</div>
       </div>
       <div id="cityPickerBtn" class="city-picker-btn" onclick="openCitySheet()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -621,31 +606,6 @@
     </nav>
   </div>
 
-  <!-- LEGAL SCREENS -->
-  <div class="screen" id="screenImpressum">
-    <div class="header" style="padding-bottom:20px"><div class="header-top">
-      <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <div id="impressumTitle" style="color:white;font-weight:700;font-size:17px">Impressum</div>
-      <div style="width:38px"></div>
-    </div></div>
-    <div style="padding:20px;overflow-y:auto;flex:1"><div class="detail-card" id="impressumBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div></div>
-  </div>
-  <div class="screen" id="screenDatenschutz">
-    <div class="header" style="padding-bottom:20px"><div class="header-top">
-      <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <div id="datenschutzTitle" style="color:white;font-weight:700;font-size:17px">Datenschutz</div>
-      <div style="width:38px"></div>
-    </div></div>
-    <div style="padding:20px;overflow-y:auto;flex:1"><div class="detail-card" id="datenschutzBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div></div>
-  </div>
-  <div class="screen" id="screenAGB">
-    <div class="header" style="padding-bottom:20px"><div class="header-top">
-      <button onclick="goBack()" style="background:rgba(255,255,255,0.22);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <div id="agbTitle" style="color:white;font-weight:700;font-size:17px">Nutzungsbedingungen</div>
-      <div style="width:38px"></div>
-    </div></div>
-    <div style="padding:20px;overflow-y:auto;flex:1"><div class="detail-card" id="agbBody" style="padding:20px;line-height:1.7;font-size:14px;color:var(--text-2)"></div></div>
-  </div>
   <!-- DETAIL -->
   <div class="screen detail-screen" id="screenDetail">
     <div class="detail-hero">
@@ -729,8 +689,6 @@
         <div class="map-chip map-chip-unterkunft" data-cat="kat-unterkunft"><span class="chip-dot"></span><span data-i18n="cat_accommodation">Unterkünfte</span></div>
         <div class="map-chip map-chip-geschaefte" data-cat="kat-geschaefte"><span class="chip-dot"></span><span data-i18n="cat_shops">Geschäfte</span></div>
         <div class="map-chip map-chip-sport" data-cat="kat-sport"><span class="chip-dot"></span><span data-i18n="cat_sport">Sport</span></div>
-        <div class="map-chip map-chip-tankstelle" data-cat="kat-tankstelle"><span class="chip-dot"></span><span>Tankstellen</span></div>
-        <div class="map-chip map-chip-beauty" data-cat="kat-beauty"><span class="chip-dot"></span><span>Beauty</span></div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;padding:6px 16px 10px">
         <div id="mapCityPickerBtn" onclick="openMapCitySheet()" style="flex:1;display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-2)">
@@ -978,11 +936,6 @@
           </div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
-      </div>
-      <div class="profil-section" style="margin-bottom:16px">
-        <div class="profil-row" onclick="showScreen('screenImpressum')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="profil-row-label">Impressum</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div>
-        <div class="profil-row" onclick="showScreen('screenDatenschutz')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="profil-row-label">Datenschutz</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div>
-        <div class="profil-row" onclick="showScreen('screenAGB')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="profil-row-label">Nutzungsbedingungen</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div>
       </div>
       <button class="logout-btn" onclick="handleLogout()" data-i18n="logout">Ausloggen</button>
     </div>
@@ -1390,7 +1343,6 @@
 
   function toggleLang() {
     currentLang = currentLang === 'de' ? 'es' : 'de';
-    renderLegalScreens();
     localStorage.setItem('buscar_lang', currentLang);
     contentTranslated = false;
     applyLang();
@@ -1639,17 +1591,7 @@
     });
   }
 
-  let screenHistory = [];
-  function goBack() {
-    const prev = screenHistory.length > 0 ? screenHistory.pop() : 'screenHome';
-    showScreen(prev);
-    if (prev === 'screenMap') setTimeout(() => renderMap(), 100);
-  }
   function showScreen(id) {
-    const dbb = document.getElementById('detailBackBtn');
-    if (dbb) dbb.style.display = id === 'screenDetail' ? 'flex' : 'none';
-    const prev = document.querySelector('.screen.active');
-    if (prev && prev.id !== id) screenHistory.push(prev.id);
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     window.scrollTo(0, 0);
@@ -1749,9 +1691,6 @@
   auth.onAuthStateChanged(async user => {
     currentUser = user;
     if (user) {
-      updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
-      const splash = document.getElementById('splash');
-      if (splash) splash.style.display = 'none';
       let displayName = user.email.split('@')[0];
       let avatarUrl = null;
       try {
@@ -1766,37 +1705,21 @@
       setAvatarDisplay(avatarUrl, initial);
       document.getElementById('profilName').textContent = displayName;
       document.getElementById('profilEmail').textContent = user.email;
-      updateGreeting();
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
       updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings();
-    } else { showScreen('screenAuth'); const splash=document.getElementById('splash'); if(splash){splash.classList.add('fade');setTimeout(()=>splash.style.display='none',380);} }
+    } else { showScreen('screenAuth'); }
   });
 
-  function renderLegalScreens() {
-    const de = currentLang === 'de';
-    const it=document.getElementById('impressumTitle'); const ib=document.getElementById('impressumBody');
-    if(it) it.textContent=de?'Impressum':'Aviso Legal';
-    if(ib) ib.innerHTML=de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Impressum</p><p><strong>Verantwortlich:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay</p><br><p><strong>Kontakt:</strong><br>maximechristalle@gmail.com</p><br><p>Buscar ist ein privates Informationsprojekt ohne kommerziellen Charakter.</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Aviso Legal</p><p><strong>Responsable:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay</p><br><p><strong>Contacto:</strong><br>maximechristalle@gmail.com</p><br><p>Buscar es un proyecto de información privado sin fines comerciales.</p>';
-    const dt=document.getElementById('datenschutzTitle'); const db2=document.getElementById('datenschutzBody');
-    if(dt) dt.textContent=de?'Datenschutz':'Privacidad';
-    if(db2) db2.innerHTML=de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Datenschutzerklärung</p><p><strong>1. Verantwortlicher</strong><br>Maxime Christalle, San Bernardino, Paraguay<br>maximechristalle@gmail.com</p><br><p><strong>2. Erhobene Daten</strong><br>E-Mail, Benutzername, Fotos und Einträge. Keine Weitergabe ohne Einwilligung.</p><br><p><strong>3. Firebase/Google</strong><br>Wir nutzen Firebase (Google LLC). Info: <a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>4. Rechte</strong><br>Auskunft, Berichtigung, Löschung: maximechristalle@gmail.com</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Política de Privacidad</p><p><strong>1. Responsable</strong><br>Maxime Christalle, San Bernardino, Paraguay<br>maximechristalle@gmail.com</p><br><p><strong>2. Datos</strong><br>Correo, nombre de usuario, fotos y entradas. Sin cesión a terceros.</p><br><p><strong>3. Firebase/Google</strong><br>Usamos Firebase (Google LLC). Info: <a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>4. Derechos</strong><br>Acceso, corrección, eliminación: maximechristalle@gmail.com</p>';
-    const at=document.getElementById('agbTitle'); const ab=document.getElementById('agbBody');
-    if(at) at.textContent=de?'Nutzungsbedingungen':'Términos de Uso';
-    if(ab) ab.innerHTML=de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Nutzungsbedingungen</p><p><strong>1.</strong> Diese Bedingungen gelten für Buscar.</p><br><p><strong>2.</strong> Kostenlose Nutzung. Keine falschen oder beleidigenden Inhalte.</p><br><p><strong>3.</strong> Einträge können ohne Angabe entfernt werden.</p><br><p><strong>4.</strong> Du bist für deine hochgeladenen Inhalte verantwortlich.</p><br><p><strong>5.</strong> Keine Gewähr für Richtigkeit der Einträge.</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Términos de Uso</p><p><strong>1.</strong> Estos términos aplican al uso de Buscar.</p><br><p><strong>2.</strong> Uso gratuito. No se permite contenido falso u ofensivo.</p><br><p><strong>3.</strong> Las entradas pueden eliminarse sin justificación.</p><br><p><strong>4.</strong> Eres responsable del contenido que subes.</p><br><p><strong>5.</strong> No se garantiza la exactitud de las entradas.</p>';
-  }
   function updateGreeting() {
     const searchEl = document.querySelector('#searchInput');
     if (searchEl) searchEl.placeholder = t('search_placeholder');
     const h = new Date().getHours();
     const el = document.getElementById('headerGreeting');
     if (!el) return;
-    const rawName = currentUser ? (document.getElementById('profilName')?.textContent || currentUser.email.split('@')[0] || '') : '';
-    const name = rawName && rawName !== '-' ? rawName.split(' ')[0] : '';
-    const suffix = name ? ', ' + name + '!' : '!';
-    if (h >= 5 && h < 12) el.textContent = t('greet_morning') + suffix;
-    else if (h >= 12 && h < 18) el.textContent = t('greet_day') + suffix;
-    else if (h >= 18 && h < 22) el.textContent = t('greet_evening') + suffix;
-    else el.textContent = t('greet_night') + suffix;
+    if (h >= 5 && h < 12) el.textContent = t('greet_morning');
+    else if (h >= 12 && h < 18) el.textContent = t('greet_day');
+    else if (h >= 18 && h < 22) el.textContent = t('greet_evening');
+    else el.textContent = t('greet_night');
   }
 
   function setAvatarDisplay(url, initial) {
@@ -1893,8 +1816,6 @@
     'kat-unterkunft': ['Alle', 'Hotel', 'Hostel', 'Ferienwohnung', 'B&B', 'Camping'],
     'kat-geschaefte': ['Alle', 'Supermarkt', 'Markt', 'Apotheke', 'Elektronik', 'Kleidung', 'Baumarkt'],
     'kat-sport': ['Alle', 'Fitnessstudio', 'Kampfsport', 'Yoga & Pilates', 'Schwimmbad', 'Fußball', 'Tennis', 'Radfahren', 'Crossfit', 'Klettern'],
-    'kat-tankstelle': ['Alle','Tankstelle','Autowaschanlage','Reifenservice'],
-    'kat-beauty': ['Alle','Frisör','Beauty-Salon','Spa & Wellness','Nagelpflege','Barbershop','Massage'],
   };
 
   function openFilterSheet(mode) {
@@ -2047,12 +1968,10 @@
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
-    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
   }
 
   function showDetail(id) {
-    const dbb = document.getElementById('detailBackBtn');
-    if (dbb) dbb.style.display = 'flex';
     const l = allListings.find(x => x.id === id);
     if (!l) return;
     document.getElementById('detailIcon').innerHTML = catIcons[l.category_id]||catIcons['default'];
@@ -2117,8 +2036,6 @@
     'kat-unterkunft': '#8B5CF6',
     'kat-geschaefte': '#EF4444',
     'kat-sport': '#06B6D4',
-    'kat-tankstelle': '#EF4444',
-    'kat-beauty': '#EC4899',
     'default': '#6B6B6B'
   };
 
@@ -2897,29 +2814,6 @@
     }
   }
 
-  async function deletePhoto(photoId, url, listingId) {
-    if (!confirm('Foto löschen?')) return;
-    try {
-      await db.collection('listing_photos').doc(photoId).delete();
-      try { const ref=firebase.storage().refFromURL(url); await ref.delete(); } catch(e){}
-      await loadPhotos(listingId);
-    } catch(e) { alert('Fehler beim Löschen.'); }
-  }
-  async function compressImage(file, maxPx=1200, quality=0.75) {
-    return new Promise(resolve => {
-      const img = new Image();
-      const url = URL.createObjectURL(file);
-      img.onload = () => {
-        let w=img.width, h=img.height;
-        if (w>maxPx||h>maxPx) { if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;} }
-        const canvas=document.createElement('canvas');
-        canvas.width=w; canvas.height=h;
-        canvas.getContext('2d').drawImage(img,0,0,w,h);
-        canvas.toBlob(blob=>{URL.revokeObjectURL(url);resolve(blob);},'image/jpeg',quality);
-      };
-      img.src=url;
-    });
-  }
   async function uploadPhoto(event, listingId) {
     const file = event.target.files[0];
     if (!file) return;
@@ -3601,6 +3495,5 @@
     });
   }
 </script>
-  <button class="detail-back" id="detailBackBtn" onclick="goBack()" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
 </body>
 </html>
