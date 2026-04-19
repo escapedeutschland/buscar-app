@@ -116,7 +116,7 @@
     .listing-card:active { transform: scale(0.982); box-shadow: var(--shadow-md); }
     .listing-icon-wrap { width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, #FFF3D6 0%, var(--yellow-light) 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(245,166,35,0.15); }
     .listing-icon-wrap svg { width: 26px; height: 26px; stroke: var(--yellow); }
-    .listing-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .listing-body { flex: 1; min-width: 0; display:flex;flex-direction:column;gap:3px; }
     .listing-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
     .listing-name { font-size: 15px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .badge-geprüft { font-size: 10px; font-weight: 700; color: var(--green); background: var(--green-light); padding: 2px 7px; border-radius: 6px; flex-shrink: 0; }
@@ -153,9 +153,6 @@
     .detail-badge-row { padding: 12px 16px; display: flex; gap: 8px; }
     .detail-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
     .detail-badge.green { background: var(--green-light); color: var(--green); }
-    .detail-badge.blue { background:#DBEAFE;color:#2563EB; }
-    .detail-badge.open-status { background:#DCFCE7;color:#15803D; }
-    .detail-badge.closed-status { background:#F1F5F9;color:#94A3B8; }
     .detail-cta { display: flex; gap: 10px; margin-top: 6px; }
     .detail-cta-btn { flex: 1; padding: 15px; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
     .detail-cta-btn.primary { background: var(--yellow); color: white; }
@@ -214,9 +211,6 @@
     /* FOTOS */
     .photos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 12px 16px 16px; }
     .photo-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; cursor: pointer; }
-    .photo-thumb-wrap { position:relative;display:inline-block;width:100%;aspect-ratio:1; }
-    .photo-thumb-wrap .photo-thumb { width:100%;height:100%;object-fit:cover;border-radius:8px;cursor:pointer;display:block; }
-    .photo-delete-btn { position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.6);color:white;border:none;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center; }
     .photo-upload-btn { width: 100%; aspect-ratio: 1; border: 1.5px dashed var(--border); border-radius: 8px; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; gap: 4px; }
     .photo-upload-btn svg { width: 22px; height: 22px; stroke: var(--text-3); }
     .photo-upload-btn span { font-size: 11px; color: var(--text-3); font-weight: 500; }
@@ -1723,22 +1717,6 @@
     } else { showScreen('screenAuth'); }
   });
 
-  function renderLegalScreens() {
-    const de = currentLang === 'de';
-    const el = id => document.getElementById(id);
-    if(el('impressumTitle')) el('impressumTitle').textContent = de?'Impressum':'Aviso Legal';
-    if(el('impressumBody')) el('impressumBody').innerHTML = de
-      ? '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Impressum</p><p><strong>Verantwortlich:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay<br>maximechristalle@gmail.com</p><br><p>Buscar ist ein privates Informationsprojekt ohne kommerziellen Charakter.</p>'
-      : '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Aviso Legal</p><p><strong>Responsable:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay<br>maximechristalle@gmail.com</p><br><p>Buscar es un proyecto de información privado sin fines comerciales.</p>';
-    if(el('datenschutzTitle')) el('datenschutzTitle').textContent = de?'Datenschutz':'Privacidad';
-    if(el('datenschutzBody')) el('datenschutzBody').innerHTML = de
-      ? '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Datenschutzerklärung</p><p><strong>1. Verantwortlicher:</strong><br>Maxime Christalle, San Bernardino, Paraguay<br>maximechristalle@gmail.com</p><br><p><strong>2. Daten:</strong><br>E-Mail, Benutzername, Fotos. Keine Weitergabe ohne Einwilligung.</p><br><p><strong>3. Firebase:</strong><br><a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>4. Rechte:</strong><br>maximechristalle@gmail.com</p>'
-      : '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Política de Privacidad</p><p><strong>1. Responsable:</strong><br>Maxime Christalle, San Bernardino, Paraguay<br>maximechristalle@gmail.com</p><br><p><strong>2. Datos:</strong><br>Correo, nombre, fotos. Sin cesión a terceros.</p><br><p><strong>3. Firebase:</strong><br><a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>4. Derechos:</strong><br>maximechristalle@gmail.com</p>';
-    if(el('agbTitle')) el('agbTitle').textContent = de?'Nutzungsbedingungen':'Términos de Uso';
-    if(el('agbBody')) el('agbBody').innerHTML = de
-      ? '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Nutzungsbedingungen</p><p><strong>1.</strong> Diese Bedingungen gelten für Buscar.</p><br><p><strong>2.</strong> Kostenlose Nutzung. Keine falschen Inhalte.</p><br><p><strong>3.</strong> Einträge können entfernt werden.</p><br><p><strong>4.</strong> Du bist für deine Inhalte verantwortlich.</p><br><p><strong>5.</strong> Keine Gewähr für Richtigkeit.</p>'
-      : '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Términos de Uso</p><p><strong>1.</strong> Estos términos aplican al uso de Buscar.</p><br><p><strong>2.</strong> Uso gratuito. No se permite contenido falso.</p><br><p><strong>3.</strong> Las entradas pueden eliminarse.</p><br><p><strong>4.</strong> Eres responsable del contenido que subes.</p><br><p><strong>5.</strong> No se garantiza la exactitud.</p>';
-  }
   function updateGreeting() {
     const searchEl = document.querySelector('#searchInput');
     if (searchEl) searchEl.placeholder = t('search_placeholder');
@@ -1997,7 +1975,7 @@
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
-    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div>${isNew(l.created_at)?`<span class='badge-neu'>Neu</span>`:''}\${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+    container.innerHTML = filtered.map(l => `<div class="listing-card" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name">${l.name||''}</div>${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div>${isNew(l.created_at)?`<span class='badge-neu'>Neu</span>`:''}${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
   }
 
   function showDetail(id) {
@@ -2013,10 +1991,8 @@
     descEl.innerHTML = descContent || t('no_description');
     descEl.dataset.original = descContent;
     const badges = document.getElementById('detailBadges');
-    const openStatus = isOpen(l.opening_hours);
-    const openBadge = openStatus===true ? '<span class="detail-badge open-status">'+t('open_now')+'</span>' : openStatus===false ? '<span class="detail-badge closed-status">'+t('closed_now')+'</span>' : '';
-    document.getElementById('detailBadgeRow').innerHTML = (l.verified?'<span class="detail-badge green">'+t('verified')+'</span>':'') + (isNew(l.created_at)?'<span class="detail-badge blue">Neu</span>':'') + openBadge;
-    badges.style.display = (l.verified || isNew(l.created_at) || openStatus!==null) ? 'block' : 'none';
+    document.getElementById('detailBadgeRow').innerHTML = l.verified?`<span class='detail-badge green'>${t('verified')}</span>`:'';
+    badges.style.display = l.verified?'block':'none';
     let infoHTML = '';
     if (l.phone) infoHTML += `<a class="detail-row" href="tel:${l.phone}"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Telefon</div><div class="detail-row-value">${l.phone}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
     if (l.website) infoHTML += `<a class="detail-row" href="https://${l.website}" target="_blank"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Website</div><div class="detail-row-value">${l.website}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
@@ -2548,7 +2524,18 @@
   })(); }); // end window.load
 
   // Check if a place is open now - supports two time blocks
-    function isNew(c) { if(!c) return false; try { var d=c.toDate?c.toDate():new Date(c); return (Date.now()-d.getTime())<1209600000; } catch(e){ return false; } }
+  function isNew(c){if(!c)return false;try{var d=c.toDate?c.toDate():new Date(c);return(Date.now()-d.getTime())<1209600000;}catch(e){return false;}}
+
+  function renderLegalScreens() {
+    var de = currentLang === 'de';
+    var el = function(id){return document.getElementById(id);};
+    if(el('impressumTitle')) el('impressumTitle').textContent = de?'Impressum':'Aviso Legal';
+    if(el('impressumBody')) el('impressumBody').innerHTML = de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Impressum</p><p><strong>Verantwortlich:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay<br>maximechristalle@gmail.com</p><br><p>Buscar ist ein privates Informationsprojekt ohne kommerziellen Charakter.</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Aviso Legal</p><p><strong>Responsable:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay<br>maximechristalle@gmail.com</p><br><p>Buscar es un proyecto de información privado sin fines comerciales.</p>';
+    if(el('datenschutzTitle')) el('datenschutzTitle').textContent = de?'Datenschutz':'Privacidad';
+    if(el('datenschutzBody')) el('datenschutzBody').innerHTML = de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Datenschutzerklärung</p><p><strong>Verantwortlicher:</strong><br>Maxime Christalle, San Bernardino, Paraguay, maximechristalle@gmail.com</p><br><p><strong>Daten:</strong><br>E-Mail, Benutzername, Fotos. Keine Weitergabe ohne Einwilligung.</p><br><p><strong>Firebase:</strong><br><a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>Rechte:</strong><br>maximechristalle@gmail.com</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Política de Privacidad</p><p><strong>Responsable:</strong><br>Maxime Christalle, San Bernardino, Paraguay, maximechristalle@gmail.com</p><br><p><strong>Datos:</strong><br>Correo, nombre, fotos. Sin cesión a terceros.</p><br><p><strong>Firebase:</strong><br><a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>Derechos:</strong><br>maximechristalle@gmail.com</p>';
+    if(el('agbTitle')) el('agbTitle').textContent = de?'Nutzungsbedingungen':'Términos de Uso';
+    if(el('agbBody')) el('agbBody').innerHTML = de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Nutzungsbedingungen</p><p><strong>1.</strong> Kostenlose Nutzung. Keine falschen Inhalte.</p><br><p><strong>2.</strong> Einträge können entfernt werden.</p><br><p><strong>3.</strong> Du bist für deine Inhalte verantwortlich.</p><br><p><strong>4.</strong> Keine Gewähr für Richtigkeit.</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Términos de Uso</p><p><strong>1.</strong> Uso gratuito. No se permite contenido falso.</p><br><p><strong>2.</strong> Las entradas pueden eliminarse.</p><br><p><strong>3.</strong> Eres responsable del contenido que subes.</p><br><p><strong>4.</strong> No se garantiza la exactitud.</p>';
+  }
 
   function isOpen(hours) {
     if (!hours) return null;
@@ -2825,13 +2812,12 @@
     try {
       const snap = await db.collection('listing_photos')
         .where('listing_id', '==', listingId)
+        .where('pending', '==', false)
         .orderBy('created_at', 'asc').get();
       const photos = snap.docs.map(d => ({id: d.id, ...d.data()}));
-      grid.innerHTML = photos.map(p => {
-        const canDel = currentUser && (currentUser.email === ADMIN_EMAIL || p.uploaded_by === currentUser.uid);
-        const delBtn = canDel ? `<button class="photo-delete-btn" onclick="event.stopPropagation();deletePhoto('${p.id}','${p.url}','${listingId}')" title="Löschen">✕</button>` : '';
-        return `<div class="photo-thumb-wrap"><img class="photo-thumb" src="${p.url}" alt="Foto" onclick="openLightbox('${p.url}')">${delBtn}</div>`;
-      }).join('');
+      grid.innerHTML = photos.map(p => `
+        <img class="photo-thumb" src="${p.url}" alt="Foto" onclick="openLightbox('${p.url}')">`
+      ).join('');
       grid.innerHTML += `
         <label class="photo-upload-btn" for="photoFileInput">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -2848,44 +2834,21 @@
     }
   }
 
-  async function compressImage(file, maxPx, quality) {
-    maxPx = maxPx||1200; quality = quality||0.75;
-    return new Promise(function(resolve) {
-      var img = new Image();
-      var url = URL.createObjectURL(file);
-      img.onload = function() {
-        var w=img.width, h=img.height;
-        if(w>maxPx||h>maxPx){if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;}}
-        var canvas=document.createElement('canvas');
-        canvas.width=w; canvas.height=h;
-        canvas.getContext('2d').drawImage(img,0,0,w,h);
-        canvas.toBlob(function(blob){URL.revokeObjectURL(url);resolve(blob);},'image/jpeg',quality);
-      };
-      img.src=url;
-    });
-  }
-  async function deletePhoto(photoId, url, listingId) {
-    if (!confirm('Foto löschen?')) return;
-    try {
-      await db.collection('listing_photos').doc(photoId).delete();
-      try { await firebase.storage().refFromURL(url).delete(); } catch(e){}
-      await loadPhotos(listingId);
-    } catch(e) { alert('Fehler beim Löschen.'); }
-  }
   async function uploadPhoto(event, listingId) {
-    const rawFile = event.target.files[0];
-    if (!rawFile) return;
-    if (!rawFile.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { alert('Foto ist zu groß. Max. 5 MB.'); return; }
+    if (!file.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
 
     const progress = document.getElementById('photoProgress');
     progress.style.display = 'block';
     progress.textContent = 'Wird hochgeladen...';
 
+    const filename = Date.now() + '_' + currentUser.uid + '.' + file.name.split('.').pop();
+    const ref = storage.ref('listings/' + listingId + '/' + filename);
+
     try {
-      const file = await compressImage(rawFile);
-      const filename = Date.now() + '_' + currentUser.uid + '.jpg';
-      const ref = storage.ref('listing_photos/' + listingId + '_' + filename);
-      const snap = await ref.put(file, {contentType:'image/jpeg'});
+      const snap = await ref.put(file);
       const url = await snap.ref.getDownloadURL();
       const name = await getUsername();
       await db.collection('listing_photos').add({
