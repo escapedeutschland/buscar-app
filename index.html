@@ -462,10 +462,10 @@
     .admin-empty-sub { font-size: 13px; color: var(--text-2); }
 
     /* PROFIL */
-    .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 52px 24px 28px; display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; overflow: hidden; flex-shrink: 0; max-height: 260px; } display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
-    .profil-avatar { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 32px; font-weight: 900; color: white; }
-    .profil-name { font-size: 20px; font-weight: 700; color: white; }
-    .profil-email { font-size: 13px; color: rgba(255,255,255,0.8); }
+    .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 52px 24px 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; overflow: hidden; flex-shrink: 0; } display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
+    .profil-avatar { width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 28px; font-weight: 900; color: white; overflow: hidden; flex-shrink: 0; }
+        .profil-name { font-size: 18px; font-weight: 700; color: white; }
+        .profil-email { font-size: 12px; color: rgba(255,255,255,0.75); }
     .profil-body { padding: 24px; flex: 1; padding-bottom: 120px; overflow-y: auto; }
     .profil-section { background: var(--card); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 16px; }
     .profil-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 0.5px solid var(--border); cursor: pointer; }
@@ -930,8 +930,8 @@
         <circle cx="60" cy="60" r="55" fill="none" stroke="white" stroke-width="2"/>
         <circle cx="60" cy="60" r="35" fill="none" stroke="white" stroke-width="2"/>
       </svg>
-      <div style="position:relative;display:inline-block;cursor:pointer" onclick="document.getElementById('avatarFileInput').click()">
-        <div class="profil-avatar" id="profilAvatar" style="overflow:hidden">?</div>
+      <div style="position:relative;display:inline-block;cursor:pointer;width:72px;height:72px;" onclick="document.getElementById('avatarFileInput').click()">
+        <div class="profil-avatar" id="profilAvatar" style="overflow:hidden;width:72px;height:72px;">?</div>
         <div style="position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:var(--yellow);border:2px solid white;display:flex;align-items:center;justify-content:center">
           <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 0 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
         </div>
