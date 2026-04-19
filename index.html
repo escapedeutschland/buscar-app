@@ -112,7 +112,7 @@
     #listingsInner { display: block; }
     .listings::-webkit-scrollbar { display: none; }
     .section-title { font-size: 12px; font-weight: 600; color: var(--text-3); letter-spacing: 1px; text-transform: uppercase; margin: 12px 0 10px; }
-    .listing-card { background: var(--card); border-radius: var(--radius-lg); padding: 14px 14px 14px 20px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 12px; cursor: pointer; transition: box-shadow 0.15s ease; border: 1px solid rgba(0,0,0,0.03); position: relative; overflow: hidden; height: 90px; align-items: center; }
+    .listing-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px 16px 16px 20px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 14px; cursor: pointer; transition: box-shadow 0.15s ease; border: 1px solid rgba(0,0,0,0.03); position: relative; overflow: hidden; min-height: 110px; align-items: center; }
     .listing-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--cat-color, var(--yellow)); border-radius:0; }
     @keyframes heartPop { 0%{transform:scale(1)} 30%{transform:scale(1.5)} 60%{transform:scale(0.9)} 100%{transform:scale(1)} }
     .fav-pop { animation: heartPop 0.4s ease; }
@@ -462,11 +462,11 @@
     .admin-empty-sub { font-size: 13px; color: var(--text-2); }
 
     /* PROFIL */
-    .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 72px 24px 32px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; flex-shrink: 0; } display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
+    .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 52px 24px 28px; display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; overflow: hidden; flex-shrink: 0; max-height: 260px; } display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
     .profil-avatar { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 32px; font-weight: 900; color: white; }
     .profil-name { font-size: 20px; font-weight: 700; color: white; }
     .profil-email { font-size: 13px; color: rgba(255,255,255,0.8); }
-    .profil-body { padding: 24px; flex: 1; padding-bottom: 120px; }
+    .profil-body { padding: 24px; flex: 1; padding-bottom: 120px; overflow-y: auto; }
     .profil-section { background: var(--card); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 16px; }
     .profil-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 0.5px solid var(--border); cursor: pointer; }
     .profil-row:last-child { border-bottom: none; }
@@ -918,7 +918,7 @@
   </div>
 
   <!-- PROFIL -->
-  <div class="screen" id="screenProfil">
+  <div class="screen" id="screenProfil" style="overflow:hidden;">
     <div class="profil-header">
       <!-- Decorative rings -->
       <svg style="position:absolute;top:-20px;right:-20px;opacity:0.07;pointer-events:none" viewBox="0 0 160 160" width="160" height="160">
