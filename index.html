@@ -112,7 +112,7 @@
     #listingsInner { display: block; }
     .listings::-webkit-scrollbar { display: none; }
     .section-title { font-size: 12px; font-weight: 600; color: var(--text-3); letter-spacing: 1px; text-transform: uppercase; margin: 12px 0 10px; }
-    .listing-card { background: var(--card); border-radius: var(--radius-lg); padding: 16px 16px 16px 20px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 14px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; border: 1px solid rgba(0,0,0,0.03); position: relative; overflow: hidden; min-height: 96px; align-items: center; }
+    .listing-card { background: var(--card); border-radius: var(--radius-lg); padding: 14px 14px 14px 20px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 12px; cursor: pointer; transition: box-shadow 0.15s ease; border: 1px solid rgba(0,0,0,0.03); position: relative; overflow: hidden; height: 90px; align-items: center; }
     .listing-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--cat-color, var(--yellow)); border-radius:0; }
     @keyframes heartPop { 0%{transform:scale(1)} 30%{transform:scale(1.5)} 60%{transform:scale(0.9)} 100%{transform:scale(1)} }
     .fav-pop { animation: heartPop 0.4s ease; }
@@ -121,8 +121,8 @@
     .open-badge { display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:6px; }
     .open-badge.open { background:rgba(34,197,94,0.15);color:#16a34a; }
     .open-badge.closed { background:rgba(239,68,68,0.12);color:#dc2626; }
-    .listing-card:active { transform: scale(0.982); box-shadow: var(--shadow-md); }
-    .listing-icon-wrap { width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, #FFF3D6 0%, var(--yellow-light) 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(245,166,35,0.15); }
+
+    .listing-icon-wrap { width: 50px; height: 50px; flex-shrink: 0; border-radius: 16px; background: linear-gradient(135deg, #FFF3D6 0%, var(--yellow-light) 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(245,166,35,0.15); }
     .listing-icon-wrap svg { width: 26px; height: 26px; stroke: var(--yellow); }
     .listing-body { flex: 1; min-width: 0; align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
     .listing-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 3px; }
@@ -462,7 +462,7 @@
     .admin-empty-sub { font-size: 13px; color: var(--text-2); }
 
     /* PROFIL */
-    .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 60px 24px 32px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; } display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
+    .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 72px 24px 32px; display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; flex-shrink: 0; } display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
     .profil-avatar { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 32px; font-weight: 900; color: white; }
     .profil-name { font-size: 20px; font-weight: 700; color: white; }
     .profil-email { font-size: 13px; color: rgba(255,255,255,0.8); }
@@ -651,9 +651,11 @@
       <div class="detail-cover-overlay" id="detailCoverOverlay" style="display:none"></div>
       <button class="detail-back" onclick="showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       <button class="fav-btn" id="favBtn" onclick="toggleFavorite()"><svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+      <div style="position:relative;z-index:2">
       <div class="detail-hero-icon" id="detailIcon"></div>
       <div class="detail-title" id="detailTitle">-</div>
       <div class="detail-city" id="detailCity"></div>
+      </div>
     </div>
     <div class="detail-body">
       <div id="detailBadges" class="detail-card" style="display:none"><div class="detail-badge-row" id="detailBadgeRow"></div></div>
@@ -1751,6 +1753,7 @@
       setAvatarDisplay(avatarUrl, initial);
       document.getElementById('profilName').textContent = displayName;
       document.getElementById('profilEmail').textContent = user.email;
+      updateGreeting();
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
       updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
       var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden');
@@ -1763,10 +1766,13 @@
     const h = new Date().getHours();
     const el = document.getElementById('headerGreeting');
     if (!el) return;
-    if (h >= 5 && h < 12) el.textContent = t('greet_morning');
-    else if (h >= 12 && h < 18) el.textContent = t('greet_day');
-    else if (h >= 18 && h < 22) el.textContent = t('greet_evening');
-    else el.textContent = t('greet_night');
+    const rawName = currentUser ? (document.getElementById('profilName')?.textContent||currentUser.email.split('@')[0]||'') : '';
+    const name = rawName && rawName !== '-' ? rawName.split(' ')[0] : '';
+    const suffix = name ? ', ' + name + '!' : '!';
+    if (h >= 5 && h < 12) el.textContent = t('greet_morning') + suffix;
+    else if (h >= 12 && h < 18) el.textContent = t('greet_day') + suffix;
+    else if (h >= 18 && h < 22) el.textContent = t('greet_evening') + suffix;
+    else el.textContent = t('greet_night') + suffix;
   }
 
   function setAvatarDisplay(url, initial) {
