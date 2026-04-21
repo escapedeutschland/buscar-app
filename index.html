@@ -1651,7 +1651,11 @@
     // Hard-hide map screen when not active to prevent Leaflet bleeding
     const mapScreen = document.getElementById('screenMap');
     if (mapScreen) mapScreen.style.display = id === 'screenMap' ? 'flex' : 'none';
-    if (id === 'screenMap' && leafletMap) setTimeout(() => leafletMap.invalidateSize(), 150);
+    if (id === 'screenMap' && leafletMap) {
+      setTimeout(() => leafletMap.invalidateSize({animate:false}), 100);
+      setTimeout(() => leafletMap.invalidateSize({animate:false}), 400);
+      setTimeout(() => leafletMap.invalidateSize({animate:false}), 800);
+    }
   }
 
   function switchTab(tab) {
@@ -2149,15 +2153,30 @@
     'default': 'Ort'
   };
 
-  function makeMarkerIcon(color) {
+  function makeMarkerIcon(color, emoji) {
+    const ic = emoji || '📍';
     return L.divIcon({
       className: '',
-      html: `<div style="width:30px;height:30px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2.5px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.25)"></div>`,
-      iconSize: [30, 30],
-      iconAnchor: [15, 30],
-      popupAnchor: [0, -34]
+      html: `<div style="width:34px;height:34px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2.5px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
+        <span style="transform:rotate(45deg);font-size:14px;line-height:1;margin-top:2px;">${ic}</span>
+      </div>`,
+      iconSize: [34, 34],
+      iconAnchor: [17, 34],
+      popupAnchor: [0, -38]
     });
   }
+
+  const catIcons = {
+    'kat-restaurants':     '🍽️',
+    'kat-unterkunft':      '🛏️',
+    'kat-orte':            '🏛️',
+    'kat-geschaefte':      '🛒',
+    'kat-sport':           '💪',
+    'kat-beauty':          '✂️',
+    'kat-dienstleistung':  '🏥',
+    'kat-tankstelle':      '⛽',
+    'default':             '📍',
+  };
 
   // City coords for map zoom
   const mapCityCoords = {
@@ -2207,12 +2226,8 @@
         minZoom: 5,
         maxZoom: 18,
         maxBounds: paraguayBounds,
-        maxBoundsViscosity: 1.0,
-        zoomSnap: 0.5,
-        zoomDelta: 0.5,
-        wheelPxPerZoomLevel: 100,
-        bounceAtZoomLimits: false
-      }).setView([-24.5, -58.0], 5.8);
+        maxBoundsViscosity: 0.9
+      }).setView([-24.5, -58.0], 6);
       leafletMap.options.paddingTopLeft = [0, 0];
       leafletMap.options.paddingBottomRight = [0, 140];
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -2252,7 +2267,8 @@
     const markerData = (mapCategory === 'Alle' && mapCityFilter === 'Alle') ? withCoords.slice(0, 500) : withCoords;
     markerData.forEach(l => {
       const color = catColors[l.category_id] || catColors['default'];
-      const marker = L.marker([l.lat, l.lng], { icon: makeMarkerIcon(color) });
+      const emoji = catIcons[l.category_id] || catIcons['default'];
+      const marker = L.marker([l.lat, l.lng], { icon: makeMarkerIcon(color, emoji) });
       marker.bindPopup(`
         <div class="map-popup" onclick="showDetail('${l.id}')">
           <div class="map-popup-name">${l.name||''}${l.deal_text?'<span style="margin-left:5px;font-size:11px">⚡</span>':''}</div>
@@ -2282,7 +2298,8 @@
       </div>`).join('');
 
     // Invalidate size after screen transition
-    setTimeout(() => leafletMap.invalidateSize({ animate: false }), 50);
+    setTimeout(() => leafletMap.invalidateSize({animate:false}), 50);
+    setTimeout(() => leafletMap.invalidateSize({animate:false}), 300);
   }
 
   document.getElementById('mapCats').addEventListener('click', e => {
