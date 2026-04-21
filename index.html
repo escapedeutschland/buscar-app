@@ -2311,15 +2311,17 @@
         container: 'leafletMap',
         style: ML_STYLE,
         center: [-58.0, -23.5],
-        zoom: 6,
-        minZoom: 5,
+        zoom: 5.5,
+        minZoom: 4.5,
         maxZoom: 18,
-        maxBounds: [[-75.0, -35.0], [-42.0, -12.0]],
+        maxBounds: [[-68.0, -32.0], [-50.0, -14.0]],
         dragRotate: false,
         pitchWithRotate: false,
         touchPitch: false,
+        touchZoomRotate: true,
         attributionControl: false
       });
+      maplibreMap.touchZoomRotate.disableRotation();
 
       maplibreMap.addControl(new maplibregl.NavigationControl({ showCompass:false }), 'top-right');
       maplibreMap.addControl(new maplibregl.AttributionControl({ compact:true }), 'bottom-right');
