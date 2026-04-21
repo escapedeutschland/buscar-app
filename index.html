@@ -1666,7 +1666,7 @@
     const mapScreen = document.getElementById('screenMap');
     if (mapScreen) mapScreen.style.display = id === 'screenMap' ? 'flex' : 'none';
     if (id === 'screenMap' && leafletMap) {
-      setTimeout(() => { leafletMap.invalidateSize({animate:false}); renderMapMarkers(); }, 150);
+      setTimeout(() => leafletMap.invalidateSize({animate:false}), 150);
       setTimeout(() => leafletMap.invalidateSize({animate:false}), 500);
     }
   }
@@ -2170,13 +2170,11 @@
   function makeMarkerIcon(color, emoji) {
     const ic = emoji || '📍';
     return L.divIcon({
-      className: '',
-      html: `<div style="width:34px;height:34px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2.5px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
-        <span style="transform:rotate(45deg);font-size:14px;line-height:1;margin-top:2px;">${ic}</span>
-      </div>`,
-      iconSize: [34, 34],
-      iconAnchor: [17, 34],
-      popupAnchor: [0, -38]
+      className: 'buscar-pin',
+      html: `<div style="width:28px;height:28px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;"><span style="transform:rotate(45deg);font-size:12px;">${ic}</span></div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
+      popupAnchor: [0, -32]
     });
   }
 
@@ -2224,18 +2222,16 @@
         minZoom: 5,
         maxZoom: 18
       }).setView([-23.5, -58.0], 6);
-      leafletMap.options.paddingTopLeft = [0, 0];
-      leafletMap.options.paddingBottomRight = [0, 140];
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19
-      }).addTo(leafletMap);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap);
       L.control.attribution({ prefix: '© OpenStreetMap' }).addTo(leafletMap);
-
-      // Viewport culling: refresh markers after zoom/pan
-      leafletMap.on('moveend zoomend', () => { renderMapMarkers(); });
     }
 
-    // Apply filters
+    // Clear markers
+    if (markerCluster) { leafletMap.removeLayer(markerCluster); markerCluster = null; }
+    leafletMarkers = [];
+    markerCluster = L.layerGroup();
+
+    // Filter
     let filtered = allListings;
     if (mapCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === mapCategory);
     if (mapCityFilter !== 'Alle') filtered = filtered.filter(l => l.city === mapCityFilter);
@@ -2245,17 +2241,27 @@
     const withCoords = filtered.filter(l => l.lat && l.lng);
     const noCoords   = filtered.filter(l => !l.lat || !l.lng);
 
-    // Store for viewport culling
-    leafletMap._buscarFiltered = withCoords;
-
-    // Update header
     document.getElementById('mapHeaderSub').textContent = withCoords.length + ' ' + t('map_sub_all').replace('Alle Orte in Paraguay','Orte auf der Karte').replace('Todos los lugares en Paraguay','lugares en el mapa');
     document.getElementById('mapNoCoords').style.display = noCoords.length ? 'block' : 'none';
 
-    // Fit view
-    if (withCoords.length === 0) {
-      document.getElementById('mapList').innerHTML = '';
-    } else if (withCoords.length === 1) {
+    // Add markers (all, no culling – DivIcon is light enough)
+    withCoords.forEach(l => {
+      const color = catColors[l.category_id] || catColors['default'];
+      const emoji = catEmojis[l.category_id] || catEmojis['default'];
+      const marker = L.marker([l.lat, l.lng], { icon: makeMarkerIcon(color, emoji) });
+      marker.bindPopup(`
+        <div class="map-popup" onclick="showDetail('${l.id}')">
+          <div class="map-popup-name">${l.name||''}</div>
+          <div class="map-popup-city">${l.city||''}</div>
+          <div class="map-popup-cat">${catLabels[l.category_id]||'Ort'}</div>
+        </div>`, { closeButton: false, maxWidth: 220 });
+      markerCluster.addLayer(marker);
+      leafletMarkers.push(marker);
+    });
+    leafletMap.addLayer(markerCluster);
+
+    // Fit bounds
+    if (withCoords.length === 1) {
       leafletMap.setView([withCoords[0].lat, withCoords[0].lng], 14);
     } else if (mapCityFilter === 'Alle' && mapCategory === 'Alle') {
       leafletMap.setView([-23.5, -58.0], 6, { animate: false });
@@ -2264,7 +2270,7 @@
       leafletMap.fitBounds(bounds, { paddingTopLeft:[50,50], paddingBottomRight:[50,120], maxZoom:14 });
     }
 
-    // Bottom card list (all filtered, not just visible)
+    // Bottom cards
     document.getElementById('mapList').innerHTML = withCoords.map(l => `
       <div class="map-card" onclick="showDetail('${l.id}')">
         <div class="map-card-name">${l.name||''}</div>
@@ -2272,54 +2278,13 @@
         <div class="map-card-cat">${catLabels[l.category_id]||''}</div>
       </div>`).join('');
 
-    // Render markers for current viewport
-    renderMapMarkers();
-
-    // Invalidate map size
-    setTimeout(() => leafletMap.invalidateSize({animate:false}), 50);
-    setTimeout(() => leafletMap.invalidateSize({animate:false}), 300);
+    setTimeout(() => leafletMap.invalidateSize({animate:false}), 100);
+    setTimeout(() => leafletMap.invalidateSize({animate:false}), 400);
   }
 
-  function renderMapMarkers() {
-    if (!leafletMap) return;
+  function renderMapMarkers() {}
 
-    // Remove old markers from DOM
-    if (markerCluster) { leafletMap.removeLayer(markerCluster); markerCluster = null; }
-    leafletMarkers = [];
 
-    const all = leafletMap._buscarFiltered || [];
-    if (!all.length) return;
-
-    // Get visible bounds with generous padding so markers don't pop in/out abruptly
-    const bounds = leafletMap.getBounds().pad(0.5);
-    const zoom = leafletMap.getZoom();
-
-    // At low zoom show all (few markers visible), at high zoom cull to viewport
-    const visible = zoom < 9
-      ? all
-      : all.filter(l => bounds.contains([l.lat, l.lng]));
-
-    // Cap at 300 for safety
-    const toRender = visible.slice(0, 300);
-
-    markerCluster = L.layerGroup();
-
-    toRender.forEach(l => {
-      const color  = catColors[l.category_id]  || catColors['default'];
-      const emoji  = catEmojis[l.category_id]  || catEmojis['default'];
-      const marker = L.marker([l.lat, l.lng], { icon: makeMarkerIcon(color, emoji) });
-      marker.bindPopup(`
-        <div class="map-popup" onclick="showDetail('${l.id}')">
-          <div class="map-popup-name">${l.name||''}${l.deal_text?'<span style="margin-left:5px;font-size:11px">⚡</span>':''}</div>
-          <div class="map-popup-city">${l.city||''}</div>
-          <div class="map-popup-cat">${catLabels[l.category_id]||'Ort'}</div>
-        </div>`, { closeButton:false, maxWidth:220 });
-      markerCluster.addLayer(marker);
-      leafletMarkers.push(marker);
-    });
-
-    leafletMap.addLayer(markerCluster);
-  }
 
 
   document.getElementById('mapCats').addEventListener('click', e => {
