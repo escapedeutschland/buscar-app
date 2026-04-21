@@ -18,7 +18,10 @@
   <title>Buscar – Deutsche in Paraguay</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -2143,6 +2146,7 @@
 
   let leafletMap = null;
   let leafletMarkers = [];
+  let markerCluster = null;
   let mapCityFilter = 'Alle';
 
   const catColors = {
@@ -2236,11 +2240,27 @@
 
     }
 
-    // Clear existing markers efficiently
-    if (leafletMarkers.length) {
-      leafletMarkers.forEach(m => leafletMap.removeLayer(m));
-      leafletMarkers = [];
+    // Clear existing markers via cluster group
+    if (markerCluster) {
+      leafletMap.removeLayer(markerCluster);
+      markerCluster = null;
     }
+    leafletMarkers = [];
+    markerCluster = L.markerClusterGroup({
+      maxClusterRadius: 50,
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      disableClusteringAtZoom: 14,
+      iconCreateFunction: function(cluster) {
+        const count = cluster.getChildCount();
+        return L.divIcon({
+          html: '<div style="background:var(--gold,#D4841A);color:white;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);">' + count + '</div>',
+          className: '',
+          iconSize: [36, 36]
+        });
+      }
+    });
 
     // Filter listings
     let filtered = allListings;
@@ -2273,9 +2293,12 @@
           <div class="map-popup-city">${l.city||''}</div>
           <div class="map-popup-cat">${catLabels[l.category_id]||'Ort'}</div>
         </div>`, { closeButton: false, maxWidth: 220 });
-      marker.addTo(leafletMap);
+      markerCluster.addLayer(marker);
       leafletMarkers.push(marker);
     });
+
+    // Add cluster to map
+    leafletMap.addLayer(markerCluster);
 
     // Fit bounds
     if (withCoords.length === 1) {
@@ -2681,7 +2704,7 @@
       const h_str = hours.replace(/\u2013/g, '-').replace(/\u2014/g, '-');
 
       // 24h special cases
-      if (/t\u00e4glich\s*24h?/i.test(hours) || /24\s*h(oras)?/i.test(hours) || /24 stunden/i.test(hours)) return true;
+      if (/t\u00e4glich\s*24h?/i.test(hours) || /24\s*[h/]?\s*7/i.test(hours) || /24\s*h(oras)?/i.test(hours) || /24 stunden/i.test(hours) || /always open/i.test(hours)) return true;
 
       const now = new Date();
       const hh = now.getHours();
