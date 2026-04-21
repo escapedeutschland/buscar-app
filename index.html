@@ -2287,7 +2287,7 @@
     if (withCoords.length === 1) {
       maplibreMap.flyTo({ center:[withCoords[0].lng, withCoords[0].lat], zoom:14, animate:false });
     } else if (mapCityFilter === 'Alle' && mapCategory === 'Alle') {
-      maplibreMap.jumpTo({ center:[-58.45, -23.5], zoom:5.0 });
+      maplibreMap.jumpTo({ center:[-58.45, -24.2], zoom:5.0 });
     } else if (withCoords.length > 1) {
       const lngs = withCoords.map(l=>l.lng), lats = withCoords.map(l=>l.lat);
       maplibreMap.fitBounds(
@@ -2310,7 +2310,7 @@
       maplibreMap = new maplibregl.Map({
         container: 'leafletMap',
         style: ML_STYLE,
-        center: [-58.45, -23.5],
+        center: [-58.45, -24.2],
         zoom: 5.0,
         minZoom: 4.8,
         maxZoom: 18,
