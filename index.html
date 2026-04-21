@@ -2208,7 +2208,7 @@
         maxZoom: 18,
         maxBounds: paraguayBounds,
         maxBoundsViscosity: 1.0,
-        zoomSnap: 0,
+        zoomSnap: 0.5,
         zoomDelta: 0.5,
         wheelPxPerZoomLevel: 100,
         bounceAtZoomLimits: false
@@ -2731,7 +2731,7 @@
         // Also try the whole timePart as one block
         if (checkTimeBlock(timePart)) return true;
       }
-      return false;
+      return null;
     } catch(e) { return null; }
   }
 
