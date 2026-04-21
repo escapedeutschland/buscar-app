@@ -1633,6 +1633,17 @@
     'kat-beauty': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
         'default': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
   };
+  const catEmojis = {
+    'kat-restaurants':    '🍽',
+    'kat-unterkunft':     '🛏',
+    'kat-orte':           '🏛',
+    'kat-geschaefte':     '🛒',
+    'kat-sport':          '💪',
+    'kat-beauty':         '✂',
+    'kat-dienstleistung': '🏥',
+    'kat-tankstelle':     '⛽',
+    'default':            '📍',
+  };
   const catNames = { 'kat-restaurants': 'Restaurants', 'kat-dienstleistung': 'Dienstleistungen', 'kat-orte': 'Orte', 'kat-unterkunft': 'Unterkünfte', 'kat-geschaefte': 'Geschäfte', 'kat-sport': 'Sport & Fitness' };
 
   function setNav(active) {
@@ -2166,17 +2177,6 @@
     });
   }
 
-  const catIcons = {
-    'kat-restaurants':     '🍽️',
-    'kat-unterkunft':      '🛏️',
-    'kat-orte':            '🏛️',
-    'kat-geschaefte':      '🛒',
-    'kat-sport':           '💪',
-    'kat-beauty':          '✂️',
-    'kat-dienstleistung':  '🏥',
-    'kat-tankstelle':      '⛽',
-    'default':             '📍',
-  };
 
   // City coords for map zoom
   const mapCityCoords = {
@@ -2267,7 +2267,7 @@
     const markerData = (mapCategory === 'Alle' && mapCityFilter === 'Alle') ? withCoords.slice(0, 500) : withCoords;
     markerData.forEach(l => {
       const color = catColors[l.category_id] || catColors['default'];
-      const emoji = catIcons[l.category_id] || catIcons['default'];
+      const emoji = catEmojis[l.category_id] || catEmojis['default'];
       const marker = L.marker([l.lat, l.lng], { icon: makeMarkerIcon(color, emoji) });
       marker.bindPopup(`
         <div class="map-popup" onclick="showDetail('${l.id}')">
