@@ -2200,6 +2200,7 @@
         L.latLng(-35.0, -70.0),
         L.latLng(-10.0, -45.0)
       );
+      const canvasRenderer = L.canvas({ padding: 0.5 });
       leafletMap = L.map('leafletMap', {
         zoomControl: true,
         attributionControl: false,
@@ -2222,9 +2223,11 @@
 
     }
 
-    // Clear existing markers
-    leafletMarkers.forEach(m => leafletMap.removeLayer(m));
-    leafletMarkers = [];
+    // Clear existing markers efficiently
+    if (leafletMarkers.length) {
+      leafletMarkers.forEach(m => leafletMap.removeLayer(m));
+      leafletMarkers = [];
+    }
 
     // Filter listings
     let filtered = allListings;
@@ -2245,8 +2248,9 @@
       return;
     }
 
-    // Add markers
-    withCoords.forEach(l => {
+    // Add markers (cap at 500 for performance when no filter)
+    const markerData = (mapCategory === 'Alle' && mapCityFilter === 'Alle') ? withCoords.slice(0, 500) : withCoords;
+    markerData.forEach(l => {
       const color = catColors[l.category_id] || catColors['default'];
       const marker = L.marker([l.lat, l.lng], { icon: makeMarkerIcon(color) });
       marker.bindPopup(`
@@ -2658,48 +2662,74 @@
   function isOpen(hours) {
     if (!hours) return null;
     try {
+      // Normalize: replace em-dash with hyphen
+      const h_str = hours.replace(/\u2013/g, '-').replace(/\u2014/g, '-');
+
+      // 24h special cases
+      if (/t\u00e4glich\s*24h?/i.test(hours) || /24\s*h(oras)?/i.test(hours) || /24 stunden/i.test(hours)) return true;
+
       const now = new Date();
-      const h = now.getHours();
-      const m = now.getMinutes();
-      const hm = h * 60 + m;
-      const day = now.getDay();
-      const dayNames = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+      const hh = now.getHours();
+      const mm = now.getMinutes();
+      const hm = hh * 60 + mm;
+      const day = now.getDay(); // 0=So,1=Mo...6=Sa
+      const dayNames = ['so','mo','di','mi','do','fr','sa'];
       const today = dayNames[day];
 
       function parseTime(s) {
-        const p = s.trim().split(':');
-        return parseInt(p[0])*60 + (parseInt(p[1])||0);
+        s = s.trim();
+        const p = s.split(':');
+        return parseInt(p[0]) * 60 + (parseInt(p[1]) || 0);
       }
 
-      function checkBlock(timeStr) {
-        const parts = timeStr.trim().split('-');
+      function checkTimeBlock(timeStr) {
+        // timeStr like "08:00-13:30"
+        const t = timeStr.trim();
+        const parts = t.split('-');
         if (parts.length < 2) return false;
         const open = parseTime(parts[0]);
         const close = parseTime(parts[1]);
+        if (close < open) return hm >= open || hm < close; // overnight
         return hm >= open && hm < close;
       }
 
       function dayMatches(prefix) {
-        const p = prefix.toLowerCase().trim();
-        if (!p || p.includes('täglich') || p.includes('daily')) return true;
-        if (p.includes('mo') && p.includes('fr') && day >= 1 && day <= 5) return true;
-        if (p.includes('mo') && p.includes('sa') && day >= 1 && day <= 6) return true;
-        if (p.includes('mo') && p.includes('so') && day >= 1) return true;
-        if (p.includes('sa') && p.includes('so') && (day === 0 || day === 6)) return true;
-        if (p.includes(today.toLowerCase())) return true;
-        return false;
+        const p = prefix.toLowerCase().trim().replace(/-/g, '-');
+        if (!p) return true;
+        if (p.includes('täglich') || p.includes('daily') || p.includes('diario')) return true;
+        // range like "mo-fr", "mo-sa", "mo-so"
+        const rangeMatch = p.match(/([a-z]{2})-([a-z]{2})/);
+        if (rangeMatch) {
+          const start = dayNames.indexOf(rangeMatch[1]);
+          const end   = dayNames.indexOf(rangeMatch[2]);
+          if (start !== -1 && end !== -1) {
+            if (end >= start) return day >= start && day <= end;
+            else return day >= start || day <= end; // wraps (Sa-Mo etc)
+          }
+        }
+        // single day check
+        return p.includes(today);
       }
 
-      // Split on & for two blocks
-      const blocks = hours.split('&');
-      const dayPart = blocks[0].trim().split(' ')[0];
-      if (!dayMatches(dayPart)) return false;
-
-      for (let block of blocks) {
-        block = block.trim();
-        // Remove day prefix from first block
-        const timeStr = block.replace(/^[A-Za-zÄÖÜäöü\-]+\s*/, '');
-        if (checkBlock(timeStr)) return true;
+      // Split by comma first to get day-segments like "Mo-Fr 08:00-13:00, Sa 09:00-12:00"
+      const segments = h_str.split(',');
+      for (let seg of segments) {
+        seg = seg.trim();
+        if (!seg) continue;
+        // Split prefix (day) and time(s)
+        // Day prefix ends before first digit
+        const firstDigit = seg.search(/\d/);
+        if (firstDigit === -1) continue;
+        const dayPrefix = seg.substring(0, firstDigit).replace(/[^A-Za-züäöÄÖÜ\-]/g, ' ').trim();
+        const timePart  = seg.substring(firstDigit).trim();
+        if (!dayMatches(dayPrefix)) continue;
+        // Time part may have multiple blocks separated by & or space
+        const timeBlocks = timePart.split(/[&]|\s{2,}/).map(t => t.trim()).filter(Boolean);
+        for (const tb of timeBlocks) {
+          if (checkTimeBlock(tb)) return true;
+        }
+        // Also try the whole timePart as one block
+        if (checkTimeBlock(timePart)) return true;
       }
       return false;
     } catch(e) { return null; }
