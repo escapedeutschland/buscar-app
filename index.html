@@ -2314,6 +2314,10 @@
         zoom: 6,
         minZoom: 5,
         maxZoom: 18,
+        maxBounds: [[-75.0, -35.0], [-42.0, -12.0]],
+        dragRotate: false,
+        pitchWithRotate: false,
+        touchPitch: false,
         attributionControl: false
       });
 
@@ -2330,60 +2334,77 @@
         });
         pendingData = null;
 
-        // Pin outer circle
-        maplibreMap.addLayer({
-          id: 'listings-outer',
-          type: 'circle',
-          source: 'listings',
-          paint: {
-            'circle-radius': ['interpolate',['linear'],['zoom'], 5,6, 10,10, 15,14],
-            'circle-color': CAT_COLORS_ML,
-            'circle-stroke-width': 2,
-            'circle-stroke-color': 'white',
-            'circle-opacity': 0.95
-          }
+        // Build teardrop SVG icons per category and load into map
+        const pinDefs = [
+          { id:'pin-restaurants',    color:'#F5A623', emoji:'🍽' },
+          { id:'pin-unterkunft',     color:'#8B5CF6', emoji:'🛏' },
+          { id:'pin-orte',           color:'#22C55E', emoji:'🏛' },
+          { id:'pin-geschaefte',     color:'#EF4444', emoji:'🛒' },
+          { id:'pin-sport',          color:'#06B6D4', emoji:'💪' },
+          { id:'pin-beauty',         color:'#EC4899', emoji:'✂' },
+          { id:'pin-dienstleistung', color:'#3B82F6', emoji:'🏥' },
+          { id:'pin-tankstelle',     color:'#F97316', emoji:'⛽' },
+          { id:'pin-default',        color:'#6B6B6B', emoji:'📍' },
+        ];
+
+        const pinPromises = pinDefs.map(({ id, color, emoji }) => new Promise(resolve => {
+          const W = 36, H = 48;
+          const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+            <path d="M18 0 C8.06 0 0 8.06 0 18 C0 31.5 18 48 18 48 C18 48 36 31.5 36 18 C36 8.06 27.94 0 18 0 Z"
+              fill="${color}" stroke="white" stroke-width="2.5"/>
+            <text x="18" y="23" font-size="14" text-anchor="middle" dominant-baseline="middle" font-family="Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif">${emoji}</text>
+          </svg>`;
+          const img = new Image(W, H);
+          img.onload = () => {
+            if (!maplibreMap.hasImage(id)) maplibreMap.addImage(id, img, { pixelRatio: 2 });
+            resolve();
+          };
+          img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+        }));
+
+        Promise.all(pinPromises).then(() => {
+          // Symbol layer using custom teardrop icons
+          maplibreMap.addLayer({
+            id: 'listings-pins',
+            type: 'symbol',
+            source: 'listings',
+            layout: {
+              'icon-image': ['match', ['get','cat'],
+                'kat-restaurants',    'pin-restaurants',
+                'kat-unterkunft',     'pin-unterkunft',
+                'kat-orte',           'pin-orte',
+                'kat-geschaefte',     'pin-geschaefte',
+                'kat-sport',          'pin-sport',
+                'kat-beauty',         'pin-beauty',
+                'kat-dienstleistung', 'pin-dienstleistung',
+                'kat-tankstelle',     'pin-tankstelle',
+                'pin-default'
+              ],
+              'icon-size': ['interpolate',['linear'],['zoom'], 5,0.5, 10,0.7, 15,1.0],
+              'icon-anchor': 'bottom',
+              'icon-allow-overlap': true,
+              'icon-ignore-placement': true
+            }
+          });
+
+          // Click on pins
+          maplibreMap.on('click', 'listings-pins', e => {
+            const p = e.features[0].properties;
+            const coords = e.features[0].geometry.coordinates.slice();
+            new maplibregl.Popup({ closeButton:false, maxWidth:'220px' })
+              .setLngLat(coords)
+              .setHTML(`<div class="map-popup" onclick="showDetail('${p.id}')">
+                <div class="map-popup-name">${p.name}${p.deal?'<span style="margin-left:5px;font-size:11px">⚡</span>':''}</div>
+                <div class="map-popup-city">${p.city}</div>
+                <div class="map-popup-cat">${p.catLabel}</div>
+              </div>`)
+              .addTo(maplibreMap);
+          });
+          maplibreMap.on('mouseenter','listings-pins',()=>{ maplibreMap.getCanvas().style.cursor='pointer'; });
+          maplibreMap.on('mouseleave','listings-pins',()=>{ maplibreMap.getCanvas().style.cursor=''; });
         });
 
-        // Emoji label
-        maplibreMap.addLayer({
-          id: 'listings-emoji',
-          type: 'symbol',
-          source: 'listings',
-          layout: {
-            'text-field': ['match',['get','cat'],
-              'kat-restaurants','🍽',
-              'kat-unterkunft','🛏',
-              'kat-orte','🏛',
-              'kat-geschaefte','🛒',
-              'kat-sport','💪',
-              'kat-beauty','✂',
-              'kat-dienstleistung','🏥',
-              'kat-tankstelle','⛽',
-              '📍'
-            ],
-            'text-size': 10,
-            'text-allow-overlap': true,
-            'text-ignore-placement': true,
-            'text-anchor': 'center'
-          }
-        });
 
-        // Click → popup
-        maplibreMap.on('click', 'listings-outer', e => {
-          const p = e.features[0].properties;
-          const coords = e.features[0].geometry.coordinates.slice();
-          new maplibregl.Popup({ closeButton:false, maxWidth:'220px', className:'ml-popup' })
-            .setLngLat(coords)
-            .setHTML(`<div class="map-popup" onclick="showDetail('${p.id}')">
-              <div class="map-popup-name">${p.name}${p.deal?'<span style="margin-left:5px;font-size:11px">⚡</span>':''}</div>
-              <div class="map-popup-city">${p.city}</div>
-              <div class="map-popup-cat">${p.catLabel}</div>
-            </div>`)
-            .addTo(maplibreMap);
-        });
-
-        maplibreMap.on('mouseenter','listings-outer',()=>{ maplibreMap.getCanvas().style.cursor='pointer'; });
-        maplibreMap.on('mouseleave','listings-outer',()=>{ maplibreMap.getCanvas().style.cursor=''; });
 
         updateMapData();
       });
