@@ -18,10 +18,7 @@
   <title>Buscar – Deutsche in Paraguay</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -2240,27 +2237,10 @@
 
     }
 
-    // Clear existing markers via cluster group
-    if (markerCluster) {
-      leafletMap.removeLayer(markerCluster);
-      markerCluster = null;
-    }
+    // Clear existing markers
+    if (markerCluster) { leafletMap.removeLayer(markerCluster); markerCluster = null; }
     leafletMarkers = [];
-    markerCluster = L.markerClusterGroup({
-      maxClusterRadius: 50,
-      spiderfyOnMaxZoom: true,
-      showCoverageOnHover: false,
-      zoomToBoundsOnClick: true,
-      disableClusteringAtZoom: 14,
-      iconCreateFunction: function(cluster) {
-        const count = cluster.getChildCount();
-        return L.divIcon({
-          html: '<div style="background:var(--gold,#D4841A);color:white;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);">' + count + '</div>',
-          className: '',
-          iconSize: [36, 36]
-        });
-      }
-    });
+    markerCluster = L.layerGroup();
 
     // Filter listings
     let filtered = allListings;
@@ -2282,13 +2262,22 @@
     }
 
     // Add markers (cap at 500 for performance when no filter)
-    const markerData = (mapCategory === 'Alle' && mapCityFilter === 'Alle') ? withCoords.slice(0, 500) : withCoords;
-    markerData.forEach(l => {
+    const renderer = L.canvas({ padding: 0.5 });
+    withCoords.forEach(l => {
       const color = catColors[l.category_id] || catColors['default'];
       const emoji = catEmojis[l.category_id] || catEmojis['default'];
-      const marker = L.marker([l.lat, l.lng], { icon: makeMarkerIcon(color, emoji) });
+      const marker = L.circleMarker([l.lat, l.lng], {
+        renderer,
+        radius: 10,
+        fillColor: color,
+        color: 'white',
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.95
+      });
       marker.bindPopup(`
         <div class="map-popup" onclick="showDetail('${l.id}')">
+          <div style="font-size:20px;text-align:center;margin-bottom:4px;">${emoji}</div>
           <div class="map-popup-name">${l.name||''}${l.deal_text?'<span style="margin-left:5px;font-size:11px">⚡</span>':''}</div>
           <div class="map-popup-city">${l.city||''}</div>
           <div class="map-popup-cat">${catLabels[l.category_id]||'Ort'}</div>
