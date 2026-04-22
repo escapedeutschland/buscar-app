@@ -1698,6 +1698,7 @@
     const mapScreen = document.getElementById('screenMap');
     if (mapScreen) mapScreen.style.display = id === 'screenMap' ? 'flex' : 'none';
     if (id === 'screenMap') {
+      _mapFitOnUpdate = true;
       setTimeout(() => { if (maplibreMap) maplibreMap.resize(); renderMap(); }, 100);
     }
     if (id === 'screenProfil' && currentUser) {
@@ -2293,6 +2294,7 @@
   let maplibreMap = null;
   let mapLoaded = false;
   let pendingData = null;
+  let _mapFitOnUpdate = true; // fit on first load only
   let mapCityFilter = 'Alle';
 
   const catColors = {
@@ -2435,17 +2437,21 @@
       pendingData = geojson;
     }
 
-    // Fit bounds
-    if (withCoords.length === 1) {
-      maplibreMap.flyTo({ center:[withCoords[0].lng, withCoords[0].lat], zoom:14, animate:false });
-    } else if (mapCityFilter === 'Alle' && mapCategory === 'Alle') {
-      maplibreMap.jumpTo({ center:[-58.45, -24.2], zoom:5.0 });
-    } else if (withCoords.length > 1) {
-      const lngs = withCoords.map(l=>l.lng), lats = withCoords.map(l=>l.lat);
-      maplibreMap.fitBounds(
-        [[Math.min(...lngs), Math.min(...lats)],[Math.max(...lngs), Math.max(...lats)]],
-        { padding:60, maxZoom:14, animate:false }
-      );
+    // Fit bounds only when city filter changes or on first load
+    // Never move map when only category/subcategory filter changes
+    if (_mapFitOnUpdate) {
+      _mapFitOnUpdate = false;
+      if (withCoords.length === 1) {
+        maplibreMap.flyTo({ center:[withCoords[0].lng, withCoords[0].lat], zoom:14, animate:false });
+      } else if (mapCityFilter === 'Alle' && mapCategory === 'Alle') {
+        maplibreMap.jumpTo({ center:[-58.45, -24.2], zoom:5.0 });
+      } else if (withCoords.length > 1) {
+        const lngs = withCoords.map(l=>l.lng), lats = withCoords.map(l=>l.lat);
+        maplibreMap.fitBounds(
+          [[Math.min(...lngs), Math.min(...lats)],[Math.max(...lngs), Math.max(...lats)]],
+          { padding:60, maxZoom:14, animate:false }
+        );
+      }
     }
 
     // Bottom cards
@@ -3742,6 +3748,7 @@
 
   function selectMapCity(city) {
     mapCityFilter = city;
+    _mapFitOnUpdate = true;
     const btn = document.getElementById('mapCityPickerBtn');
     const label = document.getElementById('mapCityPickerLabel');
     if (city === 'Alle') {
