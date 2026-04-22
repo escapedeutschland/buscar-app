@@ -1224,6 +1224,40 @@
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
+      <!-- Meine Events -->
+      <div class="profil-section" style="margin-bottom:16px" id="myEventsSection">
+        <div class="profil-row" onclick="toggleMyEvents()">
+          <div class="profil-row-left">
+            <div class="profil-row-icon">🎪</div>
+            <div>
+              <span class="profil-row-label">Meine Events</span>
+              <div id="myEventsCount" style="font-size:11px;color:var(--text-3);margin-top:1px"></div>
+            </div>
+          </div>
+          <svg id="myEventsChevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="transition:transform 0.25s"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div id="myEventsPanel" style="display:none;padding:8px 16px 12px">
+          <div id="myEventsList"></div>
+        </div>
+      </div>
+
+      <!-- Meine Anmeldungen -->
+      <div class="profil-section" style="margin-bottom:16px" id="mySignupsSection">
+        <div class="profil-row" onclick="toggleMySignups()">
+          <div class="profil-row-left">
+            <div class="profil-row-icon">🎟️</div>
+            <div>
+              <span class="profil-row-label">Angemeldete Events</span>
+              <div id="mySignupsCount" style="font-size:11px;color:var(--text-3);margin-top:1px"></div>
+            </div>
+          </div>
+          <svg id="mySignupsChevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="transition:transform 0.25s"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div id="mySignupsPanel" style="display:none;padding:8px 16px 12px">
+          <div id="mySignupsList"></div>
+        </div>
+      </div>
+
       <div class="profil-section" style="margin-bottom:16px">
         <div class="profil-row" onclick="showEditUsername()">
           <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="profil-row-label" data-i18n="change_username">Benutzername ändern</span></div>
@@ -2420,12 +2454,18 @@
     }
 
     if (ev.has_signup && !isCancelled) {
-      if (isFull) {
+      var isSignedUp = currentUser && (ev.signups||[]).includes(currentUser.uid);
+      if (isSignedUp) {
+        bodyHtml += '<div style="display:flex;gap:8px;margin-bottom:14px">'
+          + '<div style="flex:1;background:#ECFDF5;border-radius:var(--radius-lg);padding:14px;text-align:center;color:#22C55E;font-weight:700;font-size:14px">✅ Du bist angemeldet</div>'
+          + '<button onclick="unsignupEvent(\'' + id + '\')" style="background:var(--surface-2);border:none;border-radius:var(--radius-lg);padding:14px 16px;font-size:14px;font-weight:600;color:var(--text-2);cursor:pointer">Abmelden</button>'
+          + '</div>';
+      } else if (isFull) {
         bodyHtml += '<div style="background:#FEE2E2;border-radius:var(--radius-lg);padding:16px;text-align:center;color:#EF4444;font-weight:700;margin-bottom:14px">Ausgebucht</div>';
       } else if (currentUser) {
-        bodyHtml += '<button onclick="signupEvent(\'' + id + '\')" style="width:100%;background:var(--yellow);border:none;border-radius:var(--radius-lg);padding:16px;font-size:16px;font-weight:700;color:white;cursor:pointer;margin-bottom:14px">Anmelden</button>';
+        bodyHtml += '<button onclick="signupEvent(\'' + id + '\')" style="width:100%;background:var(--yellow);border:none;border-radius:var(--radius-lg);padding:16px;font-size:16px;font-weight:700;color:white;cursor:pointer;margin-bottom:14px">' + t('ev_signup_btn') + '</button>';
       } else {
-        bodyHtml += '<button onclick="showScreen(\'screenAuth\')" style="width:100%;background:var(--yellow);border:none;border-radius:var(--radius-lg);padding:16px;font-size:16px;font-weight:700;color:white;cursor:pointer;margin-bottom:14px">Einloggen zum Anmelden</button>';
+        bodyHtml += '<button onclick="showScreen(\'screenAuth\')" style="width:100%;background:var(--yellow);border:none;border-radius:var(--radius-lg);padding:16px;font-size:16px;font-weight:700;color:white;cursor:pointer;margin-bottom:14px">' + t('ev_login_signup') + '</button>';
       }
     }
 
@@ -2618,7 +2658,7 @@
       });
       var ev = allEvents.find(function(e){ return e.id === id; });
       if (ev) ev.signups_count = (ev.signups_count||0) + 1;
-      showToast('✅ Anmeldung erfolgreich!');
+      showToast(t('ev_signup_ok'));
       showEventDetail(id);
     } catch(e) {
       alert(e.message === 'Ausgebucht' ? 'Leider ausgebucht.' : e.message === 'Bereits angemeldet' ? 'Du bist bereits angemeldet.' : 'Fehler: ' + e.message);
@@ -2631,9 +2671,11 @@
       await db.collection('events').doc(id).delete();
       allEvents = allEvents.filter(function(e){ return e.id !== id; });
       showToast(t('ev_delete_ok'));
-      setNav('navEvents');
-      showScreen('screenEvents');
-      renderEvents();
+      if (_evDetailSource === 'profil') {
+        setNav('navProfil'); showScreen('screenProfil'); loadMyEvents();
+      } else {
+        setNav('navEvents'); showScreen('screenEvents'); renderEvents();
+      }
     } catch(e) { alert('Fehler: ' + e.message); }
   }
 
@@ -2729,6 +2771,9 @@
       setNav('navMap');
       showScreen('screenMap');
       setTimeout(function(){ if (maplibreMap) maplibreMap.resize(); }, 100);
+    } else if (_evDetailSource === 'profil') {
+      setNav('navProfil');
+      showScreen('screenProfil');
     } else {
       setNav('navEvents');
       showScreen('screenEvents');
@@ -2746,7 +2791,155 @@
 
   // ── END EVENTS ON MAP ──────────────────────────────────────────────────────
 
-  auth.onAuthStateChanged(async user => {
+
+  // ── PROFIL: MEINE EVENTS & ANMELDUNGEN ─────────────────────────────────────
+
+  function toggleMyEvents() {
+    var panel = document.getElementById('myEventsPanel');
+    var chevron = document.getElementById('myEventsChevron');
+    var open = panel.style.display === 'none';
+    panel.style.display = open ? 'block' : 'none';
+    chevron.style.transform = open ? 'rotate(90deg)' : '';
+    if (open) loadMyEvents();
+  }
+
+  function toggleMySignups() {
+    var panel = document.getElementById('mySignupsPanel');
+    var chevron = document.getElementById('mySignupsChevron');
+    var open = panel.style.display === 'none';
+    panel.style.display = open ? 'block' : 'none';
+    chevron.style.transform = open ? 'rotate(90deg)' : '';
+    if (open) loadMySignups();
+  }
+
+  async function loadMyEvents() {
+    if (!currentUser) return;
+    var list = document.getElementById('myEventsList');
+    var countEl = document.getElementById('myEventsCount');
+    list.innerHTML = '<div style="font-size:13px;color:var(--text-3);padding:8px 0">Wird geladen...</div>';
+    try {
+      var snap = await db.collection('events').where('created_by','==',currentUser.uid).get();
+      var events = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      events.sort(function(a,b){
+        var da = a.date_start ? a.date_start.toDate() : new Date(0);
+        var db2 = b.date_start ? b.date_start.toDate() : new Date(0);
+        return db2 - da;
+      });
+      countEl.textContent = events.length === 0 ? 'Noch keine Events' :
+        events.length === 1 ? '1 Event' : events.length + ' Events';
+      if (events.length === 0) {
+        list.innerHTML = '<div style="font-size:13px;color:var(--text-3);padding:8px 0">Du hast noch keine Events erstellt.</div>';
+        return;
+      }
+      list.innerHTML = events.map(function(ev) {
+        var start = ev.date_start ? ev.date_start.toDate() : null;
+        var dateStr = start ? start.toLocaleDateString('de-DE',{day:'numeric',month:'short',year:'numeric'}) : '';
+        var isCancelled = ev.status === 'cancelled';
+        var signups = ev.signups_count || 0;
+        var cap = ev.capacity || 0;
+        var spotsStr = ev.has_signup ? (cap > 0 ? signups + '/' + cap + ' Anmeldungen' : signups + ' Anmeldungen') : '';
+        return '<div style="padding:10px 0;border-bottom:1px solid var(--border)">'
+          + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
+          + '<div style="flex:1">'
+          + '<div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:2px">' + (ev.title||'') + '</div>'
+          + '<div style="font-size:12px;color:var(--text-3)">' + dateStr + (ev.city ? ' · ' + ev.city : '') + '</div>'
+          + (spotsStr ? '<div style="font-size:12px;color:var(--yellow);margin-top:2px;font-weight:600">' + spotsStr + '</div>' : '')
+          + '</div>'
+          + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
+          + (isCancelled ? '<span style="font-size:10px;font-weight:700;background:#EF4444;color:white;padding:2px 7px;border-radius:8px">Abgesagt</span>' : '<span style="font-size:10px;font-weight:700;background:#22C55E;color:white;padding:2px 7px;border-radius:8px">Aktiv</span>')
+          + '<button onclick="showEventDetailFromProfile(\'' + ev.id + '\')" style="font-size:11px;color:var(--yellow);background:none;border:none;cursor:pointer;font-weight:600;padding:0">Details →</button>'
+          + '<button onclick="deleteEvent(\'' + ev.id + '\')" style="font-size:11px;color:#EF4444;background:none;border:none;cursor:pointer;font-weight:600;padding:0">Löschen</button>'
+          + '</div>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+    } catch(e) {
+      list.innerHTML = '<div style="font-size:13px;color:#EF4444;padding:8px 0">Fehler beim Laden.</div>';
+    }
+  }
+
+  async function loadMySignups() {
+    if (!currentUser) return;
+    var list = document.getElementById('mySignupsList');
+    var countEl = document.getElementById('mySignupsCount');
+    list.innerHTML = '<div style="font-size:13px;color:var(--text-3);padding:8px 0">Wird geladen...</div>';
+    try {
+      var snap = await db.collection('events').where('signups','array-contains',currentUser.uid).get();
+      var events = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      events.sort(function(a,b){
+        var da = a.date_start ? a.date_start.toDate() : new Date(0);
+        var db2 = b.date_start ? b.date_start.toDate() : new Date(0);
+        return da - db2;
+      });
+      countEl.textContent = events.length === 0 ? 'Keine Anmeldungen' :
+        events.length === 1 ? '1 Event' : events.length + ' Events';
+      if (events.length === 0) {
+        list.innerHTML = '<div style="font-size:13px;color:var(--text-3);padding:8px 0">Du hast dich noch bei keinem Event angemeldet.</div>';
+        return;
+      }
+      list.innerHTML = events.map(function(ev) {
+        var start = ev.date_start ? ev.date_start.toDate() : null;
+        var dateStr = start ? start.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'}) : '';
+        var timeStr = start ? start.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) : '';
+        var isCancelled = ev.status === 'cancelled';
+        var isPast = start && start < new Date();
+        var emoji = EVENT_TYPE_EMOJIS[ev.type] || '📅';
+        var color = EVENT_TYPE_COLORS[ev.type] || '#F5A623';
+        return '<div style="padding:10px 0;border-bottom:1px solid var(--border);' + (isCancelled ? 'opacity:0.7' : '') + '">'
+          + '<div style="display:flex;gap:10px;align-items:flex-start">'
+          + '<div style="width:36px;height:36px;border-radius:50%;background:' + (isCancelled ? '#EF4444' : color) + ';display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">' + (isCancelled ? '❌' : emoji) + '</div>'
+          + '<div style="flex:1;min-width:0">'
+          + '<div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:2px">' + (ev.title||'') + '</div>'
+          + '<div style="font-size:12px;color:var(--text-3)">' + dateStr + (timeStr ? ' · ' + timeStr : '') + (ev.city ? ' · ' + ev.city : '') + '</div>'
+          + (isCancelled ? '<div style="font-size:12px;font-weight:700;color:#EF4444;margin-top:3px">⚠️ Dieses Event wurde abgesagt</div>' : '')
+          + (isPast && !isCancelled ? '<div style="font-size:11px;color:var(--text-3);margin-top:2px">Vergangen</div>' : '')
+          + '</div>'
+          + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">'
+          + (!isCancelled ? '<button onclick="showEventDetailFromProfile(\'' + ev.id + '\')" style="font-size:11px;color:var(--yellow);background:none;border:none;cursor:pointer;font-weight:600;padding:0">Details →</button>' : '')
+          + '<button onclick="unsignupEvent(\'' + ev.id + '\')" style="font-size:11px;color:var(--text-3);background:none;border:none;cursor:pointer;font-weight:600;padding:0">Abmelden</button>'
+          + '</div>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+    } catch(e) {
+      list.innerHTML = '<div style="font-size:13px;color:#EF4444;padding:8px 0">Fehler beim Laden.</div>';
+    }
+  }
+
+  function showEventDetailFromProfile(id) {
+    _evDetailSource = 'profil';
+    if (allEvents.length) {
+      var ev = allEvents.find(function(e){ return e.id === id; });
+      if (ev) { showEventDetail(id); return; }
+    }
+    loadEvents().then(function(){ showEventDetail(id); });
+  }
+
+  async function unsignupEvent(id) {
+    if (!currentUser) return;
+    if (!confirm('Von diesem Event abmelden?')) return;
+    try {
+      var ref = db.collection('events').doc(id);
+      await db.runTransaction(async function(tx) {
+        var doc = await tx.get(ref);
+        var data = doc.data();
+        var subs = (data.signups || []).filter(function(uid){ return uid !== currentUser.uid; });
+        tx.update(ref, { signups_count: Math.max(0, (data.signups_count||1) - 1), signups: subs });
+      });
+      // Update allEvents cache
+      var ev = allEvents.find(function(e){ return e.id === id; });
+      if (ev) {
+        ev.signups_count = Math.max(0, (ev.signups_count||1) - 1);
+        ev.signups = (ev.signups||[]).filter(function(uid){ return uid !== currentUser.uid; });
+      }
+      showToast('✅ Abgemeldet.');
+      loadMySignups();
+    } catch(e) { alert('Fehler: ' + e.message); }
+  }
+
+  // ── END PROFIL EVENTS ──────────────────────────────────────────────────────
+
+    auth.onAuthStateChanged(async user => {
     currentUser = user;
     if (user) {
       let displayName = user.email.split('@')[0];
