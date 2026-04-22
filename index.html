@@ -569,7 +569,89 @@
 <div id="app">
 
   <!-- AUTH -->
-  <div class="screen active" id="screenAuth">
+  
+    <!-- ══ EVENTS SCREEN ══════════════════════════════════════════════════ -->
+    <div class="screen" id="screenEvents">
+      <div class="header" style="padding-bottom:0">
+        <div class="header-top">
+          <div class="logo"><span style="color:var(--yellow)">B</span>uscar</div>
+          <button onclick="showEventForm()" style="background:var(--yellow);border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;color:white;cursor:pointer;display:flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Event</button>
+        </div>
+        <div class="header-hero" style="padding-top:8px;padding-bottom:16px">
+          <div class="header-greeting">Events</div>
+          <div class="header-sub" id="eventsSubtitle">Veranstaltungen in Paraguay</div>
+        </div>
+      </div>
+      <div class="event-filter-bar">
+        <div class="event-chip active" id="evChip-all" onclick="setEventTime('all')">📅 Alle</div>
+        <div class="event-chip" id="evChip-today" onclick="setEventTime('today')">Heute</div>
+        <div class="event-chip" id="evChip-week" onclick="setEventTime('week')">Diese Woche</div>
+        <div class="event-chip" id="evChip-month" onclick="setEventTime('month')">Diesen Monat</div>
+      </div>
+      <div class="event-filter-bar" style="padding-top:0">
+        <div class="event-chip active" id="evType-all" onclick="setEventType('all')">🎉 Alle Typen</div>
+        <div class="event-chip" id="evType-party" onclick="setEventType('Party')">🎊 Party</div>
+        <div class="event-chip" id="evType-festival" onclick="setEventType('Festival')">🎪 Festival</div>
+        <div class="event-chip" id="evType-konzert" onclick="setEventType('Konzert')">🎵 Konzert</div>
+        <div class="event-chip" id="evType-retreat" onclick="setEventType('Retreat')">🧘 Retreat</div>
+        <div class="event-chip" id="evType-workshop" onclick="setEventType('Workshop')">🛠 Workshop</div>
+        <div class="event-chip" id="evType-sport" onclick="setEventType('Sport')">⚽ Sport</div>
+        <div class="event-chip" id="evType-markt" onclick="setEventType('Markt')">🛒 Markt</div>
+        <div class="event-chip" id="evType-sonstiges" onclick="setEventType('Sonstiges')">📌 Sonstiges</div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:8px 0 100px" id="eventsList">
+        <div style="text-align:center;padding:40px 20px;color:var(--text-3)">Events werden geladen...</div>
+      </div>
+    </div>
+
+    <!-- ══ EVENT DETAIL SCREEN ════════════════════════════════════════════ -->
+    <div class="screen" id="screenEventDetail">
+      <div class="event-detail-header" id="eventDetailHeader" style="background:linear-gradient(150deg,#F5A623 0%,#D4841A 100%)">
+        <button onclick="showScreen('screenEvents')" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;padding:6px 12px;color:white;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>Zurück</button>
+        <div class="event-detail-type-badge" id="evDetailTypeBadge"></div>
+        <div class="event-detail-title" id="evDetailTitle"></div>
+        <div class="event-detail-meta-row" id="evDetailMeta"></div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:16px 16px 100px" id="evDetailBody"></div>
+    </div>
+
+    <!-- ══ EVENT FORM SCREEN ══════════════════════════════════════════════ -->
+    <div class="screen" id="screenEventForm">
+      <div style="background:var(--yellow);padding:52px 20px 20px;color:white">
+        <button onclick="showScreen('screenEvents')" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;padding:6px 12px;color:white;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>Abbrechen</button>
+        <div style="font-size:22px;font-weight:800">Event erstellen</div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:16px 16px 100px">
+        <div class="event-form-section">
+          <div class="event-form-section-title">Grundinfo</div>
+          <input class="form-input" id="evFormTitle" placeholder="Event-Titel *" style="margin-bottom:10px">
+          <select class="form-input" id="evFormType" style="margin-bottom:10px"><option value="">Typ wählen *</option><option value="Party">🎊 Party</option><option value="Festival">🎪 Festival</option><option value="Konzert">🎵 Konzert</option><option value="Retreat">🧘 Retreat</option><option value="Workshop">🛠 Workshop</option><option value="Sport">⚽ Sport</option><option value="Markt">🛒 Markt</option><option value="Sonstiges">📌 Sonstiges</option></select>
+          <textarea class="form-input" id="evFormDesc" placeholder="Beschreibung *" rows="3" style="margin-bottom:0;resize:none"></textarea>
+        </div>
+        <div class="event-form-section">
+          <div class="event-form-section-title">Datum & Ort</div>
+          <input class="form-input" id="evFormDate" type="date" style="margin-bottom:10px">
+          <div style="display:flex;gap:8px;margin-bottom:10px"><input class="form-input" id="evFormTimeStart" type="time" style="flex:1"><input class="form-input" id="evFormTimeEnd" type="time" style="flex:1"></div>
+          <input class="form-input" id="evFormCity" placeholder="Stadt *" style="margin-bottom:10px">
+          <input class="form-input" id="evFormAddress" placeholder="Adresse / Veranstaltungsort">
+        </div>
+        <div class="event-form-section">
+          <div class="event-form-section-title">Preis & Kapazität</div>
+          <div class="event-toggle-row" style="margin-bottom:10px"><span class="event-toggle-label">Kostenpflichtig</span><label class="event-toggle"><input type="checkbox" id="evFormIsPaid" onchange="document.getElementById('evFormPriceRow').style.display=this.checked?'block':'none'"><span class="event-toggle-slider"></span></label></div>
+          <div id="evFormPriceRow" style="display:none;margin-bottom:10px"><input class="form-input" id="evFormPrice" type="number" placeholder="Preis in Guaraní"></div>
+          <div class="event-toggle-row"><span class="event-toggle-label">Anmeldung aktivieren</span><label class="event-toggle"><input type="checkbox" id="evFormHasSignup" onchange="document.getElementById('evFormCapacityRow').style.display=this.checked?'block':'none'"><span class="event-toggle-slider"></span></label></div>
+          <div id="evFormCapacityRow" style="display:none;margin-top:10px"><input class="form-input" id="evFormCapacity" type="number" placeholder="Max. Teilnehmer"></div>
+        </div>
+        <div class="event-form-section">
+          <div class="event-form-section-title">Regeln (optional)</div>
+          <textarea class="form-input" id="evFormRules" placeholder="z.B. Nur 18+, max. 1 Begleitung..." rows="2" style="resize:none"></textarea>
+        </div>
+        <div id="evFormError" style="color:#EF4444;font-size:13px;font-weight:600;margin-bottom:10px;display:none"></div>
+        <button onclick="submitEvent()" id="evFormSubmitBtn" style="width:100%;background:var(--yellow);border:none;border-radius:var(--radius-lg);padding:16px;font-size:16px;font-weight:700;color:white;cursor:pointer">Event veröffentlichen</button>
+      </div>
+    </div>
+
+    <div class="screen active" id="screenAuth">
     <div class="auth-header">
       <!-- Lang toggle -->
       <div style="position:absolute;top:16px;right:16px;z-index:2">
