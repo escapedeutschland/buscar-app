@@ -608,6 +608,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <span id="filterOpenLabel" data-i18n="open_now">Geöffnet</span>
       </button>
+      <button class="filter-btn" id="filterDealBtn" onclick="toggleDealFilter()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.78 0l-8-4a2 2 0 0 1-1.11-1.79V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z"/><polyline points="2.32 6.16 12 11 21.68 6.16"/><line x1="12" y1="22.76" x2="12" y2="11"/></svg>
+        <span id="filterDealLabel">Deals</span>
+      </button>
     </div>
     <div class="cats-wrap">
       <div class="cats-scroll" id="catsScroll">
@@ -1881,6 +1885,7 @@
   let activeSubcat = 'Alle';
   let activeMinStars = 0;
   let activeOpenNow = false;
+  let activeDeal = false;
   let filterMode = 'sub';
 
   const subcats = {
@@ -1934,6 +1939,17 @@
     if (activeOpenNow) { btn.classList.add('active-open'); }
     else { btn.classList.remove('active-open'); }
     document.getElementById('filterOpenLabel').textContent = t('open_now');
+    renderListings();
+  }
+
+  function toggleDealFilter() {
+    activeDeal = !activeDeal;
+    const btn = document.getElementById('filterDealBtn');
+    if (activeDeal) {
+      btn.classList.add('active-open');
+    } else {
+      btn.classList.remove('active-open');
+    }
     renderListings();
   }
 
@@ -2044,6 +2060,7 @@
     if (activeSubcat !== 'Alle') filtered = filtered.filter(l => (l.subcategory||'') === activeSubcat);
     if (activeMinStars > 0) filtered = filtered.filter(l => { const avg = getAvgRating(l.id); return avg && avg >= activeMinStars; });
     if (activeOpenNow) filtered = filtered.filter(l => isOpen(l.opening_hours) === true);
+    if (activeDeal) filtered = filtered.filter(l => l.deal_text && l.deal_text.trim() !== '');
     if (searchQuery) { const q = searchQuery.toLowerCase(); filtered = filtered.filter(l => (l.name||'').toLowerCase().includes(q)||(l.description||'').toLowerCase().includes(q)||(l.city||'').toLowerCase().includes(q)); }
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
@@ -2261,6 +2278,7 @@
     if (mapCityFilter !== 'Alle') f = f.filter(l => l.city === mapCityFilter);
     if (mapSubcatFilter !== 'Alle') f = f.filter(l => (l.subcategory||'') === mapSubcatFilter);
     if (mapMinStars > 0) f = f.filter(l => { const a = getAvgRating(l.id); return a && a >= mapMinStars; });
+    if (activeDeal) f = f.filter(l => l.deal_text && l.deal_text.trim() !== '');
     return f;
   }
 
