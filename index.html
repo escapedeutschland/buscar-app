@@ -578,18 +578,18 @@
           <button onclick="showEventForm()" style="background:var(--yellow);border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;color:white;cursor:pointer;display:flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Event</button>
         </div>
         <div class="header-hero" style="padding-top:8px;padding-bottom:16px">
-          <div class="header-greeting">Events</div>
-          <div class="header-sub" id="eventsSubtitle">Veranstaltungen in Paraguay</div>
+          <div class="header-greeting" data-i18n="events_title">Events</div>
+          <div class="header-sub" id="eventsSubtitle" data-i18n="events_sub">Veranstaltungen in Paraguay</div>
         </div>
       </div>
       <div class="event-filter-bar">
-        <div class="event-chip active" id="evChip-all" onclick="setEventTime('all')">📅 Alle</div>
-        <div class="event-chip" id="evChip-today" onclick="setEventTime('today')">Heute</div>
-        <div class="event-chip" id="evChip-week" onclick="setEventTime('week')">Diese Woche</div>
-        <div class="event-chip" id="evChip-month" onclick="setEventTime('month')">Diesen Monat</div>
+        <div class="event-chip active" id="evChip-all" onclick="setEventTime('all')" data-i18n="ev_time_all">📅 Alle</div>
+        <div class="event-chip" id="evChip-today" onclick="setEventTime('today')" data-i18n="ev_time_today">Heute</div>
+        <div class="event-chip" id="evChip-week" onclick="setEventTime('week')" data-i18n="ev_time_week">Diese Woche</div>
+        <div class="event-chip" id="evChip-month" onclick="setEventTime('month')" data-i18n="ev_time_month">Diesen Monat</div>
       </div>
       <div class="event-filter-bar" style="padding-top:0">
-        <div class="event-chip active" id="evType-all" onclick="setEventType('all')">🎉 Alle Typen</div>
+        <div class="event-chip active" id="evType-all" onclick="setEventType('all')" data-i18n="ev_type_all">🎉 Alle Typen</div>
         <div class="event-chip" id="evType-party" onclick="setEventType('Party')">🎊 Party</div>
         <div class="event-chip" id="evType-festival" onclick="setEventType('Festival')">🎪 Festival</div>
         <div class="event-chip" id="evType-konzert" onclick="setEventType('Konzert')">🎵 Konzert</div>
@@ -600,12 +600,12 @@
         <div class="event-chip" id="evType-sonstiges" onclick="setEventType('Sonstiges')">📌 Sonstiges</div>
       </div>
       <div style="flex:1;overflow-y:auto;padding:8px 0 100px" id="eventsList">
-        <div style="text-align:center;padding:40px 20px;color:var(--text-3)">Events werden geladen...</div>
+        <div style="text-align:center;padding:40px 20px;color:var(--text-3)" data-i18n="events_loading">Events werden geladen...</div>
       </div>
       <nav class="bottom-nav">
       <div class="nav-item active" id="navHome" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span data-i18n="nav_home">Home</span></div>
       <div class="nav-item" id="navMap" onclick="setNav('navMap');showScreen('screenMap');renderMap()"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span data-i18n="nav_map">Karte</span></div>
-      <div class="nav-item" id="navEvents" onclick="setNav('navEvents');showScreen('screenEvents');loadEvents()"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Events</span></div>
+      <div class="nav-item" id="navEvents" onclick="setNav('navEvents');showScreen('screenEvents');loadEvents()"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span data-i18n="nav_events">Events</span></div>
       <div class="nav-item" id="navForm" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span data-i18n="nav_entry">Eintrag</span></div>
       <div class="nav-item" id="navProfil" onclick="setNav('navProfil');showScreen('screenProfil')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span data-i18n="nav_profile">Profil</span></div>
     </nav>
@@ -614,7 +614,7 @@
     <!-- ══ EVENT DETAIL SCREEN ════════════════════════════════════════════ -->
     <div class="screen" id="screenEventDetail">
       <div class="event-detail-header" id="eventDetailHeader" style="background:linear-gradient(150deg,#F5A623 0%,#D4841A 100%)">
-        <button onclick="evDetailBack()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;padding:6px 12px;color:white;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>Zurück</button>
+        <button onclick="evDetailBack()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;padding:6px 12px;color:white;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg data-i18n-btn="ev_back">Zurück</button>
         <div class="event-detail-type-badge" id="evDetailTypeBadge"></div>
         <div class="event-detail-title" id="evDetailTitle"></div>
         <div class="event-detail-meta-row" id="evDetailMeta"></div>
@@ -627,15 +627,15 @@
       <div class="form-header" style="position:relative;overflow:hidden">
         <div style="position:absolute;right:-10px;top:-10px;opacity:0.08;pointer-events:none"><svg viewBox="0 0 120 120" width="120" height="120"><rect x="20" y="15" width="80" height="90" rx="8" fill="white"/><line x1="35" y1="40" x2="85" y2="40" stroke="var(--yellow)" stroke-width="6"/><line x1="35" y1="58" x2="85" y2="58" stroke="var(--yellow)" stroke-width="6"/><line x1="35" y1="76" x2="65" y2="76" stroke="var(--yellow)" stroke-width="6"/></svg></div>
         <button class="form-back" onclick="showScreen('screenEvents')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <div class="form-title">Event erstellen</div>
-        <div class="form-sub">Dein Event erscheint sofort für alle</div>
+        <div class="form-title" data-i18n="ev_create">Event erstellen</div>
+        <div class="form-sub" data-i18n="ev_form_sub">Dein Event erscheint sofort für alle</div>
       </div>
       <div class="form-body">
         <div id="evFormError" class="form-error-msg" style="display:none"></div>
 
         <!-- Grundinfo -->
         <div class="form-card">
-          <div class="form-card-title">Grundinfo</div>
+          <div class="form-card-title" data-i18n="ev_basic">Grundinfo</div>
           <div class="form-field">
             <label class="field-label">Event-Titel *</label>
             <input class="field-input" id="evFormTitle" placeholder="z.B. Terere Festival Asunción" maxlength="80">
@@ -662,7 +662,7 @@
 
         <!-- Datum & Zeit -->
         <div class="form-card">
-          <div class="form-card-title">Datum & Zeit</div>
+          <div class="form-card-title" data-i18n="ev_datetime">Datum & Zeit</div>
           <div class="form-field">
             <label class="field-label">Datum *</label>
             <input class="field-input" id="evFormDate" type="date">
@@ -679,7 +679,7 @@
 
         <!-- Ort -->
         <div class="form-card">
-          <div class="form-card-title">Ort</div>
+          <div class="form-card-title" data-i18n="ev_location">Ort</div>
           <div class="form-field">
             <label class="field-label">Stadt *</label>
             <input class="field-input" id="evFormCity" placeholder="z.B. Asunción">
@@ -701,7 +701,7 @@
 
         <!-- Fotos -->
         <div class="form-card">
-          <div class="form-card-title">Fotos</div>
+          <div class="form-card-title" data-i18n="ev_photos">Fotos</div>
           <div id="evFormPhotoGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px"></div>
           <input type="file" id="evPhotoInput" accept="image/*" multiple style="display:none" onchange="handleEvPhotos(event)">
           <button onclick="document.getElementById('evPhotoInput').click()" style="width:100%;padding:12px;background:var(--surface-2);border:1.5px dashed var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
@@ -713,9 +713,9 @@
 
         <!-- Preis & Anmeldung -->
         <div class="form-card">
-          <div class="form-card-title">Preis & Anmeldung</div>
+          <div class="form-card-title" data-i18n="ev_price_cap">Preis & Anmeldung</div>
           <div class="event-toggle-row">
-            <div><span class="event-toggle-label">Kostenpflichtig</span><div style="font-size:11px;color:var(--text-3);margin-top:2px">Eintrittsgebühr angeben</div></div>
+            <div><span class="event-toggle-label" data-i18n="ev_paid">Kostenpflichtig</span><div style="font-size:11px;color:var(--text-3);margin-top:2px" data-i18n="ev_paid_sub">Eintrittsgebühr angeben</div></div>
             <label class="event-toggle"><input type="checkbox" id="evFormIsPaid" onchange="document.getElementById('evFormPriceRow').style.display=this.checked?'block':'none'"><span class="event-toggle-slider"></span></label>
           </div>
           <div id="evFormPriceRow" style="display:none;margin-top:12px">
@@ -724,7 +724,7 @@
           </div>
           <div style="height:1px;background:var(--border);margin:14px 0"></div>
           <div class="event-toggle-row">
-            <div><span class="event-toggle-label">Anmeldung aktivieren</span><div style="font-size:11px;color:var(--text-3);margin-top:2px">User können sich anmelden</div></div>
+            <div><span class="event-toggle-label" data-i18n="ev_signup">Anmeldung aktivieren</span><div style="font-size:11px;color:var(--text-3);margin-top:2px" data-i18n="ev_signup_sub">User können sich anmelden</div></div>
             <label class="event-toggle"><input type="checkbox" id="evFormHasSignup" onchange="document.getElementById('evFormCapacityRow').style.display=this.checked?'block':'none'"><span class="event-toggle-slider"></span></label>
           </div>
           <div id="evFormCapacityRow" style="display:none;margin-top:12px">
@@ -741,7 +741,7 @@
           </div>
         </div>
 
-        <button onclick="submitEvent()" id="evFormSubmitBtn" class="form-submit" style="margin-top:8px">Event veröffentlichen</button>
+        <button onclick="submitEvent()" id="evFormSubmitBtn" class="form-submit" style="margin-top:8px" data-i18n-btn="ev_publish">Event veröffentlichen</button>
       </div>
     </div>
 
@@ -1200,7 +1200,7 @@
           <div class="profil-row-left">
             <div class="profil-row-icon">🏆</div>
             <div>
-              <span class="profil-row-label">Meine Auszeichnungen</span>
+              <span class="profil-row-label" data-i18n="badge_title">🏆 Meine Auszeichnungen</span>
               <div id="profilListingsCount" style="font-size:11px;color:var(--text-3);margin-top:1px"></div>
             </div>
           </div>
@@ -1550,6 +1550,44 @@
       cancel: 'Abbrechen',
       approve: 'Genehmigen',
       reject: 'Ablehnen',
+      // Events
+      nav_events: 'Events',
+      events_title: 'Events',
+      events_sub: 'Veranstaltungen in Paraguay',
+      events_loading: 'Events werden geladen...',
+      events_none: t('events_none'),
+      events_none_filter: 'Keine Events für diesen Filter',
+      ev_time_all: '📅 Alle', ev_time_today: 'Heute', ev_time_week: 'Diese Woche', ev_time_month: 'Diesen Monat',
+      ev_type_all: '🎉 Alle Typen',
+      ev_create: 'Event erstellen', ev_publish: 'Event veröffentlichen', ev_publishing: 'Wird veröffentlicht...',
+      ev_form_sub: 'Dein Event erscheint sofort für alle',
+      ev_basic: 'Grundinfo', ev_datetime: 'Datum & Zeit', ev_location: 'Ort', ev_photos: 'Fotos',
+      ev_price_cap: 'Preis & Anmeldung', ev_rules_opt: 'Regeln',
+      ev_title_label: 'Event-Titel *', ev_type_label: 'Typ *', ev_type_choose: 'Typ wählen...',
+      ev_desc_label: 'Beschreibung *', ev_date_label: 'Datum *', ev_time_label: 'Uhrzeit',
+      ev_city_label: 'Stadt *', ev_addr_label: 'Adresse / Veranstaltungsort',
+      ev_map_btn: 'Meinen Standort verwenden',
+      ev_photos_btn: 'Fotos hinzufügen',
+      ev_paid: 'Kostenpflichtig', ev_paid_sub: 'Eintrittsgebühr angeben',
+      ev_price_label: 'Preis (Guaraní)',
+      ev_signup: 'Anmeldung aktivieren', ev_signup_sub: 'User können sich anmelden',
+      ev_capacity_label: 'Max. Teilnehmer',
+      ev_rules_placeholder: 'z.B. Nur 18+, max. 1 Begleitung...',
+      ev_back: 'Zurück', ev_to_event: 'Zum Event →',
+      ev_entry: t('ev_entry'), ev_capacity: t('ev_capacity'), ev_rules: 'Regeln',
+      ev_free: t('ev_free'), ev_paid_label: 'Kostenpflichtig',
+      ev_spots: 'Plätze frei', ev_full: t('ev_full_msg'), ev_cancelled: 'Abgesagt',
+      ev_signup_btn: 'Anmelden', ev_login_signup: 'Einloggen zum Anmelden',
+      ev_cancel_btn: 'Event absagen', ev_cancel_confirm: t('ev_cancel_confirm'),
+      ev_signup_ok: t('ev_signup_ok'), ev_already_signed: t('ev_already_signed'),
+      ev_full_msg: 'Ausgebucht', ev_error_fields: t('ev_error_fields'),
+      // Badges
+      badge_title: '🏆 Meine Auszeichnungen',
+      badge_first: 'Erster Eintrag', badge_five: '5 Einträge', badge_ten: '10 Einträge',
+      badge_twenty: '20 Einträge', badge_fifty: '50 Einträge', badge_hundred: '100 Einträge',
+      badge_explorer: 'Entdecker', badge_chaco: 'Chaco-Kenner',
+      badge_new: t('badge_new'),
+      badge_count_0: 'Noch keine eigenen Einträge', badge_count_1: '1 eigener Eintrag', badge_count_n: ' eigene Einträge',
     },
     es: {
       // Navegación
@@ -1630,6 +1668,44 @@
       cancel: 'Cancelar',
       approve: 'Aprobar',
       reject: 'Rechazar',
+      // Events
+      nav_events: 'Eventos',
+      events_title: 'Eventos',
+      events_sub: 'Eventos en Paraguay',
+      events_loading: 'Cargando eventos...',
+      events_none: 'No se encontraron eventos',
+      events_none_filter: 'No hay eventos para este filtro',
+      ev_time_all: '📅 Todos', ev_time_today: 'Hoy', ev_time_week: 'Esta semana', ev_time_month: 'Este mes',
+      ev_type_all: '🎉 Todos los tipos',
+      ev_create: 'Crear evento', ev_publish: 'Publicar evento', ev_publishing: 'Publicando...',
+      ev_form_sub: 'Tu evento aparece de inmediato para todos',
+      ev_basic: 'Info básica', ev_datetime: 'Fecha y hora', ev_location: 'Lugar', ev_photos: 'Fotos',
+      ev_price_cap: 'Precio y registro', ev_rules_opt: 'Reglas',
+      ev_title_label: 'Título del evento *', ev_type_label: 'Tipo *', ev_type_choose: 'Elegir tipo...',
+      ev_desc_label: 'Descripción *', ev_date_label: 'Fecha *', ev_time_label: 'Hora',
+      ev_city_label: 'Ciudad *', ev_addr_label: 'Dirección / Lugar del evento',
+      ev_map_btn: 'Usar mi ubicación',
+      ev_photos_btn: 'Agregar fotos',
+      ev_paid: 'Con entrada', ev_paid_sub: 'Indicar precio de entrada',
+      ev_price_label: 'Precio (Guaraní)',
+      ev_signup: 'Activar registro', ev_signup_sub: 'Los usuarios pueden registrarse',
+      ev_capacity_label: 'Máx. participantes',
+      ev_rules_placeholder: 'Ej: Solo mayores de 18, máx. 1 acompañante...',
+      ev_back: 'Volver', ev_to_event: 'Ver evento →',
+      ev_entry: 'Entrada', ev_capacity: 'Capacidad', ev_rules: 'Reglas',
+      ev_free: 'Gratis', ev_paid_label: 'Con costo',
+      ev_spots: 'lugares disponibles', ev_full: 'Agotado', ev_cancelled: 'Cancelado',
+      ev_signup_btn: 'Registrarse', ev_login_signup: 'Iniciar sesión para registrarse',
+      ev_cancel_btn: 'Cancelar evento', ev_cancel_confirm: '¿Cancelar este evento?',
+      ev_signup_ok: '✅ ¡Registro exitoso!', ev_already_signed: 'Ya estás registrado.',
+      ev_full_msg: 'Sin lugares disponibles', ev_error_fields: 'Por favor completa todos los campos obligatorios (*).',
+      // Badges
+      badge_title: '🏆 Mis Insignias',
+      badge_first: 'Primer registro', badge_five: '5 registros', badge_ten: '10 registros',
+      badge_twenty: '20 registros', badge_fifty: '50 registros', badge_hundred: '100 registros',
+      badge_explorer: 'Explorador', badge_chaco: 'Conocedor del Chaco',
+      badge_new: '🏆 Nueva insignia: ',
+      badge_count_0: 'Aún sin registros propios', badge_count_1: '1 registro propio', badge_count_n: ' registros propios',
     }
   };
 
@@ -1842,6 +1918,64 @@
 
     // Rerender if data loaded
     if (allListings.length) renderListings();
+
+    // Events screen - filter chips
+    var evChipMap = {
+      'evChip-all': 'ev_time_all', 'evChip-today': 'ev_time_today',
+      'evChip-week': 'ev_time_week', 'evChip-month': 'ev_time_month',
+      'evType-all': 'ev_type_all'
+    };
+    Object.keys(evChipMap).forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = t(evChipMap[id]);
+    });
+    // Events form fields
+    var evFormLabels = {
+      'ev_create': ['form-title'], 'ev_form_sub': ['form-sub'],
+    };
+    var evLabelMap = {
+      'Event erstellen': t('ev_create'), 'Crear evento': t('ev_create'),
+      'Dein Event erscheint sofort für alle': t('ev_form_sub'), 'Tu evento aparece de inmediato para todos': t('ev_form_sub'),
+      'Event-Titel *': t('ev_title_label'), 'Título del evento *': t('ev_title_label'),
+      'Datum *': t('ev_date_label'), 'Fecha *': t('ev_date_label'),
+      'Uhrzeit': t('ev_time_label'), 'Hora': t('ev_time_label'),
+      'Stadt *': t('ev_city_label'), 'Ciudad *': t('ev_city_label'),
+    };
+    document.querySelectorAll('#screenEventForm .field-label, #screenEventForm .form-title, #screenEventForm .form-sub, #screenEventForm .form-card-title').forEach(function(el) {
+      var txt = el.textContent.trim();
+      if (evLabelMap[txt]) el.textContent = evLabelMap[txt];
+    });
+    // Event form toggles
+    var evToggleMap = {
+      'Kostenpflichtig': t('ev_paid'), 'Con entrada': t('ev_paid'),
+      'Anmeldung aktivieren': t('ev_signup'), 'Activar registro': t('ev_signup'),
+    };
+    document.querySelectorAll('.event-toggle-label').forEach(function(el) {
+      if (evToggleMap[el.textContent.trim()]) el.textContent = evToggleMap[el.textContent.trim()];
+    });
+    // Event form submit btn
+    var evSubmitBtn = document.getElementById('evFormSubmitBtn');
+    if (evSubmitBtn && !evSubmitBtn.disabled) evSubmitBtn.textContent = t('ev_publish');
+    // Events subtitle
+    var evSub = document.getElementById('eventsSubtitle');
+    if (evSub && (evSub.textContent === 'Veranstaltungen in Paraguay' || evSub.textContent === 'Eventos en Paraguay')) {
+      evSub.textContent = t('events_sub');
+    }
+    // Badge section
+    var badgeRow = document.querySelector('#screenProfil .profil-row-label[data-i18n="badge_title"]');
+    if (badgeRow) badgeRow.textContent = t('badge_title');
+    // Re-render badges if visible
+    if (document.getElementById('badgeSection') && document.getElementById('badgeSection').style.display !== 'none') {
+      var currentBadges = [];
+      document.querySelectorAll('.badge-item').forEach(function(el) {
+        if (el.querySelector('.badge-icon.earned')) {
+          var name = el.querySelector('.badge-name').textContent;
+          var def = getBadgeDefs().find(function(b){ return b.name === name; });
+        }
+      });
+    }
+    // Re-render events if on events screen
+    if (allEvents.length) renderEvents();
   }
 
 
@@ -2020,16 +2154,16 @@
   }
 
   // ── BADGE SYSTEM ─────────────────────────────────────────────────────────
-  const BADGE_DEFS = [
-    { id: 'first',    emoji: '🌱', name: 'Erster Eintrag',   threshold: 1   },
-    { id: 'five',     emoji: '✋', name: '5 Einträge',        threshold: 5   },
-    { id: 'ten',      emoji: '🔟', name: '10 Einträge',       threshold: 10  },
-    { id: 'twenty',   emoji: '🚀', name: '20 Einträge',       threshold: 20  },
-    { id: 'fifty',    emoji: '⭐', name: '50 Einträge',       threshold: 50  },
-    { id: 'hundred',  emoji: '💯', name: '100 Einträge',      threshold: 100 },
-    { id: 'explorer', emoji: '🗺️', name: 'Entdecker',         threshold: 3,  special: 'cities3' },
-    { id: 'chaco',    emoji: '🌵', name: 'Chaco-Kenner',      threshold: 1,  special: 'chaco'   },
-  ];
+  function getBadgeDefs() { return [
+    { id: 'first',    emoji: '🌱', name: t('badge_first'),   threshold: 1   },
+    { id: 'five',     emoji: '✋', name: t('badge_five'),        threshold: 5   },
+    { id: 'ten',      emoji: '🔟', name: t('badge_ten'),       threshold: 10  },
+    { id: 'twenty',   emoji: '🚀', name: t('badge_twenty'),       threshold: 20  },
+    { id: 'fifty',    emoji: '⭐', name: t('badge_fifty'),       threshold: 50  },
+    { id: 'hundred',  emoji: '💯', name: t('badge_hundred'),      threshold: 100 },
+    { id: 'explorer', emoji: '🗺️', name: t('badge_explorer'),         threshold: 3,  special: 'cities3' },
+    { id: 'chaco',    emoji: '🌵', name: t('badge_chaco'),      threshold: 1,  special: 'chaco'   },
+  ];; }
 
   async function loadBadges(uid) {
     try {
@@ -2042,8 +2176,8 @@
       const snap = await db.collection('listings').where('created_by','==',uid).get();
       const count = snap.size;
       document.getElementById('profilListingsCount').textContent =
-        count === 0 ? 'Noch keine eigenen Einträge' :
-        count === 1 ? '1 eigener Eintrag' : count + ' eigene Einträge';
+        count === 0 ? t('badge_count_0') :
+        count === 1 ? t('badge_count_1') : count + t('badge_count_n');
 
       // Check special badges
       const docs = snap.docs.map(d => d.data());
@@ -2053,7 +2187,7 @@
       // Compute newly earned
       let earned = [...cached];
       const newlyEarned = [];
-      for (const b of BADGE_DEFS) {
+      for (const b of getBadgeDefs()) {
         let qualifies = false;
         if (b.special === 'cities3') qualifies = cities.size >= 3;
         else if (b.special === 'chaco') qualifies = hasChaco;
@@ -2070,7 +2204,7 @@
         try {
           await db.collection('users').doc(uid).set({ badges: earned }, { merge: true });
           newlyEarned.forEach(id => {
-            const def = BADGE_DEFS.find(b => b.id === id);
+            const def = getBadgeDefs().find(b => b.id === id);
             if (def) showToast('🏆 Neue Auszeichnung: ' + def.name + ' ' + def.emoji);
           });
           renderBadgeGrid(earned); // update grid with new badges
@@ -2083,7 +2217,7 @@
     const grid = document.getElementById('badgeGrid');
     const section = document.getElementById('badgeSection');
     if (!grid) return;
-    grid.innerHTML = BADGE_DEFS.map(function(b) {
+    grid.innerHTML = getBadgeDefs().map(function(b) {
       const isEarned = earned.includes(b.id);
       const checkHtml = isEarned ? '<span class="badge-check">&#10003;</span>' : '';
       const iconClass = 'badge-icon ' + (isEarned ? 'earned' : 'locked');
@@ -2209,9 +2343,9 @@
       var isFull = ev.has_signup && ev.capacity > 0 && (ev.signups_count||0) >= ev.capacity;
       var isCancelled = ev.status === 'cancelled';
       var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' ₲' : 'Kostenpflichtig') : 'Kostenlos';
-      var spotsLeft = ev.has_signup && ev.capacity > 0 ? (ev.capacity - (ev.signups_count||0)) + ' Plätze frei' : '';
-      var statusHtml = isCancelled ? '<span class="event-status-cancelled">Abgesagt</span>' :
-                       isFull ? '<span class="event-status-full">Ausgebucht</span>' :
+      var spotsLeft = ev.has_signup && ev.capacity > 0 ? (ev.capacity - (ev.signups_count||0)) + ' ' + t('ev_spots') : '';
+      var statusHtml = isCancelled ? '<span class=\"event-status-cancelled\">'+t('ev_cancelled')+'</span>' :
+                       isFull ? '<span class=\"event-status-full\">'+t('ev_full')+'</span>' :
                        spotsLeft ? '<span class="event-spots">' + spotsLeft + '</span>' : '';
 
       return '<div class="event-card" onclick="showEventDetail(\'' + ev.id + '\')">'
@@ -2429,7 +2563,7 @@
     }
 
     var btn = document.getElementById('evFormSubmitBtn');
-    btn.disabled = true; btn.textContent = 'Wird veröffentlicht...';
+    btn.disabled = true; btn.textContent = t('ev_publishing');
 
     try {
       var tStart = document.getElementById('evFormTimeStart').value || '00:00';
@@ -2463,7 +2597,7 @@
       errEl.textContent = 'Fehler: ' + e.message;
       errEl.style.display = 'block';
       btn.disabled = false;
-      btn.textContent = 'Event veröffentlichen';
+      btn.textContent = t('ev_publish');
     }
   }
 
