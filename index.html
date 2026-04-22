@@ -1852,19 +1852,23 @@
     const grid = document.getElementById('badgeGrid');
     const section = document.getElementById('badgeSection');
     if (!grid) return;
-    grid.innerHTML = BADGE_DEFS.map(b => {
+    grid.innerHTML = BADGE_DEFS.map(function(b) {
       const isEarned = earned.includes(b.id);
-      return `<div class="badge-item">
-        <div class="badge-icon \${isEarned ? 'earned' : 'locked'}">
-          <span>\${b.emoji}</span>
-          \${isEarned ? '<span class="badge-check">✓</span>' : ''}
-        </div>
-        <div class="badge-name \${isEarned ? 'earned' : ''}">\${b.name}</div>
-      </div>`;
+      const checkHtml = isEarned ? '<span class="badge-check">&#10003;</span>' : '';
+      const iconClass = 'badge-icon ' + (isEarned ? 'earned' : 'locked');
+      const nameClass = 'badge-name ' + (isEarned ? 'earned' : '');
+      return '<div class="badge-item">'
+        + '<div class="' + iconClass + '">'
+        + '<span style="font-size:24px;line-height:1;display:block;">' + b.emoji + '</span>'
+        + checkHtml
+        + '</div>'
+        + '<div class="' + nameClass + '">' + b.name + '</div>'
+        + '</div>';
     }).join('');
     section.style.display = 'block';
   }
 
+  
   function showToast(msg) {
     let toast = document.getElementById('badgeToast');
     if (!toast) {
