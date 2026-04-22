@@ -3277,7 +3277,25 @@
     renderListings();
   }
 
-  function renderListings() {
+  function scoreEntry(l) {
+    var score = 0;
+    // Bewertung (0–5 Sterne × 2 = max 10 Punkte)
+    var avg = getAvgRating(l.id);
+    if (avg) score += avg * 2;
+    // Vollständigkeit
+    if (l.phone && l.phone.trim())        score += 2;
+    if (l.website && l.website.trim())    score += 1;
+    if (l.opening_hours && l.opening_hours.trim()) score += 1;
+    if ((l.description || '').length > 100) score += 1;
+    if (l.verified)                        score += 2;
+    // Titelbild / Fotos
+    if (l.cover_url && l.cover_url.trim()) score += 3;
+    // Neu eingetragen (< 14 Tage)
+    if (isNew(l.created_at)) score += 1;
+    return score;
+  }
+
+    function renderListings() {
     let filtered = allListings;
     if (activeCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === activeCategory);
     if (activeCity !== 'Alle') filtered = filtered.filter(l => l.city === activeCity);
@@ -3286,6 +3304,11 @@
     if (activeOpenNow) filtered = filtered.filter(l => isOpen(l.opening_hours) === true);
     if (activeDeal) filtered = filtered.filter(l => l.deal_text && l.deal_text.trim() !== '');
     if (searchQuery) { const q = searchQuery.toLowerCase(); filtered = filtered.filter(l => (l.name||'').toLowerCase().includes(q)||(l.description||'').toLowerCase().includes(q)||(l.city||'').toLowerCase().includes(q)); }
+    // ── Vollständigkeits-Score & Sortierung ──────────────────────────────────
+    filtered = filtered.slice().sort(function(a, b) {
+      return scoreEntry(b) - scoreEntry(a);
+    });
+    // ─────────────────────────────────────────────────────────────────────────
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
