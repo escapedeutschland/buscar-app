@@ -614,7 +614,7 @@
     <!-- ══ EVENT DETAIL SCREEN ════════════════════════════════════════════ -->
     <div class="screen" id="screenEventDetail">
       <div class="event-detail-header" id="eventDetailHeader" style="background:linear-gradient(150deg,#F5A623 0%,#D4841A 100%)">
-        <button onclick="showScreen('screenEvents')" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;padding:6px 12px;color:white;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>Zurück</button>
+        <button onclick="evDetailBack()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;padding:6px 12px;color:white;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>Zurück</button>
         <div class="event-detail-type-badge" id="evDetailTypeBadge"></div>
         <div class="event-detail-title" id="evDetailTitle"></div>
         <div class="event-detail-meta-row" id="evDetailMeta"></div>
@@ -2236,7 +2236,8 @@
     }).join('');
   }
 
-  function showEventDetail(id) {
+  function showEventDetail(id, source) {
+    if (source) _evDetailSource = source;
     var ev = allEvents.find(function(e){ return e.id === id; });
     if (!ev) return;
     var start = ev.date_start ? ev.date_start.toDate() : null;
@@ -2504,6 +2505,7 @@
   
   // ── EVENTS ON MAP ──────────────────────────────────────────────────────────
   let _showEventsOnMap = false;
+  let _evDetailSource = 'events'; // 'events' or 'map'
   let _eventsMapLayer = null;
   let _eventsMapMarkers = [];
 
@@ -2523,7 +2525,15 @@
     _eventsMapMarkers = [];
   }
 
-  async function renderEventsOnMap() {
+  function buildEvPopup(evId, title, city, type) {
+    return '<div class="map-popup" data-evid="' + evId + '" onclick="evMarkerClick(this.getAttribute(\'data-evid\'))" style="cursor:pointer">'
+      + '<div class="map-popup-name">' + title + '</div>'
+      + '<div class="map-popup-city">' + city + ' &middot; ' + type + '</div>'
+      + '<div class="map-popup-cat" style="color:var(--yellow);margin-top:2px">Zum Event →</div>'
+      + '</div>';
+  }
+
+    async function renderEventsOnMap() {
     clearEventsFromMap();
     if (!maplibreMap || !mapLoaded) return;
     var events = allEvents.length ? allEvents : [];
@@ -2540,34 +2550,24 @@
       var color = EVENT_TYPE_COLORS[ev.type] || '#F5A623';
       var emoji = EVENT_TYPE_EMOJIS[ev.type] || '📅';
       var evId = ev.id;
-      var evTitle = ev.title || '';
-      var evCity = ev.city || '';
-      var evType = ev.type || '';
 
-      // Outer pin like listings
+      // Circle marker
       var el = document.createElement('div');
-      el.style.cssText = [
-        'width:40px;height:40px;border-radius:50% 50% 50% 0;transform:rotate(-45deg)',
-        'background:'+color+';border:2px solid white',
-        'box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;',
-        'display:flex;align-items:center;justify-content:center'
-      ].join(';');
-      var inner = document.createElement('span');
-      inner.style.cssText = 'transform:rotate(45deg);font-size:18px;display:block;line-height:1;';
-      inner.textContent = emoji;
-      el.appendChild(inner);
+      el.style.cssText = 'width:38px;height:38px;border-radius:50%;background:'+color+';border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;';
+      el.textContent = emoji;
 
-      // Tooltip on hover
-      el.title = evTitle + ' · ' + evCity;
-
-      var marker = new maplibregl.Marker({ element: el, anchor: 'bottom-left' })
+      var marker = new maplibregl.Marker({ element: el, anchor: 'center' })
         .setLngLat([ev.lng, ev.lat])
         .addTo(maplibreMap);
 
-      // Direct click → open detail (no popup needed)
+      // Popup like listings - click popup → detail
+      var popup = new maplibregl.Popup({ closeButton: false, maxWidth: '220px', offset: 20 })
+        .setHTML(buildEvPopup(evId, ev.title||'', ev.city||'', ev.type||''));
+      marker.setPopup(popup);
+
       el.addEventListener('click', function(e) {
         e.stopPropagation();
-        evMarkerClick(evId);
+        marker.togglePopup();
       });
 
       _eventsMapMarkers.push(marker);
@@ -2575,13 +2575,22 @@
   }
 
 
-  function evMarkerClick(id) {
-    setNav('navEvents');
+  function evDetailBack() {
+    if (_evDetailSource === 'map') {
+      setNav('navMap');
+      showScreen('screenMap');
+      setTimeout(function(){ if (maplibreMap) maplibreMap.resize(); }, 100);
+    } else {
+      setNav('navEvents');
+      showScreen('screenEvents');
+    }
+  }
+
+    function evMarkerClick(id) {
+    _evDetailSource = 'map';
     if (allEvents.length) {
-      showScreen('screenEventDetail');
       showEventDetail(id);
     } else {
-      showScreen('screenEvents');
       loadEvents().then(function(){ showEventDetail(id); });
     }
   }
