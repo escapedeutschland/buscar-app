@@ -1579,6 +1579,7 @@
       ev_spots: 'Plätze frei', ev_full: 'Ausgebucht', ev_cancelled: 'Abgesagt',
       ev_signup_btn: 'Anmelden', ev_login_signup: 'Einloggen zum Anmelden',
       ev_cancel_btn: 'Event absagen', ev_cancel_confirm: 'Event wirklich absagen?',
+      ev_delete_btn: 'Löschen', ev_delete_confirm: 'Event endgültig löschen?', ev_delete_ok: 'Event gelöscht.',
       ev_signup_ok: '✅ Anmeldung erfolgreich!', ev_already_signed: 'Du bist bereits angemeldet.',
       ev_full_msg: 'Ausgebucht', ev_error_fields: 'Bitte alle Pflichtfelder (*) ausfüllen.',
       // Badges
@@ -1696,6 +1697,7 @@
       ev_spots: 'lugares disponibles', ev_full: 'Agotado', ev_cancelled: 'Cancelado',
       ev_signup_btn: 'Registrarse', ev_login_signup: 'Iniciar sesión para registrarse',
       ev_cancel_btn: 'Cancelar evento', ev_cancel_confirm: '¿Cancelar este evento?',
+      ev_delete_btn: 'Eliminar', ev_delete_confirm: '¿Eliminar este evento definitivamente?', ev_delete_ok: 'Evento eliminado.',
       ev_signup_ok: '✅ ¡Registro exitoso!', ev_already_signed: 'Ya estás registrado.',
       ev_full_msg: 'Sin lugares disponibles', ev_error_fields: 'Por favor completa todos los campos obligatorios (*).',
       // Badges
@@ -2428,7 +2430,10 @@
     }
 
     if (currentUser && ev.created_by === currentUser.uid) {
-      bodyHtml += '<button onclick="cancelEvent(\'' + id + '\')" style="width:100%;background:var(--surface-2);border:none;border-radius:var(--radius-lg);padding:14px;font-size:14px;font-weight:600;color:var(--text-2);cursor:pointer">Event absagen</button>';
+      bodyHtml += '<div style="display:flex;gap:8px;margin-top:0">'
+        + '<button onclick="cancelEvent(\'' + id + '\')" style="flex:1;background:var(--surface-2);border:none;border-radius:var(--radius-lg);padding:14px;font-size:14px;font-weight:600;color:var(--text-2);cursor:pointer">' + t('ev_cancel_btn') + '</button>'
+        + '<button onclick="deleteEvent(\'' + id + '\')" style="flex:1;background:#FEE2E2;border:none;border-radius:var(--radius-lg);padding:14px;font-size:14px;font-weight:600;color:#EF4444;cursor:pointer">' + t('ev_delete_btn') + '</button>'
+        + '</div>';
     }
 
     document.getElementById('evDetailBody').innerHTML = bodyHtml;
@@ -2620,7 +2625,19 @@
     }
   }
 
-  async function cancelEvent(id) {
+  async function deleteEvent(id) {
+    if (!confirm(t('ev_delete_confirm'))) return;
+    try {
+      await db.collection('events').doc(id).delete();
+      allEvents = allEvents.filter(function(e){ return e.id !== id; });
+      showToast(t('ev_delete_ok'));
+      setNav('navEvents');
+      showScreen('screenEvents');
+      renderEvents();
+    } catch(e) { alert('Fehler: ' + e.message); }
+  }
+
+    async function cancelEvent(id) {
     if (!confirm('Event wirklich absagen?')) return;
     try {
       await db.collection('events').doc(id).update({ status: 'cancelled' });
