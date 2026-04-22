@@ -472,9 +472,7 @@
     /* PROFIL */
     .profil-header { background: linear-gradient(150deg, #F5A623 0%, #D4841A 60%, #B8661A 100%); padding: 52px 24px 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; overflow: hidden; flex-shrink: 0; } display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
     .profil-avatar { width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 28px; font-weight: 900; color: white; overflow: hidden; flex-shrink: 0; }
-            .badge-section { padding: 16px; }
-    .badge-section-title { font-size: 13px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-    .badge-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+            .badge-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
     .badge-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
     .badge-icon { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; position: relative; }
     .badge-icon.earned { background: linear-gradient(135deg, #F5A623, #D4841A); box-shadow: 0 4px 12px rgba(212,132,26,0.35); }
@@ -971,10 +969,20 @@
       <div id="avatarProgress" style="font-size:12px;color:rgba(255,255,255,0.8);display:none">Wird hochgeladen...</div>
     </div>
 <div class="profil-body">
-      <div id="profilListingsCount" class="profil-listings-count"></div>
-      <div class="badge-section" id="badgeSection" style="display:none">
-        <div class="badge-section-title">🏆 Meine Auszeichnungen</div>
-        <div class="badge-grid" id="badgeGrid"></div>
+      <div class="profil-section" style="margin-bottom:16px">
+        <div class="profil-row" onclick="toggleBadgePanel()" id="badgeRow">
+          <div class="profil-row-left">
+            <div class="profil-row-icon">🏆</div>
+            <div>
+              <span class="profil-row-label">Meine Auszeichnungen</span>
+              <div id="profilListingsCount" style="font-size:11px;color:var(--text-3);margin-top:1px"></div>
+            </div>
+          </div>
+          <svg id="badgeChevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="transition:transform 0.25s"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div id="badgeSection" style="display:none;padding:16px 16px 8px">
+          <div class="badge-grid" id="badgeGrid"></div>
+        </div>
       </div>
       <div class="profil-section">
         <div class="profil-row" onclick="setNav('navHome');showScreen('screenHome')">
@@ -1798,7 +1806,12 @@
 
   async function loadBadges(uid) {
     try {
-      // Count user listings
+      // Step 1: Show cached badges immediately from user doc (fast)
+      const userDoc = await db.collection('users').doc(uid).get();
+      const cached = userDoc.exists ? (userDoc.data().badges || []) : [];
+      renderBadgeGrid(cached); // instant render from cache
+
+      // Step 2: Count listings in background to check for new badges
       const snap = await db.collection('listings').where('created_by','==',uid).get();
       const count = snap.size;
       document.getElementById('profilListingsCount').textContent =
@@ -1810,14 +1823,8 @@
       const cities = new Set(docs.map(d => d.city).filter(Boolean));
       const hasChaco = docs.some(d => ['Filadelfia','Loma Plata','Mariscal Estigarribia','Fuerte Olimpo','Bahía Negra','Neuland','Pozo Colorado'].includes(d.city));
 
-      // Fetch earned badges from user doc
-      let earned = [];
-      try {
-        const userDoc = await db.collection('users').doc(uid).get();
-        earned = userDoc.exists ? (userDoc.data().badges || []) : [];
-      } catch(e) {}
-
       // Compute newly earned
+      let earned = [...cached];
       const newlyEarned = [];
       for (const b of BADGE_DEFS) {
         let qualifies = false;
@@ -1831,20 +1838,17 @@
         }
       }
 
-      // Save newly earned badges
+      // Save and show newly earned badges
       if (newlyEarned.length > 0) {
         try {
           await db.collection('users').doc(uid).set({ badges: earned }, { merge: true });
-          // Show toast for each new badge
           newlyEarned.forEach(id => {
             const def = BADGE_DEFS.find(b => b.id === id);
             if (def) showToast('🏆 Neue Auszeichnung: ' + def.name + ' ' + def.emoji);
           });
+          renderBadgeGrid(earned); // update grid with new badges
         } catch(e) {}
       }
-
-      // Render badge grid
-      renderBadgeGrid(earned);
     } catch(e) { console.error('badge error', e); }
   }
 
@@ -1865,11 +1869,19 @@
         + '<div class="' + nameClass + '">' + b.name + '</div>'
         + '</div>';
     }).join('');
-    section.style.display = 'block';
+    // section visibility controlled by toggleBadgePanel
   }
 
   
-  function showToast(msg) {
+  function toggleBadgePanel() {
+    const panel = document.getElementById('badgeSection');
+    const chevron = document.getElementById('badgeChevron');
+    const open = panel.style.display === 'none';
+    panel.style.display = open ? 'block' : 'none';
+    chevron.style.transform = open ? 'rotate(90deg)' : '';
+  }
+
+    function showToast(msg) {
     let toast = document.getElementById('badgeToast');
     if (!toast) {
       toast = document.createElement('div');
