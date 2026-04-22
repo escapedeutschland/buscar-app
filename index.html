@@ -2729,9 +2729,9 @@
     }
   }
 
-    // ── END EVENTS ON MAP ──────────────────────────────────────────────────────
+  // ── END EVENTS ON MAP ──────────────────────────────────────────────────────
 
-    auth.onAuthStateChanged(async user => {
+  auth.onAuthStateChanged(async user => {
     currentUser = user;
     if (user) {
       let displayName = user.email.split('@')[0];
