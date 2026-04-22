@@ -517,6 +517,50 @@
     .nav-item span { font-size: 10px; font-weight: 600; color: var(--text-3); transition: color 0.2s; letter-spacing: 0.2px; }
     .nav-item.active svg { stroke: var(--yellow); transform: translateY(-1px); }
     .nav-item.active span { color: var(--yellow); }
+  
+    /* ── EVENTS ─────────────────────────────────────────────────────────── */
+    .event-filter-bar { display:flex; gap:8px; padding:10px 16px 6px; overflow-x:auto; scrollbar-width:none; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; }
+    .event-filter-bar::-webkit-scrollbar { display:none; }
+    .event-chip { display:inline-flex; align-items:center; gap:5px; padding:7px 14px; border-radius:20px; border:1.5px solid var(--border); background:var(--card); font-size:12px; font-weight:600; color:var(--text-2); cursor:pointer; white-space:nowrap; flex-shrink:0; transition:all 0.18s; }
+    .event-chip.active { background:var(--yellow); border-color:var(--yellow); color:white; }
+    .event-card { background:var(--card); border-radius:var(--radius-lg); margin:0 16px 12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.06); cursor:pointer; }
+    .event-card-banner { height:6px; background:linear-gradient(90deg,#F5A623,#D4841A); }
+    .event-card-banner.type-festival { background:linear-gradient(90deg,#8B5CF6,#6D28D9); }
+    .event-card-banner.type-konzert { background:linear-gradient(90deg,#EC4899,#BE185D); }
+    .event-card-banner.type-retreat { background:linear-gradient(90deg,#22C55E,#15803D); }
+    .event-card-banner.type-sport { background:linear-gradient(90deg,#06B6D4,#0E7490); }
+    .event-card-banner.type-workshop { background:linear-gradient(90deg,#F97316,#C2410C); }
+    .event-card-banner.type-markt { background:linear-gradient(90deg,#EF4444,#B91C1C); }
+    .event-card-body { padding:14px 16px 16px; }
+    .event-card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:6px; }
+    .event-card-title { font-size:16px; font-weight:700; color:var(--text-1); line-height:1.3; }
+    .event-card-type { font-size:10px; font-weight:700; padding:3px 8px; border-radius:10px; background:var(--surface-2); color:var(--text-2); white-space:nowrap; }
+    .event-card-meta { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
+    .event-meta-item { display:flex; align-items:center; gap:4px; font-size:12px; color:var(--text-2); }
+    .event-card-desc { font-size:13px; color:var(--text-2); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .event-card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
+    .event-price { font-size:13px; font-weight:700; color:var(--yellow); }
+    .event-spots { font-size:12px; color:var(--text-3); }
+    .event-status-full { font-size:11px; font-weight:700; color:white; background:#EF4444; padding:3px 8px; border-radius:10px; }
+    .event-status-cancelled { font-size:11px; font-weight:700; color:white; background:#6B7280; padding:3px 8px; border-radius:10px; }
+    /* Event detail */
+    .event-detail-header { background:linear-gradient(150deg,#F5A623 0%,#D4841A 60%,#B8661A 100%); padding:52px 20px 24px; color:white; }
+    .event-detail-title { font-size:22px; font-weight:800; margin-bottom:6px; line-height:1.3; }
+    .event-detail-type-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.2); border-radius:12px; padding:4px 10px; font-size:12px; font-weight:700; margin-bottom:14px; }
+    .event-detail-meta-row { display:flex; flex-wrap:wrap; gap:12px; }
+    .event-detail-meta { display:flex; align-items:center; gap:6px; font-size:13px; opacity:0.92; }
+    /* Event form */
+    .event-form-section { background:var(--card); border-radius:var(--radius-lg); padding:16px; margin-bottom:14px; }
+    .event-form-section-title { font-size:12px; font-weight:700; color:var(--text-2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }
+    .event-toggle-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; }
+    .event-toggle-label { font-size:14px; color:var(--text-1); font-weight:600; }
+    .event-toggle { position:relative; width:44px; height:24px; }
+    .event-toggle input { opacity:0; width:0; height:0; }
+    .event-toggle-slider { position:absolute; inset:0; background:var(--surface-2); border-radius:12px; transition:0.2s; cursor:pointer; }
+    .event-toggle-slider:before { content:''; position:absolute; height:18px; width:18px; left:3px; bottom:3px; background:white; border-radius:50%; transition:0.2s; }
+    .event-toggle input:checked + .event-toggle-slider { background:var(--yellow); }
+    .event-toggle input:checked + .event-toggle-slider:before { transform:translateX(20px); }
+
   </style>
 </head>
 <body>
@@ -658,6 +702,7 @@
     <nav class="bottom-nav">
       <div class="nav-item active" id="navHome" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span data-i18n="nav_home">Home</span></div>
       <div class="nav-item" id="navMap" onclick="setNav('navMap');showScreen('screenMap');renderMap()"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span data-i18n="nav_map">Karte</span></div>
+      <div class="nav-item" id="navEvents" onclick="setNav('navEvents');showScreen('screenEvents');loadEvents()"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Events</span></div>
       <div class="nav-item" id="navForm" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span data-i18n="nav_entry">Eintrag</span></div>
       <div class="nav-item" id="navProfil" onclick="setNav('navProfil');showScreen('screenProfil')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span data-i18n="nav_profile">Profil</span></div>
     </nav>
@@ -780,6 +825,7 @@
     <nav class="bottom-nav">
       <div class="nav-item" id="navHome2" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
       <div class="nav-item active" id="navMap2" onclick="setNav('navMap');showScreen('screenMap');renderMap()"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span>Karte</span></div>
+      <div class="nav-item" id="navEvents2" onclick="setNav('navEvents');showScreen('screenEvents');loadEvents()"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Events</span></div>
       <div class="nav-item" id="navForm2" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Eintrag</span></div>
       <div class="nav-item" id="navProfil2" onclick="setNav('navProfil');showScreen('screenProfil')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profil</span></div>
     </nav>
@@ -1682,7 +1728,7 @@
   const catNames = { 'kat-restaurants': 'Restaurants', 'kat-dienstleistung': 'Dienstleistungen', 'kat-orte': 'Orte', 'kat-unterkunft': 'Unterkünfte', 'kat-geschaefte': 'Geschäfte', 'kat-sport': 'Sport & Fitness' };
 
   function setNav(active) {
-    ['navHome','navMap','navForm','navProfil'].forEach(id => {
+    ['navHome','navMap','navEvents','navForm','navProfil'].forEach(id => {
       const el = document.getElementById(id);
       const el2 = document.getElementById(id + '2');
       if (el) el.classList.toggle('active', id === active);
@@ -1896,7 +1942,290 @@
     toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 3500);
   }
 
-  auth.onAuthStateChanged(async user => {
+
+  // ══ EVENTS SYSTEM ═════════════════════════════════════════════════════════
+  let allEvents = [];
+  let evTimeFilter = 'all';
+  let evTypeFilter = 'all';
+
+  const EVENT_TYPE_COLORS = {
+    'Party':'#F5A623','Festival':'#8B5CF6','Konzert':'#EC4899',
+    'Retreat':'#22C55E','Workshop':'#F97316','Sport':'#06B6D4',
+    'Markt':'#EF4444','Sonstiges':'#6B7280'
+  };
+  const EVENT_TYPE_EMOJIS = {
+    'Party':'🎊','Festival':'🎪','Konzert':'🎵','Retreat':'🧘',
+    'Workshop':'🛠','Sport':'⚽','Markt':'🛒','Sonstiges':'📌'
+  };
+
+  async function loadEvents() {
+    try {
+      const now = new Date();
+      const snap = await db.collection('events')
+        .where('date_end', '>=', now)
+        .orderBy('date_end', 'asc')
+        .get();
+      allEvents = snap.docs.map(function(d) { return Object.assign({id:d.id}, d.data()); });
+      renderEvents();
+    } catch(e) {
+      console.error('loadEvents error', e);
+      document.getElementById('eventsList').innerHTML =
+        '<div style="text-align:center;padding:40px;color:var(--text-3)">Fehler beim Laden.</div>';
+    }
+  }
+
+  function setEventTime(val) {
+    evTimeFilter = val;
+    document.querySelectorAll('[id^="evChip-"]').forEach(function(el){ el.classList.remove('active'); });
+    var chip = document.getElementById('evChip-' + val);
+    if (chip) chip.classList.add('active');
+    renderEvents();
+  }
+
+  function setEventType(val) {
+    evTypeFilter = val;
+    document.querySelectorAll('[id^="evType-"]').forEach(function(el){ el.classList.remove('active'); });
+    var key = val === 'all' ? 'all' : val.toLowerCase();
+    var chip = document.getElementById('evType-' + key);
+    if (chip) chip.classList.add('active');
+    renderEvents();
+  }
+
+  function renderEvents() {
+    var now = new Date();
+    var todayEnd = new Date(); todayEnd.setHours(23,59,59);
+    var weekEnd = new Date(); weekEnd.setDate(weekEnd.getDate()+7);
+    var monthEnd = new Date(); monthEnd.setDate(monthEnd.getDate()+30);
+
+    var filtered = allEvents.filter(function(ev) {
+      var start = ev.date_start ? ev.date_start.toDate() : null;
+      if (!start) return false;
+      if (evTimeFilter === 'today') return start <= todayEnd;
+      if (evTimeFilter === 'week')  return start <= weekEnd;
+      if (evTimeFilter === 'month') return start <= monthEnd;
+      return true;
+    });
+
+    if (evTypeFilter !== 'all') {
+      filtered = filtered.filter(function(ev){ return ev.type === evTypeFilter; });
+    }
+
+    var sub = filtered.length === 0 ? 'Keine Events gefunden' :
+              filtered.length === 1 ? '1 Event' : filtered.length + ' Events';
+    document.getElementById('eventsSubtitle').textContent = sub;
+
+    if (filtered.length === 0) {
+      document.getElementById('eventsList').innerHTML =
+        '<div style="text-align:center;padding:60px 20px;color:var(--text-3);font-size:15px">🎪<br><br>Keine Events für diesen Filter</div>';
+      return;
+    }
+
+    document.getElementById('eventsList').innerHTML = filtered.map(function(ev) {
+      var start = ev.date_start ? ev.date_start.toDate() : null;
+      var dateStr = start ? start.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'}) : '';
+      var timeStr = start ? start.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) : '';
+      var emoji = EVENT_TYPE_EMOJIS[ev.type] || '📌';
+      var typeClass = 'type-' + (ev.type||'').toLowerCase();
+      var isFull = ev.has_signup && ev.capacity > 0 && (ev.signups_count||0) >= ev.capacity;
+      var isCancelled = ev.status === 'cancelled';
+      var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' ₲' : 'Kostenpflichtig') : 'Kostenlos';
+      var spotsLeft = ev.has_signup && ev.capacity > 0 ? (ev.capacity - (ev.signups_count||0)) + ' Plätze frei' : '';
+      var statusHtml = isCancelled ? '<span class="event-status-cancelled">Abgesagt</span>' :
+                       isFull ? '<span class="event-status-full">Ausgebucht</span>' :
+                       spotsLeft ? '<span class="event-spots">' + spotsLeft + '</span>' : '';
+
+      return '<div class="event-card" onclick="showEventDetail(\'' + ev.id + '\')">'
+        + '<div class="event-card-banner ' + typeClass + '"></div>'
+        + '<div class="event-card-body">'
+        + '<div class="event-card-top">'
+        + '<div class="event-card-title">' + (ev.title||'') + '</div>'
+        + '<div class="event-card-type">' + emoji + ' ' + (ev.type||'') + '</div>'
+        + '</div>'
+        + '<div class="event-card-meta">'
+        + '<div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> '
+        + dateStr + (timeStr ? ' · ' + timeStr : '') + '</div>'
+        + '<div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> '
+        + (ev.city||'') + '</div>'
+        + '</div>'
+        + '<div class="event-card-desc">' + (ev.description||'') + '</div>'
+        + '<div class="event-card-footer">'
+        + '<span class="event-price">' + priceStr + '</span>'
+        + statusHtml
+        + '</div>'
+        + '</div></div>';
+    }).join('');
+  }
+
+  function showEventDetail(id) {
+    var ev = allEvents.find(function(e){ return e.id === id; });
+    if (!ev) return;
+    var start = ev.date_start ? ev.date_start.toDate() : null;
+    var end   = ev.date_end   ? ev.date_end.toDate()   : null;
+    var emoji = EVENT_TYPE_EMOJIS[ev.type] || '📌';
+    var color = EVENT_TYPE_COLORS[ev.type] || '#F5A623';
+
+    document.getElementById('eventDetailHeader').style.background =
+      'linear-gradient(150deg,' + color + ' 0%,' + color + 'cc 100%)';
+    document.getElementById('evDetailTypeBadge').textContent = emoji + ' ' + (ev.type||'');
+    document.getElementById('evDetailTitle').textContent = ev.title||'';
+
+    var dateStr    = start ? start.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '';
+    var timeStr    = start ? start.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) : '';
+    var timeEndStr = end   ? end.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})   : '';
+
+    document.getElementById('evDetailMeta').innerHTML =
+      '<div class="event-detail-meta">📅 ' + dateStr + '</div>'
+      + (timeStr ? '<div class="event-detail-meta">🕐 ' + timeStr + (timeEndStr ? ' – ' + timeEndStr : '') + '</div>' : '')
+      + '<div class="event-detail-meta">📍 ' + (ev.city||'') + (ev.address ? ', ' + ev.address : '') + '</div>';
+
+    var isFull = ev.has_signup && ev.capacity > 0 && (ev.signups_count||0) >= ev.capacity;
+    var isCancelled = ev.status === 'cancelled';
+    var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' Guaraní' : 'Kostenpflichtig') : 'Kostenlos';
+
+    var bodyHtml = '<div style="background:var(--card);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px">'
+      + '<p style="font-size:15px;line-height:1.6;color:var(--text-1);margin:0">' + (ev.description||'') + '</p>'
+      + '</div>';
+
+    bodyHtml += '<div style="background:var(--card);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px">';
+    bodyHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+      + '<span style="font-size:13px;color:var(--text-2)">Eintritt</span>'
+      + '<span style="font-size:15px;font-weight:700;color:var(--yellow)">' + priceStr + '</span></div>';
+    if (ev.has_signup && ev.capacity > 0) {
+      bodyHtml += '<div style="display:flex;justify-content:space-between;align-items:center">'
+        + '<span style="font-size:13px;color:var(--text-2)">Kapazität</span>'
+        + '<span style="font-size:15px;font-weight:700">' + (ev.signups_count||0) + ' / ' + ev.capacity + '</span></div>';
+    }
+    bodyHtml += '</div>';
+
+    if (ev.rules) {
+      bodyHtml += '<div style="background:var(--card);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px">'
+        + '<div style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Regeln</div>'
+        + '<p style="font-size:14px;color:var(--text-1);margin:0;line-height:1.5">' + ev.rules + '</p>'
+        + '</div>';
+    }
+
+    if (ev.has_signup && !isCancelled) {
+      if (isFull) {
+        bodyHtml += '<div style="background:#FEE2E2;border-radius:var(--radius-lg);padding:16px;text-align:center;color:#EF4444;font-weight:700;margin-bottom:14px">Ausgebucht</div>';
+      } else if (currentUser) {
+        bodyHtml += '<button onclick="signupEvent(\'' + id + '\')" style="width:100%;background:var(--yellow);border:none;border-radius:var(--radius-lg);padding:16px;font-size:16px;font-weight:700;color:white;cursor:pointer;margin-bottom:14px">Anmelden</button>';
+      } else {
+        bodyHtml += '<button onclick="showScreen(\'screenAuth\')" style="width:100%;background:var(--yellow);border:none;border-radius:var(--radius-lg);padding:16px;font-size:16px;font-weight:700;color:white;cursor:pointer;margin-bottom:14px">Einloggen zum Anmelden</button>';
+      }
+    }
+
+    if (currentUser && ev.created_by === currentUser.uid) {
+      bodyHtml += '<button onclick="cancelEvent(\'' + id + '\')" style="width:100%;background:var(--surface-2);border:none;border-radius:var(--radius-lg);padding:14px;font-size:14px;font-weight:600;color:var(--text-2);cursor:pointer">Event absagen</button>';
+    }
+
+    document.getElementById('evDetailBody').innerHTML = bodyHtml;
+    showScreen('screenEventDetail');
+  }
+
+  function showEventForm() {
+    if (!currentUser) { showScreen('screenAuth'); return; }
+    ['evFormTitle','evFormDesc','evFormCity','evFormAddress','evFormPrice','evFormCapacity','evFormRules'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('evFormType').value = '';
+    document.getElementById('evFormDate').value = '';
+    document.getElementById('evFormTimeStart').value = '';
+    document.getElementById('evFormTimeEnd').value = '';
+    document.getElementById('evFormIsPaid').checked = false;
+    document.getElementById('evFormHasSignup').checked = false;
+    document.getElementById('evFormPriceRow').style.display = 'none';
+    document.getElementById('evFormCapacityRow').style.display = 'none';
+    document.getElementById('evFormError').style.display = 'none';
+    showScreen('screenEventForm');
+  }
+
+  async function submitEvent() {
+    var title = document.getElementById('evFormTitle').value.trim();
+    var type  = document.getElementById('evFormType').value;
+    var desc  = document.getElementById('evFormDesc').value.trim();
+    var date  = document.getElementById('evFormDate').value;
+    var city  = document.getElementById('evFormCity').value.trim();
+    var errEl = document.getElementById('evFormError');
+
+    if (!title || !type || !desc || !date || !city) {
+      errEl.textContent = 'Bitte alle Pflichtfelder (*) ausfüllen.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    var btn = document.getElementById('evFormSubmitBtn');
+    btn.disabled = true; btn.textContent = 'Wird veröffentlicht...';
+
+    try {
+      var tStart = document.getElementById('evFormTimeStart').value || '00:00';
+      var tEnd   = document.getElementById('evFormTimeEnd').value   || '23:59';
+      var dateStart = new Date(date + 'T' + tStart);
+      var dateEnd   = new Date(date + 'T' + tEnd);
+      var isPaid    = document.getElementById('evFormIsPaid').checked;
+      var hasSignup = document.getElementById('evFormHasSignup').checked;
+
+      await db.collection('events').add({
+        title: title, type: type, description: desc,
+        date_start: dateStart, date_end: dateEnd,
+        city: city, address: document.getElementById('evFormAddress').value.trim() || null,
+        is_paid: isPaid,
+        ticket_price: isPaid ? (Number(document.getElementById('evFormPrice').value)||0) : 0,
+        has_signup: hasSignup,
+        capacity: hasSignup ? (Number(document.getElementById('evFormCapacity').value)||0) : 0,
+        signups_count: 0, signups: [],
+        rules: document.getElementById('evFormRules').value.trim() || null,
+        status: 'open',
+        created_by: currentUser.uid,
+        created_at: new Date()
+      });
+
+      showScreen('screenEvents');
+      loadEvents();
+    } catch(e) {
+      errEl.textContent = 'Fehler: ' + e.message;
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Event veröffentlichen';
+    }
+  }
+
+  async function signupEvent(id) {
+    if (!currentUser) return;
+    try {
+      var ref = db.collection('events').doc(id);
+      await db.runTransaction(async function(tx) {
+        var doc = await tx.get(ref);
+        var data = doc.data();
+        if (data.has_signup && data.capacity > 0 && (data.signups_count||0) >= data.capacity) throw new Error('Ausgebucht');
+        var subs = data.signups || [];
+        if (subs.includes(currentUser.uid)) throw new Error('Bereits angemeldet');
+        tx.update(ref, { signups_count: (data.signups_count||0) + 1, signups: subs.concat([currentUser.uid]) });
+      });
+      var ev = allEvents.find(function(e){ return e.id === id; });
+      if (ev) ev.signups_count = (ev.signups_count||0) + 1;
+      showToast('✅ Anmeldung erfolgreich!');
+      showEventDetail(id);
+    } catch(e) {
+      alert(e.message === 'Ausgebucht' ? 'Leider ausgebucht.' : e.message === 'Bereits angemeldet' ? 'Du bist bereits angemeldet.' : 'Fehler: ' + e.message);
+    }
+  }
+
+  async function cancelEvent(id) {
+    if (!confirm('Event wirklich absagen?')) return;
+    try {
+      await db.collection('events').doc(id).update({ status: 'cancelled' });
+      var ev = allEvents.find(function(e){ return e.id === id; });
+      if (ev) ev.status = 'cancelled';
+      showToast('Event wurde abgesagt.');
+      showScreen('screenEvents');
+      renderEvents();
+    } catch(e) { alert('Fehler: ' + e.message); }
+  }
+  // ══ END EVENTS SYSTEM ══════════════════════════════════════════════════════
+
+
+    auth.onAuthStateChanged(async user => {
     currentUser = user;
     if (user) {
       let displayName = user.email.split('@')[0];
