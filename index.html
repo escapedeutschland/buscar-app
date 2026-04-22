@@ -617,37 +617,124 @@
 
     <!-- ══ EVENT FORM SCREEN ══════════════════════════════════════════════ -->
     <div class="screen" id="screenEventForm">
-      <div style="background:var(--yellow);padding:52px 20px 20px;color:white">
-        <button onclick="showScreen('screenEvents')" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;padding:6px 12px;color:white;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>Abbrechen</button>
-        <div style="font-size:22px;font-weight:800">Event erstellen</div>
+      <div class="form-header" style="position:relative;overflow:hidden">
+        <div style="position:absolute;right:-10px;top:-10px;opacity:0.08;pointer-events:none"><svg viewBox="0 0 120 120" width="120" height="120"><rect x="20" y="15" width="80" height="90" rx="8" fill="white"/><line x1="35" y1="40" x2="85" y2="40" stroke="var(--yellow)" stroke-width="6"/><line x1="35" y1="58" x2="85" y2="58" stroke="var(--yellow)" stroke-width="6"/><line x1="35" y1="76" x2="65" y2="76" stroke="var(--yellow)" stroke-width="6"/></svg></div>
+        <button class="form-back" onclick="showScreen('screenEvents')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <div class="form-title">Event erstellen</div>
+        <div class="form-sub">Dein Event erscheint sofort für alle</div>
       </div>
-      <div style="flex:1;overflow-y:auto;padding:16px 16px 100px">
-        <div class="event-form-section">
-          <div class="event-form-section-title">Grundinfo</div>
-          <input class="form-input" id="evFormTitle" placeholder="Event-Titel *" style="margin-bottom:10px">
-          <select class="form-input" id="evFormType" style="margin-bottom:10px"><option value="">Typ wählen *</option><option value="Party">🎊 Party</option><option value="Festival">🎪 Festival</option><option value="Konzert">🎵 Konzert</option><option value="Retreat">🧘 Retreat</option><option value="Workshop">🛠 Workshop</option><option value="Sport">⚽ Sport</option><option value="Markt">🛒 Markt</option><option value="Sonstiges">📌 Sonstiges</option></select>
-          <textarea class="form-input" id="evFormDesc" placeholder="Beschreibung *" rows="3" style="margin-bottom:0;resize:none"></textarea>
+      <div class="form-body">
+        <div id="evFormError" class="form-error-msg" style="display:none"></div>
+
+        <!-- Grundinfo -->
+        <div class="form-card">
+          <div class="form-card-title">Grundinfo</div>
+          <div class="form-field">
+            <label class="field-label">Event-Titel *</label>
+            <input class="field-input" id="evFormTitle" placeholder="z.B. Terere Festival Asunción" maxlength="80">
+          </div>
+          <div class="form-field">
+            <label class="field-label">Typ *</label>
+            <select class="field-select" id="evFormType">
+              <option value="">Typ wählen...</option>
+              <option value="Party">🎊 Party</option>
+              <option value="Festival">🎪 Festival</option>
+              <option value="Konzert">🎵 Konzert</option>
+              <option value="Retreat">🧘 Retreat</option>
+              <option value="Workshop">🛠 Workshop</option>
+              <option value="Sport">⚽ Sport</option>
+              <option value="Markt">🛒 Markt</option>
+              <option value="Sonstiges">📌 Sonstiges</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="field-label">Beschreibung *</label>
+            <textarea class="field-input" id="evFormDesc" placeholder="Was erwartet die Besucher? Mindestens 30 Zeichen." rows="4" style="resize:none"></textarea>
+          </div>
         </div>
-        <div class="event-form-section">
-          <div class="event-form-section-title">Datum & Ort</div>
-          <input class="form-input" id="evFormDate" type="date" style="margin-bottom:10px">
-          <div style="display:flex;gap:8px;margin-bottom:10px"><input class="form-input" id="evFormTimeStart" type="time" style="flex:1"><input class="form-input" id="evFormTimeEnd" type="time" style="flex:1"></div>
-          <input class="form-input" id="evFormCity" placeholder="Stadt *" style="margin-bottom:10px">
-          <input class="form-input" id="evFormAddress" placeholder="Adresse / Veranstaltungsort">
+
+        <!-- Datum & Zeit -->
+        <div class="form-card">
+          <div class="form-card-title">Datum & Zeit</div>
+          <div class="form-field">
+            <label class="field-label">Datum *</label>
+            <input class="field-input" id="evFormDate" type="date">
+          </div>
+          <div class="form-field">
+            <label class="field-label">Uhrzeit</label>
+            <div style="display:flex;gap:10px;align-items:center">
+              <input class="field-input" id="evFormTimeStart" type="time" style="flex:1">
+              <span style="color:var(--text-3);font-size:13px;flex-shrink:0">bis</span>
+              <input class="field-input" id="evFormTimeEnd" type="time" style="flex:1">
+            </div>
+          </div>
         </div>
-        <div class="event-form-section">
-          <div class="event-form-section-title">Preis & Kapazität</div>
-          <div class="event-toggle-row" style="margin-bottom:10px"><span class="event-toggle-label">Kostenpflichtig</span><label class="event-toggle"><input type="checkbox" id="evFormIsPaid" onchange="document.getElementById('evFormPriceRow').style.display=this.checked?'block':'none'"><span class="event-toggle-slider"></span></label></div>
-          <div id="evFormPriceRow" style="display:none;margin-bottom:10px"><input class="form-input" id="evFormPrice" type="number" placeholder="Preis in Guaraní"></div>
-          <div class="event-toggle-row"><span class="event-toggle-label">Anmeldung aktivieren</span><label class="event-toggle"><input type="checkbox" id="evFormHasSignup" onchange="document.getElementById('evFormCapacityRow').style.display=this.checked?'block':'none'"><span class="event-toggle-slider"></span></label></div>
-          <div id="evFormCapacityRow" style="display:none;margin-top:10px"><input class="form-input" id="evFormCapacity" type="number" placeholder="Max. Teilnehmer"></div>
+
+        <!-- Ort -->
+        <div class="form-card">
+          <div class="form-card-title">Ort</div>
+          <div class="form-field">
+            <label class="field-label">Stadt *</label>
+            <input class="field-input" id="evFormCity" placeholder="z.B. Asunción">
+          </div>
+          <div class="form-field">
+            <label class="field-label">Adresse / Veranstaltungsort</label>
+            <input class="field-input" id="evFormAddress" placeholder="z.B. Av. España 1234">
+          </div>
+          <div class="form-field">
+            <label class="field-label">Standort auf Karte</label>
+            <div id="evMapPicker" style="width:100%;height:180px;border-radius:12px;overflow:hidden;border:1.5px solid var(--border);margin-bottom:8px;background:var(--surface-2)"></div>
+            <button onclick="evPickLocation()" style="width:100%;padding:12px;background:var(--yellow-light,#FFF8EC);color:var(--yellow-dark,#B8661A);border:1.5px solid var(--yellow);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+              Meinen Standort verwenden
+            </button>
+            <div id="evLocationStatus" style="font-size:12px;color:var(--text-3);margin-top:6px;display:none"></div>
+          </div>
         </div>
-        <div class="event-form-section">
-          <div class="event-form-section-title">Regeln (optional)</div>
-          <textarea class="form-input" id="evFormRules" placeholder="z.B. Nur 18+, max. 1 Begleitung..." rows="2" style="resize:none"></textarea>
+
+        <!-- Fotos -->
+        <div class="form-card">
+          <div class="form-card-title">Fotos</div>
+          <div id="evFormPhotoGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px"></div>
+          <input type="file" id="evPhotoInput" accept="image/*" multiple style="display:none" onchange="handleEvPhotos(event)">
+          <button onclick="document.getElementById('evPhotoInput').click()" style="width:100%;padding:12px;background:var(--surface-2);border:1.5px dashed var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Fotos hinzufügen
+          </button>
+          <div id="evPhotoProgress" style="font-size:12px;color:var(--text-3);margin-top:6px;display:none"></div>
         </div>
-        <div id="evFormError" style="color:#EF4444;font-size:13px;font-weight:600;margin-bottom:10px;display:none"></div>
-        <button onclick="submitEvent()" id="evFormSubmitBtn" style="width:100%;background:var(--yellow);border:none;border-radius:var(--radius-lg);padding:16px;font-size:16px;font-weight:700;color:white;cursor:pointer">Event veröffentlichen</button>
+
+        <!-- Preis & Anmeldung -->
+        <div class="form-card">
+          <div class="form-card-title">Preis & Anmeldung</div>
+          <div class="event-toggle-row">
+            <div><span class="event-toggle-label">Kostenpflichtig</span><div style="font-size:11px;color:var(--text-3);margin-top:2px">Eintrittsgebühr angeben</div></div>
+            <label class="event-toggle"><input type="checkbox" id="evFormIsPaid" onchange="document.getElementById('evFormPriceRow').style.display=this.checked?'block':'none'"><span class="event-toggle-slider"></span></label>
+          </div>
+          <div id="evFormPriceRow" style="display:none;margin-top:12px">
+            <label class="field-label">Preis (Guaraní)</label>
+            <input class="field-input" id="evFormPrice" type="number" placeholder="z.B. 50000">
+          </div>
+          <div style="height:1px;background:var(--border);margin:14px 0"></div>
+          <div class="event-toggle-row">
+            <div><span class="event-toggle-label">Anmeldung aktivieren</span><div style="font-size:11px;color:var(--text-3);margin-top:2px">User können sich anmelden</div></div>
+            <label class="event-toggle"><input type="checkbox" id="evFormHasSignup" onchange="document.getElementById('evFormCapacityRow').style.display=this.checked?'block':'none'"><span class="event-toggle-slider"></span></label>
+          </div>
+          <div id="evFormCapacityRow" style="display:none;margin-top:12px">
+            <label class="field-label">Max. Teilnehmer</label>
+            <input class="field-input" id="evFormCapacity" type="number" placeholder="z.B. 200">
+          </div>
+        </div>
+
+        <!-- Regeln -->
+        <div class="form-card">
+          <div class="form-card-title">Regeln <span style="font-weight:400;color:var(--text-3)">(optional)</span></div>
+          <div class="form-field">
+            <textarea class="field-input" id="evFormRules" placeholder="z.B. Nur 18+, max. 1 Begleitung, kein Alkohol..." rows="3" style="resize:none"></textarea>
+          </div>
+        </div>
+
+        <button onclick="submitEvent()" id="evFormSubmitBtn" class="form-submit-btn" style="margin-top:4px">Event veröffentlichen</button>
       </div>
     </div>
 
@@ -2219,10 +2306,103 @@
     document.getElementById('evFormPriceRow').style.display = 'none';
     document.getElementById('evFormCapacityRow').style.display = 'none';
     document.getElementById('evFormError').style.display = 'none';
+    document.getElementById('evFormPhotoGrid').innerHTML = '';
+    document.getElementById('evLocationStatus').style.display = 'none';
+    evPendingPhotos = [];
+    _evLat = null; _evLng = null;
     showScreen('screenEventForm');
+    if (_evMapPicker) { setTimeout(function(){ _evMapPicker.resize(); }, 200); }
   }
 
-  async function submitEvent() {
+  let _evLat = null, _evLng = null;
+  let evPendingPhotos = [];
+  let _evMapPicker = null;
+
+  function evPickLocation() {
+    if (navigator.geolocation) {
+      document.getElementById('evLocationStatus').style.display = 'block';
+      document.getElementById('evLocationStatus').textContent = 'Standort wird ermittelt...';
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        _evLat = pos.coords.latitude;
+        _evLng = pos.coords.longitude;
+        document.getElementById('evLocationStatus').textContent = '📍 Standort gesetzt: ' + _evLat.toFixed(4) + ', ' + _evLng.toFixed(4);
+        initEvMap(_evLat, _evLng);
+      }, function() {
+        document.getElementById('evLocationStatus').textContent = 'Standort konnte nicht ermittelt werden.';
+      });
+    }
+  }
+
+  function initEvMap(lat, lng) {
+    if (!_evMapPicker) {
+      _evMapPicker = new maplibregl.Map({
+        container: 'evMapPicker',
+        style: ML_STYLE,
+        center: [lng, lat],
+        zoom: 14,
+        interactive: true,
+        dragRotate: false,
+        attributionControl: false
+      });
+      _evMapPicker.dragRotate.disable();
+      _evMapPicker.touchZoomRotate.disableRotation();
+      var marker = new maplibregl.Marker({ color: '#F5A623', draggable: true })
+        .setLngLat([lng, lat])
+        .addTo(_evMapPicker);
+      marker.on('dragend', function() {
+        var lngLat = marker.getLngLat();
+        _evLat = lngLat.lat;
+        _evLng = lngLat.lng;
+        document.getElementById('evLocationStatus').textContent = '📍 ' + _evLat.toFixed(4) + ', ' + _evLng.toFixed(4);
+      });
+      _evMapPicker.on('click', function(e) {
+        _evLat = e.lngLat.lat;
+        _evLng = e.lngLat.lng;
+        marker.setLngLat([_evLng, _evLat]);
+        document.getElementById('evLocationStatus').textContent = '📍 ' + _evLat.toFixed(4) + ', ' + _evLng.toFixed(4);
+      });
+    } else {
+      _evMapPicker.setCenter([lng, lat]);
+      _evMapPicker.resize();
+    }
+  }
+
+  function handleEvPhotos(event) {
+    evPendingPhotos = Array.from(event.target.files);
+    var grid = document.getElementById('evFormPhotoGrid');
+    grid.innerHTML = evPendingPhotos.map(function(f, i) {
+      var url = URL.createObjectURL(f);
+      return '<div style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden">'
+        + '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover">'
+        + '<button onclick="removeEvPhoto(' + i + ')" style="position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>'
+        + '</div>';
+    }).join('');
+  }
+
+  function removeEvPhoto(index) {
+    evPendingPhotos.splice(index, 1);
+    handleEvPhotos({ target: { files: evPendingPhotos } });
+  }
+
+  async function uploadEvPhotos(eventId) {
+    if (!evPendingPhotos.length) return;
+    var progress = document.getElementById('evPhotoProgress');
+    progress.style.display = 'block';
+    for (var i = 0; i < evPendingPhotos.length; i++) {
+      var file = evPendingPhotos[i];
+      progress.textContent = 'Foto ' + (i+1) + ' von ' + evPendingPhotos.length + ' wird hochgeladen...';
+      var filename = Date.now() + '_' + i + '.' + file.name.split('.').pop();
+      var ref = storage.ref('events/' + eventId + '/' + filename);
+      var snap = await ref.put(file);
+      var url = await snap.ref.getDownloadURL();
+      await db.collection('events').doc(eventId).update({
+        photos: firebase.firestore.FieldValue.arrayUnion(url)
+      });
+    }
+    progress.textContent = 'Fotos hochgeladen!';
+  }
+
+    async function submitEvent() {
     var title = document.getElementById('evFormTitle').value.trim();
     var type  = document.getElementById('evFormType').value;
     var desc  = document.getElementById('evFormDesc').value.trim();
@@ -2247,21 +2427,24 @@
       var isPaid    = document.getElementById('evFormIsPaid').checked;
       var hasSignup = document.getElementById('evFormHasSignup').checked;
 
-      await db.collection('events').add({
+      var evRef = await db.collection('events').add({
         title: title, type: type, description: desc,
         date_start: dateStart, date_end: dateEnd,
         city: city, address: document.getElementById('evFormAddress').value.trim() || null,
+        lat: _evLat, lng: _evLng,
         is_paid: isPaid,
         ticket_price: isPaid ? (Number(document.getElementById('evFormPrice').value)||0) : 0,
         has_signup: hasSignup,
         capacity: hasSignup ? (Number(document.getElementById('evFormCapacity').value)||0) : 0,
         signups_count: 0, signups: [],
+        photos: [],
         rules: document.getElementById('evFormRules').value.trim() || null,
         status: 'open',
         created_by: currentUser.uid,
         created_at: new Date()
       });
 
+      if (evPendingPhotos.length) await uploadEvPhotos(evRef.id);
       showScreen('screenEvents');
       loadEvents();
     } catch(e) {
