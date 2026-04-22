@@ -1230,7 +1230,7 @@
           <div class="profil-row-left">
             <div class="profil-row-icon">🎪</div>
             <div>
-              <span class="profil-row-label">Meine Events</span>
+              <span class="profil-row-label" data-i18n="my_events_title">Meine Events</span>
               <div id="myEventsCount" style="font-size:11px;color:var(--text-3);margin-top:1px"></div>
             </div>
           </div>
@@ -1247,7 +1247,7 @@
           <div class="profil-row-left">
             <div class="profil-row-icon">🎟️</div>
             <div>
-              <span class="profil-row-label">Angemeldete Events</span>
+              <span class="profil-row-label" data-i18n="my_signups_title">Angemeldete Events</span>
               <div id="mySignupsCount" style="font-size:11px;color:var(--text-3);margin-top:1px"></div>
             </div>
           </div>
@@ -1614,6 +1614,17 @@
       ev_signup_btn: 'Anmelden', ev_login_signup: 'Einloggen zum Anmelden',
       ev_cancel_btn: 'Event absagen', ev_cancel_confirm: 'Event wirklich absagen?',
       ev_delete_btn: 'Löschen', ev_delete_confirm: 'Event endgültig löschen?', ev_delete_ok: 'Event gelöscht.',
+      // Profile events
+      my_events_title: 'Meine Events', loading: 'Wird geladen...', error_loading: 'Fehler beim Laden.', ev_cancel_done: 'Event wurde abgesagt.', my_signups_title: 'Angemeldete Events',
+      my_events_none: 'Du hast noch keine Events erstellt.',
+      my_events_count_0: 'Noch keine Events', my_events_count_1: '1 Event',
+      my_signups_none: 'Du hast dich noch bei keinem Event angemeldet.',
+      my_signups_count_0: 'Keine Anmeldungen',
+      ev_active: 'Aktiv', ev_details: 'Details →',
+      ev_past: 'Vergangen', ev_cancelled_warning: '⚠️ Dieses Event wurde abgesagt',
+      ev_unsignup_confirm: 'Von diesem Event abmelden?', ev_unsignup_ok: '✅ Abgemeldet.',
+      ev_already_signed_up: '✅ Du bist angemeldet', ev_unsignup_btn: 'Abmelden',
+      ev_signups_label: 'Anmeldungen',
       ev_signup_ok: '✅ Anmeldung erfolgreich!', ev_already_signed: 'Du bist bereits angemeldet.',
       ev_full_msg: 'Ausgebucht', ev_error_fields: 'Bitte alle Pflichtfelder (*) ausfüllen.',
       // Badges
@@ -1732,6 +1743,17 @@
       ev_signup_btn: 'Registrarse', ev_login_signup: 'Iniciar sesión para registrarse',
       ev_cancel_btn: 'Cancelar evento', ev_cancel_confirm: '¿Cancelar este evento?',
       ev_delete_btn: 'Eliminar', ev_delete_confirm: '¿Eliminar este evento definitivamente?', ev_delete_ok: 'Evento eliminado.',
+      // Perfil eventos
+      my_events_title: 'Mis Eventos', loading: 'Cargando...', error_loading: 'Error al cargar.', ev_cancel_done: 'Evento cancelado.', my_signups_title: 'Eventos Registrados',
+      my_events_none: 'Aún no has creado ningún evento.',
+      my_events_count_0: 'Sin eventos', my_events_count_1: '1 Evento',
+      my_signups_none: 'Aún no te has registrado en ningún evento.',
+      my_signups_count_0: 'Sin registros',
+      ev_active: 'Activo', ev_details: 'Detalles →',
+      ev_past: 'Pasado', ev_cancelled_warning: '⚠️ Este evento fue cancelado',
+      ev_unsignup_confirm: '¿Cancelar registro en este evento?', ev_unsignup_ok: '✅ Registro cancelado.',
+      ev_already_signed_up: '✅ Estás registrado', ev_unsignup_btn: 'Cancelar registro',
+      ev_signups_label: 'Registros',
       ev_signup_ok: '✅ ¡Registro exitoso!', ev_already_signed: 'Ya estás registrado.',
       ev_full_msg: 'Sin lugares disponibles', ev_error_fields: 'Por favor completa todos los campos obligatorios (*).',
       // Badges
@@ -2825,8 +2847,8 @@
         var db2 = b.date_start ? b.date_start.toDate() : new Date(0);
         return db2 - da;
       });
-      countEl.textContent = events.length === 0 ? 'Noch keine Events' :
-        events.length === 1 ? '1 Event' : events.length + ' Events';
+      countEl.textContent = events.length === 0 ? t('my_events_count_0') :
+        events.length === 1 ? t('my_events_count_1') : events.length + ' ' + t('nav_events');
       if (events.length === 0) {
         list.innerHTML = '<div style="font-size:13px;color:var(--text-3);padding:8px 0">Du hast noch keine Events erstellt.</div>';
         return;
@@ -2871,7 +2893,7 @@
         var db2 = b.date_start ? b.date_start.toDate() : new Date(0);
         return da - db2;
       });
-      countEl.textContent = events.length === 0 ? 'Keine Anmeldungen' :
+      countEl.textContent = events.length === 0 ? t('my_signups_count_0') :
         events.length === 1 ? '1 Event' : events.length + ' Events';
       if (events.length === 0) {
         list.innerHTML = '<div style="font-size:13px;color:var(--text-3);padding:8px 0">Du hast dich noch bei keinem Event angemeldet.</div>';
@@ -2917,7 +2939,7 @@
 
   async function unsignupEvent(id) {
     if (!currentUser) return;
-    if (!confirm('Von diesem Event abmelden?')) return;
+    if (!confirm(t('ev_unsignup_confirm'))) return;
     try {
       var ref = db.collection('events').doc(id);
       await db.runTransaction(async function(tx) {
@@ -2932,7 +2954,7 @@
         ev.signups_count = Math.max(0, (ev.signups_count||1) - 1);
         ev.signups = (ev.signups||[]).filter(function(uid){ return uid !== currentUser.uid; });
       }
-      showToast('✅ Abgemeldet.');
+      showToast(t('ev_unsignup_ok'));
       loadMySignups();
     } catch(e) { alert('Fehler: ' + e.message); }
   }
