@@ -1200,7 +1200,7 @@
           <div class="profil-row-left">
             <div class="profil-row-icon">🏆</div>
             <div>
-              <span class="profil-row-label" data-i18n="badge_title">🏆 Meine Auszeichnungen</span>
+              <span class="profil-row-label" data-i18n="badge_title">Meine Auszeichnungen</span>
               <div id="profilListingsCount" style="font-size:11px;color:var(--text-3);margin-top:1px"></div>
             </div>
           </div>
@@ -1582,7 +1582,7 @@
       ev_signup_ok: '✅ Anmeldung erfolgreich!', ev_already_signed: 'Du bist bereits angemeldet.',
       ev_full_msg: 'Ausgebucht', ev_error_fields: 'Bitte alle Pflichtfelder (*) ausfüllen.',
       // Badges
-      badge_title: '🏆 Meine Auszeichnungen',
+      badge_title: 'Meine Auszeichnungen',
       badge_first: 'Erster Eintrag', badge_five: '5 Einträge', badge_ten: '10 Einträge',
       badge_twenty: '20 Einträge', badge_fifty: '50 Einträge', badge_hundred: '100 Einträge',
       badge_explorer: 'Entdecker', badge_chaco: 'Chaco-Kenner',
@@ -1700,7 +1700,7 @@
       ev_signup_ok: '✅ ¡Registro exitoso!', ev_already_signed: 'Ya estás registrado.',
       ev_full_msg: 'Sin lugares disponibles', ev_error_fields: 'Por favor completa todos los campos obligatorios (*).',
       // Badges
-      badge_title: '🏆 Mis Insignias',
+      badge_title: 'Mis Insignias',
       badge_first: 'Primer registro', badge_five: '5 registros', badge_ten: '10 registros',
       badge_twenty: '20 registros', badge_fifty: '50 registros', badge_hundred: '100 registros',
       badge_explorer: 'Explorador', badge_chaco: 'Conocedor del Chaco',
@@ -2205,7 +2205,7 @@
           await db.collection('users').doc(uid).set({ badges: earned }, { merge: true });
           newlyEarned.forEach(id => {
             const def = getBadgeDefs().find(b => b.id === id);
-            if (def) showToast('🏆 Neue Auszeichnung: ' + def.name + ' ' + def.emoji);
+            if (def) showToast('🏆 ' + def.name + ' ' + def.emoji);
           });
           renderBadgeGrid(earned); // update grid with new badges
         } catch(e) {}
