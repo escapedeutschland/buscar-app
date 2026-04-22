@@ -2532,36 +2532,56 @@
         var now = new Date();
         var snap = await db.collection('events').where('date_end','>=',now).get();
         events = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+        allEvents = events;
       } catch(e) { return; }
     }
     events.forEach(function(ev) {
       if (!ev.lat || !ev.lng) return;
       var color = EVENT_TYPE_COLORS[ev.type] || '#F5A623';
       var emoji = EVENT_TYPE_EMOJIS[ev.type] || '📅';
-      var el = document.createElement('div');
-      el.style.cssText = 'width:36px;height:36px;background:'+color+';border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;';
-      el.textContent = emoji;
       var evId = ev.id;
-      var evTitle = (ev.title||'').replace(/'/g,"&#39;");
-      var evCity = (ev.city||'').replace(/'/g,"&#39;");
-      var evType = (ev.type||'');
-      var marker = new maplibregl.Marker({ element: el })
+      var evTitle = ev.title || '';
+      var evCity = ev.city || '';
+      var evType = ev.type || '';
+
+      // Outer pin like listings
+      var el = document.createElement('div');
+      el.style.cssText = [
+        'width:40px;height:40px;border-radius:50% 50% 50% 0;transform:rotate(-45deg)',
+        'background:'+color+';border:2px solid white',
+        'box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;',
+        'display:flex;align-items:center;justify-content:center'
+      ].join(';');
+      var inner = document.createElement('span');
+      inner.style.cssText = 'transform:rotate(45deg);font-size:18px;display:block;line-height:1;';
+      inner.textContent = emoji;
+      el.appendChild(inner);
+
+      // Tooltip on hover
+      el.title = evTitle + ' · ' + evCity;
+
+      var marker = new maplibregl.Marker({ element: el, anchor: 'bottom-left' })
         .setLngLat([ev.lng, ev.lat])
         .addTo(maplibreMap);
-      var popup = new maplibregl.Popup({ closeButton:false, maxWidth:'220px' })
-        .setHTML('<div class="map-popup" onclick="evMarkerClick(\''+evId+'\')"><div class="map-popup-name">' + evTitle + '</div><div class="map-popup-city">' + evCity + ' &middot; ' + evType + '</div></div>');
-      marker.setPopup(popup);
-      el.addEventListener('click', function(){ marker.togglePopup(); });
+
+      // Direct click → open detail (no popup needed)
+      el.addEventListener('click', function(e) {
+        e.stopPropagation();
+        evMarkerClick(evId);
+      });
+
       _eventsMapMarkers.push(marker);
     });
   }
 
+
   function evMarkerClick(id) {
     setNav('navEvents');
-    showScreen('screenEvents');
     if (allEvents.length) {
+      showScreen('screenEventDetail');
       showEventDetail(id);
     } else {
+      showScreen('screenEvents');
       loadEvents().then(function(){ showEventDetail(id); });
     }
   }
