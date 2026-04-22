@@ -599,6 +599,10 @@
         <div class="event-chip" id="evType-markt" onclick="setEventType('Markt')">🛒 Markt</div>
         <div class="event-chip" id="evType-sonstiges" onclick="setEventType('Sonstiges')">📌 Sonstiges</div>
       </div>
+      <div id="ptrEvents" style="text-align:center;height:0;overflow:hidden;transition:height 0.2s;color:var(--text-3);font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16" class="ptr-arrow" style="transition:transform 0.2s"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        <span class="ptr-text" data-i18n="ptr_pull">Aktualisieren</span>
+      </div>
       <div style="flex:1;overflow-y:auto;padding:8px 0 100px" id="eventsList">
         <div style="text-align:center;padding:40px 20px;color:var(--text-3)" data-i18n="events_loading">Events werden geladen...</div>
       </div>
@@ -618,6 +622,10 @@
         <div class="event-detail-type-badge" id="evDetailTypeBadge"></div>
         <div class="event-detail-title" id="evDetailTitle"></div>
         <div class="event-detail-meta-row" id="evDetailMeta"></div>
+      </div>
+      <div id="ptrEventDetail" style="text-align:center;height:0;overflow:hidden;transition:height 0.2s;color:var(--text-3);font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16" class="ptr-arrow" style="transition:transform 0.2s"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        <span class="ptr-text" data-i18n="ptr_pull">Aktualisieren</span>
       </div>
       <div style="flex:1;overflow-y:auto;padding:16px 16px 100px" id="evDetailBody"></div>
     </div>
@@ -865,8 +873,8 @@
     </div>
     <div class="listings">
       <div id="pullIndicator" style="text-align:center;height:0;overflow:hidden;transition:height 0.2s;color:var(--text-3);font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16" id="pullArrow" style="transition:transform 0.2s"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-        <span id="pullText">Aktualisieren</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16" class="ptr-arrow" style="transition:transform 0.2s"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        <span class="ptr-text">Aktualisieren</span>
       </div>
       <div class="section-title" id="sectionTitle">Alle Einträge</div>
       <div id="listingsInner">
@@ -1428,7 +1436,8 @@
       <div class="form-title">Meine Favoriten</div>
       <div class="form-sub">Gespeicherte Orte</div>
     </div>
-    <div style="padding:16px 16px 100px" id="favoritesBody">
+    <div id="ptrFavorites" style="text-align:center;height:0;overflow:hidden;transition:height 0.2s;color:var(--text-3);font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16" class="ptr-arrow" style="transition:transform 0.2s"><path d="M12 5v14M5 12l7 7 7-7"/></svg><span class="ptr-text" data-i18n="ptr_pull">Aktualisieren</span></div>
+    <div style="overflow-y:auto;padding:16px 16px 100px" id="favoritesBody">
       <div class="empty-state">
         <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
         <div class="empty-title">Noch keine Favoriten</div>
@@ -1582,6 +1591,7 @@
       min_stars: 'Minimum Sterne', stars_all: 'Alle',
       apply_filter: 'Anwenden',
       cancel: 'Abbrechen',
+      ptr_pull: 'Aktualisieren', ptr_release: 'Loslassen...',
       approve: 'Genehmigen',
       reject: 'Ablehnen',
       // Events
@@ -1711,6 +1721,7 @@
       min_stars: 'Estrellas mínimas', stars_all: 'Todas',
       apply_filter: 'Aplicar',
       cancel: 'Cancelar',
+      ptr_pull: 'Actualizar', ptr_release: 'Soltar...',
       approve: 'Aprobar',
       reject: 'Rechazar',
       // Events
@@ -2120,6 +2131,17 @@
     if (id === 'screenProfil' && currentUser) {
       loadBadges(currentUser.uid);
     }
+    // Setup PTR for each screen
+    var ptrMap = {
+      'screenEvents':      { el: document.getElementById('eventsList'),    ind: 'ptrEvents',      fn: function(){ loadEvents(); } },
+      'screenProfil':      { el: document.querySelector('#screenProfil .profil-body'), ind: 'ptrProfil', fn: function(){ if(currentUser) loadBadges(currentUser.uid); } },
+      'screenFavorites':   { el: document.getElementById('favoritesBody'), ind: 'ptrFavorites',   fn: function(){ loadFavorites(); } },
+      'screenEventDetail': { el: document.getElementById('evDetailBody'),  ind: 'ptrEventDetail', fn: function(){ if(_currentEventId) showEventDetail(_currentEventId, _evDetailSource); } },
+    };
+    if (ptrMap[id] && ptrMap[id].el && !ptrMap[id].el._ptrDone) {
+      setupPTR(ptrMap[id].el, ptrMap[id].ind, ptrMap[id].fn);
+      ptrMap[id].el._ptrDone = true;
+    }
   }
 
   function switchTab(tab) {
@@ -2426,7 +2448,9 @@
     }).join('');
   }
 
+  var _currentEventId = null;
   function showEventDetail(id, source) {
+    _currentEventId = id;
     if (source) _evDetailSource = source;
     var ev = allEvents.find(function(e){ return e.id === id; });
     if (!ev) return;
@@ -3955,32 +3979,45 @@
     let startY = 0, pulling = false, triggered = false;
     const el = document.querySelector('.listings');
     if (!el) return;
-    el.addEventListener('touchstart', e => {
+    // Generic PTR – reused by all screens
+    setupPTR(el, 'pullIndicator', function(){ loadListings(); });
+  })(); }); // end window.load
+
+  function setupPTR(el, indicatorId, onRefresh) {
+    if (!el) return;
+    var startY = 0, pulling = false, triggered = false;
+    el.addEventListener('touchstart', function(e) {
       if (el.scrollTop === 0) { startY = e.touches[0].clientY; pulling = true; triggered = false; }
     }, { passive: true });
-    el.addEventListener('touchmove', e => {
+    el.addEventListener('touchmove', function(e) {
       if (!pulling) return;
-      const dy = e.touches[0].clientY - startY;
+      var dy = e.touches[0].clientY - startY;
       if (dy > 0 && el.scrollTop === 0) {
-        const ind = document.getElementById('pullIndicator');
-        const arrow = document.getElementById('pullArrow');
-        const pull = Math.min(dy, 80);
+        var ind = document.getElementById(indicatorId);
+        if (!ind) return;
+        var arrow = ind.querySelector('.ptr-arrow');
+        var txt = ind.querySelector('.ptr-text');
+        var pull = Math.min(dy, 80);
         ind.style.height = (pull * 0.7) + 'px';
-        arrow.style.transform = pull > 55 ? 'rotate(180deg)' : 'rotate(0deg)';
-        if (pull > 55 && !triggered) { triggered = true; document.getElementById('pullText').textContent = 'Loslassen...'; }
-        if (pull <= 55 && triggered) { triggered = false; document.getElementById('pullText').textContent = 'Aktualisieren'; }
+        if (arrow) arrow.style.transform = pull > 55 ? 'rotate(180deg)' : '';
+        if (pull > 55 && !triggered) { triggered = true; if(txt) txt.textContent = t('ptr_release') || 'Loslassen...'; }
+        if (pull <= 55 && triggered) { triggered = false; if(txt) txt.textContent = t('ptr_pull') || 'Aktualisieren'; }
       }
     }, { passive: true });
-    el.addEventListener('touchend', () => {
+    el.addEventListener('touchend', function() {
       if (!pulling) return;
       pulling = false;
-      const ind = document.getElementById('pullIndicator');
-      ind.style.height = '0';
-      document.getElementById('pullArrow').style.transform = 'rotate(0deg)';
-      document.getElementById('pullText').textContent = 'Aktualisieren';
-      if (triggered) { triggered = false; loadListings(); }
+      var ind = document.getElementById(indicatorId);
+      if (ind) {
+        ind.style.height = '0';
+        var arrow = ind.querySelector('.ptr-arrow');
+        var txt = ind.querySelector('.ptr-text');
+        if (arrow) arrow.style.transform = '';
+        if (txt) txt.textContent = t('ptr_pull') || 'Aktualisieren';
+      }
+      if (triggered) { triggered = false; onRefresh(); }
     });
-  })(); }); // end window.load
+  }
 
   // Check if a place is open now - supports two time blocks
   function isNew(c){if(!c)return false;try{var d=c.toDate?c.toDate():new Date(c);return(Date.now()-d.getTime())<1209600000;}catch(e){return false;}}
