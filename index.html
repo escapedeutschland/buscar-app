@@ -249,7 +249,8 @@
     .photo-lightbox-close svg { width: 18px; height: 18px; stroke: white; }
 
     /* FILTER PANEL */
-    .filter-bar { display: flex; align-items: center; gap: 8px; padding: 0 16px 10px; flex-shrink: 0; }
+    .filter-bar { display: flex; align-items: center; gap: 8px; padding: 0 16px 10px; flex-shrink: 0; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .filter-bar::-webkit-scrollbar { display: none; }
     .filter-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--card); cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-2); white-space: nowrap; transition: all 0.18s; }
     .filter-btn svg { width: 13px; height: 13px; stroke: var(--text-2); fill: none; }
     .filter-btn.active { background: var(--text-1); border-color: var(--text-1); color: white; }
