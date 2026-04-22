@@ -1799,7 +1799,7 @@
   async function loadBadges(uid) {
     try {
       // Count user listings
-      const snap = await db.collection('listings').where('owner_id','==',uid).get();
+      const snap = await db.collection('listings').where('created_by','==',uid).get();
       const count = snap.size;
       document.getElementById('profilListingsCount').textContent =
         count === 0 ? 'Noch keine eigenen Einträge' :
