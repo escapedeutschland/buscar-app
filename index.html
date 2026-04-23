@@ -2985,6 +2985,96 @@
 
   // ── END PROFIL EVENTS ──────────────────────────────────────────────────────
 
+  
+  // ══ KOORDINATEN-EDITOR (nur Admin) ════════════════════════════════════════
+  var _coordListingId = null;
+  var _coordMap = null;
+  var _coordMarker = null;
+  var _coordLat = null;
+  var _coordLng = null;
+
+  function openCoordEditor(listingId) {
+    var l = allListings.find(function(x){ return x.id === listingId; });
+    if (!l) return;
+    _coordListingId = listingId;
+    _coordLat = l.lat || -25.2867;
+    _coordLng = l.lng || -57.6470;
+
+    document.getElementById('coordEditorName').textContent = l.name || 'Koordinaten setzen';
+    document.getElementById('coordEditorSub').textContent = (l.city || '') + (l.address ? ' · ' + l.address : '');
+    document.getElementById('coordLat').textContent = _coordLat ? _coordLat.toFixed(6) : '–';
+    document.getElementById('coordLng').textContent = _coordLng ? _coordLng.toFixed(6) : '–';
+
+    showScreen('screenCoordEditor');
+
+    setTimeout(function() {
+      if (!_coordMap) {
+        _coordMap = new maplibregl.Map({
+          container: 'coordEditorMap',
+          style: ML_STYLE,
+          center: [_coordLng, _coordLat],
+          zoom: 16,
+          attributionControl: false
+        });
+        _coordMap.dragRotate.disable();
+        _coordMap.touchZoomRotate.disableRotation();
+
+        _coordMarker = new maplibregl.Marker({ color: '#1D4ED8', draggable: true })
+          .setLngLat([_coordLng, _coordLat])
+          .addTo(_coordMap);
+
+        _coordMarker.on('dragend', function() {
+          var pos = _coordMarker.getLngLat();
+          _coordLat = pos.lat;
+          _coordLng = pos.lng;
+          document.getElementById('coordLat').textContent = _coordLat.toFixed(6);
+          document.getElementById('coordLng').textContent = _coordLng.toFixed(6);
+        });
+
+        _coordMap.on('click', function(e) {
+          _coordLat = e.lngLat.lat;
+          _coordLng = e.lngLat.lng;
+          _coordMarker.setLngLat([_coordLng, _coordLat]);
+          document.getElementById('coordLat').textContent = _coordLat.toFixed(6);
+          document.getElementById('coordLng').textContent = _coordLng.toFixed(6);
+        });
+      } else {
+        _coordMap.resize();
+        _coordMap.setCenter([_coordLng, _coordLat]);
+        _coordMap.setZoom(16);
+        _coordMarker.setLngLat([_coordLng, _coordLat]);
+      }
+    }, 150);
+  }
+
+  function closeCoordEditor() {
+    showScreen('screenDetail');
+  }
+
+  async function saveCoordinates() {
+    if (!_coordListingId || !_coordLat || !_coordLng) return;
+    var btn = document.getElementById('coordSaveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Wird gespeichert...';
+    try {
+      await db.collection('listings').doc(_coordListingId).update({
+        lat: _coordLat,
+        lng: _coordLng
+      });
+      // Update local cache
+      var l = allListings.find(function(x){ return x.id === _coordListingId; });
+      if (l) { l.lat = _coordLat; l.lng = _coordLng; }
+      showToast('✅ Koordinaten gespeichert!');
+      closeCoordEditor();
+      if (maplibreMap && mapLoaded) renderMap();
+    } catch(e) {
+      alert('Fehler: ' + e.message);
+      btn.disabled = false;
+      btn.textContent = 'Koordinaten speichern';
+    }
+  }
+  // ══ END KOORDINATEN-EDITOR ═════════════════════════════════════════════════
+
     auth.onAuthStateChanged(async user => {
     currentUser = user;
     if (user) {
@@ -4577,6 +4667,10 @@
           <button class="owner-edit-btn" onclick="openEditListing('${listing.id}')" style="margin-bottom:12px">
             <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             ${t('edit_entry')}
+          </button>
+          <button onclick="openCoordEditor('${listing.id}')" style="width:100%;padding:12px 16px;background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:#1D4ED8;cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Koordinaten setzen
           </button>
           <div style="background:#FFF5F0;border:1.5px solid #FFD4B8;border-radius:14px;padding:14px">
             <div style="font-size:12px;font-weight:700;color:#C2410C;margin-bottom:10px">🏷 Mein Deal</div>
