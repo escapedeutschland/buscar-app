@@ -1,4 +1,5 @@
 {
+  "id": "/buscar-app/",
   "name": "Buscar – Deutsche in Paraguay",
   "short_name": "Buscar",
   "description": "Die App für Deutsche in Paraguay – Orte, Ärzte, Restaurants, Events & mehr.",
@@ -13,29 +14,15 @@
   "icons": [
     {
       "src": "icon-192.png",
-      "sizes": "192x192",
+      "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
       "src": "icon-512.png",
-      "sizes": "512x512",
+      "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Karte öffnen",
-      "short_name": "Karte",
-      "url": "/buscar-app/",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Events",
-      "short_name": "Events",
-      "url": "/buscar-app/",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
   ],
   "prefer_related_applications": false
