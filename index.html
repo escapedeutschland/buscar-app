@@ -162,6 +162,20 @@
     .detail-city { display: flex; align-items: center; gap: 5px; font-size: 13px; color: rgba(255,255,255,0.8); }
     .detail-city svg { width: 13px; height: 13px; stroke: rgba(255,255,255,0.8); }
     .detail-body { padding: 20px 16px 120px; }
+    
+    /* EXCHANGE RATE WIDGET */
+    .exchange-widget { background: var(--card); border-radius: var(--radius-lg); border: 1px solid rgba(0,0,0,0.04); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 14px; }
+    .exchange-header { display: flex; align-items: center; gap: 8px; padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+    .exchange-header-icon { font-size: 16px; }
+    .exchange-header-title { font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: 1.5px; text-transform: uppercase; flex: 1; }
+    .exchange-header-time { font-size: 10px; color: var(--text-3); }
+    .exchange-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; border-bottom: 1px solid var(--border); }
+    .exchange-row:last-child { border-bottom: none; }
+    .exchange-from { font-size: 14px; font-weight: 600; color: var(--text-1); }
+    .exchange-arrow { font-size: 12px; color: var(--text-3); margin: 0 6px; }
+    .exchange-to { font-size: 15px; font-weight: 800; color: #10B981; }
+    .exchange-loading { padding: 18px 16px; text-align: center; font-size: 13px; color: var(--text-3); }
+    .exchange-note { padding: 8px 16px 12px; font-size: 10px; color: var(--text-3); line-height: 1.4; }
     .detail-card { background: var(--card); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 14px; border: 1px solid rgba(0,0,0,0.04); box-shadow: var(--shadow-sm); }
     .detail-section-title { font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: 1.5px; text-transform: uppercase; padding: 16px 16px 8px; }
     .detail-desc { font-size: 14px; color: var(--text-2); line-height: 1.65; padding: 0 16px 16px; }
@@ -920,6 +934,7 @@
 
       <!-- DEAL -->
       <div id="detailDealCard"></div>
+        <div id="detailExchange" style="display:none;"></div>
 
       <!-- BEWERTUNGEN -->
       <div class="detail-card" id="detailRatingsCard">
@@ -1530,7 +1545,7 @@
       // Categories
       cat_all: 'Alle', cat_restaurants: 'Restaurants', cat_services: 'Dienstleistungen',
       cat_places: 'Orte', cat_accommodation: 'Unterkünfte', cat_shops: 'Geschäfte',
-      cat_sport: 'Sport & Fitness', cat_tankstelle: 'Tankstellen', cat_beauty: 'Beauty & Wellness',
+      cat_sport: 'Sport & Fitness', cat_tankstelle: 'Tankstellen', cat_wechselstube: 'Wechselstuben', cat_beauty: 'Beauty & Wellness',
       // City picker
       city_select: 'Stadt wählen...', city_all: '🌍 Alle Städte',
       // Listings
@@ -1657,7 +1672,7 @@
       // Categorías
       cat_all: 'Todos', cat_restaurants: 'Restaurantes', cat_services: 'Servicios',
       cat_places: 'Lugares', cat_accommodation: 'Alojamientos', cat_shops: 'Tiendas',
-      cat_sport: 'Deporte & Fitness', cat_tankstelle: 'Gasolineras', cat_beauty: 'Belleza & Bienestar',
+      cat_sport: 'Deporte & Fitness', cat_tankstelle: 'Gasolineras', cat_wechselstube: 'Casas de cambio', cat_beauty: 'Belleza & Bienestar',
       // Selector de ciudad
       city_select: 'Seleccionar ciudad...', city_all: '🌍 Todas las ciudades',
       // Listados
@@ -3488,6 +3503,58 @@
     }
 
     currentListingId = id;
+
+    // Exchange rate widget for Wechselstube entries
+    const exDiv = document.getElementById('detailExchange');
+    if (l.category_id === 'kat-wechselstube') {
+      exDiv.style.display = 'block';
+      exDiv.innerHTML = '<div class="exchange-widget"><div class="exchange-loading">💱 Lade Wechselkurse...</div></div>';
+      fetch('https://open.er-api.com/v6/latest/USD')
+        .then(r => r.json())
+        .then(data => {
+          const rates = data.rates || {};
+          const pyg = rates.PYG || 0;
+          const eur = rates.EUR || 0;
+          const brl = rates.BRL || 0;
+          const now = new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+          const lang = currentLang;
+          const note = lang === 'de'
+            ? '* Interbanken-Referenzkurs. Der Kurs vor Ort kann leicht abweichen.'
+            : '* Tipo de cambio de referencia interbancario. El tipo real puede variar.';
+          const title = lang === 'de' ? 'Wechselkurse' : 'Tipos de cambio';
+          const timeLabel = lang === 'de' ? 'Stand' : 'Actualizado';
+          exDiv.innerHTML = `<div class="exchange-widget">
+            <div class="exchange-header">
+              <span class="exchange-header-icon">💱</span>
+              <span class="exchange-header-title">${title}</span>
+              <span class="exchange-header-time">${timeLabel}: ${now}</span>
+            </div>
+            <div class="exchange-row">
+              <span class="exchange-from">1 USD 🇺🇸</span>
+              <span class="exchange-arrow">→</span>
+              <span class="exchange-to">${pyg ? Math.round(pyg).toLocaleString('de-DE') + ' PYG' : '—'}</span>
+            </div>
+            <div class="exchange-row">
+              <span class="exchange-from">1 EUR 🇪🇺</span>
+              <span class="exchange-arrow">→</span>
+              <span class="exchange-to">${(pyg && eur) ? Math.round(pyg/eur).toLocaleString('de-DE') + ' PYG' : '—'}</span>
+            </div>
+            <div class="exchange-row">
+              <span class="exchange-from">1 BRL 🇧🇷</span>
+              <span class="exchange-arrow">→</span>
+              <span class="exchange-to">${(pyg && brl) ? Math.round(pyg/brl).toLocaleString('de-DE') + ' PYG' : '—'}</span>
+            </div>
+            <div class="exchange-note">${note}</div>
+          </div>`;
+        })
+        .catch(() => {
+          exDiv.innerHTML = '<div class="exchange-widget"><div class="exchange-loading">Kurse nicht verfügbar</div></div>';
+        });
+    } else {
+      exDiv.style.display = 'none';
+      exDiv.innerHTML = '';
+    }
+
     showScreen('screenDetail');
     loadReviews(id);
     loadComments(id);
