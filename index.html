@@ -865,6 +865,7 @@
         <div class="cat-chip" data-cat="kat-sport" data-i18n="cat_sport">Sport & Fitness</div>
         <div class="cat-chip" data-cat="kat-tankstelle" data-i18n="cat_tankstelle">Tankstellen</div>
         <div class="cat-chip" data-cat="kat-beauty" data-i18n="cat_beauty">Beauty & Wellness</div>
+        <div class="cat-chip" data-cat="kat-wechselstube" data-i18n="cat_wechselstube">Wechselstuben</div>
       </div>
       <div id="cityPickerBtn" class="city-picker-btn" onclick="openCitySheet()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -985,6 +986,7 @@
         <div class="map-chip map-chip-sport" data-cat="kat-sport"><span class="chip-dot"></span><span data-i18n="cat_sport">Sport</span></div>
         <div class="map-chip map-chip-tankstelle" data-cat="kat-tankstelle"><span class="chip-dot"></span><span>Tankstellen</span></div>
         <div class="map-chip map-chip-beauty" data-cat="kat-beauty"><span class="chip-dot"></span><span>Beauty</span></div>
+        <div class="map-chip map-chip-wechselstube" data-cat="kat-wechselstube"><span class="chip-dot"></span><span>Wechselstuben</span></div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;padding:6px 16px 10px">
         <div id="mapCityPickerBtn" onclick="openMapCitySheet()" style="flex:1;display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-2)">
@@ -2092,6 +2094,7 @@
     'kat-geschaefte': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
     'kat-sport': '<svg viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l4.24 4.24"/><path d="M14.83 9.17l4.24-4.24"/><path d="M14.83 14.83l4.24 4.24"/><path d="M9.17 14.83l-4.24 4.24"/></svg>',
     'kat-tankstelle': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 22V10a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12"/><rect x="3" y="10" width="10" height="12"/><path d="M13 6h2l2 5h2"/><line x1="3" y1="22" x2="13" y2="22"/></svg>',
+    'kat-wechselstube': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.5 8.5c0-1.1.9-2 2-2h2a2 2 0 0 1 0 4h-3a2 2 0 0 0 0 4h2a2 2 0 0 0 2-2"/><line x1="12" y1="6.5" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="17.5"/></svg>',
     'kat-beauty': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
         'default': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
   };
@@ -2104,6 +2107,7 @@
     'kat-beauty':         '✂',
     'kat-dienstleistung': '🏥',
     'kat-tankstelle':     '⛽',
+    'kat-wechselstube':   '💱',
     'default':            '📍',
   };
   const catNames = { 'kat-restaurants': 'Restaurants', 'kat-dienstleistung': 'Dienstleistungen', 'kat-orte': 'Orte', 'kat-unterkunft': 'Unterkünfte', 'kat-geschaefte': 'Geschäfte', 'kat-sport': 'Sport & Fitness' };
@@ -3507,6 +3511,7 @@
     'kat-geschaefte': '#EF4444',
     'kat-sport': '#06B6D4',
     'kat-tankstelle': '#EF4444',
+    'kat-wechselstube': '#10B981',
     'kat-beauty': '#EC4899',
     'default': '#6B6B6B'
   };
@@ -3518,6 +3523,7 @@
     'kat-unterkunft': 'Unterkunft',
     'kat-geschaefte': 'Geschäft',
     'kat-sport': 'Sport',
+    'kat-wechselstube': 'Wechselstube',
     'default': 'Ort'
   };
 
@@ -3708,6 +3714,7 @@
           { id:'pin-beauty',         color:'#EC4899', emoji:'✂' },
           { id:'pin-dienstleistung', color:'#3B82F6', emoji:'🏥' },
           { id:'pin-tankstelle',     color:'#F97316', emoji:'⛽' },
+          { id:'pin-wechselstube', color:'#10B981', emoji:'💱' },
           { id:'pin-default',        color:'#6B6B6B', emoji:'📍' },
         ];
 
@@ -3742,6 +3749,7 @@
                 'kat-beauty',         'pin-beauty',
                 'kat-dienstleistung', 'pin-dienstleistung',
                 'kat-tankstelle',     'pin-tankstelle',
+                'kat-wechselstube', 'pin-wechselstube',
                 'pin-default'
               ],
               'icon-size': ['interpolate',['linear'],['zoom'], 5,0.5, 10,0.7, 15,1.0],
