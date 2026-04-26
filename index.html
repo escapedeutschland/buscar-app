@@ -532,7 +532,7 @@
     .empty-title { font-size: 16px; font-weight: 600; }
     .empty-sub { font-size: 13px; color: var(--text-2); }
 
-        /* BOTTOM NAV */
+    /* BOTTOM NAV */
     .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 0.5px solid rgba(0,0,0,0.06); display: flex; padding: 8px 0 24px; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); }
     .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 6px 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     .nav-item svg { width: 22px; height: 22px; stroke: var(--text-3); transition: stroke 0.08s; fill: none; }
@@ -1532,7 +1532,6 @@
       <button class="filter-apply-btn" onclick="applyMapFilter()">Anwenden</button>
     </div>
   </div>
-
 
   <!-- LIGHTBOX -->
   <div class="photo-lightbox" id="photoLightbox" onclick="closeLightbox()">
@@ -5385,7 +5384,6 @@
       inp.value='';
     });
   });
-
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
