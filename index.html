@@ -532,6 +532,13 @@
     .empty-title { font-size: 16px; font-weight: 600; }
     .empty-sub { font-size: 13px; color: var(--text-2); }
 
+    /* REPORT */
+    .report-btn{display:flex;align-items:center;justify-content:center;gap:5px;margin:8px 16px 0;padding:10px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text-3);cursor:pointer;width:calc(100% - 32px);border-radius:10px;}
+    .report-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:1000;display:none;align-items:flex-end;justify-content:center;}
+    .report-overlay.visible{display:flex;}
+    .report-sheet{background:var(--card);border-radius:24px 24px 0 0;width:100%;max-width:430px;padding:0 0 32px;}
+    .report-option{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:0.5px solid var(--border);cursor:pointer;font-size:14px;color:var(--text-1);}
+    .report-option:last-child{border-bottom:none;}
     /* BOTTOM NAV */
     .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 0.5px solid rgba(0,0,0,0.06); display: flex; padding: 8px 0 24px; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); }
     .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 6px 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
@@ -959,6 +966,7 @@
         <div class="photo-upload-progress" id="photoProgress">Wird hochgeladen...</div>
       </div>
 
+      <button class="report-btn" onclick="openReport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Eintrag melden</button>
       <!-- KOMMENTARE -->
       <div class="detail-card" id="detailCommentsCard">
         <div class="detail-section-title" data-i18n="discussion">Diskussion</div>
@@ -1533,6 +1541,19 @@
     </div>
   </div>
 
+  <!-- REPORT SHEET -->
+  <div class="report-overlay" id="reportOverlay" onclick="if(event.target.id==='reportOverlay')closeReport()">
+    <div class="report-sheet">
+      <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 16px"></div>
+      <div style="font-size:16px;font-weight:700;padding:0 20px 14px;color:var(--text-1)">Eintrag melden</div>
+      <div class="report-option" onclick="submitReport('closed')">&#x1F6AB; Ort existiert nicht mehr / geschlossen</div>
+      <div class="report-option" onclick="submitReport('address')">&#x1F4CD; Falsche Adresse oder Koordinaten</div>
+      <div class="report-option" onclick="submitReport('phone')">&#x1F4DE; Falsche Telefonnummer</div>
+      <div class="report-option" onclick="submitReport('content')">&#x26A0; Unangemessener Inhalt</div>
+      <div class="report-option" onclick="submitReport('other')">&#x1F4AC; Sonstiges</div>
+      <div class="report-option" onclick="closeReport()" style="color:var(--text-3);justify-content:center;font-weight:600">Abbrechen</div>
+    </div>
+  </div>
   <!-- LIGHTBOX -->
   <div class="photo-lightbox" id="photoLightbox" onclick="closeLightbox()">
     <button class="photo-lightbox-close" onclick="closeLightbox()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
@@ -5382,6 +5403,18 @@
     });
   });
 
+  function openReport(){if(!currentListingId)return;document.getElementById('reportOverlay').classList.add('visible');}
+  function closeReport(){document.getElementById('reportOverlay').classList.remove('visible');}
+  async function submitReport(reason){
+    closeReport();
+    if(!currentListingId)return;
+    var l=allListings.find(function(x){return x.id===currentListingId;});
+    var labels={'closed':'Ort existiert nicht mehr','address':'Falsche Adresse','phone':'Falsche Telefonnummer','content':'Unangemessener Inhalt','other':'Sonstiges'};
+    try{
+      await db.collection('reports').add({listing_id:currentListingId,listing_name:l?l.name:'',listing_city:l?l.city:'',reason:reason,reason_label:labels[reason]||reason,user_id:currentUser?currentUser.uid:null,created_at:new Date(),status:'pending'});
+      showToast('✅ Meldung eingereicht – danke!');
+    }catch(e){showToast('Fehler beim Senden.');}
+  }
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/buscar-app/sw.js')
