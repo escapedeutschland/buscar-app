@@ -3413,12 +3413,12 @@
     function renderListings() {
     let filtered = allListings;
     if (activeCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === activeCategory);
-    if (activeCity !== 'Alle') filtered = filtered.filter(l => l.city === activeCity);
-    if (activeSubcat !== 'Alle') filtered = filtered.filter(l => (l.subcategory||'') === activeSubcat);
+    if (activeCity !== 'Alle') filtered = filtered.filter(l => norm(l.city||'') === norm(activeCity));
+    if (activeSubcat !== 'Alle') filtered = filtered.filter(l => norm(l.subcategory||'') === norm(activeSubcat));
     if (activeMinStars > 0) filtered = filtered.filter(l => { const avg = getAvgRating(l.id); return avg && avg >= activeMinStars; });
     if (activeOpenNow) filtered = filtered.filter(l => isOpen(l.opening_hours) === true);
     if (activeDeal) filtered = filtered.filter(l => l.deal_text && l.deal_text.trim() !== '');
-    if (searchQuery) { const q = searchQuery.toLowerCase(); filtered = filtered.filter(l => (l.name||'').toLowerCase().includes(q)||(l.description||'').toLowerCase().includes(q)||(l.city||'').toLowerCase().includes(q)); }
+    if (searchQuery) { const q = norm(searchQuery); filtered = filtered.filter(l => norm(l.name||'').includes(q)||norm(l.description||'').includes(q)||norm(l.city||'').includes(q)||norm(l.subcategory||'').includes(q)); }
     // ── Vollständigkeits-Score & Sortierung ──────────────────────────────────
     filtered = filtered.slice().sort(function(a, b) {
       return scoreEntry(b) - scoreEntry(a);
@@ -3689,11 +3689,15 @@
     };
   }
 
+  function norm(s) {
+    return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[''\u2019]/g,"'");
+  }
+
   function getFilteredListings() {
     let f = allListings;
     if (mapCategory !== 'Alle') f = f.filter(l => l.category_id === mapCategory);
-    if (mapCityFilter !== 'Alle') f = f.filter(l => l.city === mapCityFilter);
-    if (mapSubcatFilter !== 'Alle') f = f.filter(l => (l.subcategory||'') === mapSubcatFilter);
+    if (mapCityFilter !== 'Alle') f = f.filter(l => norm(l.city||'') === norm(mapCityFilter));
+    if (mapSubcatFilter !== 'Alle') f = f.filter(l => norm(l.subcategory||'') === norm(mapSubcatFilter));
     if (mapMinStars > 0) f = f.filter(l => { const a = getAvgRating(l.id); return a && a >= mapMinStars; });
     if (activeDeal) f = f.filter(l => l.deal_text && l.deal_text.trim() !== '');
     return f;
