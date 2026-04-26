@@ -2147,21 +2147,11 @@
     });
   }
 
-  // Cache all screen elements at startup for instant switching
-  let _screenEls = null;
-  let _currentScreenEl = null;
-  function _initScreenCache() {
-    _screenEls = document.querySelectorAll('.screen');
-  }
-
   function showScreen(id) {
     activeScreen = id;
-    // Use cached elements - no DOM query on every tap
-    if (!_screenEls) _initScreenCache();
-    if (_currentScreenEl) _currentScreenEl.classList.remove('active');
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const next = document.getElementById(id);
-    if (next) { next.classList.add('active'); _currentScreenEl = next; }
-    // Async scroll - don't block the screen switch
+    if (next) next.classList.add('active');
     requestAnimationFrame(function(){ window.scrollTo(0, 0); });
     // Hard-hide map screen when not active to prevent Leaflet bleeding
     const mapScreen = document.getElementById('screenMap');
@@ -4211,8 +4201,7 @@
     if (!el) return;
     // Generic PTR – reused by all screens
     setupPTR(el, 'pullIndicator', function(){ loadListings(); });
-    _initScreenCache();
-    })(); }); // end window.load
+      })(); }); // end window.load
 
   function setupPTR(el, indicatorId, onRefresh) {
     if (!el) return;
