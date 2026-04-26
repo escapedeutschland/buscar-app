@@ -2147,11 +2147,31 @@
     });
   }
 
+  // Cached screens for instant switching – populated on first call
+  var _screens = null;
+  var _prevScreenId = null;
+
   function showScreen(id) {
     activeScreen = id;
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const next = document.getElementById(id);
-    if (next) next.classList.add('active');
+    // Build cache on first call
+    if (!_screens) {
+      _screens = {};
+      document.querySelectorAll('.screen').forEach(function(s) {
+        _screens[s.id] = s;
+      });
+      // Find which screen is currently active
+      document.querySelectorAll('.screen.active').forEach(function(s) {
+        _prevScreenId = s.id;
+      });
+    }
+    // Swap: remove active from previous, add to next
+    if (_prevScreenId && _prevScreenId !== id && _screens[_prevScreenId]) {
+      _screens[_prevScreenId].classList.remove('active');
+    }
+    if (_screens[id]) {
+      _screens[id].classList.add('active');
+    }
+    _prevScreenId = id;
     requestAnimationFrame(function(){ window.scrollTo(0, 0); });
     // Hard-hide map screen when not active to prevent Leaflet bleeding
     const mapScreen = document.getElementById('screenMap');
@@ -3432,7 +3452,12 @@
   }
 
     function renderListings() {
-    if (activeScreen !== 'screenHome') return; // Don't render if user switched screens
+    if (activeScreen !== 'screenHome') return;
+    // Defer heavy DOM work to next frame so nav stays responsive
+    requestAnimationFrame(function() { _doRenderListings(); });
+  }
+  function _doRenderListings() {
+    if (activeScreen !== 'screenHome') return;
     let filtered = allListings;
     if (activeCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === activeCategory);
     if (activeCity !== 'Alle') filtered = filtered.filter(l => norm(l.city||'') === norm(activeCity));
