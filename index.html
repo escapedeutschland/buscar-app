@@ -4033,6 +4033,7 @@
         <span id="adminTabListings" onclick="loadAdminListings()" style="cursor:pointer;font-weight:700;color:white;border-bottom:2px solid white;padding-bottom:2px">Einträge</span>
         <span id="adminTabClaims" onclick="loadAdminClaims()" style="cursor:pointer;color:rgba(255,255,255,0.6)">Inhaber-Anfragen${claimBadge}</span>
         <span id="adminTabDeals" onclick="loadAdminDeals()" style="cursor:pointer;color:rgba(255,255,255,0.6)">🏷 Deals</span>
+        <span id="adminTabReports" onclick="loadAdminReports()" style="cursor:pointer;color:rgba(255,255,255,0.6)">🚩 Meldungen</span>
       </div>`;
     loadAdminListings();
   }
@@ -5403,6 +5404,46 @@
     });
   });
 
+  async function loadAdminReports() {
+    ['adminTabListings','adminTabClaims','adminTabDeals','adminTabReports'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el){el.style.color='rgba(255,255,255,0.6)';el.style.borderBottom='none';}
+    });
+    var tab=document.getElementById('adminTabReports');
+    if(tab){tab.style.color='white';tab.style.borderBottom='2px solid white';}
+    var body=document.getElementById('adminBody');
+    body.innerHTML='<div style="text-align:center;padding:40px"><div style="width:28px;height:28px;border:3px solid #FFF8EC;border-top-color:#F5A623;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto"></div></div>';
+    try {
+      var snap=await db.collection('reports').where('status','==','pending').orderBy('created_at','desc').get();
+      if(snap.empty){
+        body.innerHTML='<div class="admin-empty"><div class="admin-empty-icon">&#x2713;</div><div class="admin-empty-text">Keine Meldungen</div><div class="admin-empty-sub">Alles erledigt!</div></div>';
+        return;
+      }
+      body.innerHTML=snap.docs.map(function(d){
+        var r=Object.assign({id:d.id},d.data());
+        var date=r.created_at?r.created_at.toDate().toLocaleDateString('de-DE'):'';
+        var lid=r.listing_id||'';
+        return '<div class="admin-card" id="reportCard_'+r.id+'">'
+          +'<div class="admin-card-name">'+(r.listing_name||'Unbekannt')+'</div>'
+          +'<div class="admin-card-meta">'+(r.listing_city||'')+' &middot; '+date+'</div>'
+          +'<div style="background:var(--red-light);color:var(--red);padding:8px 12px;border-radius:8px;margin-bottom:12px;font-size:13px;font-weight:600">&#x1F6A9; '+(r.reason_label||r.reason||'')+'</div>'
+          +'<div class="admin-actions">'
+          +'<button class="admin-btn approve" onclick="resolveReport(&quot;'+r.id+'&quot;)">&#10003; Erledigt</button>'
+          +'<button class="admin-btn reject" onclick="showDetail(&quot;'+lid+'&quot;);showScreen('+"'screenDetail'"+')">Eintrag ansehen</button>'
+          +'</div></div>';
+      }).join('');
+    } catch(e) {
+      body.innerHTML='<div class="admin-empty"><div class="admin-empty-text">Fehler: '+e.message+'</div></div>';
+    }
+  }
+  async function resolveReport(reportId) {
+    try {
+      await db.collection('reports').doc(reportId).update({status:'resolved'});
+      var card=document.getElementById('reportCard_'+reportId);
+      if(card)card.remove();
+      showToast('&#10003; Meldung als erledigt markiert.');
+    } catch(e){alert('Fehler: '+e.message);}
+  }
   function openReport(){if(!currentListingId)return;document.getElementById('reportOverlay').classList.add('visible');}
   function closeReport(){document.getElementById('reportOverlay').classList.remove('visible');}
   async function submitReport(reason){
