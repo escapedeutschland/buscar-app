@@ -1,4 +1,4 @@
-const CACHE_NAME = 'buscar-v69';
+const CACHE_NAME = 'buscar-v70';
 
 // Network-first für HTML – immer frische App laden
 // Cache-first nur für statische Assets (Scripts, CSS)
