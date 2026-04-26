@@ -1,7 +1,4 @@
-const CACHE_NAME = 'buscar-v71';
-
-// Network-first für HTML – immer frische App laden
-// Cache-first nur für statische Assets (Scripts, CSS)
+const CACHE_NAME = 'buscar-v73';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -17,10 +14,7 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-
   const url = e.request.url;
-
-  // Never cache these
   if (url.includes('firestore') ||
       url.includes('firebase') ||
       url.includes('googleapis') ||
@@ -29,7 +23,6 @@ self.addEventListener('fetch', e => {
       url.includes('er-api.com') ||
       url.includes('mymemory')) return;
 
-  // HTML: always network-first, fall back to cache
   if (url.includes('buscar-app') && (url.endsWith('/') || url.endsWith('.html'))) {
     e.respondWith(
       fetch(e.request)
@@ -43,7 +36,6 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Everything else: cache-first
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
