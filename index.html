@@ -534,9 +534,9 @@
     /* BOTTOM NAV */
     .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 0.5px solid rgba(0,0,0,0.06); display: flex; padding: 8px 0 24px; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); }
     .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 6px 0; }
-    .nav-item svg { width: 22px; height: 22px; stroke: var(--text-3); transition: all 0.2s; fill: none; }
-    .nav-item span { font-size: 10px; font-weight: 600; color: var(--text-3); transition: color 0.2s; letter-spacing: 0.2px; }
-    .nav-item.active svg { stroke: var(--yellow); transform: translateY(-1px); }
+    .nav-item svg { width: 22px; height: 22px; stroke: var(--text-3); transition: stroke 0.08s; fill: none; }
+    .nav-item span { font-size: 10px; font-weight: 600; color: var(--text-3); transition: color 0.08s; letter-spacing: 0.2px; }
+    .nav-item.active svg { stroke: var(--yellow); }
     .nav-item.active span { color: var(--yellow); }
   
     /* ── EVENTS ─────────────────────────────────────────────────────────── */
@@ -2147,11 +2147,22 @@
     });
   }
 
+  // Cache all screen elements at startup for instant switching
+  let _screenEls = null;
+  let _currentScreenEl = null;
+  function _initScreenCache() {
+    _screenEls = document.querySelectorAll('.screen');
+  }
+
   function showScreen(id) {
     activeScreen = id;
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    window.scrollTo(0, 0);
+    // Use cached elements - no DOM query on every tap
+    if (!_screenEls) _initScreenCache();
+    if (_currentScreenEl) _currentScreenEl.classList.remove('active');
+    const next = document.getElementById(id);
+    if (next) { next.classList.add('active'); _currentScreenEl = next; }
+    // Async scroll - don't block the screen switch
+    requestAnimationFrame(function(){ window.scrollTo(0, 0); });
     // Hard-hide map screen when not active to prevent Leaflet bleeding
     const mapScreen = document.getElementById('screenMap');
     if (mapScreen) mapScreen.style.display = id === 'screenMap' ? 'flex' : 'none';
@@ -4200,7 +4211,8 @@
     if (!el) return;
     // Generic PTR – reused by all screens
     setupPTR(el, 'pullIndicator', function(){ loadListings(); });
-  })(); }); // end window.load
+    _initScreenCache();
+    })(); }); // end window.load
 
   function setupPTR(el, indicatorId, onRefresh) {
     if (!el) return;
