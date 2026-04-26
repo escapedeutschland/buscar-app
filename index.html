@@ -29,6 +29,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
   <style>
+    button, a, [onclick], .nav-item, .cat-chip, .map-chip, .filter-chip { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --yellow: #F5A623; --yellow-dark: #D4841A; --yellow-light: #FFF8EC;
@@ -533,7 +534,7 @@
 
     /* BOTTOM NAV */
     .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 0.5px solid rgba(0,0,0,0.06); display: flex; padding: 8px 0 24px; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); }
-    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 6px 0; }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 6px 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     .nav-item svg { width: 22px; height: 22px; stroke: var(--text-3); transition: stroke 0.08s; fill: none; }
     .nav-item span { font-size: 10px; font-weight: 600; color: var(--text-3); transition: color 0.08s; letter-spacing: 0.2px; }
     .nav-item.active svg { stroke: var(--yellow); }
