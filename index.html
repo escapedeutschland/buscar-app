@@ -5,6 +5,11 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#F5A623">
   <!-- Cache bust: 20260418 -->
@@ -3155,11 +3160,23 @@
 
   async function loadListings() {
     try {
-      const snap = await db.collection('listings').where('verified', '==', true).get();
+      // Zeige gecachte Daten sofort waehrend frische Daten geladen werden
+      try {
+        const cached = localStorage.getItem('buscar_listings');
+        if (cached && allListings.length === 0) {
+          allListings = JSON.parse(cached);
+          buildCityChips();
+          renderListings();
+        }
+      } catch(e) {}
+      // Listings + Ratings PARALLEL laden (statt nacheinander)
+      const [snap] = await Promise.all([
+        db.collection('listings').where('verified', '==', true).get(),
+        loadAllRatings()
+      ]);
       allListings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      // Cache to localStorage for offline use
+      // Cache aktualisieren
       try { localStorage.setItem('buscar_listings', JSON.stringify(allListings)); localStorage.setItem('buscar_listings_ts', Date.now()); } catch(e) {}
-      await loadAllRatings();
       buildCityChips();
       renderListings();
       document.getElementById('offlineBanner').classList.remove('visible');
@@ -3171,8 +3188,9 @@
         if (cached) {
           allListings = JSON.parse(cached);
           const mins = Math.round((Date.now() - parseInt(ts)) / 60000);
-          await loadAllRatings();
           buildCityChips();
+          renderListings();
+          await loadAllRatings();
           renderListings();
           document.getElementById('offlineBanner').textContent = '📡 Offline – letzte Aktualisierung vor ' + (mins < 60 ? mins + ' Min.' : Math.round(mins/60) + ' Std.');
           document.getElementById('offlineBanner').classList.add('visible');
