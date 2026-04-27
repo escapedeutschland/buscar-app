@@ -1087,7 +1087,7 @@
         <div class="form-card-title">Grundinfos</div>
         <div class="form-field">
           <label class="field-label">Name des Ortes *</label>
-          <input class="field-input" type="text" id="newName" placeholder="z.B. Dr. Müller, Café Central" maxlength="60" oninput="checkDuplicate();updateCounter('newName','nameCounter',60)">
+          <input class="field-input" type="text" id="newName" placeholder="z.B. Dr. Müller, Café Central" maxlength="60" oninput="checkDuplicate()">
           <div class="field-counter" id="nameCounter">0 / 60</div>
           <div class="dupe-warning" id="dupeWarning"><div class="dupe-warning-title">⚠️ Ähnliche Einträge gefunden – bitte prüfen:</div><div id="dupeList"></div></div>
           <div class="field-error" id="nameError">Name darf keine Emojis enthalten.</div>
