@@ -4001,3 +4001,60 @@
       console.log('debug overlay setup failed:', err);
     }
   })();
+
+  // iOS Safari sometimes drops the click event after touchend on div-with-onclick
+  // elements. This bridge synthesizes a click if no native click fires shortly
+  // after a tap on a clickable element.
+  (function () {
+    var lastClickTime = 0;
+    document.addEventListener('click', function () {
+      lastClickTime = Date.now();
+    }, true);
+
+    var touchStart = null;
+    document.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) { touchStart = null; return; }
+      var t = e.touches[0];
+      touchStart = { x: t.clientX, y: t.clientY, time: Date.now() };
+    }, { capture: true, passive: true });
+
+    function findClickableAncestor(el) {
+      while (el && el.nodeType === 1) {
+        if (el.onclick) return el;
+        if (el.getAttribute && el.getAttribute('onclick')) return el;
+        if (el.tagName === 'BUTTON' || el.tagName === 'A') return el;
+        if (el.classList) {
+          if (el.classList.contains('profil-row') || el.classList.contains('nav-item') ||
+              el.classList.contains('listing-card') || el.classList.contains('cat-chip') ||
+              el.classList.contains('map-chip') || el.classList.contains('filter-btn') ||
+              el.classList.contains('filter-chip') || el.classList.contains('detail-row') ||
+              el.classList.contains('detail-cta-btn') || el.classList.contains('auth-btn') ||
+              el.classList.contains('auth-tab')) {
+            return el;
+          }
+        }
+        el = el.parentElement;
+      }
+      return null;
+    }
+
+    document.addEventListener('touchend', function (e) {
+      if (!touchStart || e.changedTouches.length !== 1) { touchStart = null; return; }
+      var t = e.changedTouches[0];
+      var dx = Math.abs(t.clientX - touchStart.x);
+      var dy = Math.abs(t.clientY - touchStart.y);
+      var dt = Date.now() - touchStart.time;
+      var endTime = Date.now();
+      touchStart = null;
+      if (dx > 10 || dy > 10 || dt > 600) return;
+
+      var target = findClickableAncestor(e.target);
+      if (!target) return;
+
+      setTimeout(function () {
+        if (lastClickTime < endTime) {
+          try { target.click(); } catch (err) {}
+        }
+      }, 80);
+    }, { capture: true, passive: true });
+  })();
