@@ -3925,3 +3925,79 @@
       setTimeout(function () { el.style.display = 'none'; }, 500);
     }, 3500);
   }
+
+  // iOS touch debug overlay - enabled with ?debug=1 in URL
+  (function setupTouchDebug() {
+    try {
+      var urlHasDebug = location.search.indexOf('debug=1') !== -1;
+      var lsHasDebug = false;
+      try { lsHasDebug = localStorage.getItem('buscar_debug_touch') === '1'; } catch (e) {}
+      if (!urlHasDebug && !lsHasDebug) return;
+      try { localStorage.setItem('buscar_debug_touch', '1'); } catch (e) {}
+
+      var panel = document.createElement('div');
+      panel.id = 'touchDebugPanel';
+      panel.style.cssText =
+        'position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;' +
+        'background:rgba(0,0,0,0.85);color:#0f0;font:11px/1.3 monospace;' +
+        'padding:6px 8px;z-index:2147483647;max-height:32vh;overflow:auto;' +
+        'pointer-events:none;white-space:pre-wrap;word-break:break-all;';
+
+      var header = document.createElement('div');
+      header.style.cssText = 'color:#fff;font-weight:700;margin-bottom:4px;display:flex;justify-content:space-between;pointer-events:auto;';
+      header.innerHTML = '<span>iOS Touch Debug v1</span><span style="color:#f5a623;cursor:pointer" id="dbgClose">[X]</span>';
+      panel.appendChild(header);
+
+      var lines = document.createElement('div');
+      lines.id = 'dbgLines';
+      panel.appendChild(lines);
+
+      function append() {
+        if (!document.body) return;
+        if (!document.body.contains(panel)) document.body.appendChild(panel);
+      }
+      if (document.body) append(); else document.addEventListener('DOMContentLoaded', append);
+
+      var max = 14;
+      var buf = [];
+      function log(label, e, color) {
+        var t = e.target;
+        var sig = t && t.tagName ? t.tagName.toLowerCase() : '?';
+        if (t && t.id) sig += '#' + t.id;
+        if (t && t.className && typeof t.className === 'string') {
+          var cls = t.className.split(/\s+/).filter(Boolean).slice(0, 2).join('.');
+          if (cls) sig += '.' + cls;
+        }
+        var pt = '';
+        if (e.touches && e.touches[0]) pt = ' (' + Math.round(e.touches[0].clientX) + ',' + Math.round(e.touches[0].clientY) + ')';
+        else if (typeof e.clientX === 'number') pt = ' (' + Math.round(e.clientX) + ',' + Math.round(e.clientY) + ')';
+        var time = (new Date()).toISOString().substr(14, 9);
+        var line = '[' + time + '] ' + label + ' -> ' + sig + pt;
+        buf.push({ text: line, color: color || '#0f0' });
+        if (buf.length > max) buf.shift();
+        if (lines) {
+          lines.innerHTML = buf.map(function (b) {
+            return '<div style="color:' + b.color + '">' + b.text.replace(/[<>&]/g, function (c) { return { '<':'&lt;','>':'&gt;','&':'&amp;' }[c]; }) + '</div>';
+          }).join('');
+        }
+      }
+
+      document.addEventListener('touchstart', function (e) { log('touchstart', e, '#0ff'); }, true);
+      document.addEventListener('touchend',   function (e) { log('touchend  ', e, '#9f9'); }, true);
+      document.addEventListener('click',      function (e) { log('CLICK     ', e, '#fc0'); }, true);
+      window.addEventListener('error', function (e) {
+        buf.push({ text: '[ERROR] ' + e.message, color: '#f66' });
+        if (buf.length > max) buf.shift();
+        if (lines) lines.innerHTML = buf.map(function(b){ return '<div style="color:'+b.color+'">'+b.text+'</div>'; }).join('');
+      });
+
+      document.addEventListener('click', function (e) {
+        if (e.target && e.target.id === 'dbgClose') {
+          try { localStorage.removeItem('buscar_debug_touch'); } catch (err) {}
+          panel.remove();
+        }
+      }, true);
+    } catch (err) {
+      console.log('debug overlay setup failed:', err);
+    }
+  })();
