@@ -4055,6 +4055,6 @@
         if (lastClickTime < endTime) {
           try { target.click(); } catch (err) {}
         }
-      }, 80);
+      }, 25);
     }, { capture: true, passive: true });
   })();
