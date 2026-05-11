@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.escapedeutschland.buscar",
+      "sha256_cert_fingerprints": [
+        "EB:C0:A9:AF:53:90:DA:D2:47:D3:E0:A9:30:D5:23:EB:54:DE:15:A8:AE:D9:9C:B7:10:7B:02:66:31:23:30:4D"
+      ]
+    }
+  }
+]
