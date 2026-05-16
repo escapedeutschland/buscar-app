@@ -17,17 +17,17 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Buscar – Deutsche in Paraguay</title>
-  <link rel="preload" href="styles.css?v=75" as="style">
-  <link rel="preload" href="app.js?v=75" as="script">
+  <link rel="preload" href="styles.css?v=74" as="style">
+  <link rel="preload" href="app.js?v=74" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-  <link href="styles.css?v=75" rel="stylesheet">
+  <link href="styles.css?v=74" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  <script defer src="app.js?v=75"></script>
+  <script defer src="app.js?v=74"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -565,17 +565,6 @@
         </div>
       </div>
       <div class="form-card">
-        <div class="form-card-title" data-i18n="location_card_title">Standort *</div>
-        <div style="font-size:12px;color:var(--text-3);margin-bottom:10px" data-i18n="location_required_hint">Der Standort wird benötigt, damit dein Eintrag auf der Karte erscheint.</div>
-        <div id="locationPermissionBanner" style="display:none;margin-bottom:10px;padding:10px 12px;background:#FFEFD5;border:1.5px solid var(--yellow);border-radius:10px;font-size:12px;color:var(--yellow-dark);cursor:pointer;align-items:center;gap:8px" onclick="showLocationPermissionModal()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <span data-i18n="loc_banner_text">Standort-Berechtigung fehlt – tippen für Anleitung</span>
-        </div>
-        <button type="button" onclick="useMyLocation()" id="locationBtn" style="width:100%;padding:12px;background:var(--yellow-light);color:var(--yellow-dark);border:1.5px solid var(--yellow);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Meinen Standort verwenden</button>
-        <div id="locationStatus" style="font-size:12px;margin-top:6px;display:none"></div>
-        <button type="button" id="locationRemoveBtn" onclick="removeLocation()" style="display:none;margin-top:6px;background:none;border:none;color:var(--text-3);font-size:11px;cursor:pointer;text-decoration:underline" data-i18n="loc_remove">Standort entfernen</button>
-      </div>
-      <div class="form-card">
         <div class="form-card-title">Kontakt (optional)</div>
         <div class="form-field">
           <label class="field-label">Telefon</label>
@@ -589,6 +578,7 @@
         <div class="form-field">
           <label class="field-label">Adresse</label>
           <input class="field-input" type="text" id="newAddress" placeholder="Straße, Stadtviertel">
+          <button type="button" onclick="useMyLocation()" id="locationBtn" style="margin-top:8px;width:100%;padding:12px;background:var(--yellow-light);color:var(--yellow-dark);border:1.5px solid var(--yellow);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Meinen Standort verwenden</button><div id="locationStatus" style="font-size:12px;margin-top:6px;display:none"></div>
         </div>
         <div class="form-field">
           <label class="field-label">Öffnungszeiten</label>
@@ -1005,29 +995,6 @@
   <div class="photo-lightbox" id="photoLightbox" onclick="closeLightbox()">
     <button class="photo-lightbox-close" onclick="closeLightbox()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     <img id="lightboxImg" src="" alt="">
-  </div>
-
-  <!-- LOCATION PERMISSION MODAL -->
-  <div id="locationPermissionModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px" onclick="if(event.target.id==='locationPermissionModal')closeLocationPermissionModal()">
-    <div style="background:var(--card);border-radius:20px;max-width:380px;width:100%;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-        <div style="width:44px;height:44px;border-radius:12px;background:var(--yellow-light);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--yellow-dark)" stroke-width="2.5" stroke-linecap="round" width="22" height="22"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        </div>
-        <div style="font-size:17px;font-weight:700;color:var(--text-1)" data-i18n="loc_modal_title">Standort aktivieren</div>
-      </div>
-      <div style="font-size:14px;color:var(--text-2);line-height:1.5;margin-bottom:14px" data-i18n="loc_modal_text">Damit du einen Eintrag erstellen kannst, brauchen wir die Standort-Berechtigung. So aktivierst du sie:</div>
-      <ol style="font-size:14px;color:var(--text-1);line-height:1.7;margin:0 0 18px 0;padding-left:22px">
-        <li data-i18n="loc_modal_step1">Öffne die Einstellungen deines Handys</li>
-        <li data-i18n="loc_modal_step2">Wähle "Apps" → "Buscar"</li>
-        <li data-i18n="loc_modal_step3">Tippe auf "Berechtigungen" → "Standort"</li>
-        <li data-i18n="loc_modal_step4">Wähle "Bei Nutzung der App zulassen"</li>
-      </ol>
-      <div style="display:flex;gap:10px">
-        <button onclick="closeLocationPermissionModal()" style="flex:1;padding:13px;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--text-2);cursor:pointer" data-i18n="loc_modal_close">Schließen</button>
-        <button onclick="retryLocation()" style="flex:1;padding:13px;background:var(--yellow);border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:white;cursor:pointer" data-i18n="loc_modal_retry">Erneut versuchen</button>
-      </div>
-    </div>
   </div>
 
 </div>
