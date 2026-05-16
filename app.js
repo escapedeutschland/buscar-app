@@ -3461,7 +3461,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       return;
     }
     section.innerHTML = `
-      <div class="detail-card owner-section" id="claimDiv" style="padding:14px 16px">
+      <div class="detail-card owner-section" id="claimDiv" style="padding:14px 16px;margin-top:14px">
         <button class="claim-btn" onclick="showClaimForm()" style="width:100%;background:var(--surface-2);color:var(--text-2);border:none;border-radius:10px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">Ich bin der Inhaber dieses Ortes</button>
         <div style="font-size:11px;color:var(--text-3);text-align:center;margin-top:8px;line-height:1.4">Als verifizierter Inhaber kannst du diesen Eintrag selbst verwalten.</div>
         <div id="claimForm" style="display:none;margin-top:14px">
@@ -3857,7 +3857,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // Service Worker registrieren fuer Offline-Funktionalitaet
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js?v=78')
+      navigator.serviceWorker.register('sw.js?v=79')
         .then(reg => { console.log('SW registered'); })
         .catch(err => { console.log('SW registration failed'); });
     });
