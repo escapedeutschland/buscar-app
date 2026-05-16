@@ -3816,7 +3816,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // Service Worker registrieren fuer Offline-Funktionalitaet
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js?v=76')
+      navigator.serviceWorker.register('sw.js?v=77')
         .then(reg => { console.log('SW registered'); })
         .catch(err => { console.log('SW registration failed'); });
     });
