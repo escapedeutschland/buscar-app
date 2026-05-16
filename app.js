@@ -2461,6 +2461,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       document.getElementById('locationStatus').style.display = 'none';
       const removeBtn = document.getElementById('locationRemoveBtn');
       if (removeBtn) removeBtn.style.display = 'none';
+      const mapPrev = document.getElementById('locationMapPreview');
+      if (mapPrev) mapPrev.style.display = 'none';
     } catch (err) {
       document.getElementById('formError').textContent = 'Fehler beim Einreichen. Bitte versuche es erneut.'; document.getElementById('formError').classList.add('visible');
     }
@@ -2480,12 +2482,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const btn = document.getElementById('locationBtn');
     const status = document.getElementById('locationStatus');
     const removeBtn = document.getElementById('locationRemoveBtn');
-    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>' + t('location_btn');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg> Meinen Standort verwenden';
     btn.style.background = ''; btn.style.borderColor = ''; btn.style.color = '';
     btn.dataset.saved = '';
     btn.disabled = false;
     if (status) status.style.display = 'none';
     if (removeBtn) removeBtn.style.display = 'none';
+    // Mini-Karte verstecken
+    const mapPrev = document.getElementById('locationMapPreview');
+    if (mapPrev) mapPrev.style.display = 'none';
     // Permission-Status neu pruefen damit Banner ggf. wieder erscheint
     checkLocationPermissionForForm();
   }
@@ -2528,10 +2533,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         window._newLng = pos.coords.longitude;
         status.style.color = 'var(--green)';
         status.style.display = 'block';
-        status.textContent = t('location_saved') + ': '
+        status.textContent = 'Standort gespeichert: '
           + pos.coords.latitude.toFixed(5) + ', '
           + pos.coords.longitude.toFixed(5);
-        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg> ' + t('location_saved');
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg> Standort gespeichert';
         btn.style.background = 'var(--green-light)';
         btn.style.borderColor = 'var(--green)';
         btn.style.color = 'var(--green)';
@@ -2544,6 +2549,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         if (formError) formError.classList.remove('visible');
         const removeBtn = document.getElementById('locationRemoveBtn');
         if (removeBtn) removeBtn.style.display = 'inline-block';
+        // Mini-Karten-Vorschau initialisieren / aktualisieren
+        initLocationMapPreview(pos.coords.latitude, pos.coords.longitude);
       },
       function(err) {
         btn.disabled = false;
@@ -2576,7 +2583,67 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     );
   }
 
-  function showLocationPermissionModal() {
+  // Mini-Karten-Vorschau im Form-Screen (zeigt aktuellen Standort, draggable)
+  let _locationMap = null;
+  let _locationMarker = null;
+
+  function initLocationMapPreview(lat, lng) {
+    const container = document.getElementById('locationMapPreview');
+    if (!container) return;
+    container.style.display = 'block';
+
+    // Wenn Karte schon existiert: Position aktualisieren
+    if (_locationMap && _locationMarker) {
+      _locationMap.setCenter([lng, lat]);
+      _locationMap.setZoom(15);
+      _locationMarker.setLngLat([lng, lat]);
+      setTimeout(function(){ _locationMap.resize(); }, 50);
+      return;
+    }
+
+    // Karte neu erstellen
+    try {
+      _locationMap = new maplibregl.Map({
+        container: 'locationMapPreview',
+        style: ML_STYLE,
+        center: [lng, lat],
+        zoom: 15,
+        interactive: true,
+        dragRotate: false,
+        attributionControl: false
+      });
+      _locationMap.dragRotate.disable();
+      _locationMap.touchZoomRotate.disableRotation();
+
+      _locationMarker = new maplibregl.Marker({ color: '#F5A623', draggable: true })
+        .setLngLat([lng, lat])
+        .addTo(_locationMap);
+
+      // Bei Drag: Koordinaten anpassen
+      _locationMarker.on('dragend', function() {
+        const pos = _locationMarker.getLngLat();
+        window._newLat = pos.lat;
+        window._newLng = pos.lng;
+        const status = document.getElementById('locationStatus');
+        if (status) status.textContent = 'Standort gespeichert: ' + pos.lat.toFixed(5) + ', ' + pos.lng.toFixed(5);
+      });
+
+      // Bei Tipp auf Karte: Marker dorthin verschieben
+      _locationMap.on('click', function(e) {
+        window._newLat = e.lngLat.lat;
+        window._newLng = e.lngLat.lng;
+        _locationMarker.setLngLat([e.lngLat.lng, e.lngLat.lat]);
+        const status = document.getElementById('locationStatus');
+        if (status) status.textContent = 'Standort gespeichert: ' + e.lngLat.lat.toFixed(5) + ', ' + e.lngLat.lng.toFixed(5);
+      });
+
+      setTimeout(function(){ if (_locationMap) _locationMap.resize(); }, 100);
+    } catch(e) {
+      console.error('Mini-Karte konnte nicht geladen werden', e);
+    }
+  }
+
+    function showLocationPermissionModal() {
     const modal = document.getElementById('locationPermissionModal');
     if (modal) modal.style.display = 'flex';
   }
@@ -3749,7 +3816,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // Service Worker registrieren fuer Offline-Funktionalitaet
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js?v=75')
+      navigator.serviceWorker.register('sw.js?v=76')
         .then(reg => { console.log('SW registered'); })
         .catch(err => { console.log('SW registration failed'); });
     });
