@@ -3240,7 +3240,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const grid = document.getElementById('photosGrid');
     const canDelete = currentUser && currentUser.email === ADMIN_EMAIL;
     let html = photos.map(p => `<div class="photo-thumb-wrap" style="position:relative"><img class="photo-thumb" src="${p.url}" onclick="openLightbox('${p.url}')">${canDelete ? `<button onclick="deletePhoto('${p.id}','${p.path}',event)" style="position:absolute;top:4px;right:4px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>` : ''}</div>`).join('');
-    if (currentUser) html += `<div class="photo-upload" onclick="document.getElementById('photoFileInput').click()"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>`;
+    if (currentUser) html += `<label class="photo-upload" for="photoFileInput" style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="22" height="22"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span></label>`;
     grid.innerHTML = html + `<input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="uploadPhoto(event)">`;
   }
 
@@ -3420,9 +3420,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       return;
     }
     section.innerHTML = `
-      <div class="detail-card owner-section" id="claimDiv">
-        <button class="claim-btn" onclick="showClaimForm()">Ich bin der Inhaber dieses Ortes</button>
-        <div class="claim-info">Als verifizierter Inhaber kannst du diesen Eintrag selbst verwalten.</div>
+      <div class="detail-card owner-section" id="claimDiv" style="padding:14px 16px">
+        <button class="claim-btn" onclick="showClaimForm()" style="width:100%;background:var(--surface-2);color:var(--text-2);border:none;border-radius:10px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">Ich bin der Inhaber dieses Ortes</button>
+        <div style="font-size:11px;color:var(--text-3);text-align:center;margin-top:8px;line-height:1.4">Als verifizierter Inhaber kannst du diesen Eintrag selbst verwalten.</div>
         <div id="claimForm" style="display:none;margin-top:14px">
           <textarea class="field-textarea" id="claimReason" placeholder="Warum bist du der Inhaber? (z.B. Geschäftsführer seit 2020)" maxlength="300" style="font-size:13px"></textarea>
           <div style="display:flex;gap:8px;margin-top:8px">
