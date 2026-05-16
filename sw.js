@@ -1,25 +1,22 @@
-const VERSION = 'v74';
+const VERSION = 'v75';
 const STATIC_CACHE = 'buscar-static-' + VERSION;
 const RUNTIME_CACHE = 'buscar-runtime-' + VERSION;
-
 const STATIC_ASSETS = [
   './',
   './index.html',
-  './styles.css?v=74',
-  './app.js?v=74',
+  './styles.css?v=75',
+  './app.js?v=75',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
   './paraguay.geojson'
 ];
-
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => cache.addAll(STATIC_ASSETS).catch(() => {}))
   );
 });
-
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -31,22 +28,17 @@ self.addEventListener('activate', (event) => {
     ).then(() => self.clients.claim())
   );
 });
-
 const NEVER_CACHE = [
   'firestore', 'firebase', 'googleapis', 'translate',
   'er-api.com', 'mymemory', 'identitytoolkit', 'securetoken'
 ];
-
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
-
   const url = req.url;
   if (NEVER_CACHE.some((s) => url.includes(s))) return;
-
   const accept = req.headers.get('accept') || '';
   const isHTML = req.mode === 'navigate' || accept.includes('text/html');
-
   if (isHTML) {
     event.respondWith(
       fetch(req)
@@ -59,7 +51,6 @@ self.addEventListener('fetch', (event) => {
     );
     return;
   }
-
   event.respondWith(
     caches.match(req).then((cached) => {
       if (cached) return cached;
