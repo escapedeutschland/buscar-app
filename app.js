@@ -3240,7 +3240,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const grid = document.getElementById('photosGrid');
     const canDelete = currentUser && currentUser.email === ADMIN_EMAIL;
     let html = photos.map(p => `<div class="photo-thumb-wrap" style="position:relative"><img class="photo-thumb" src="${p.url}" onclick="openLightbox('${p.url}')">${canDelete ? `<button onclick="deletePhoto('${p.id}','${p.path}',event)" style="position:absolute;top:4px;right:4px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>` : ''}</div>`).join('');
-    if (currentUser) html += `<label class="photo-upload" for="photoFileInput" style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="22" height="22"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span></label>`;
+    if (currentUser) html += `<div class="photo-upload" onclick="document.getElementById('photoFileInput').click()" style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="22" height="22"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span></div>`;
     grid.innerHTML = html + `<input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="uploadPhoto(event)">`;
   }
 
@@ -3275,26 +3275,67 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function uploadPhoto(event) {
-    if (!currentUser || !currentListingId) return;
-    const file = event.target.files[0]; if (!file) return;
-    const prog = document.getElementById('photoProgress'); prog.classList.add('visible'); prog.textContent='Wird komprimiert...';
+    if (!currentUser) { showToast('Du musst eingeloggt sein.'); return; }
+    if (!currentListingId) { showToast('Kein Eintrag gewählt.'); return; }
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const prog = document.getElementById('photoProgress');
+    if (prog) { prog.classList.add('visible'); prog.textContent = 'Foto wird komprimiert...'; }
+
     try {
-      const blob = await compressImage(file, 1200, 1200, 0.7);
-      prog.textContent='Wird hochgeladen...';
+      // Komprimieren
+      let blob;
+      try {
+        blob = await compressImage(file, 1200, 1200, 0.7);
+      } catch(compErr) {
+        console.error('Compress error:', compErr);
+        throw new Error('Foto-Format nicht unterstützt. Bitte JPG oder PNG verwenden.');
+      }
+      if (prog) prog.textContent = 'Foto wird hochgeladen...';
+
+      // Upload zu Firebase Storage
       const filename = Date.now() + '_' + Math.random().toString(36).substr(2,5) + '.jpg';
       const path = 'listings/' + currentListingId + '/' + filename;
       const ref = storage.ref(path);
       const snap = await ref.put(blob, { contentType: 'image/jpeg' });
       const url = await snap.ref.getDownloadURL();
+
+      // Eintrag in Firestore
       const isAdmin = currentUser.email === ADMIN_EMAIL;
       await db.collection('listing_photos').add({
         listing_id: currentListingId, url, path, user_id: currentUser.uid,
         pending: !isAdmin, created_at: new Date()
       });
-      prog.textContent = isAdmin ? '✓ Hochgeladen!' : '✓ Foto wird geprüft!';
-      setTimeout(() => prog.classList.remove('visible'), 2000);
-      if (isAdmin) loadPhotos(currentListingId);
-    } catch(e) { prog.textContent = 'Fehler.'; }
+
+      // Erfolg: sichtbarer Toast + verlängerte Status-Anzeige
+      if (isAdmin) {
+        if (prog) {
+          prog.textContent = '✓ Hochgeladen!';
+          setTimeout(function(){ if (prog) prog.classList.remove('visible'); }, 2500);
+        }
+        showToast('✓ Foto hochgeladen');
+        loadPhotos(currentListingId);
+      } else {
+        if (prog) {
+          prog.textContent = '✓ Foto wird geprüft und nach Freigabe sichtbar';
+          setTimeout(function(){ if (prog) prog.classList.remove('visible'); }, 5000);
+        }
+        showToast('✓ Foto eingereicht – wird geprüft und nach Freigabe sichtbar');
+      }
+
+      // Input zurücksetzen damit gleiches Foto erneut wählbar ist
+      try { event.target.value = ''; } catch(e) {}
+
+    } catch(e) {
+      console.error('Photo upload error:', e);
+      const msg = (e && e.message) ? e.message : 'Unbekannter Fehler';
+      if (prog) {
+        prog.textContent = '✗ ' + msg;
+        setTimeout(function(){ if (prog) prog.classList.remove('visible'); }, 5000);
+      }
+      showToast('✗ Fehler: ' + msg);
+    }
   }
 
   function openLightbox(url) { document.getElementById('lightboxImg').src = url; document.getElementById('photoLightbox').classList.add('visible'); }
@@ -3816,7 +3857,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // Service Worker registrieren fuer Offline-Funktionalitaet
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js?v=77')
+      navigator.serviceWorker.register('sw.js?v=78')
         .then(reg => { console.log('SW registered'); })
         .catch(err => { console.log('SW registration failed'); });
     });
