@@ -1,4 +1,4 @@
-  const ADMIN_EMAIL = 'maximechristalle@gmail.com';
+const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   let currentLang = localStorage.getItem('buscar_lang') || 'de';
 
@@ -51,6 +51,25 @@
       contact_optional: 'Kontakt (optional)',
       tel_label: 'Telefon', web_label: 'Website', addr_label: 'Adresse', hours_label: 'Öffnungszeiten',
       location_btn: 'Meinen Standort verwenden', location_saved: 'Standort gespeichert',
+      // === NEU: Location-Permission-Fix ===
+      location_card_title: 'Standort *',
+      location_required_hint: 'Der Standort wird benötigt, damit dein Eintrag auf der Karte erscheint.',
+      location_required_error: 'Bitte gib deinen Standort an. Tippe auf "Meinen Standort verwenden".',
+      loc_banner_text: 'Standort-Berechtigung fehlt – tippen für Anleitung',
+      loc_modal_title: 'Standort aktivieren',
+      loc_modal_text: 'Damit du einen Eintrag erstellen kannst, brauchen wir die Standort-Berechtigung. So aktivierst du sie:',
+      loc_modal_step1: 'Öffne die Einstellungen deines Handys',
+      loc_modal_step2: 'Wähle "Apps" → "Buscar"',
+      loc_modal_step3: 'Tippe auf "Berechtigungen" → "Standort"',
+      loc_modal_step4: 'Wähle "Bei Nutzung der App zulassen"',
+      loc_modal_close: 'Schließen',
+      loc_modal_retry: 'Erneut versuchen',
+      loc_unavailable: 'Standort momentan nicht verfügbar. Bitte erneut versuchen.',
+      loc_timeout: 'Standort-Suche dauert zu lang. Bitte erneut versuchen.',
+      loc_unsupported: 'Standort wird von diesem Browser nicht unterstützt.',
+      loc_remove: 'Standort entfernen',
+      loc_locating: 'Standort wird ermittelt...',
+      // === Ende NEU ===
       photos_optional: 'Fotos (optional, max. 3)',
       photos_hint: 'Fotos helfen bei der Prüfung und werden nach Genehmigung sichtbar.',
       submit_btn: 'Eintrag einreichen', submitting: 'Wird eingereicht...',
@@ -178,14 +197,30 @@
       contact_optional: 'Contacto (opcional)',
       tel_label: 'Teléfono', web_label: 'Sitio web', addr_label: 'Dirección', hours_label: 'Horario',
       location_btn: 'Usar mi ubicación', location_saved: 'Ubicación guardada',
+      // === NEU: Location-Permission-Fix ===
+      location_card_title: 'Ubicación *',
+      location_required_hint: 'La ubicación es necesaria para que tu lugar aparezca en el mapa.',
+      location_required_error: 'Por favor indica tu ubicación. Toca "Usar mi ubicación".',
+      loc_banner_text: 'Permiso de ubicación denegado – toca para ayuda',
+      loc_modal_title: 'Activar ubicación',
+      loc_modal_text: 'Para crear un lugar necesitamos el permiso de ubicación. Así lo activas:',
+      loc_modal_step1: 'Abre los ajustes de tu teléfono',
+      loc_modal_step2: 'Selecciona "Aplicaciones" → "Buscar"',
+      loc_modal_step3: 'Toca "Permisos" → "Ubicación"',
+      loc_modal_step4: 'Elige "Permitir solo mientras usas la app"',
+      loc_modal_close: 'Cerrar',
+      loc_modal_retry: 'Reintentar',
+      loc_unavailable: 'Ubicación no disponible. Intenta de nuevo.',
+      loc_timeout: 'La búsqueda de ubicación tardó demasiado. Intenta de nuevo.',
+      loc_unsupported: 'Tu navegador no admite ubicación.',
+      loc_remove: 'Quitar ubicación',
+      loc_locating: 'Determinando ubicación...',
+      // === Ende NEU ===
       photos_optional: 'Fotos (opcional, máx. 3)',
       photos_hint: 'Las fotos ayudan en la revisión y serán visibles tras aprobación.',
       submit_btn: 'Enviar listado', submitting: 'Enviando...',
       submit_success: '¡Gracias! Tu listado fue enviado y será revisado.',
       fill_all: 'Por favor completa todos los campos obligatorios.',
-      // Formulario extra
-      photos_optional: 'Fotos (opcional, máx. 3)',
-      photos_hint: 'Las fotos ayudan en la revisión y serán visibles tras aprobación.',
       // Auth
       login: 'Iniciar sesión', register: 'Registrarse', logout: 'Cerrar sesión',
       email_label: 'Correo electrónico', password_label: 'Contraseña', name_auth: 'Nombre',
@@ -642,6 +677,11 @@
     if (id === 'screenProfil' && currentUser) {
       loadBadges(currentUser.uid);
     }
+    // === NEU: Beim Öffnen des Formulars Standort-Berechtigung pruefen
+    if (id === 'screenForm') {
+      checkLocationPermissionForForm();
+    }
+    // === Ende NEU ===
     // PTR setup – cached, runs only once per screen (not on every tap)
     if (!showScreen._ptr) {
       showScreen._ptr = {
@@ -828,10 +868,8 @@
         + '<div class="' + nameClass + '">' + b.name + '</div>'
         + '</div>';
     }).join('');
-    // section visibility controlled by toggleBadgePanel
   }
 
-  
   function toggleBadgePanel() {
     const panel = document.getElementById('badgeSection');
     const chevron = document.getElementById('badgeChevron');
@@ -840,7 +878,7 @@
     chevron.style.transform = open ? 'rotate(90deg)' : '';
   }
 
-    function showToast(msg) {
+  function showToast(msg) {
     let toast = document.getElementById('badgeToast');
     if (!toast) {
       toast = document.createElement('div');
@@ -853,7 +891,6 @@
     clearTimeout(toast._t);
     toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 3500);
   }
-
 
   // ══ EVENTS SYSTEM ═════════════════════════════════════════════════════════
   let allEvents = [];
@@ -1157,7 +1194,7 @@
     progress.textContent = 'Fotos hochgeladen!';
   }
 
-    async function submitEvent() {
+  async function submitEvent() {
     var title = document.getElementById('evFormTitle').value.trim();
     var type  = document.getElementById('evFormType').value;
     var desc  = document.getElementById('evFormDesc').value.trim();
@@ -1245,7 +1282,7 @@
     } catch(e) { alert('Fehler: ' + e.message); }
   }
 
-    async function cancelEvent(id) {
+  async function cancelEvent(id) {
     if (!confirm('Event wirklich absagen?')) return;
     try {
       await db.collection('events').doc(id).update({ status: 'cancelled' });
@@ -1258,8 +1295,6 @@
   }
   // ══ END EVENTS SYSTEM ══════════════════════════════════════════════════════
 
-
-  
   // ── EVENTS ON MAP ──────────────────────────────────────────────────────────
   let _showEventsOnMap = false;
   let _evDetailSource = 'events'; // 'events' or 'map'
@@ -1290,7 +1325,7 @@
       + '</div>';
   }
 
-    async function renderEventsOnMap() {
+  async function renderEventsOnMap() {
     clearEventsFromMap();
     if (!maplibreMap || !mapLoaded) return;
     var events = allEvents.length ? allEvents : [];
@@ -1331,7 +1366,6 @@
     });
   }
 
-
   function evDetailBack() {
     if (_evDetailSource === 'map') {
       setNav('navMap');
@@ -1346,7 +1380,7 @@
     }
   }
 
-    function evMarkerClick(id) {
+  function evMarkerClick(id) {
     _evDetailSource = 'map';
     if (allEvents.length) {
       showEventDetail(id);
@@ -1354,9 +1388,7 @@
       loadEvents().then(function(){ showEventDetail(id); });
     }
   }
-
   // ── END EVENTS ON MAP ──────────────────────────────────────────────────────
-
 
   // ── PROFIL: MEINE EVENTS & ANMELDUNGEN ─────────────────────────────────────
 
@@ -1502,10 +1534,8 @@
       loadMySignups();
     } catch(e) { alert('Fehler: ' + e.message); }
   }
-
   // ── END PROFIL EVENTS ──────────────────────────────────────────────────────
 
-  
   // ══ KOORDINATEN-EDITOR (nur Admin) ════════════════════════════════════════
   var _coordListingId = null;
   var _coordMap = null;
@@ -1595,7 +1625,7 @@
   }
   // ══ END KOORDINATEN-EDITOR ═════════════════════════════════════════════════
 
-    auth.onAuthStateChanged(async user => {
+  auth.onAuthStateChanged(async user => {
     currentUser = user;
     if (user) {
       let displayName = user.email.split('@')[0];
@@ -1773,17 +1803,6 @@
   function toggleOpenNowFilter() {
     activeOpenNow = !activeOpenNow;
     const btn = document.getElementById('filterOpenBtn');
-    if (activeOpenNow) {
-      btn.classList.add('active-open');
-    } else {
-      btn.classList.remove('active-open');
-    }
-    renderListings();
-  }
-
-  function toggleOpenNowFilter() {
-    activeOpenNow = !activeOpenNow;
-    const btn = document.getElementById('filterOpenBtn');
     if (activeOpenNow) { btn.classList.add('active-open'); }
     else { btn.classList.remove('active-open'); }
     document.getElementById('filterOpenLabel').textContent = t('open_now');
@@ -1903,25 +1922,20 @@
 
   function scoreEntry(l) {
     var score = 0;
-    // Bewertung (0–5 Sterne × 2 = max 10 Punkte)
     var avg = getAvgRating(l.id);
     if (avg) score += avg * 2;
-    // Vollständigkeit
     if (l.phone && l.phone.trim())        score += 2;
     if (l.website && l.website.trim())    score += 1;
     if (l.opening_hours && l.opening_hours.trim()) score += 1;
     if ((l.description || '').length > 100) score += 1;
     if (l.verified)                        score += 2;
-    // Titelbild / Fotos
     if (l.cover_url && l.cover_url.trim()) score += 3;
-    // Neu eingetragen (< 14 Tage)
     if (isNew(l.created_at)) score += 1;
     return score;
   }
 
-    function renderListings() {
+  function renderListings() {
     if (activeScreen !== 'screenHome') return;
-    // Defer heavy DOM work to next frame so nav stays responsive
     requestAnimationFrame(function() { _doRenderListings(); });
   }
   function _doRenderListings() {
@@ -1934,11 +1948,9 @@
     if (activeOpenNow) filtered = filtered.filter(l => isOpen(l.opening_hours) === true);
     if (activeDeal) filtered = filtered.filter(l => l.deal_text && l.deal_text.trim() !== '');
     if (searchQuery) { const q = norm(searchQuery); filtered = filtered.filter(l => norm(l.name||'').includes(q)||norm(l.description||'').includes(q)||norm(l.city||'').includes(q)||norm(l.subcategory||'').includes(q)); }
-    // ── Vollständigkeits-Score & Sortierung ──────────────────────────────────
     filtered = filtered.slice().sort(function(a, b) {
       return scoreEntry(b) - scoreEntry(a);
     });
-    // ─────────────────────────────────────────────────────────────────────────
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
@@ -1969,7 +1981,6 @@
         var oldWrap=document.getElementById('coverBtnWrap');if(oldWrap)oldWrap.remove();
         var wrap=document.createElement('div');
         wrap.id='coverBtnWrap';
-        // position handled by CSS #coverBtnWrap
         wrap.appendChild(delCovBtn);
         wrap.appendChild(covBtn);
         hero.appendChild(wrap);
@@ -1978,7 +1989,6 @@
         hero.appendChild(covBtn);
       }
       covBtn.onclick=function(){document.getElementById('coverFileInput').click();};
-
     }
     document.getElementById('detailIcon').innerHTML = catIcons[l.category_id]||catIcons['default'];
     const svg = document.getElementById('detailIcon').querySelector('svg');
@@ -2088,7 +2098,7 @@
   let maplibreMap = null;
   let mapLoaded = false;
   let pendingData = null;
-  let _mapFitOnUpdate = true; // fit on first load only
+  let _mapFitOnUpdate = true;
   let mapCityFilter = 'Alle';
 
   const catColors = {
@@ -2126,8 +2136,6 @@
     });
   }
 
-
-  // City coords for map zoom
   const mapCityCoords = {
     "Asunción": [-25.2867, -57.6470], "San Lorenzo": [-25.3333, -57.5167],
     "Luque": [-25.2667, -57.4833], "Capiatá": [-25.3500, -57.4500],
@@ -2237,8 +2245,6 @@
       pendingData = geojson;
     }
 
-    // Fit bounds only when city filter changes or on first load
-    // Never move map when only category/subcategory filter changes
     if (_mapFitOnUpdate) {
       _mapFitOnUpdate = false;
       if (withCoords.length === 1) {
@@ -2254,7 +2260,6 @@
       }
     }
 
-    // Bottom cards
     document.getElementById('mapList').innerHTML = withCoords.map(l => `
       <div class="map-card" onclick="showDetail('${l.id}')">
         <div class="map-card-name">${l.name||''}</div>
@@ -2283,7 +2288,6 @@
         keyboard: true,
         attributionControl: false
       });
-      // Disable rotation completely - both mouse and touch
       maplibreMap.dragRotate.disable();
       maplibreMap.touchZoomRotate.disableRotation();
 
@@ -2293,14 +2297,12 @@
       maplibreMap.on('load', () => {
         mapLoaded = true;
 
-        // GeoJSON source
         maplibreMap.addSource('listings', {
           type: 'geojson',
           data: pendingData || { type:'FeatureCollection', features:[] }
         });
         pendingData = null;
 
-        // Build teardrop SVG icons per category and load into map
         const pinDefs = [
           { id:'pin-restaurants',    color:'#F5A623', emoji:'🍽' },
           { id:'pin-unterkunft',     color:'#8B5CF6', emoji:'🛏' },
@@ -2330,7 +2332,6 @@
         }));
 
         Promise.all(pinPromises).then(() => {
-          // Symbol layer using custom teardrop icons
           maplibreMap.addLayer({
             id: 'listings-pins',
             type: 'symbol',
@@ -2355,7 +2356,6 @@
             }
           });
 
-          // Click on pins
           maplibreMap.on('click', 'listings-pins', e => {
             const p = e.features[0].properties;
             const coords = e.features[0].geometry.coordinates.slice();
@@ -2372,8 +2372,6 @@
           maplibreMap.on('mouseleave','listings-pins',()=>{ maplibreMap.getCanvas().style.cursor=''; });
         });
 
-
-
         updateMapData();
       });
     } else {
@@ -2383,10 +2381,6 @@
   }
 
   function renderMapMarkers() {}
-
-
-
-
 
   document.getElementById('mapCats').addEventListener('click', e => {
     const chip = e.target.closest('.map-chip');
@@ -2428,12 +2422,28 @@
     if (desc.length < 50) { document.getElementById('descError').classList.add('visible'); document.getElementById('newDesc').classList.add('error'); valid = false; } else { document.getElementById('newDesc').classList.remove('error'); }
     if (!isValidPhone(phone)) { document.getElementById('phoneError').classList.add('visible'); document.getElementById('newPhone').classList.add('error'); valid = false; } else { document.getElementById('newPhone').classList.remove('error'); }
     if (!name || !cat || !city || !desc) { document.getElementById('formError').textContent = t('fill_all'); document.getElementById('formError').classList.add('visible'); valid = false; }
+
+    // === NEU: Standort ist Pflicht ===
+    if (!window._newLat || !window._newLng) {
+      document.getElementById('formError').textContent = t('location_required_error');
+      document.getElementById('formError').classList.add('visible');
+      valid = false;
+      // Standort-Karte hervorheben und runterscrollen
+      const locBtn = document.getElementById('locationBtn');
+      if (locBtn) {
+        locBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        locBtn.style.boxShadow = '0 0 0 3px var(--red)';
+        setTimeout(function() { locBtn.style.boxShadow = ''; }, 2500);
+      }
+    }
+    // === Ende NEU ===
+
     if (!valid) return;
 
     const btn = document.getElementById('formSubmitBtn');
     btn.disabled = true; btn.textContent = 'Wird eingereicht...';
     try {
-      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: (()=>{ const d=document.getElementById('hoursDay').value; const f=document.getElementById('hoursFrom').value; const t=document.getElementById('hoursTo').value; const f2=document.getElementById('hoursFrom2').value; const t2=document.getElementById('hoursTo2').value; let val=''; if(d&&f&&t){val=d+' '+f+'-'+t; if(f2&&t2) val+=' & '+f2+'-'+t2;} document.getElementById('newHours').value=val; return val||null; })(), lat: window._newLat||null, lng: window._newLng||null, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date() });
+      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: (()=>{ const d=document.getElementById('hoursDay').value; const f=document.getElementById('hoursFrom').value; const t=document.getElementById('hoursTo').value; const f2=document.getElementById('hoursFrom2').value; const t2=document.getElementById('hoursTo2').value; let val=''; if(d&&f&&t){val=d+' '+f+'-'+t; if(f2&&t2) val+=' & '+f2+'-'+t2;} document.getElementById('newHours').value=val; return val||null; })(), lat: window._newLat, lng: window._newLng, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date() });
       if (pendingFormPhotos.length) await uploadFormPhotos(ref.id);
       document.getElementById('formSuccess').textContent = t('submit_success'); document.getElementById('formSuccess').classList.add('visible');
       pendingFormPhotos = [];
@@ -2447,18 +2457,168 @@
       const btn2 = document.getElementById('locationBtn');
       btn2.disabled = false; btn2.style.background = 'var(--yellow-light)'; btn2.style.borderColor = 'var(--yellow)'; btn2.style.color = 'var(--yellow-dark)';
       btn2.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg> Meinen Standort verwenden';
+      btn2.dataset.saved = '';
       document.getElementById('locationStatus').style.display = 'none';
+      const removeBtn = document.getElementById('locationRemoveBtn');
+      if (removeBtn) removeBtn.style.display = 'none';
     } catch (err) {
       document.getElementById('formError').textContent = 'Fehler beim Einreichen. Bitte versuche es erneut.'; document.getElementById('formError').classList.add('visible');
     }
     btn.disabled = false; btn.textContent = 'Eintrag einreichen';
   }
 
+  // ══════════════════════════════════════════════════════════════════════════
+  // STANDORT-PERMISSION-FIX (Bug-Fix v75)
+  // Standort ist Pflicht für Einträge. Wenn die Berechtigung verweigert wird,
+  // zeigen wir ein Modal mit Schritt-für-Schritt-Anleitung statt nur eine
+  // kleine Fehlermeldung.
+  // ══════════════════════════════════════════════════════════════════════════
+
+  function removeLocation() {
+    window._newLat = null;
+    window._newLng = null;
+    const btn = document.getElementById('locationBtn');
+    const status = document.getElementById('locationStatus');
+    const removeBtn = document.getElementById('locationRemoveBtn');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>' + t('location_btn');
+    btn.style.background = ''; btn.style.borderColor = ''; btn.style.color = '';
+    btn.dataset.saved = '';
+    btn.disabled = false;
+    if (status) status.style.display = 'none';
+    if (removeBtn) removeBtn.style.display = 'none';
+    // Permission-Status neu pruefen damit Banner ggf. wieder erscheint
+    checkLocationPermissionForForm();
+  }
+
+  async function useMyLocation() {
+    const btn = document.getElementById('locationBtn');
+    const status = document.getElementById('locationStatus');
+
+    if (!navigator.geolocation) {
+      status.style.color = 'var(--red)';
+      status.style.display = 'block';
+      status.textContent = t('loc_unsupported');
+      return;
+    }
+
+    // 1) Vorab-Check via Permissions API (wo verfügbar)
+    if (navigator.permissions && navigator.permissions.query) {
+      try {
+        const perm = await navigator.permissions.query({ name: 'geolocation' });
+        if (perm.state === 'denied') {
+          // Berechtigung bereits verweigert -> direkt Modal
+          showLocationPermissionModal();
+          // Banner sicherheitshalber einblenden
+          const banner = document.getElementById('locationPermissionBanner');
+          if (banner) banner.style.display = 'flex';
+          return;
+        }
+      } catch (e) {
+        // Permissions-API nicht unterstützt -> weiter mit getCurrentPosition
+      }
+    }
+
+    // 2) Standort anfragen
+    btn.textContent = t('loc_locating');
+    btn.disabled = true;
+
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        window._newLat = pos.coords.latitude;
+        window._newLng = pos.coords.longitude;
+        status.style.color = 'var(--green)';
+        status.style.display = 'block';
+        status.textContent = t('location_saved') + ': '
+          + pos.coords.latitude.toFixed(5) + ', '
+          + pos.coords.longitude.toFixed(5);
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg> ' + t('location_saved');
+        btn.style.background = 'var(--green-light)';
+        btn.style.borderColor = 'var(--green)';
+        btn.style.color = 'var(--green)';
+        btn.dataset.saved = 'true';
+        btn.disabled = false;
+        // Banner und Form-Error verstecken
+        const banner = document.getElementById('locationPermissionBanner');
+        if (banner) banner.style.display = 'none';
+        const formError = document.getElementById('formError');
+        if (formError) formError.classList.remove('visible');
+        const removeBtn = document.getElementById('locationRemoveBtn');
+        if (removeBtn) removeBtn.style.display = 'inline-block';
+      },
+      function(err) {
+        btn.disabled = false;
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>' + t('location_btn');
+
+        // Fehler-Code unterscheiden:
+        // 1 = PERMISSION_DENIED  -> Modal mit Anleitung
+        // 2 = POSITION_UNAVAILABLE -> Status-Text
+        // 3 = TIMEOUT -> Status-Text
+        if (err && err.code === 1) {
+          status.style.display = 'none';
+          const banner = document.getElementById('locationPermissionBanner');
+          if (banner) banner.style.display = 'flex';
+          showLocationPermissionModal();
+        } else if (err && err.code === 2) {
+          status.style.color = 'var(--red)';
+          status.style.display = 'block';
+          status.textContent = t('loc_unavailable');
+        } else if (err && err.code === 3) {
+          status.style.color = 'var(--red)';
+          status.style.display = 'block';
+          status.textContent = t('loc_timeout');
+        } else {
+          status.style.color = 'var(--red)';
+          status.style.display = 'block';
+          status.textContent = t('loc_unavailable');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  }
+
+  function showLocationPermissionModal() {
+    const modal = document.getElementById('locationPermissionModal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeLocationPermissionModal() {
+    const modal = document.getElementById('locationPermissionModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function retryLocation() {
+    closeLocationPermissionModal();
+    // Kurz warten, dann nochmal probieren - User hat moeglicherweise
+    // gerade die Berechtigung in den Einstellungen freigeschaltet.
+    setTimeout(function() { useMyLocation(); }, 250);
+  }
+
+  // Beim Oeffnen des Form-Screens: pruefen ob Berechtigung schon verweigert ist
+  // und ggf. Banner einblenden, damit der User es VOR dem Klick weiss.
+  async function checkLocationPermissionForForm() {
+    const banner = document.getElementById('locationPermissionBanner');
+    if (!banner) return;
+    // Wenn schon Koordinaten gespeichert sind, Banner nicht zeigen
+    if (window._newLat && window._newLng) {
+      banner.style.display = 'none';
+      return;
+    }
+    if (!navigator.permissions || !navigator.permissions.query) return;
+    try {
+      const perm = await navigator.permissions.query({ name: 'geolocation' });
+      banner.style.display = perm.state === 'denied' ? 'flex' : 'none';
+    } catch (e) {
+      // Nicht unterstuetzt - kein Banner
+    }
+  }
+  // ══════════════════════════════════════════════════════════════════════════
+  // END STANDORT-PERMISSION-FIX
+  // ══════════════════════════════════════════════════════════════════════════
+
   async function loadAdmin() {
     showScreen('screenAdmin');
     const body = document.getElementById('adminBody');
 
-    // Count pending claims for badge
     let claimCount = 0;
     try {
       const claimSnap = await db.collection('claims').where('status','==','pending').get();
@@ -2467,7 +2627,6 @@
 
     const claimBadge = claimCount > 0 ? `<span style="background:var(--red);color:white;border-radius:20px;padding:1px 7px;font-size:11px;font-weight:700;margin-left:6px">${claimCount}</span>` : '';
 
-    // Always rebuild tabs
     document.getElementById('adminSub').innerHTML = `
       <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
         <span id="adminTabListings" onclick="loadAdminListings()" style="cursor:pointer;font-weight:700;color:white;border-bottom:2px solid white;padding-bottom:2px">Einträge</span>
@@ -2488,7 +2647,6 @@
     try {
       const snap = await db.collection('listings').where('verified', '==', false).get();
       const pending = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      // Don't overwrite tabs - just update title if needed
       if (!pending.length) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-icon">&#10003;</div><div class="admin-empty-text">Alles geprüft!</div><div class="admin-empty-sub">Keine offenen Einträge.</div></div>'; return; }
       const photoSnaps = await Promise.all(pending.map(l =>
         db.collection('listing_photos').where('listing_id','==',l.id).where('pending','==',true).get()
@@ -2496,7 +2654,6 @@
       body.innerHTML = pending.map((l, idx) => {
         const photos = photoSnaps[idx].docs.map(d => d.data());
         const photoHTML = photos.length ? `<div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto">${photos.map(p => `<img src="${p.url}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0">`).join('')}</div>` : '';
-        // Find similar existing listings
         const lName = (l.name||'').toLowerCase();
         const similar = allListings.filter(ex =>
           ex.id !== l.id &&
@@ -2571,7 +2728,6 @@
 
   async function loadAdminDeals() {
     showScreen('screenAdmin');
-    // Switch to deals tab
     document.getElementById('adminTabListings').style.color = 'rgba(255,255,255,0.6)';
     document.getElementById('adminTabListings').style.borderBottom = 'none';
     const body = document.getElementById('adminBody');
@@ -2620,6 +2776,7 @@
       loadAdminDeals();
     } catch(e) { alert('Fehler.'); }
   }
+
   async function rejectEntry(id) {
     if (!confirm('Eintrag wirklich löschen?')) return;
     try { await db.collection('listings').doc(id).delete(); document.getElementById('adminCard_'+id).remove(); } catch (err) { alert('Fehler.'); }
@@ -2692,14 +2849,12 @@
       </div>`).join('');
   }
 
-  // Pull-to-refresh - init after DOM ready
   window.addEventListener('load', function() { (function() {
     let startY = 0, pulling = false, triggered = false;
     const el = document.querySelector('.listings');
     if (!el) return;
-    // Generic PTR – reused by all screens
     setupPTR(el, 'pullIndicator', function(){ loadListings(); });
-      })(); }); // end window.load
+      })(); });
 
   function setupPTR(el, indicatorId, onRefresh) {
     if (!el) return;
@@ -2737,7 +2892,6 @@
     });
   }
 
-  // Check if a place is open now - supports two time blocks
   function isNew(c){if(!c)return false;try{var d=c.toDate?c.toDate():new Date(c);return(Date.now()-d.getTime())<1209600000;}catch(e){return false;}}
 
   const subcatTranslations = {
@@ -2779,476 +2933,392 @@
   function isOpen(hours) {
     if (!hours) return null;
     try {
-      // Normalize: replace em-dash with hyphen
-      const h_str = hours.replace(/\u2013/g, '-').replace(/\u2014/g, '-');
-
-      // 24h special cases
-      if (/t\u00e4glich\s*24h?/i.test(hours) || /24\s*[h/]?\s*7/i.test(hours) || /24\s*h(oras)?/i.test(hours) || /24 stunden/i.test(hours) || /always open/i.test(hours)) return true;
-
       const now = new Date();
-      const hh = now.getHours();
-      const mm = now.getMinutes();
-      const hm = hh * 60 + mm;
-      const day = now.getDay(); // 0=So,1=Mo...6=Sa
-      const dayNames = ['so','mo','di','mi','do','fr','sa'];
-      const today = dayNames[day];
+      const day = now.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+      const h = now.getHours();
+      const m = now.getMinutes();
+      const nowMin = h * 60 + m;
 
-      function parseTime(s) {
-        s = s.trim();
-        const p = s.split(':');
-        return parseInt(p[0]) * 60 + (parseInt(p[1]) || 0);
-      }
+      // Parse "Mo-Fr 08:00-18:00" or "täglich 08:00-22:00" etc.
+      const lower = hours.toLowerCase();
+      let activeToday = false;
+      if (lower.includes('täglich')) activeToday = true;
+      else if (lower.includes('mo-fr') && day >= 1 && day <= 5) activeToday = true;
+      else if (lower.includes('mo-sa') && day >= 1 && day <= 6) activeToday = true;
+      else if (lower.includes('mo-so') && day >= 1) activeToday = true;
+      else if (lower.includes('mo-so') && day === 0) activeToday = true;
+      else if (lower.includes('sa-so') && (day === 0 || day === 6)) activeToday = true;
+      if (!activeToday) return false;
 
-      function checkTimeBlock(timeStr) {
-        // timeStr like "08:00-13:30"
-        const t = timeStr.trim();
-        const parts = t.split('-');
-        if (parts.length < 2) return false;
-        const open = parseTime(parts[0]);
-        const close = parseTime(parts[1]);
-        if (close < open) return hm >= open || hm < close; // overnight
-        return hm >= open && hm < close;
-      }
+      // Extract time blocks like "08:00-18:00" (can have two blocks separated by &)
+      const blocks = hours.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/g);
+      if (!blocks) return null;
 
-      function dayMatches(prefix) {
-        const p = prefix.toLowerCase().trim().replace(/-/g, '-');
-        if (!p) return true;
-        if (p.includes('täglich') || p.includes('daily') || p.includes('diario')) return true;
-        // range like "mo-fr", "mo-sa", "mo-so"
-        const rangeMatch = p.match(/([a-z]{2})-([a-z]{2})/);
-        if (rangeMatch) {
-          const start = dayNames.indexOf(rangeMatch[1]);
-          const end   = dayNames.indexOf(rangeMatch[2]);
-          if (start !== -1 && end !== -1) {
-            if (end >= start) return day >= start && day <= end;
-            else return day >= start || day <= end; // wraps (Sa-Mo etc)
-          }
+      for (const block of blocks) {
+        const match = block.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+        if (!match) continue;
+        const fromMin = parseInt(match[1])*60 + parseInt(match[2]);
+        let toMin = parseInt(match[3])*60 + parseInt(match[4]);
+        if (toMin === 0) toMin = 24*60; // 00:00 = end of day
+        if (toMin < fromMin) {
+          // Overnight - check if now is after from OR before to
+          if (nowMin >= fromMin || nowMin < toMin) return true;
+        } else {
+          if (nowMin >= fromMin && nowMin < toMin) return true;
         }
-        // single day check
-        return p.includes(today);
       }
-
-      // Split by comma to get day-segments like "Mo-Fr 08:00-13:00, Sa 09:00-12:00"
-      const segments = h_str.split(',');
-      let todayMatched = false;
-      for (let seg of segments) {
-        seg = seg.trim();
-        if (!seg) continue;
-        const firstDigit = seg.search(/\d/);
-        if (firstDigit === -1) continue;
-        const dayPrefix = seg.substring(0, firstDigit).replace(/[^A-Za-züäöÄÖÜ\-]/g, ' ').trim();
-        const timePart  = seg.substring(firstDigit).trim();
-        if (!dayMatches(dayPrefix)) continue;
-        todayMatched = true; // this segment applies to today
-        // Check time blocks
-        const timeBlocks = timePart.split(/[&]/).map(t => t.trim()).filter(Boolean);
-        for (const tb of timeBlocks) {
-          if (checkTimeBlock(tb)) return true;
-        }
-        if (checkTimeBlock(timePart)) return true;
-      }
-      // If today was matched but no time block was open → closed
-      if (todayMatched) return false;
-      // Today not mentioned at all → unknown
-      return null;
+      return false;
     } catch(e) { return null; }
   }
 
   function setRating(val) {
     currentUserRating = val;
-    document.querySelectorAll('#reviewStars .star').forEach((s,i) => {
-      s.classList.toggle('active', i<val);
-      if (i === val-1) {
-        s.classList.remove('star-pulse');
-        void s.offsetWidth;
-        s.classList.add('star-pulse');
-      }
+    document.querySelectorAll('#reviewStars .star').forEach(s => {
+      s.classList.toggle('active', parseInt(s.dataset.val) <= val);
     });
   }
 
   async function submitReview(listingId) {
-    if (!currentUserRating) { alert('Bitte wähle eine Sternebewertung.'); return; }
+    if (!currentUser || currentUserRating === 0) return;
     const btn = document.getElementById('reviewSubmitBtn');
-    btn.disabled = true; btn.textContent = 'Wird gespeichert...';
-    const name = await getUsername();
+    btn.disabled = true; btn.textContent = 'Wird gesendet...';
     try {
+      const userDoc = await db.collection('users').doc(currentUser.uid).get();
+      const userName = userDoc.exists ? (userDoc.data().username || userDoc.data().name) : currentUser.email.split('@')[0];
       await db.collection('reviews').add({
-        listing_id: listingId, user_id: currentUser.uid, user_name: name,
-        rating: currentUserRating, comment: document.getElementById('reviewText').value.trim()||null,
+        listing_id: listingId, user_id: currentUser.uid, user_name: userName,
+        rating: currentUserRating, comment: document.getElementById('reviewText').value.trim(),
         created_at: new Date()
       });
-      await loadReviews(listingId);
-    } catch(e) { btn.disabled=false; btn.textContent='Bewertung abschicken'; }
+      await loadAllRatings();
+      loadReviews(listingId);
+      renderListings();
+    } catch (err) { alert('Fehler.'); btn.disabled=false; btn.textContent='Bewertung abschicken'; }
   }
 
   async function loadComments(listingId) {
-    const snap = await db.collection('comments').where('listing_id','==',listingId).orderBy('created_at','asc').get();
-    const comments = snap.docs.map(d => ({id:d.id,...d.data()}));
-    const topLevel = comments.filter(c => !c.parent_id);
-    const replies = comments.filter(c => c.parent_id);
-    const myUid = currentUser ? currentUser.uid : null;
-    const trashIcon = (id, lid) => `<button onclick="deleteComment('${id}','${lid}')" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center" title="Löschen"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>`;
-
-    document.getElementById('commentsList').innerHTML = topLevel.map(c => {
-      const cReplies = replies.filter(r => r.parent_id === c.id);
-      const isOwn = myUid && c.user_id === myUid;
-      return `<div class="comment-item" id="comment_${c.id}">
+    const snap = await db.collection('comments').where('listing_id','==',listingId).orderBy('created_at','desc').get();
+    const allComments = snap.docs.map(d => ({id:d.id, ...d.data()}));
+    const topLevel = allComments.filter(c => !c.parent_id);
+    const repliesMap = {};
+    allComments.forEach(c => {
+      if (c.parent_id) {
+        if (!repliesMap[c.parent_id]) repliesMap[c.parent_id] = [];
+        repliesMap[c.parent_id].push(c);
+      }
+    });
+    const list = document.getElementById('commentsList');
+    if (!topLevel.length) { list.innerHTML = '<div style="padding:12px 16px;font-size:13px;color:var(--text-3)">Noch keine Kommentare.</div>'; return; }
+    list.innerHTML = topLevel.map(c => {
+      const replies = (repliesMap[c.id] || []).sort((a,b) => (a.created_at?.toDate?.()||0) - (b.created_at?.toDate?.()||0));
+      const myComment = currentUser && c.user_id === currentUser.uid;
+      const repliesHTML = replies.map(r => {
+        const myReply = currentUser && r.user_id === currentUser.uid;
+        return `<div class="reply-item">
+          <div class="reply-item-top">
+            <span class="reply-item-name">${r.user_name||'Anonym'}</span>
+            <span class="reply-item-date">${formatDate(r.created_at)}</span>
+            ${myReply ? `<button onclick="deleteComment('${r.id}','${listingId}')" style="margin-left:6px;font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;padding:0">${t('delete')}</button>` : ''}
+          </div>
+          <div class="reply-item-text" data-original="${r.text}">${r.text}</div>
+        </div>`;
+      }).join('');
+      return `<div class="comment-item">
         <div class="comment-item-top">
           <span class="comment-item-name">${c.user_name||'Anonym'}</span>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="comment-item-date">${formatDate(c.created_at)}</span>
-            ${isOwn ? trashIcon(c.id, listingId) : ''}
-          </div>
+          <span class="comment-item-date">${formatDate(c.created_at)}</span>
+          ${myComment ? `<button onclick="deleteComment('${c.id}','${listingId}')" style="margin-left:6px;font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;padding:0">${t('delete')}</button>` : ''}
         </div>
-        <div class="comment-item-text" data-original="${c.body}">${c.body}</div>
-        <button class='comment-reply-btn' onclick='toggleReplyForm("${c.id}")'>${t('reply')}</button>
-        ${cReplies.length ? `<div class="comment-replies">${cReplies.map(r => {
-          const isOwnReply = myUid && r.user_id === myUid;
-          return `<div class="reply-item">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
-              <div><span class="reply-item-name">${r.user_name||'Anonym'}</span> <span class="reply-item-date">${formatDate(r.created_at)}</span></div>
-              ${isOwnReply ? trashIcon(r.id, listingId) : ''}
-            </div>
-            <div class="reply-item-text" data-original="${r.body}">${r.body}</div>
-          </div>`;
-        }).join('')}</div>` : ''}
-        <div class="reply-form" id="replyForm_${c.id}">
-          <input class="reply-input" id="replyInput_${c.id}" placeholder="Antwort schreiben...">
-          <button class='reply-submit' onclick='submitReply("${listingId}","${c.id}")'>${t('reply')}</button>
+        <div class="comment-item-text" data-original="${c.text}">${c.text}</div>
+        <button class="reply-btn" onclick="toggleReplyForm('${c.id}')">${t('reply')}</button>
+        ${repliesHTML}
+        <div class="reply-form" id="replyForm_${c.id}" style="display:none;margin-top:8px">
+          <textarea class="comment-input" id="replyInput_${c.id}" placeholder="Antwort..." rows="1"></textarea>
+          <button class="comment-send" onclick="submitReply('${listingId}','${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
         </div>
       </div>`;
     }).join('');
   }
 
   async function deleteReview(reviewId, listingId) {
-    if (!confirm('Bewertung wirklich löschen?')) return;
-    try {
-      await db.collection('reviews').doc(reviewId).delete();
-      await loadReviews(listingId);
-    } catch(e) { alert('Fehler beim Löschen.'); }
+    if (!confirm('Bewertung löschen?')) return;
+    try { await db.collection('reviews').doc(reviewId).delete(); await loadAllRatings(); loadReviews(listingId); renderListings(); } catch(e) { alert('Fehler.'); }
   }
 
-  function editReview(reviewId, listingId, currentRating) {
-    currentUserRating = currentRating;
+  function editReview(reviewId, listingId, oldRating) {
+    currentUserRating = oldRating;
     document.getElementById('reviewForm').innerHTML = `
-      <div class="review-form">
-        <div class='review-form-title'>${t('rate_now')}</div>
+      <div class="review-form"><div class="review-form-title">Bewertung bearbeiten</div>
         <div class="review-stars" id="reviewStars">
-          ${[1,2,3,4,5].map(i => `<span class="star${i<=currentRating?' active':''}" data-val="${i}" onclick="setRating(${i})">&#9733;</span>`).join('')}
+          ${[1,2,3,4,5].map(i => `<span class="star${i<=oldRating?' active':''}" data-val="${i}" onclick="setRating(${i})">&#9733;</span>`).join('')}
         </div>
-        <textarea class="review-textarea" id="reviewText" placeholder="Deine Erfahrung (optional)"></textarea>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button class='review-submit' onclick='updateReview("${reviewId}","${listingId}")'>${t('edit')}</button>
-          <button onclick='loadReviews("${listingId}")' style='padding:11px 16px;background:var(--bg);color:var(--text-2);border:1.5px solid var(--border);border-radius:10px;font-family:DM Sans,sans-serif;font-size:13px;font-weight:600;cursor:pointer'>${t('cancel')||'✕'}</button>
-        </div>
+        <textarea class="review-textarea" id="reviewText"></textarea>
+        <button class="review-submit" onclick="updateReview('${reviewId}','${listingId}')">Aktualisieren</button>
       </div>`;
   }
 
   async function updateReview(reviewId, listingId) {
-    if (!currentUserRating) { alert('Bitte wähle eine Sternebewertung.'); return; }
     try {
       await db.collection('reviews').doc(reviewId).update({
-        rating: currentUserRating,
-        comment: document.getElementById('reviewText').value.trim() || null,
-        updated_at: new Date()
+        rating: currentUserRating, comment: document.getElementById('reviewText').value.trim(), updated_at: new Date()
       });
-      await loadReviews(listingId);
-    } catch(e) { alert('Fehler beim Speichern.'); }
+      await loadAllRatings(); loadReviews(listingId); renderListings();
+    } catch(e) { alert('Fehler.'); }
   }
 
   async function deleteComment(commentId, listingId) {
-    if (!confirm('Kommentar wirklich löschen?')) return;
-    try {
-      await db.collection('comments').doc(commentId).delete();
-      await loadComments(listingId);
-    } catch(e) { alert('Fehler beim Löschen.'); }
+    if (!confirm('Kommentar löschen?')) return;
+    try { await db.collection('comments').doc(commentId).delete(); loadComments(listingId); } catch(e) { alert('Fehler.'); }
   }
 
   function toggleReplyForm(commentId) {
-    const form = document.getElementById('replyForm_' + commentId);
-    if (form) { form.classList.toggle('visible'); if (form.classList.contains('visible')) document.getElementById('replyInput_'+commentId).focus(); }
+    const f = document.getElementById('replyForm_'+commentId);
+    f.style.display = f.style.display === 'none' ? 'flex' : 'none';
+    if (f.style.display === 'flex') f.querySelector('textarea').focus();
   }
 
   async function submitReply(listingId, parentId) {
-    const input = document.getElementById('replyInput_' + parentId);
-    const body = input.value.trim();
-    if (!body) return;
-    const name = await getUsername();
+    const txt = document.getElementById('replyInput_'+parentId).value.trim();
+    if (!currentUser || !txt) return;
     try {
-      await db.collection('comments').add({ listing_id: listingId, parent_id: parentId, user_id: currentUser.uid, user_name: name, body, created_at: new Date() });
-      await loadComments(listingId);
-    } catch(e) { alert('Fehler beim Speichern.'); }
+      const userName = await getUsername();
+      await db.collection('comments').add({
+        listing_id: listingId, parent_id: parentId, user_id: currentUser.uid, user_name: userName,
+        text: txt, created_at: new Date()
+      });
+      loadComments(listingId);
+    } catch(e) { alert('Fehler.'); }
   }
 
   function showEditUsername() {
-    document.getElementById('newUsername').value = document.getElementById('profilName').textContent || '';
+    const cur = document.getElementById('profilName').textContent;
+    document.getElementById('newUsername').value = cur;
     document.getElementById('usernameChangeError').style.display = 'none';
     document.getElementById('usernameChangeSuccess').style.display = 'none';
     showScreen('screenEditUsername');
   }
 
   async function saveUsername() {
-    const username = document.getElementById('newUsername').value.trim();
-    const errEl = document.getElementById('usernameChangeError');
-    const okEl = document.getElementById('usernameChangeSuccess');
-    errEl.style.display = 'none'; okEl.style.display = 'none';
-
-    if (!/^[a-zA-Z0-9_]{3,30}$/.test(username)) {
-      errEl.textContent = 'Min. 3 Zeichen, nur Buchstaben, Zahlen und _.';
-      errEl.style.display = 'block'; return;
+    const newName = document.getElementById('newUsername').value.trim();
+    const err = document.getElementById('usernameChangeError');
+    const succ = document.getElementById('usernameChangeSuccess');
+    err.style.display = 'none'; succ.style.display = 'none';
+    if (!/^[a-zA-Z0-9_]{3,30}$/.test(newName)) {
+      err.textContent = 'Min. 3 Zeichen, nur Buchstaben, Zahlen und _.'; err.style.display = 'block'; return;
     }
-    const taken = await db.collection('users').where('username', '==', username).get();
-    const alreadyMine = taken.docs.length === 1 && taken.docs[0].id === currentUser.uid;
-    if (!taken.empty && !alreadyMine) {
-      errEl.textContent = 'Dieser Benutzername ist bereits vergeben.';
-      errEl.style.display = 'block'; return;
+    const taken = await db.collection('users').where('username','==',newName).get();
+    if (!taken.empty && taken.docs[0].id !== currentUser.uid) {
+      err.textContent = 'Bereits vergeben.'; err.style.display = 'block'; return;
     }
     try {
-      await db.collection('users').doc(currentUser.uid).update({ username });
-      document.getElementById('profilName').textContent = username;
-      // Get current avatar url to preserve it
-      const userDoc = await db.collection('users').doc(currentUser.uid).get();
-      const avatarUrl = userDoc.exists ? userDoc.data().avatar_url : null;
-      setAvatarDisplay(avatarUrl, username.charAt(0).toUpperCase());
-      okEl.textContent = 'Benutzername erfolgreich geändert!';
-      okEl.style.display = 'block';
-    } catch(e) {
-      errEl.textContent = 'Fehler beim Speichern.'; errEl.style.display = 'block';
-    }
+      await db.collection('users').doc(currentUser.uid).set({ username: newName }, { merge: true });
+      document.getElementById('profilName').textContent = newName;
+      succ.textContent = '✓ Gespeichert!'; succ.style.display = 'block';
+      setTimeout(() => showScreen('screenProfil'), 1200);
+    } catch(e) { err.textContent = 'Fehler.'; err.style.display = 'block'; }
   }
 
   function showEditPassword() {
-    ['currentPassword','newPassword','newPasswordConfirm'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('newPasswordConfirm').value = '';
     document.getElementById('passwordChangeError').style.display = 'none';
     document.getElementById('passwordChangeSuccess').style.display = 'none';
     showScreen('screenEditPassword');
   }
 
   async function savePassword() {
-    const current = document.getElementById('currentPassword').value;
+    const curPw = document.getElementById('currentPassword').value;
     const newPw = document.getElementById('newPassword').value;
-    const confirm = document.getElementById('newPasswordConfirm').value;
-    const errEl = document.getElementById('passwordChangeError');
-    const okEl = document.getElementById('passwordChangeSuccess');
-    errEl.style.display = 'none'; okEl.style.display = 'none';
-
-    if (!current || !newPw || !confirm) {
-      errEl.textContent = 'Bitte alle Felder ausfüllen.'; errEl.style.display = 'block'; return;
-    }
-    if (newPw.length < 6) {
-      errEl.textContent = 'Neues Passwort muss min. 6 Zeichen haben.'; errEl.style.display = 'block'; return;
-    }
-    if (newPw !== confirm) {
-      errEl.textContent = 'Passwörter stimmen nicht überein.'; errEl.style.display = 'block'; return;
-    }
+    const confirmPw = document.getElementById('newPasswordConfirm').value;
+    const err = document.getElementById('passwordChangeError');
+    const succ = document.getElementById('passwordChangeSuccess');
+    err.style.display='none'; succ.style.display='none';
+    if (newPw.length < 6) { err.textContent='Min. 6 Zeichen.'; err.style.display='block'; return; }
+    if (newPw !== confirmPw) { err.textContent='Passwörter stimmen nicht überein.'; err.style.display='block'; return; }
     try {
-      const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, current);
-      await currentUser.reauthenticateWithCredential(credential);
+      const cred = firebase.auth.EmailAuthProvider.credential(currentUser.email, curPw);
+      await currentUser.reauthenticateWithCredential(cred);
       await currentUser.updatePassword(newPw);
-      okEl.textContent = 'Passwort erfolgreich geändert!'; okEl.style.display = 'block';
-      ['currentPassword','newPassword','newPasswordConfirm'].forEach(id => document.getElementById(id).value = '');
+      succ.textContent = '✓ Passwort geändert!'; succ.style.display='block';
+      setTimeout(() => showScreen('screenProfil'), 1500);
     } catch(e) {
-      const msgs = { 'auth/wrong-password': 'Aktuelles Passwort ist falsch.', 'auth/too-many-requests': 'Zu viele Versuche. Bitte kurz warten.' };
-      errEl.textContent = msgs[e.code] || 'Fehler beim Ändern.'; errEl.style.display = 'block';
+      err.textContent = e.code === 'auth/wrong-password' ? 'Aktuelles Passwort falsch.' : 'Fehler.';
+      err.style.display='block';
     }
   }
 
   async function getUsername() {
-    try {
-      const doc = await db.collection('users').doc(currentUser.uid).get();
-      if (doc.exists) return doc.data().username || doc.data().name || currentUser.email.split('@')[0];
-    } catch(e) {}
-    return currentUser.email.split('@')[0];
+    const doc = await db.collection('users').doc(currentUser.uid).get();
+    return doc.exists ? (doc.data().username || doc.data().name || currentUser.email.split('@')[0]) : currentUser.email.split('@')[0];
   }
 
   async function submitComment() {
-    if (!currentListingId) return;
-    const input = document.getElementById('commentInput');
-    const body = input.value.trim();
-    if (!body) return;
-    const name = await getUsername();
-    input.value = '';
+    const txt = document.getElementById('commentInput').value.trim();
+    if (!currentUser || !txt || !currentListingId) return;
     try {
-      await db.collection('comments').add({ listing_id: currentListingId, parent_id: null, user_id: currentUser.uid, user_name: name, body, created_at: new Date() });
-      await loadComments(currentListingId);
-    } catch(e) { alert('Fehler beim Speichern.'); }
+      const userName = await getUsername();
+      await db.collection('comments').add({
+        listing_id: currentListingId, user_id: currentUser.uid, user_name: userName,
+        text: txt, created_at: new Date()
+      });
+      document.getElementById('commentInput').value = '';
+      loadComments(currentListingId);
+    } catch(e) { alert('Fehler.'); }
   }
 
   async function loadPhotos(listingId) {
+    const snap = await db.collection('listing_photos').where('listing_id','==',listingId).where('pending','==',false).get();
+    const photos = snap.docs.map(d => ({id:d.id, ...d.data()}));
     const grid = document.getElementById('photosGrid');
-    try {
-      const snap = await db.collection('listing_photos')
-        .where('listing_id', '==', listingId)
-        .orderBy('created_at', 'asc').get();
-      const photos = snap.docs.map(d => ({id:d.id,...d.data()}));
-      grid.innerHTML = photos.map(p => {
-        const canDel = currentUser&&(currentUser.email===ADMIN_EMAIL||p.uploaded_by===currentUser.uid);
-        const del = canDel?`<button class="photo-delete-btn" onclick="event.stopPropagation();deletePhoto('${p.id}','${p.url}','${listingId}')" title="Löschen">✕</button>`:'';
-        return `<div class="photo-thumb-wrap"><img class="photo-thumb" src="${p.url}" alt="Foto" onclick="openLightbox('${p.url}')">${del}</div>`;
-      }).join('');
-      grid.innerHTML += `
-        <label class="photo-upload-btn" for="photoFileInput">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span>${t('add_photo')}</span>
-        </label>
-        <input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="uploadPhoto(event,'${listingId}')">`;
-    } catch(e) {
-      grid.innerHTML = `
-        <label class="photo-upload-btn" for="photoFileInput">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span>Foto hinzufügen</span>
-        </label>
-        <input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="uploadPhoto(event,'${listingId}')">`;
-    }
+    const canDelete = currentUser && currentUser.email === ADMIN_EMAIL;
+    let html = photos.map(p => `<div class="photo-thumb-wrap" style="position:relative"><img class="photo-thumb" src="${p.url}" onclick="openLightbox('${p.url}')">${canDelete ? `<button onclick="deletePhoto('${p.id}','${p.path}',event)" style="position:absolute;top:4px;right:4px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>` : ''}</div>`).join('');
+    if (currentUser) html += `<div class="photo-upload" onclick="document.getElementById('photoFileInput').click()"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>`;
+    grid.innerHTML = html + `<input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="uploadPhoto(event)">`;
   }
 
-  async function compressImage(file, maxPx, quality) {
-    maxPx=maxPx||1200; quality=quality||0.75;
-    return new Promise(function(resolve){
-      var img=new Image(), url=URL.createObjectURL(file);
-      img.onload=function(){
-        var w=img.width,h=img.height;
-        if(w>maxPx||h>maxPx){if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;}}
-        var c=document.createElement('canvas');c.width=w;c.height=h;
-        c.getContext('2d').drawImage(img,0,0,w,h);
-        c.toBlob(function(b){URL.revokeObjectURL(url);resolve(b);},'image/jpeg',quality);
-      };img.src=url;
+  function compressImage(file, maxW, maxH, quality) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if (w > maxW) { h *= maxW/w; w = maxW; }
+          if (h > maxH) { w *= maxH/h; h = maxH; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          canvas.toBlob(b => resolve(b), 'image/jpeg', quality);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
     });
   }
-  async function deletePhoto(photoId, url, listingId) {
-    if(!confirm('Foto löschen?')) return;
+
+  async function deletePhoto(photoId, path, event) {
+    event.stopPropagation();
+    if (!confirm('Foto löschen?')) return;
     try {
+      if (path) await storage.ref(path).delete().catch(()=>{});
       await db.collection('listing_photos').doc(photoId).delete();
-      try{await firebase.storage().refFromURL(url).delete();}catch(e){}
-      await loadPhotos(listingId);
-    } catch(e){alert('Fehler beim Löschen.');}
+      loadPhotos(currentListingId);
+    } catch(e) { alert('Fehler.'); }
   }
-  async function uploadPhoto(event, listingId) {
-    const rawFile = event.target.files[0];
-    if (!rawFile) return;
-    if (!rawFile.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
 
-    const progress = document.getElementById('photoProgress');
-    progress.style.display = 'block';
-    progress.textContent = 'Wird hochgeladen...';
-
+  async function uploadPhoto(event) {
+    if (!currentUser || !currentListingId) return;
+    const file = event.target.files[0]; if (!file) return;
+    const prog = document.getElementById('photoProgress'); prog.classList.add('visible'); prog.textContent='Wird komprimiert...';
     try {
-      const file = await compressImage(rawFile);
-      const ref = storage.ref('listing_photos/' + listingId + '_' + Date.now() + '.jpg');
-      const snap = await ref.put(file, {contentType:'image/jpeg'});
+      const blob = await compressImage(file, 1200, 1200, 0.7);
+      prog.textContent='Wird hochgeladen...';
+      const filename = Date.now() + '_' + Math.random().toString(36).substr(2,5) + '.jpg';
+      const path = 'listings/' + currentListingId + '/' + filename;
+      const ref = storage.ref(path);
+      const snap = await ref.put(blob, { contentType: 'image/jpeg' });
       const url = await snap.ref.getDownloadURL();
-      const name = await getUsername();
+      const isAdmin = currentUser.email === ADMIN_EMAIL;
       await db.collection('listing_photos').add({
-        listing_id: listingId,
-        uploaded_by: currentUser.uid,
-        uploaded_by_name: name,
-        url,
-        created_at: new Date()
+        listing_id: currentListingId, url, path, user_id: currentUser.uid,
+        pending: !isAdmin, created_at: new Date()
       });
-      progress.textContent = 'Foto hochgeladen!';
-      setTimeout(() => { progress.style.display = 'none'; }, 2000);
-      await loadPhotos(listingId);
-    } catch(e) {
-      progress.textContent = 'Fehler beim Hochladen.';
-      setTimeout(() => { progress.style.display = 'none'; }, 2000);
-    }
+      prog.textContent = isAdmin ? '✓ Hochgeladen!' : '✓ Foto wird geprüft!';
+      setTimeout(() => prog.classList.remove('visible'), 2000);
+      if (isAdmin) loadPhotos(currentListingId);
+    } catch(e) { prog.textContent = 'Fehler.'; }
   }
 
-  function openLightbox(url) {
-    document.getElementById('lightboxImg').src = url;
-    document.getElementById('photoLightbox').classList.add('visible');
-  }
-
-  function closeLightbox() {
-    document.getElementById('photoLightbox').classList.remove('visible');
-    document.getElementById('lightboxImg').src = '';
-  }
+  function openLightbox(url) { document.getElementById('lightboxImg').src = url; document.getElementById('photoLightbox').classList.add('visible'); }
+  function closeLightbox() { document.getElementById('photoLightbox').classList.remove('visible'); }
 
   function handleFormPhotos(event) {
-    const files = Array.from(event.target.files).slice(0, 3);
-    pendingFormPhotos = files;
-    const grid = document.getElementById('formPhotoGrid');
-    const previews = files.map((f, i) => {
-      const url = URL.createObjectURL(f);
-      return `<div style="position:relative;aspect-ratio:1">
-        <img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:12px">
-        <button onclick="removeFormPhoto(${i})" type="button" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.55);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>`;
-    }).join('');
-    const addBtn = files.length < 3 ? `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Hinzufügen</span></label>` : '';
-    grid.innerHTML = previews + addBtn;
+    const files = Array.from(event.target.files).slice(0, 3 - pendingFormPhotos.length);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        pendingFormPhotos.push({ file, preview: e.target.result });
+        const idx = pendingFormPhotos.length - 1;
+        const grid = document.getElementById('formPhotoGrid');
+        const addBtn = grid.querySelector('label[for="formPhotoInput"]');
+        const div = document.createElement('div');
+        div.style.cssText = 'aspect-ratio:1;border-radius:12px;overflow:hidden;position:relative';
+        div.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover"><button onclick="removeFormPhoto(${idx})" style="position:absolute;top:6px;right:6px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:16px;line-height:1;cursor:pointer">×</button>`;
+        grid.insertBefore(div, addBtn);
+        if (pendingFormPhotos.length >= 3) addBtn.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    });
+    event.target.value = '';
   }
 
-  function removeFormPhoto(index) {
-    pendingFormPhotos.splice(index, 1);
-    const fakeEvent = { target: { files: pendingFormPhotos } };
-    handleFormPhotos(fakeEvent);
+  function removeFormPhoto(idx) {
+    pendingFormPhotos.splice(idx, 1);
+    const grid = document.getElementById('formPhotoGrid');
+    Array.from(grid.children).forEach(c => { if (c.tagName !== 'INPUT' && !c.querySelector('input')) c.remove(); });
+    const oldInput = document.getElementById('formPhotoInput');
+    const photos = [...pendingFormPhotos];
+    pendingFormPhotos = [];
+    grid.innerHTML = `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span></label><input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">`;
+    photos.forEach(p => {
+      pendingFormPhotos.push(p);
+      const idx = pendingFormPhotos.length - 1;
+      const addBtn = grid.querySelector('label[for="formPhotoInput"]');
+      const div = document.createElement('div');
+      div.style.cssText = 'aspect-ratio:1;border-radius:12px;overflow:hidden;position:relative';
+      div.innerHTML = `<img src="${p.preview}" style="width:100%;height:100%;object-fit:cover"><button onclick="removeFormPhoto(${idx})" style="position:absolute;top:6px;right:6px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:16px;line-height:1;cursor:pointer">×</button>`;
+      grid.insertBefore(div, addBtn);
+    });
   }
 
   async function uploadFormPhotos(listingId) {
     if (!pendingFormPhotos.length) return;
-    const progress = document.getElementById('formPhotoProgress');
-    progress.style.display = 'block';
+    const prog = document.getElementById('formPhotoProgress'); prog.style.display = 'block';
     for (let i = 0; i < pendingFormPhotos.length; i++) {
-      const file = pendingFormPhotos[i];
-      progress.textContent = `Foto ${i+1} von ${pendingFormPhotos.length} wird hochgeladen...`;
-      const filename = Date.now() + '_' + i + '.' + file.name.split('.').pop();
-      const ref = storage.ref('listings/' + listingId + '/' + filename);
-      const snap = await ref.put(file);
-      const url = await snap.ref.getDownloadURL();
-      await db.collection('listing_photos').add({
-        listing_id: listingId,
-        uploaded_by: currentUser ? currentUser.uid : null,
-        url,
-        pending: true,
-        created_at: new Date()
-      });
+      prog.textContent = `Foto ${i+1}/${pendingFormPhotos.length} wird hochgeladen...`;
+      try {
+        const blob = await compressImage(pendingFormPhotos[i].file, 1200, 1200, 0.7);
+        const filename = Date.now() + '_' + i + '.jpg';
+        const path = 'listings/' + listingId + '/' + filename;
+        const snap = await storage.ref(path).put(blob, { contentType: 'image/jpeg' });
+        const url = await snap.ref.getDownloadURL();
+        await db.collection('listing_photos').add({
+          listing_id: listingId, url, path, user_id: currentUser.uid, pending: true, created_at: new Date()
+        });
+      } catch(e) {}
     }
-    progress.textContent = 'Fotos hochgeladen!';
+    prog.textContent = '✓ Hochgeladen';
   }
 
   async function deleteAvatar() {
-    if (!confirm('Profilbild wirklich entfernen?')) return;
-    const progress = document.getElementById('avatarProgress');
-    progress.style.display = 'block';
-    progress.textContent = 'Wird entfernt...';
+    if (!currentUser) return;
+    if (!confirm('Foto wirklich entfernen?')) return;
     try {
-      await db.collection('users').doc(currentUser.uid).update({ avatar_url: null });
-      const displayName = document.getElementById('profilName').textContent;
-      setAvatarDisplay(null, displayName.charAt(0).toUpperCase());
-      progress.textContent = 'Profilbild entfernt.';
-      setTimeout(() => { progress.style.display = 'none'; }, 2000);
-    } catch(e) {
-      progress.textContent = 'Fehler beim Entfernen.';
-      setTimeout(() => { progress.style.display = 'none'; }, 2000);
-    }
+      const userDoc = await db.collection('users').doc(currentUser.uid).get();
+      if (userDoc.exists && userDoc.data().avatar_path) {
+        await storage.ref(userDoc.data().avatar_path).delete().catch(()=>{});
+      }
+      await db.collection('users').doc(currentUser.uid).set({ avatar_url: null, avatar_path: null }, { merge: true });
+      const name = document.getElementById('profilName').textContent;
+      setAvatarDisplay(null, name.charAt(0).toUpperCase());
+    } catch(e) { alert('Fehler.'); }
   }
 
   async function uploadAvatar(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { alert('Foto ist zu groß. Max. 5 MB.'); return; }
-    if (!file.type.startsWith('image/')) { alert('Nur Bilder erlaubt.'); return; }
-
-    const progress = document.getElementById('avatarProgress');
-    progress.style.display = 'block';
-    progress.textContent = 'Wird hochgeladen...';
-
+    if (!currentUser) return;
+    const file = event.target.files[0]; if (!file) return;
+    const prog = document.getElementById('avatarProgress'); prog.style.display='block';
     try {
-      const ref = storage.ref('avatars/' + currentUser.uid + '/avatar.' + file.name.split('.').pop());
-      const snap = await ref.put(file);
+      const blob = await compressImage(file, 400, 400, 0.85);
+      const path = 'avatars/' + currentUser.uid + '.jpg';
+      const snap = await storage.ref(path).put(blob, { contentType: 'image/jpeg' });
       const url = await snap.ref.getDownloadURL();
-      await db.collection('users').doc(currentUser.uid).update({ avatar_url: url });
-      const displayName = document.getElementById('profilName').textContent;
-      setAvatarDisplay(url, displayName.charAt(0).toUpperCase());
-      progress.textContent = 'Profilbild gespeichert!';
-      setTimeout(() => { progress.style.display = 'none'; }, 2500);
-    } catch(e) {
-      progress.textContent = 'Fehler beim Hochladen.';
-      setTimeout(() => { progress.style.display = 'none'; }, 2500);
-    }
+      await db.collection('users').doc(currentUser.uid).set({ avatar_url: url, avatar_path: path }, { merge: true });
+      const name = document.getElementById('profilName').textContent;
+      setAvatarDisplay(url, name.charAt(0).toUpperCase());
+      prog.style.display='none';
+    } catch(e) { prog.textContent='Fehler.'; }
   }
 
   let currentEditListingId = null;
@@ -3256,110 +3326,67 @@
   async function loadOwnerSection(listing) {
     const section = document.getElementById('detailOwnerSection');
     if (!currentUser) { section.innerHTML = ''; return; }
-
-    // Check if already claimed
-    const claimSnap = await db.collection('claims').where('listing_id','==',listing.id).where('status','==','approved').get();
-    const isOwned = !claimSnap.empty;
-    const ownerId = isOwned ? claimSnap.docs[0].data().user_id : null;
-    const isOwner = isOwned && ownerId === currentUser.uid;
-
-    if (isOwner) {
-      const existingDeal = listing.deal_text || '';
-      const existingCode = listing.deal_code || '';
-      const existingExpiry = listing.deal_expiry || '';
-      section.innerHTML = `
-        <div class="owner-actions">
-          <button class="owner-edit-btn" onclick="openEditListing('${listing.id}')" style="margin-bottom:12px">
-            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            ${t('edit_entry')}
-          </button>
-          <button onclick="openCoordEditor('${listing.id}')" style="width:100%;padding:12px 16px;background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:#1D4ED8;cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:12px">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            Koordinaten setzen
-          </button>
-          <div style="background:#FFF5F0;border:1.5px solid #FFD4B8;border-radius:14px;padding:14px">
-            <div style="font-size:12px;font-weight:700;color:#C2410C;margin-bottom:10px">🏷 Mein Deal</div>
-            <input id="ownerDealText" class="field-input" type="text" placeholder="z.B. 10% Rabatt für Buscar-Nutzer" value="${existingDeal}" style="margin-bottom:8px;font-size:13px">
-            <input id="ownerDealCode" class="field-input" type="text" placeholder="Gutscheincode (optional)" value="${existingCode}" style="margin-bottom:8px;font-size:13px">
-            <input id="ownerDealExpiry" class="field-input" type="text" placeholder="Gültig bis (z.B. 31.12.2025)" value="${existingExpiry}" style="margin-bottom:10px;font-size:13px">
-            <div style="display:flex;gap:8px">
-              <button onclick="saveOwnerDeal('${listing.id}')" style="flex:2;padding:12px;background:linear-gradient(135deg,#FF6B35,#F7C548);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer">💾 Deal speichern</button>
-              ${existingDeal ? `<button onclick="removeOwnerDeal('${listing.id}')" style="flex:1;padding:12px;background:var(--red-light);color:var(--red);border:1.5px solid var(--red);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer">✕</button>` : ''}
-            </div>
-          </div>
-        </div>`;
-    } else if (isOwned) {
-      section.innerHTML = `<div style="padding:8px 0"><span class="owner-badge">⭐ Verifizierter Inhaber</span></div>`;
-    } else {
-      // Check if current user already submitted a claim
-      const myClaimSnap = await db.collection('claims').where('listing_id','==',listing.id).where('user_id','==',currentUser.uid).get();
-      if (!myClaimSnap.empty) {
-        const status = myClaimSnap.docs[0].data().status;
-        if (status === 'pending') {
-          section.innerHTML = `<div style="padding:8px 0;font-size:13px;color:var(--text-3)">✓ Dein Claim wird geprüft...</div>`;
-        } else {
-          section.innerHTML = '';
-        }
-      } else {
-        section.innerHTML = `
-          <div style="margin-top:6px">
-            <button class="claim-btn" onclick="showClaimForm('${listing.id}','${(listing.name||'').replace(/'/g,"\'")}')">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-              ${t('claim_btn')}
-            </button>
-            <div style="font-size:11px;color:var(--text-3);margin-top:6px;text-align:center;padding:0 8px">${t('claim_info')}</div>
-          </div>`;
-      }
+    if (listing.owner_id === currentUser.uid) {
+      section.innerHTML = `<div class="detail-card owner-section verified">
+        <div class="owner-badge">⭐ Verifizierter Inhaber</div>
+        <button class="owner-edit-btn" onclick="openEditListing('${listing.id}')">Eintrag bearbeiten</button>
+      </div>
+      <div class="detail-card" style="background:linear-gradient(135deg,#FFF8EC 0%,white 100%)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--yellow);display:flex;align-items:center;justify-content:center;color:white;font-weight:700"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="20" height="20"><path d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.78 0l-8-4a2 2 0 0 1-1.11-1.79V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z"/></svg></div>
+          <div><div style="font-size:14px;font-weight:700;color:var(--text-1)">Buscar-Deal verwalten</div><div style="font-size:11px;color:var(--text-3)">Biete einen Vorteil für App-Nutzer</div></div>
+        </div>
+        ${listing.deal_text ? `<div style="background:white;border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:10px"><div style="font-size:12px;color:var(--text-3);margin-bottom:4px">Aktiver Deal:</div><div style="font-size:13px;font-weight:600;color:var(--text-1)">${listing.deal_text}</div>${listing.deal_code?`<div style="font-size:11px;color:#C2410C;margin-top:4px">Code: ${listing.deal_code}</div>`:''}</div>` : ''}
+        <input class="field-input" type="text" id="ownerDealText" placeholder="Deal-Beschreibung (z.B. 10% Rabatt)" value="${listing.deal_text||''}" style="font-size:13px;padding:10px 12px;margin-bottom:8px">
+        <input class="field-input" type="text" id="ownerDealCode" placeholder="Gutscheincode (optional)" value="${listing.deal_code||''}" style="font-size:13px;padding:10px 12px;margin-bottom:8px">
+        <input class="field-input" type="text" id="ownerDealExpiry" placeholder="Gültig bis (z.B. 31.12.2025)" value="${listing.deal_expiry||''}" style="font-size:13px;padding:10px 12px;margin-bottom:8px">
+        <div style="display:flex;gap:8px"><button onclick="saveOwnerDeal('${listing.id}')" style="flex:2;background:var(--yellow);color:white;border:none;border-radius:10px;padding:10px;font-weight:700;font-size:13px;cursor:pointer">Deal speichern</button>${listing.deal_text?`<button onclick="removeOwnerDeal('${listing.id}')" style="flex:1;background:var(--red-light);color:var(--red);border:none;border-radius:10px;padding:10px;font-weight:600;font-size:12px;cursor:pointer">Entfernen</button>`:''}</div>
+      </div>`;
+      return;
     }
-  }
-
-  function showClaimForm(listingId, listingName) {
-    const html = `
-      <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:flex-end" id="claimOverlay" onclick="if(event.target.id==='claimOverlay')closeClaimForm()">
-        <div style="background:var(--card);border-radius:24px 24px 0 0;padding:24px;width:100%;max-width:430px;margin:0 auto">
-          <div style="font-size:18px;font-weight:700;margin-bottom:6px">Inhaber-Anfrage</div>
-          <div style="font-size:13px;color:var(--text-2);margin-bottom:16px">${listingName}</div>
-          <div style="font-size:13px;font-weight:500;color:var(--text-2);margin-bottom:6px">Warum bist du der Inhaber?</div>
-          <textarea id="claimReason" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text-1);background:var(--bg);outline:none;resize:none;min-height:100px;-webkit-appearance:none" placeholder="Beschreibe kurz warum du der Inhaber bist..."></textarea>
-          <div id="claimError" style="display:none;color:var(--red);font-size:12px;margin-top:6px"></div>
-          <div style="display:flex;gap:10px;margin-top:14px">
-            <button onclick="closeClaimForm()" style="flex:1;padding:14px;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;color:var(--text-2)">Abbrechen</button>
-            <button onclick="submitClaim('${listingId}')" style="flex:1;padding:14px;background:var(--yellow);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer">Einreichen</button>
+    const claimSnap = await db.collection('claims').where('listing_id','==',listing.id).where('user_id','==',currentUser.uid).get();
+    if (!claimSnap.empty) {
+      const c = claimSnap.docs[0].data();
+      if (c.status === 'pending') section.innerHTML = `<div class="detail-card owner-section">✓ Dein Claim wird geprüft...</div>`;
+      else if (c.status === 'rejected') section.innerHTML = `<div class="detail-card owner-section">Dein Claim wurde leider abgelehnt.</div>`;
+      else section.innerHTML = '';
+      return;
+    }
+    section.innerHTML = `
+      <div class="detail-card owner-section" id="claimDiv">
+        <button class="claim-btn" onclick="showClaimForm()">Ich bin der Inhaber dieses Ortes</button>
+        <div class="claim-info">Als verifizierter Inhaber kannst du diesen Eintrag selbst verwalten.</div>
+        <div id="claimForm" style="display:none;margin-top:14px">
+          <textarea class="field-textarea" id="claimReason" placeholder="Warum bist du der Inhaber? (z.B. Geschäftsführer seit 2020)" maxlength="300" style="font-size:13px"></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button onclick="closeClaimForm()" style="flex:1;background:var(--surface-2);color:var(--text-1);border:none;border-radius:10px;padding:10px;font-weight:600;font-size:13px;cursor:pointer">Abbrechen</button>
+            <button onclick="submitClaim('${listing.id}')" style="flex:1;background:var(--yellow);color:white;border:none;border-radius:10px;padding:10px;font-weight:700;font-size:13px;cursor:pointer">Anfrage senden</button>
           </div>
         </div>
       </div>`;
-    document.body.insertAdjacentHTML('beforeend', html);
   }
 
-  function closeClaimForm() {
-    const el = document.getElementById('claimOverlay');
-    if (el) el.remove();
-  }
+  function showClaimForm() { document.getElementById('claimForm').style.display = 'block'; }
+  function closeClaimForm() { document.getElementById('claimForm').style.display = 'none'; }
 
   async function submitClaim(listingId) {
     const reason = document.getElementById('claimReason').value.trim();
-    const errEl = document.getElementById('claimError');
-    if (!reason || reason.length < 10) {
-      errEl.textContent = 'Bitte gib eine Begründung ein (min. 10 Zeichen).';
-      errEl.style.display = 'block'; return;
-    }
-    const name = await getUsername();
+    if (!reason) { alert('Bitte begründen.'); return; }
     try {
+      const userDoc = await db.collection('users').doc(currentUser.uid).get();
       await db.collection('claims').add({
-        listing_id: listingId, user_id: currentUser.uid,
-        user_name: name, user_email: currentUser.email,
+        listing_id: listingId, user_id: currentUser.uid, user_email: currentUser.email,
+        user_name: userDoc.exists ? (userDoc.data().username||userDoc.data().name) : currentUser.email.split('@')[0],
         reason, status: 'pending', created_at: new Date()
       });
-      closeClaimForm();
-      const section = document.getElementById('detailOwnerSection');
-      section.innerHTML = `<div style="padding:8px 0;font-size:13px;color:var(--text-3)">✓ Dein Claim wird geprüft...</div>`;
-    } catch(e) { alert('Fehler beim Einreichen.'); }
+      document.getElementById('claimDiv').innerHTML = `<div style="text-align:center;padding:8px"><div style="font-size:14px;color:var(--green);font-weight:600">✓ Anfrage gesendet!</div></div>`;
+    } catch(e) { alert('Fehler.'); }
   }
 
-  function openEditListing(listingId) {
-    const l = allListings.find(x => x.id === listingId);
+  function openEditListing(id) {
+    const l = allListings.find(x => x.id === id);
     if (!l) return;
-    currentEditListingId = listingId;
+    currentEditListingId = id;
     document.getElementById('editName').value = l.name || '';
     document.getElementById('editCity').value = l.city || '';
     document.getElementById('editDesc').value = l.description || '';
@@ -3367,176 +3394,82 @@
     document.getElementById('editWebsite').value = l.website || '';
     document.getElementById('editAddress').value = l.address || '';
     document.getElementById('editHours').value = l.opening_hours || '';
-      if (l.opening_hours) {
-        const hp = l.opening_hours.split(' ');
-        if (hp.length >= 2) {
-          const el = document.getElementById('editHoursDay');
-          if (el) el.value = hp[0] || '';
-          const times = hp[1] ? hp[1].split('-') : [];
-          if (times.length === 2) {
-            const ef = document.getElementById('editHoursFrom');
-            const et = document.getElementById('editHoursTo');
-            if (ef) ef.value = times[0] || '';
-            if (et) et.value = times[1] || '';
-          }
-        }
-      }
     document.getElementById('editListingError').style.display = 'none';
     document.getElementById('editListingSuccess').style.display = 'none';
-    document.getElementById('editListingBack').onclick = () => showScreen('screenDetail');
+    document.getElementById('editListingBack').onclick = function() { showDetail(currentEditListingId); };
     showScreen('screenEditListing');
   }
 
   async function saveListingEdits() {
     if (!currentEditListingId) return;
+    const err = document.getElementById('editListingError'); err.style.display = 'none';
     const name = document.getElementById('editName').value.trim();
+    const city = document.getElementById('editCity').value.trim();
     const desc = document.getElementById('editDesc').value.trim();
-    const errEl = document.getElementById('editListingError');
-    const okEl = document.getElementById('editListingSuccess');
-    errEl.style.display = 'none'; okEl.style.display = 'none';
-
-    if (!name || !desc) { errEl.textContent = 'Name und Beschreibung sind Pflichtfelder.'; errEl.style.display = 'block'; return; }
-
+    if (!name || !city || desc.length < 50) { err.textContent='Bitte alle Pflichtfelder ausfüllen.'; err.style.display='block'; return; }
     try {
       await db.collection('listings').doc(currentEditListingId).update({
-        name, city: document.getElementById('editCity').value.trim(),
-        description: desc,
+        name, city, description: desc,
         phone: document.getElementById('editPhone').value.trim() || null,
         website: document.getElementById('editWebsite').value.trim() || null,
         address: document.getElementById('editAddress').value.trim() || null,
-        opening_hours: (()=>{ const d=document.getElementById('editHoursDay').value; const f=document.getElementById('editHoursFrom').value; const t=document.getElementById('editHoursTo').value; if(d&&f&&t){document.getElementById('editHours').value=d+' '+f+'-'+t;} return document.getElementById('editHours').value.trim()||null; })(),
+        opening_hours: document.getElementById('editHours').value.trim() || null,
         updated_at: new Date()
       });
-      // Update local cache
-      const idx = allListings.findIndex(x => x.id === currentEditListingId);
-      if (idx !== -1) {
-        allListings[idx] = { ...allListings[idx], name, city: document.getElementById('editCity').value.trim(), description: desc };
-      }
-      okEl.style.display = 'block';
-      setTimeout(() => { showScreen('screenDetail'); loadListings(); }, 1500);
-    } catch(e) { errEl.textContent = 'Fehler beim Speichern.'; errEl.style.display = 'block'; }
+      document.getElementById('editListingSuccess').style.display = 'block';
+      await loadListings();
+      setTimeout(() => showDetail(currentEditListingId), 1500);
+    } catch(e) { err.textContent='Fehler.'; err.style.display='block'; }
   }
 
   let currentFavorites = new Set();
 
   async function loadFavoriteStatus(listingId) {
-    if (!currentUser) return;
+    if (!currentUser) { document.getElementById('favBtn').classList.remove('active'); return; }
     try {
-      const snap = await db.collection('favorites')
-        .where('user_id','==',currentUser.uid)
-        .where('listing_id','==',listingId).get();
-      const isFav = !snap.empty;
-      currentFavorites = isFav ? new Set([...currentFavorites, listingId]) : (() => { currentFavorites.delete(listingId); return currentFavorites; })();
-      const btn = document.getElementById('favBtn');
-      if (btn) btn.classList.toggle('active', isFav);
+      const doc = await db.collection('users').doc(currentUser.uid).get();
+      if (doc.exists && doc.data().favorites) {
+        currentFavorites = new Set(doc.data().favorites);
+      }
+      document.getElementById('favBtn').classList.toggle('active', currentFavorites.has(listingId));
     } catch(e) {}
   }
 
   async function toggleFavorite() {
-    if (!currentListingId || !currentUser) return;
+    if (!currentUser || !currentListingId) return;
     const btn = document.getElementById('favBtn');
-    const isFav = currentFavorites.has(currentListingId);
+    if (currentFavorites.has(currentListingId)) {
+      currentFavorites.delete(currentListingId);
+      btn.classList.remove('active');
+    } else {
+      currentFavorites.add(currentListingId);
+      btn.classList.add('active');
+    }
     try {
-      if (isFav) {
-        const snap = await db.collection('favorites')
-          .where('user_id','==',currentUser.uid)
-          .where('listing_id','==',currentListingId).get();
-        await Promise.all(snap.docs.map(d => d.ref.delete()));
-        currentFavorites.delete(currentListingId);
-        btn.classList.remove('active');
-      } else {
-        await db.collection('favorites').add({
-          user_id: currentUser.uid,
-          listing_id: currentListingId,
-          created_at: new Date()
-        });
-        currentFavorites.add(currentListingId);
-        btn.classList.add('active');
-        btn.classList.remove('fav-pop');
-        void btn.offsetWidth;
-        btn.classList.add('fav-pop');
-      }
-    } catch(e) { alert('Fehler.'); }
+      await db.collection('users').doc(currentUser.uid).set({ favorites: [...currentFavorites] }, { merge: true });
+    } catch(e) {}
   }
 
-  async function showFavorites() {
-    showScreen('screenFavorites');
+  function showFavorites() {
     const body = document.getElementById('favoritesBody');
-    body.innerHTML = '<div style="text-align:center;padding:40px"><div style="width:28px;height:28px;border:3px solid #FFF8EC;border-top-color:#F5A623;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto"></div></div>';
-    try {
-      const snap = await db.collection('favorites').where('user_id','==',currentUser.uid).orderBy('created_at','desc').get();
-      if (snap.empty) {
-        body.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="empty-title">Noch keine Favoriten</div><div class="empty-sub">Tippe auf das Herz in der Detailansicht</div></div>';
-        return;
-      }
-      const favListingIds = snap.docs.map(d => d.data().listing_id);
-      const favListings = allListings.filter(l => favListingIds.includes(l.id));
-      if (!favListings.length) {
-        body.innerHTML = '<div class="empty-state"><div class="empty-title">Keine Einträge gefunden</div></div>';
-        return;
-      }
-      body.innerHTML = favListings.map(l => `
-        <div class="profil-fav-card" onclick="showDetail('${l.id}')">
-          <div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div>
-          <div class="listing-body">
-            <div class="listing-name">${l.name||''}</div>
-            ${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" width="11" height="11"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}</div>`:''}
-            <div class="listing-desc">${l.description||''}</div>
-          </div>
-          <div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
-        </div>`).join('');
-    } catch(e) {
-      body.innerHTML = '<div class="empty-state"><div class="empty-title">Fehler beim Laden</div></div>';
+    const favs = allListings.filter(l => currentFavorites.has(l.id));
+    if (!favs.length) {
+      body.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="empty-title">Noch keine Favoriten</div><div class="empty-sub">Tippe auf das Herz in der Detailansicht</div></div>`;
+    } else {
+      body.innerHTML = favs.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-name">${l.name||''}</div><div class="listing-city">${l.city||''}</div><div class="listing-desc">${l.description||''}</div></div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
     }
+    showScreen('screenFavorites');
   }
 
   function updateSubcatOptions() {
     const cat = document.getElementById('newCategory').value;
     const field = document.getElementById('subcatField');
     const sel = document.getElementById('newSubcategory');
-    const opts = subcats[cat];
-    if (!opts || opts.length <= 1) { field.style.display = 'none'; return; }
-    field.style.display = 'block';
-    sel.innerHTML = '<option value="">Bitte wählen...</option>' +
-      opts.filter(o => o !== 'Alle').map(o => `<option value="${o}">${o}</option>`).join('');
-  }
-
-  async function translateText(text, targetLang, btnEl, outputEl) {
-    if (btnEl.dataset.loading === 'true') return;
-    // If already translated, toggle visibility
-    if (outputEl.classList.contains('visible')) {
-      outputEl.classList.remove('visible');
-      btnEl.innerHTML = '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-2"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg> ' + (currentLang === 'de' ? 'Übersetzen' : 'Traducir');
-      return;
-    }
-    btnEl.dataset.loading = 'true';
-    btnEl.innerHTML = '⏳ ...';
-    try {
-      const langCode = targetLang === 'de' ? 'de' : 'es';
-      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=auto|${langCode}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      const translated = data.responseData?.translatedText;
-      if (translated && translated !== text) {
-        outputEl.innerHTML = translated + '<div class="translate-source">MyMemory</div>';
-        outputEl.classList.add('visible');
-        btnEl.innerHTML = '<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-2"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg> ' + (currentLang === 'de' ? 'Original' : 'Original');
-      } else {
-        btnEl.innerHTML = currentLang === 'de' ? '— kein Ergebnis' : '— sin resultado';
-      }
-    } catch(e) {
-      btnEl.innerHTML = currentLang === 'de' ? '— Fehler' : '— Error';
-    }
-    btnEl.dataset.loading = 'false';
-  }
-
-  function translateIcon() {
-    return '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-2"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>';
-  }
-
-  function translateBtnHTML(id, text) {
-    const label = currentLang === 'de' ? 'Übersetzen' : 'Traducir';
-    return `<button class="translate-btn" id="tbtn_${id}" onclick="translateText('${text.replace(/'/g,"\'")}','${currentLang}',document.getElementById('tbtn_${id}'),document.getElementById('tout_${id}'))">${translateIcon()} ${label}</button><div class="translated-text" id="tout_${id}"></div>`;
+    if (cat && subcats[cat]) {
+      const opts = subcats[cat].filter(s => s !== 'Alle');
+      sel.innerHTML = '<option value="">Bitte wählen...</option>' + opts.map(s => `<option value="${s}">${s}</option>`).join('');
+      field.style.display = 'block';
+    } else { field.style.display = 'none'; }
   }
 
   let mapSubcatFilter = 'Alle';
@@ -3547,18 +3480,17 @@
     document.getElementById('mapCitySheetOverlay').classList.add('visible');
     document.getElementById('mapCitySearchInput').value = '';
     renderMapCitySheet('');
-        setTimeout(() => document.getElementById('mapCitySearchInput').focus(), 100);
+    setTimeout(() => document.getElementById('mapCitySearchInput').focus(), 100);
   }
 
   function closeMapCitySheet() {
     document.getElementById('mapCitySheetOverlay').classList.remove('visible');
-      }
+  }
 
   function renderMapCitySheet(query) {
     const list = document.getElementById('mapCitySheetList');
     const q = query.toLowerCase().trim();
     const filtered = ALL_PY_CITIES.filter(c => !q || c.toLowerCase().includes(q));
-    if (!filtered.length) { list.innerHTML = '<div class="city-sheet-empty">Keine Stadt gefunden</div>'; return; }
     list.innerHTML = filtered.map(c => `
       <div class="city-sheet-item${mapCityFilter===c?' selected':''}" onclick="selectMapCity('${c}')">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -3566,61 +3498,45 @@
       </div>`).join('');
   }
 
-  function filterMapCitySheet() {
-    renderMapCitySheet(document.getElementById('mapCitySearchInput').value);
-  }
+  function filterMapCitySheet() { renderMapCitySheet(document.getElementById('mapCitySearchInput').value); }
 
   function selectMapCity(city) {
     mapCityFilter = city;
-    _mapFitOnUpdate = true;
-    const btn = document.getElementById('mapCityPickerBtn');
-    const label = document.getElementById('mapCityPickerLabel');
-    if (city === 'Alle') {
-      btn.style.borderColor = '';
-      btn.style.color = '';
-      label.textContent = 'Stadt wählen...';
-    } else {
-      btn.style.borderColor = 'var(--yellow)';
-      btn.style.color = 'var(--yellow-dark)';
-      label.textContent = city;
-      // Zoom to city
-      if (maplibreMap && mapCityCoords[city]) {
-        const c=mapCityCoords[city]; maplibreMap.flyTo({center:[c[1],c[0]],zoom:13,animate:false});
-      }
-    }
+    document.getElementById('mapCityPickerLabel').textContent = city === 'Alle' ? 'Stadt wählen...' : city;
+    document.getElementById('mapCityPickerBtn').style.background = city === 'Alle' ? 'var(--bg)' : 'var(--yellow-light)';
     closeMapCitySheet();
+    _mapFitOnUpdate = true;
+    if (city !== 'Alle' && maplibreMap) {
+      const coords = mapCityCoords[city];
+      if (coords) maplibreMap.flyTo({center:[coords[1],coords[0]],zoom:13,animate:false});
+    }
     renderMap();
   }
 
   function openMapFilterSheet(mode) {
-        mapFilterMode = mode;
+    mapFilterMode = mode;
     const overlay = document.getElementById('mapFilterSheetOverlay');
-    const content = document.getElementById('mapFilterSheetContent');
     overlay.classList.add('visible');
+    const content = document.getElementById('mapFilterSheetContent');
     if (mode === 'sub') {
-      document.getElementById('mapFilterSheetTitle').textContent = t('filter_title_sub');
+      document.getElementById('mapFilterSheetTitle').textContent = 'Unterkategorie';
       const cats = subcats[mapCategory] || [];
-      if (!cats.length || cats.length <= 1) {
-        content.innerHTML = '<div style="padding:16px 20px;color:var(--text-3);font-size:13px">Zuerst eine Kategorie auf der Karte wählen.</div><div class="filter-divider"></div>';
-      } else {
-        content.innerHTML = `<div class="filter-section"><div class="filter-chips">${
-          cats.map(s => `<div class="filter-chip${mapSubcatFilter===s?' active':''}" onclick="selectMapFilterChip('${s}')">${s}</div>`).join('')
-        }</div></div><div class="filter-divider"></div>`;
-      }
+      if (!cats.length) { content.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3)">Erst Kategorie wählen</div>'; return; }
+      content.innerHTML = `<div class="filter-section"><div class="filter-chips">${cats.map(s => `<div class="filter-chip${mapSubcatFilter===s?' active':''}" onclick="selectMapFilterChip('${s}')">${tSubcat(s)}</div>`).join('')}</div></div>`;
     } else {
-      document.getElementById('mapFilterSheetTitle').textContent = t('filter_title_stars');
-      content.innerHTML = `<div class="filter-section"><div class="filter-section-label">${t('min_stars')}</div><div class="filter-star-row">
-        <div class="filter-star-btn${mapMinStars===0?' active':''}" onclick="selectMapStarFilter(0)">${t('stars_all')}</div>
+      document.getElementById('mapFilterSheetTitle').textContent = 'Mindest-Bewertung';
+      content.innerHTML = `<div class="filter-section"><div class="filter-section-label">Minimum Sterne</div><div class="filter-star-row">
+        <div class="filter-star-btn${mapMinStars===0?' active':''}" onclick="selectMapStarFilter(0)">Alle</div>
         <div class="filter-star-btn${mapMinStars===3?' active':''}" onclick="selectMapStarFilter(3)">3+ ★</div>
         <div class="filter-star-btn${mapMinStars===4?' active':''}" onclick="selectMapStarFilter(4)">4+ ★</div>
         <div class="filter-star-btn${mapMinStars===5?' active':''}" onclick="selectMapStarFilter(5)">5 ★</div>
-      </div></div><div class="filter-divider"></div>`;
+      </div></div>`;
     }
   }
 
   function selectMapFilterChip(val) {
     mapSubcatFilter = val;
-    document.querySelectorAll('#mapFilterSheetContent .filter-chip').forEach(c => c.classList.toggle('active', c.textContent === val));
+    document.querySelectorAll('#mapFilterSheetContent .filter-chip').forEach(c => c.classList.toggle('active', c.textContent === tSubcat(val) || c.textContent === val));
   }
 
   function selectMapStarFilter(val) {
@@ -3631,26 +3547,16 @@
 
   function closeMapFilterSheet() {
     document.getElementById('mapFilterSheetOverlay').classList.remove('visible');
-      }
+  }
 
   function applyMapFilter() {
     closeMapFilterSheet();
     const subBtn = document.getElementById('mapFilterSubBtn');
     const starBtn = document.getElementById('mapFilterStarBtn');
-    if (mapSubcatFilter !== 'Alle') {
-      subBtn.classList.add('active');
-      document.getElementById('mapFilterSubLabel').textContent = mapSubcatFilter;
-    } else {
-      subBtn.classList.remove('active');
-      document.getElementById('mapFilterSubLabel').textContent = 'Typ';
-    }
-    if (mapMinStars > 0) {
-      starBtn.classList.add('active');
-      document.getElementById('mapFilterStarLabel').textContent = mapMinStars + '+ ★';
-    } else {
-      starBtn.classList.remove('active');
-      document.getElementById('mapFilterStarLabel').textContent = '★';
-    }
+    if (mapSubcatFilter !== 'Alle') { subBtn.classList.add('active'); document.getElementById('mapFilterSubLabel').textContent = tSubcat(mapSubcatFilter); }
+    else { subBtn.classList.remove('active'); document.getElementById('mapFilterSubLabel').textContent = 'Typ'; }
+    if (mapMinStars > 0) { starBtn.classList.add('active'); document.getElementById('mapFilterStarLabel').textContent = mapMinStars + '+ ★'; }
+    else { starBtn.classList.remove('active'); document.getElementById('mapFilterStarLabel').textContent = '★'; }
     renderMap();
   }
 
@@ -3660,131 +3566,57 @@
     const expiry = document.getElementById('ownerDealExpiry').value.trim();
     try {
       await db.collection('listings').doc(listingId).update({
-        deal_text: text || null,
-        deal_code: code || null,
-        deal_expiry: expiry || null
+        deal_text: text || null, deal_code: code || null, deal_expiry: expiry || null
       });
       await loadListings();
-      // Reload detail to show updated deal
       const l = allListings.find(x => x.id === listingId);
       if (l) showDetail(listingId);
-    } catch(e) { alert('Fehler beim Speichern.'); }
+    } catch(e) { alert('Fehler: ' + e.message); }
   }
 
   async function removeOwnerDeal(listingId) {
     if (!confirm('Deal wirklich entfernen?')) return;
     try {
-      await db.collection('listings').doc(listingId).update({
-        deal_text: null, deal_code: null, deal_expiry: null
-      });
+      await db.collection('listings').doc(listingId).update({ deal_text: null, deal_code: null, deal_expiry: null });
       await loadListings();
-      const l = allListings.find(x => x.id === listingId);
-      if (l) showDetail(listingId);
+      showDetail(listingId);
     } catch(e) { alert('Fehler.'); }
   }
 
   function copyDealCode(code) {
     navigator.clipboard.writeText(code).then(() => {
       const btn = event.target;
+      const orig = btn.textContent;
       btn.textContent = '✓ Kopiert!';
-      btn.style.background = 'var(--green)';
-      setTimeout(() => { btn.textContent = 'Kopieren'; btn.style.background = ''; }, 2000);
-    }).catch(() => {
-      alert('Code: ' + code);
-    });
+      setTimeout(() => { btn.textContent = orig; }, 1500);
+    }).catch(() => {});
   }
 
-  // Pre-search in form
-  function searchExisting(query) {
-    const results = document.getElementById('formPreSearchResults');
-    if (!query || query.length < 2) { results.innerHTML = ''; return; }
-    const q = query.toLowerCase();
-    const matches = allListings.filter(l =>
-      (l.name || '').toLowerCase().includes(q)
-    ).slice(0, 5);
-    if (!matches.length) {
-      results.innerHTML = '<div style="font-size:12px;color:var(--text-3);padding:8px 0">Keine Treffer – dieser Ort scheint neu zu sein ✓</div>';
-      return;
-    }
-    results.innerHTML = matches.map(l => `
-      <div class="form-search-result" onclick="showDetail('${l.id}');showScreen('screenDetail')">
-        <div>
-          <div class="dupe-item-name">${l.name}</div>
-          <div class="dupe-item-city">${l.city || ''} · ${l.category_id ? l.category_id.replace('kat-','') : ''}</div>
-        </div>
-        <span class="dupe-view-btn">Ansehen →</span>
-      </div>`).join('');
+  function searchExisting(query, exclude) {
+    const q = norm(query);
+    return allListings.filter(l => l.id !== exclude && (norm(l.name||'').includes(q) || q.includes(norm(l.name||'').slice(0,5))));
   }
 
-  // Real-time duplicate check while typing name
+  let _dupTimer = null;
   function checkDuplicate() {
-    const name = (document.getElementById('newName').value || '').toLowerCase().trim();
-    const city = (document.getElementById('newCity') ? document.getElementById('newCity').value : '').toLowerCase();
-    const warning = document.getElementById('dupeWarning');
-    const list = document.getElementById('dupeList');
-    if (name.length < 3) { warning.classList.remove('visible'); return; }
-
-    const matches = allListings.filter(l => {
-      const ln = (l.name || '').toLowerCase();
-      // Check if name is similar (contains or starts with)
-      return ln.includes(name) || name.includes(ln) ||
-        (ln.split(' ').some(word => word.length > 3 && name.includes(word)));
-    }).slice(0, 3);
-
-    if (!matches.length) { warning.classList.remove('visible'); return; }
-
-    warning.classList.add('visible');
-    list.innerHTML = matches.map(l => `
-      <div class="dupe-item">
-        <div>
-          <div class="dupe-item-name">${l.name}</div>
-          <div class="dupe-item-city">${l.city || ''}</div>
-        </div>
-        <button class="dupe-view-btn" onclick="showDetail('${l.id}');showScreen('screenDetail')">Ansehen</button>
-      </div>`).join('');
-  }
-
-  function removeLocation() {
-    window._newLat = null;
-    window._newLng = null;
-    const btn = document.getElementById('locationBtn');
-    const status = document.getElementById('locationStatus');
-    const removeBtn = document.getElementById('locationRemoveBtn');
-    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Meinen Standort verwenden';
-    btn.style.background = ''; btn.style.borderColor = ''; btn.style.color = '';
-    btn.dataset.saved = '';
-    btn.disabled = false;
-    status.style.display = 'none';
-    if (removeBtn) removeBtn.style.display = 'none';
-  }
-
-  function useMyLocation() {
-    const btn = document.getElementById('locationBtn');
-    const status = document.getElementById('locationStatus');
-    if (!navigator.geolocation) {
-      status.style.color = 'var(--red)'; status.style.display = 'block';
-      status.textContent = 'Standort wird von diesem Browser nicht unterstützt.'; return;
-    }
-    btn.textContent = 'Standort wird ermittelt...'; btn.disabled = true;
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        window._newLat = pos.coords.latitude;
-        window._newLng = pos.coords.longitude;
-        status.style.color = 'var(--green)'; status.style.display = 'block';
-        status.textContent = 'Standort gespeichert: ' + pos.coords.latitude.toFixed(5) + ', ' + pos.coords.longitude.toFixed(5);
-        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg> Standort gespeichert';
-        btn.style.background = 'var(--green-light)'; btn.style.borderColor = 'var(--green)'; btn.style.color = 'var(--green)';
-        btn.dataset.saved = 'true';
-        const removeBtn = document.getElementById('locationRemoveBtn');
-        if (removeBtn) removeBtn.style.display = 'inline-block';
-      },
-      err => {
-        status.style.color = 'var(--red)'; status.style.display = 'block';
-        status.textContent = 'Standort konnte nicht ermittelt werden. Bitte Berechtigung erteilen.';
-        btn.disabled = false; btn.textContent = 'Meinen Standort verwenden';
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
+    clearTimeout(_dupTimer);
+    _dupTimer = setTimeout(() => {
+      const name = document.getElementById('newName').value.trim();
+      const city = document.getElementById('newCity').value.trim();
+      const warning = document.getElementById('dupeWarning');
+      const list = document.getElementById('dupeList');
+      if (name.length < 4) { warning.classList.remove('visible'); return; }
+      const found = allListings.filter(l => {
+        if (!l.name) return false;
+        const nameSim = norm(l.name).includes(norm(name).slice(0,6)) || norm(name).includes(norm(l.name).slice(0,6));
+        if (city) return nameSim && norm(l.city||'') === norm(city);
+        return nameSim;
+      }).slice(0, 3);
+      if (found.length) {
+        list.innerHTML = found.map(l => `<div class="dupe-item" onclick="showDetail('${l.id}')">${l.name} <span style="color:var(--text-3)">${l.city||''}</span></div>`).join('');
+        warning.classList.add('visible');
+      } else { warning.classList.remove('visible'); }
+    }, 600);
   }
 
   document.getElementById('catsScroll').addEventListener('click', e => {
@@ -3793,268 +3625,184 @@
     document.querySelectorAll('#catsScroll .cat-chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     activeCategory = chip.dataset.cat;
-    activeSubcat = 'Alle';
-    activeMinStars = 0;
-    document.getElementById('filterSubBtn').classList.remove('active');
-    document.getElementById('filterStarBtn').classList.remove('active');
-    document.getElementById('filterSubLabel').textContent = 'Unterkategorie';
-    document.getElementById('filterStarLabel').textContent = 'Bewertung';
+    // Show/hide filter bar based on category selection
     const filterBar = document.getElementById('filterBar');
-    const hasSubs = subcats[activeCategory] && subcats[activeCategory].length > 1;
-    filterBar.style.display = (activeCategory !== 'Alle' && hasSubs) ? 'flex' : 'none';
+    if (activeCategory === 'Alle') {
+      filterBar.style.display = 'none';
+      // Reset filters when going back to "All"
+      activeSubcat = 'Alle'; activeMinStars = 0;
+      const subBtn = document.getElementById('filterSubBtn'); const starBtn = document.getElementById('filterStarBtn');
+      if (subBtn) subBtn.classList.remove('active'); if (starBtn) starBtn.classList.remove('active');
+      const subLabel = document.getElementById('filterSubLabel'); const starLabel = document.getElementById('filterStarLabel');
+      if (subLabel) subLabel.textContent = 'Unterkategorie'; if (starLabel) starLabel.textContent = 'Bewertung';
+    } else { filterBar.style.display = 'block'; }
     renderListings();
   });
+
   const searchInput = document.getElementById('searchInput');
   const searchClear = document.getElementById('searchClear');
-  searchInput.addEventListener('input', e => { searchQuery = e.target.value; searchClear.classList.toggle('visible', searchQuery.length > 0); renderListings(); });
-  searchClear.addEventListener('click', () => { searchInput.value = ''; searchQuery = ''; searchClear.classList.remove('visible'); renderListings(); });
-  // Apply saved language on startup
+  searchInput.addEventListener('input', e => { searchQuery = e.target.value; searchClear.classList.toggle('visible', !!searchQuery); renderListings(); });
+  searchClear.addEventListener('click', () => { searchQuery = ''; searchInput.value = ''; searchClear.classList.remove('visible'); renderListings(); });
+
+  // Apply language on load
   applyLang();
 
-  // Register Service Worker for PWA
-  // Cover file input
-  async function deleteCoverImage(listingId) {
-    if(!confirm('Titelbild löschen?')) return;
+  async function deleteCoverImage(listingId){
+    if(!confirm('Titelbild entfernen?')) return;
     try {
-      await db.collection('listings').doc(listingId).update({cover_url: null});
-      var ix=allListings.findIndex(function(l){return l.id===listingId;});
-      if(ix>-1) allListings[ix].cover_url=null;
+      const l = allListings.find(x => x.id === listingId);
+      if (l && l.cover_url) {
+        // Try delete from storage (path is in cover_url query param after /o/)
+        const match = l.cover_url.match(/\/o\/([^?]+)/);
+        if (match) {
+          const path = decodeURIComponent(match[1]);
+          await storage.ref(path).delete().catch(()=>{});
+        }
+      }
+      await db.collection('listings').doc(listingId).update({ cover_url: null });
+      await loadListings();
       showDetail(listingId);
-    } catch(e){alert('Fehler: '+e.message);}
+    } catch(e) { alert('Fehler.'); }
   }
 
-  window.addEventListener('load', function(){
+  // Cover image file input
+  window.addEventListener('load', function() {
+    if(document.getElementById('coverFileInput')) return;
     var inp=document.createElement('input');
-    inp.type='file';inp.id='coverFileInput';inp.accept='image/*';inp.style.display='none';
-    document.body.appendChild(inp);
-    inp.addEventListener('change', async function(){
-      var f=inp.files[0]; if(!f||!currentListingId) return;
-      var btn=document.getElementById('coverUploadBtn'); if(btn) btn.textContent='Lädt...';
+    inp.type='file';
+    inp.accept='image/*';
+    inp.id='coverFileInput';
+    inp.style.display='none';
+    inp.onchange=async function(e){
+      var file=e.target.files[0];
+      if(!file||!currentListingId)return;
+      var hero=document.getElementById('detailHero');
+      hero.style.opacity='0.6';
       try{
-        var comp=await compressImage(f,1600,0.8);
-        var ref=firebase.storage().ref('covers/'+currentListingId+'_'+Date.now()+'.jpg');
-        await ref.put(comp,{contentType:'image/jpeg'});
-        var url=await ref.getDownloadURL();
+        var blob=await compressImage(file,1600,900,0.85);
+        var path='covers/'+currentListingId+'.jpg';
+        var snap=await storage.ref(path).put(blob,{contentType:'image/jpeg'});
+        var url=await snap.ref.getDownloadURL();
         await db.collection('listings').doc(currentListingId).update({cover_url:url});
-        var ix=allListings.findIndex(function(l){return l.id===currentListingId;});
-        if(ix>-1) allListings[ix].cover_url=url;
+        await loadListings();
         showDetail(currentListingId);
-      }catch(e){alert('Fehler: '+e.message);}
-      inp.value='';
-    });
+      }catch(err){alert('Fehler beim Hochladen');}
+      hero.style.opacity='1';
+    };
+    document.body.appendChild(inp);
   });
 
+  // ── REPORTS ──────────────────────────────────────────────────────────────
   async function loadAdminReports() {
-    ['adminTabListings','adminTabClaims','adminTabDeals','adminTabReports'].forEach(function(id){
-      var el=document.getElementById(id);
-      if(el){el.style.color='rgba(255,255,255,0.6)';el.style.borderBottom='none';}
-    });
-    var tab=document.getElementById('adminTabReports');
-    if(tab){tab.style.color='white';tab.style.borderBottom='2px solid white';}
-    var body=document.getElementById('adminBody');
-    body.innerHTML='<div style="text-align:center;padding:40px"><div style="width:28px;height:28px;border:3px solid #FFF8EC;border-top-color:#F5A623;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto"></div></div>';
+    document.getElementById('adminTabReports').style.color = 'white';
+    document.getElementById('adminTabReports').style.borderBottom = '2px solid white';
+    document.getElementById('adminTabListings').style.color = 'rgba(255,255,255,0.6)';
+    document.getElementById('adminTabListings').style.borderBottom = 'none';
+    document.getElementById('adminTabClaims').style.color = 'rgba(255,255,255,0.6)';
+    document.getElementById('adminTabClaims').style.borderBottom = 'none';
+    document.getElementById('adminTabDeals').style.color = 'rgba(255,255,255,0.6)';
+    document.getElementById('adminTabDeals').style.borderBottom = 'none';
+    const body = document.getElementById('adminBody');
+    body.innerHTML = '<div style="text-align:center;padding:40px">Wird geladen...</div>';
     try {
-      var snap=await db.collection('reports').where('status','==','pending').orderBy('created_at','desc').get();
-      if(snap.empty){
-        body.innerHTML='<div class="admin-empty"><div class="admin-empty-icon">&#x2713;</div><div class="admin-empty-text">Keine Meldungen</div><div class="admin-empty-sub">Alles erledigt!</div></div>';
-        return;
-      }
-      body.innerHTML=snap.docs.map(function(d){
-        var r=Object.assign({id:d.id},d.data());
-        var date=r.created_at?r.created_at.toDate().toLocaleDateString('de-DE'):'';
-        var lid=r.listing_id||'';
-        return '<div class="admin-card" id="reportCard_'+r.id+'">'
-          +'<div class="admin-card-name">'+(r.listing_name||'Unbekannt')+'</div>'
-          +'<div class="admin-card-meta">'+(r.listing_city||'')+' &middot; '+date+'</div>'
-          +'<div style="background:var(--red-light);color:var(--red);padding:8px 12px;border-radius:8px;margin-bottom:12px;font-size:13px;font-weight:600">&#x1F6A9; '+(r.reason_label||r.reason||'')+'</div>'
-          +'<div class="admin-actions">'
-          +'<button class="admin-btn approve" onclick="resolveReport(&quot;'+r.id+'&quot;)">&#10003; Erledigt</button>'
-          +'<button class="admin-btn reject" onclick="showDetail(&quot;'+lid+'&quot;);showScreen('+"'screenDetail'"+')">Eintrag ansehen</button>'
-          +'</div></div>';
+      const snap = await db.collection('reports').where('status','==','pending').get();
+      const reports = snap.docs.map(d => ({id:d.id, ...d.data()}));
+      if (!reports.length) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-icon">✓</div><div class="admin-empty-text">Keine offenen Meldungen</div></div>'; return; }
+      const reasonLabels = { closed:'🚫 Geschlossen', address:'📍 Falsche Adresse', phone:'📞 Falsche Telefonnummer', content:'⚠ Unangemessener Inhalt', other:'💬 Sonstiges' };
+      body.innerHTML = reports.map(r => {
+        const l = allListings.find(x => x.id === r.listing_id);
+        return `<div class="admin-card" id="reportCard_${r.id}">
+          <div class="admin-card-name">${l ? l.name : 'Eintrag gelöscht'}</div>
+          <div class="admin-card-meta">${l ? l.city : ''} · ${formatDate(r.created_at)}</div>
+          <div style="background:#FFF8EC;border-left:3px solid var(--yellow);padding:8px 10px;border-radius:6px;margin:8px 0;font-size:13px"><strong>${reasonLabels[r.reason]||r.reason}</strong></div>
+          <div class="admin-actions">
+            ${l ? `<button class="admin-btn approve" onclick="showDetail('${r.listing_id}')">Anschauen</button>` : ''}
+            <button class="admin-btn reject" onclick="resolveReport('${r.id}')">Erledigt</button>
+          </div>
+        </div>`;
       }).join('');
-    } catch(e) {
-      body.innerHTML='<div class="admin-empty"><div class="admin-empty-text">Fehler: '+e.message+'</div></div>';
-    }
+    } catch(e) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-text">Fehler beim Laden</div></div>'; }
   }
+
   async function resolveReport(reportId) {
     try {
-      await db.collection('reports').doc(reportId).update({status:'resolved'});
-      var card=document.getElementById('reportCard_'+reportId);
-      if(card)card.remove();
-      showToast('&#10003; Meldung als erledigt markiert.');
-    } catch(e){alert('Fehler: '+e.message);}
+      await db.collection('reports').doc(reportId).update({ status: 'resolved' });
+      document.getElementById('reportCard_'+reportId).remove();
+    } catch(e) { alert('Fehler.'); }
   }
-  function openReport(){if(!currentListingId)return;document.getElementById('reportOverlay').classList.add('visible');}
-  function closeReport(){document.getElementById('reportOverlay').classList.remove('visible');}
-  async function submitReport(reason){
-    closeReport();
-    if(!currentListingId)return;
-    var l=allListings.find(function(x){return x.id===currentListingId;});
-    var labels={'closed':'Ort existiert nicht mehr','address':'Falsche Adresse','phone':'Falsche Telefonnummer','content':'Unangemessener Inhalt','other':'Sonstiges'};
-    try{
-      await db.collection('reports').add({listing_id:currentListingId,listing_name:l?l.name:'',listing_city:l?l.city:'',reason:reason,reason_label:labels[reason]||reason,user_id:currentUser?currentUser.uid:null,created_at:new Date(),status:'pending'});
-      showToast('✅ Meldung eingereicht – danke!');
-    }catch(e){showToast('Fehler beim Senden.');}
+
+  function openReport() { document.getElementById('reportOverlay').classList.add('visible'); }
+  function closeReport() { document.getElementById('reportOverlay').classList.remove('visible'); }
+
+  async function submitReport(reason) {
+    if (!currentUser || !currentListingId) { closeReport(); return; }
+    try {
+      await db.collection('reports').add({
+        listing_id: currentListingId, user_id: currentUser.uid,
+        reason: reason, status: 'pending', created_at: new Date()
+      });
+      closeReport();
+      showToast('✅ Meldung gesendet. Danke!');
+    } catch(e) { alert('Fehler.'); closeReport(); }
   }
+
+  // Service Worker registrieren fuer Offline-Funktionalitaet
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/buscar-app/sw.js')
-        .then(() => console.log('SW registered'))
-        .catch(e => console.log('SW failed:', e));
+      navigator.serviceWorker.register('sw.js?v=75')
+        .then(reg => { console.log('SW registered'); })
+        .catch(err => { console.log('SW registration failed'); });
     });
   }
 
-  // Map "no-coords" notice: show once per map visit, fade out after a few seconds
-  var _mapNoCoordsShown = false;
-  var _mapNoCoordsTimer = null;
-  function showMapNoCoordsNotice(hasNoCoords) {
-    var el = document.getElementById('mapNoCoords');
-    if (!el) return;
-    if (!hasNoCoords) {
-      el.style.display = 'none';
-      el.classList.remove('fade-out');
-      return;
-    }
-    if (_mapNoCoordsShown) return;
-    _mapNoCoordsShown = true;
-    el.classList.remove('fade-out');
-    el.style.display = 'block';
-    if (_mapNoCoordsTimer) clearTimeout(_mapNoCoordsTimer);
-    _mapNoCoordsTimer = setTimeout(function () {
-      el.classList.add('fade-out');
-      setTimeout(function () { el.style.display = 'none'; }, 500);
-    }, 3500);
+  function showMapNoCoordsNotice(show) {
+    const el = document.getElementById('mapNoCoords');
+    if (el) el.style.display = show ? 'block' : 'none';
   }
 
-  // iOS touch debug overlay - enabled with ?debug=1 in URL
-  (function setupTouchDebug() {
-    try {
-      var urlHasDebug = location.search.indexOf('debug=1') !== -1;
-      var lsHasDebug = false;
-      try { lsHasDebug = localStorage.getItem('buscar_debug_touch') === '1'; } catch (e) {}
-      if (!urlHasDebug && !lsHasDebug) return;
-      try { localStorage.setItem('buscar_debug_touch', '1'); } catch (e) {}
-
-      var panel = document.createElement('div');
-      panel.id = 'touchDebugPanel';
-      panel.style.cssText =
-        'position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;' +
-        'background:rgba(0,0,0,0.85);color:#0f0;font:11px/1.3 monospace;' +
-        'padding:6px 8px;z-index:2147483647;max-height:32vh;overflow:auto;' +
-        'pointer-events:none;white-space:pre-wrap;word-break:break-all;';
-
-      var header = document.createElement('div');
-      header.style.cssText = 'color:#fff;font-weight:700;margin-bottom:4px;display:flex;justify-content:space-between;pointer-events:auto;';
-      header.innerHTML = '<span>iOS Touch Debug v1</span><span style="color:#f5a623;cursor:pointer" id="dbgClose">[X]</span>';
-      panel.appendChild(header);
-
-      var lines = document.createElement('div');
-      lines.id = 'dbgLines';
-      panel.appendChild(lines);
-
-      function append() {
-        if (!document.body) return;
-        if (!document.body.contains(panel)) document.body.appendChild(panel);
-      }
-      if (document.body) append(); else document.addEventListener('DOMContentLoaded', append);
-
-      var max = 14;
-      var buf = [];
-      function log(label, e, color) {
+  // iOS touch debug overlay (nur mit ?debug=1)
+  (function(){
+    if (window.location.search.indexOf('debug=1') === -1) return;
+    var dbg = document.createElement('div');
+    dbg.style.cssText = 'position:fixed;bottom:80px;left:8px;right:8px;background:rgba(0,0,0,0.85);color:#0F0;font-family:monospace;font-size:10px;padding:6px;z-index:99999;max-height:120px;overflow:auto;border-radius:8px;pointer-events:none';
+    document.body.appendChild(dbg);
+    var log = function(msg) {
+      var line = document.createElement('div');
+      line.textContent = new Date().toISOString().slice(14,19) + ' ' + msg;
+      dbg.appendChild(line);
+      while (dbg.childElementCount > 20) dbg.removeChild(dbg.firstChild);
+      dbg.scrollTop = dbg.scrollHeight;
+    };
+    ['touchstart','touchend','click'].forEach(function(evt){
+      document.addEventListener(evt, function(e){
         var t = e.target;
-        var sig = t && t.tagName ? t.tagName.toLowerCase() : '?';
-        if (t && t.id) sig += '#' + t.id;
-        if (t && t.className && typeof t.className === 'string') {
-          var cls = t.className.split(/\s+/).filter(Boolean).slice(0, 2).join('.');
-          if (cls) sig += '.' + cls;
-        }
-        var pt = '';
-        if (e.touches && e.touches[0]) pt = ' (' + Math.round(e.touches[0].clientX) + ',' + Math.round(e.touches[0].clientY) + ')';
-        else if (typeof e.clientX === 'number') pt = ' (' + Math.round(e.clientX) + ',' + Math.round(e.clientY) + ')';
-        var time = (new Date()).toISOString().substr(14, 9);
-        var line = '[' + time + '] ' + label + ' -> ' + sig + pt;
-        buf.push({ text: line, color: color || '#0f0' });
-        if (buf.length > max) buf.shift();
-        if (lines) {
-          lines.innerHTML = buf.map(function (b) {
-            return '<div style="color:' + b.color + '">' + b.text.replace(/[<>&]/g, function (c) { return { '<':'&lt;','>':'&gt;','&':'&amp;' }[c]; }) + '</div>';
-          }).join('');
-        }
-      }
-
-      document.addEventListener('touchstart', function (e) { log('touchstart', e, '#0ff'); }, true);
-      document.addEventListener('touchend',   function (e) { log('touchend  ', e, '#9f9'); }, true);
-      document.addEventListener('click',      function (e) { log('CLICK     ', e, '#fc0'); }, true);
-      window.addEventListener('error', function (e) {
-        buf.push({ text: '[ERROR] ' + e.message, color: '#f66' });
-        if (buf.length > max) buf.shift();
-        if (lines) lines.innerHTML = buf.map(function(b){ return '<div style="color:'+b.color+'">'+b.text+'</div>'; }).join('');
-      });
-
-      document.addEventListener('click', function (e) {
-        if (e.target && e.target.id === 'dbgClose') {
-          try { localStorage.removeItem('buscar_debug_touch'); } catch (err) {}
-          panel.remove();
-        }
+        var sel = t.tagName + (t.id?'#'+t.id:'') + (t.className && typeof t.className === 'string' ? '.'+t.className.split(' ')[0] : '');
+        log(evt + ' ' + sel.slice(0,40));
       }, true);
-    } catch (err) {
-      console.log('debug overlay setup failed:', err);
-    }
+    });
+    log('DEBUG ON');
   })();
 
-  // iOS Safari sometimes drops the click event after touchend on div-with-onclick
-  // elements. This bridge synthesizes a click if no native click fires shortly
-  // after a tap on a clickable element.
-  (function () {
-    var lastClickTime = 0;
-    document.addEventListener('click', function () {
-      lastClickTime = Date.now();
-    }, true);
-
-    var touchStart = null;
-    document.addEventListener('touchstart', function (e) {
-      if (e.touches.length !== 1) { touchStart = null; return; }
-      var t = e.touches[0];
-      touchStart = { x: t.clientX, y: t.clientY, time: Date.now() };
-    }, { capture: true, passive: true });
-
-    function findClickableAncestor(el) {
-      while (el && el.nodeType === 1) {
-        if (el.onclick) return el;
-        if (el.getAttribute && el.getAttribute('onclick')) return el;
-        if (el.tagName === 'BUTTON' || el.tagName === 'A') return el;
-        if (el.classList) {
-          if (el.classList.contains('profil-row') || el.classList.contains('nav-item') ||
-              el.classList.contains('listing-card') || el.classList.contains('cat-chip') ||
-              el.classList.contains('map-chip') || el.classList.contains('filter-btn') ||
-              el.classList.contains('filter-chip') || el.classList.contains('detail-row') ||
-              el.classList.contains('detail-cta-btn') || el.classList.contains('auth-btn') ||
-              el.classList.contains('auth-tab')) {
-            return el;
-          }
+  // Click-Bridge fuer iOS PWA (touchstart -> synthetisierter click)
+  (function() {
+    var touchMoved = false, touchTarget = null, touchStartTime = 0;
+    document.addEventListener('touchstart', function(e) {
+      touchMoved = false;
+      touchTarget = e.target;
+      touchStartTime = Date.now();
+    }, { passive: true, capture: true });
+    document.addEventListener('touchmove', function() {
+      touchMoved = true;
+    }, { passive: true, capture: true });
+    document.addEventListener('touchend', function(e) {
+      if (touchMoved) return;
+      if (Date.now() - touchStartTime > 700) return;
+      var t = touchTarget;
+      while (t && t !== document.body) {
+        if (t.onclick || t.hasAttribute('onclick') || t.tagName === 'BUTTON' || t.tagName === 'A') {
+          break;
         }
-        el = el.parentElement;
+        t = t.parentElement;
       }
-      return null;
-    }
-
-    document.addEventListener('touchend', function (e) {
-      if (!touchStart || e.changedTouches.length !== 1) { touchStart = null; return; }
-      var t = e.changedTouches[0];
-      var dx = Math.abs(t.clientX - touchStart.x);
-      var dy = Math.abs(t.clientY - touchStart.y);
-      var dt = Date.now() - touchStart.time;
-      var endTime = Date.now();
-      touchStart = null;
-      if (dx > 10 || dy > 10 || dt > 600) return;
-
-      var target = findClickableAncestor(e.target);
-      if (!target) return;
-
-      setTimeout(function () {
-        if (lastClickTime < endTime) {
-          try { target.click(); } catch (err) {}
-        }
-      }, 25);
-    }, { capture: true, passive: true });
+    }, { passive: true, capture: true });
   })();
