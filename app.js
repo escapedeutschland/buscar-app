@@ -2784,13 +2784,42 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function approveEntry(id) {
+    // 1. Listing freigeben (Hauptaufgabe)
     try {
       await db.collection('listings').doc(id).update({ verified: true });
-      const photos = await db.collection('listing_photos').where('listing_id','==',id).where('pending','==',true).get();
-      await Promise.all(photos.docs.map(d => d.ref.update({ pending: false })));
-      document.getElementById('adminCard_'+id).remove();
+    } catch (err) {
+      console.error('approveEntry: listing update failed', err);
+      var msg = (err && err.message) ? err.message : 'Unbekannter Fehler';
+      alert('Eintrag konnte nicht freigegeben werden: ' + msg);
+      return;
+    }
+
+    // 2. Zugehoerige Fotos auch freigeben (sekundaer - Fehler hier blockiert nichts)
+    // Single-Query + Client-Filter umgeht Firestore Composite-Index-Requirement
+    try {
+      var photos = await db.collection('listing_photos')
+        .where('listing_id', '==', id)
+        .get();
+      var pendingPhotos = photos.docs.filter(function(d) {
+        return d.data().pending === true;
+      });
+      await Promise.all(pendingPhotos.map(function(d) {
+        return d.ref.update({ pending: false });
+      }));
+      console.log('approveEntry: ' + pendingPhotos.length + ' Fotos freigegeben');
+    } catch (err) {
+      console.warn('approveEntry: photo update failed (Listing wurde aber freigegeben)', err);
+    }
+
+    // 3. UI aktualisieren
+    try {
+      var card = document.getElementById('adminCard_' + id);
+      if (card) card.remove();
+      showToast('✓ Eintrag freigegeben');
       await loadListings();
-    } catch (err) { alert('Fehler.'); }
+    } catch (err) {
+      console.error('approveEntry: UI refresh failed', err);
+    }
   }
 
   async function loadAdminDeals() {
@@ -2846,7 +2875,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function rejectEntry(id) {
     if (!confirm('Eintrag wirklich löschen?')) return;
-    try { await db.collection('listings').doc(id).delete(); document.getElementById('adminCard_'+id).remove(); } catch (err) { alert('Fehler.'); }
+    try {
+      await db.collection('listings').doc(id).delete();
+      var card = document.getElementById('adminCard_' + id);
+      if (card) card.remove();
+      showToast('✓ Eintrag gelöscht');
+    } catch (err) {
+      console.error('rejectEntry failed', err);
+      var msg = (err && err.message) ? err.message : 'Unbekannter Fehler';
+      alert('Eintrag konnte nicht gelöscht werden: ' + msg);
+    }
   }
 
   let currentListingId = null;
@@ -3857,7 +3895,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // Service Worker registrieren fuer Offline-Funktionalitaet
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js?v=79')
+      navigator.serviceWorker.register('sw.js?v=81')
         .then(reg => { console.log('SW registered'); })
         .catch(err => { console.log('SW registration failed'); });
     });
