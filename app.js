@@ -3895,15 +3895,47 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // Service Worker registrieren fuer Offline-Funktionalitaet
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js?v=81')
+      navigator.serviceWorker.register('sw.js?v=82')
         .then(reg => { console.log('SW registered'); })
         .catch(err => { console.log('SW registration failed'); });
     });
   }
 
+  var _mapNoCoordsShown = false;
+  var _mapNoCoordsFadeTimer = null;
+  var _mapNoCoordsCleanupTimer = null;
+  var _mapNoCoordsClickBound = false;
+  function _dismissMapNoCoordsNotice(el) {
+    if (!el) return;
+    if (_mapNoCoordsFadeTimer) { clearTimeout(_mapNoCoordsFadeTimer); _mapNoCoordsFadeTimer = null; }
+    if (_mapNoCoordsCleanupTimer) { clearTimeout(_mapNoCoordsCleanupTimer); _mapNoCoordsCleanupTimer = null; }
+    el.classList.add('fade-out');
+    _mapNoCoordsCleanupTimer = setTimeout(function () {
+      var n = document.getElementById('mapNoCoords');
+      if (n) { n.style.display = 'none'; n.classList.remove('fade-out'); }
+    }, 500);
+  }
   function showMapNoCoordsNotice(show) {
-    const el = document.getElementById('mapNoCoords');
-    if (el) el.style.display = show ? 'block' : 'none';
+    var el = document.getElementById('mapNoCoords');
+    if (!el) return;
+    if (!show) {
+      if (_mapNoCoordsFadeTimer) { clearTimeout(_mapNoCoordsFadeTimer); _mapNoCoordsFadeTimer = null; }
+      if (_mapNoCoordsCleanupTimer) { clearTimeout(_mapNoCoordsCleanupTimer); _mapNoCoordsCleanupTimer = null; }
+      el.style.display = 'none';
+      el.classList.remove('fade-out');
+      return;
+    }
+    if (_mapNoCoordsShown) return;
+    _mapNoCoordsShown = true;
+    el.classList.remove('fade-out');
+    el.style.display = 'block';
+    if (!_mapNoCoordsClickBound) {
+      _mapNoCoordsClickBound = true;
+      el.addEventListener('click', function () { _dismissMapNoCoordsNotice(el); });
+      el.addEventListener('touchend', function () { _dismissMapNoCoordsNotice(el); }, { passive: true });
+    }
+    if (_mapNoCoordsFadeTimer) clearTimeout(_mapNoCoordsFadeTimer);
+    _mapNoCoordsFadeTimer = setTimeout(function () { _dismissMapNoCoordsNotice(document.getElementById('mapNoCoords')); }, 3500);
   }
 
   // iOS touch debug overlay (nur mit ?debug=1)
