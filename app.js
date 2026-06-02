@@ -3895,7 +3895,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // Service Worker registrieren fuer Offline-Funktionalitaet
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js?v=82')
+      navigator.serviceWorker.register('sw.js?v=83')
         .then(reg => { console.log('SW registered'); })
         .catch(err => { console.log('SW registration failed'); });
     });
@@ -3961,9 +3961,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     log('DEBUG ON');
   })();
 
-  // Click-Bridge fuer iOS PWA (touchstart -> synthetisierter click)
   (function() {
-    var touchMoved = false, touchTarget = null, touchStartTime = 0;
+    var touchMoved = false, touchTarget = null, touchStartTime = 0, lastSyntheticAt = 0;
     document.addEventListener('touchstart', function(e) {
       touchMoved = false;
       touchTarget = e.target;
@@ -3977,10 +3976,21 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if (Date.now() - touchStartTime > 700) return;
       var t = touchTarget;
       while (t && t !== document.body) {
-        if (t.onclick || t.hasAttribute('onclick') || t.tagName === 'BUTTON' || t.tagName === 'A') {
-          break;
+        if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable) return;
+        var clickable = t.onclick || t.hasAttribute('onclick') || t.tagName === 'BUTTON' || t.tagName === 'A' || t.getAttribute('role') === 'button';
+        if (clickable) {
+          try { e.preventDefault(); } catch (_) {}
+          lastSyntheticAt = Date.now();
+          t.click();
+          return;
         }
         t = t.parentElement;
       }
-    }, { passive: true, capture: true });
+    }, { passive: false, capture: true });
+    document.addEventListener('click', function(e) {
+      if (Date.now() - lastSyntheticAt < 350 && e.isTrusted) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    }, true);
   })();
