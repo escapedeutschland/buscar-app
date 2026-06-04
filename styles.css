@@ -1,5 +1,6 @@
     html, body { touch-action: manipulation; overscroll-behavior-y: none; -webkit-overflow-scrolling: auto; }
     html { background: #F5A623 !important; }
+    body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top, 0px); background: #F5A623; z-index: 1; pointer-events: none; }
     button, a, [onclick], .nav-item, .cat-chip, .map-chip, .filter-chip, .filter-btn, .profil-row, .listing-card, .detail-row, .detail-cta-btn, .auth-btn, .auth-tab, .map-card, .review-submit, .reply-submit, .comment-send, .form-submit, .filter-apply-btn, .photo-upload-btn, .logout-btn { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     .nav-item, .profil-row, .listing-card, .cat-chip, .map-chip, .filter-btn { transition: opacity 0.12s ease, background-color 0.12s ease; }
     .nav-item:active, .profil-row:active, .listing-card:active, .cat-chip:active, .map-chip:active, .filter-btn:active { opacity: 0.6; }
