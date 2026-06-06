@@ -465,7 +465,7 @@
     .admin-empty-sub { font-size: 13px; color: var(--text-2); }
 
     /* PROFIL */
-    .profil-header { background: linear-gradient(180deg, #F5A623 0%, #D4841A 55%, #B8661A 100%); padding: 52px 24px 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; overflow: hidden; flex-shrink: 0; } display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden; }
+    .profil-header { background: linear-gradient(180deg, #F5A623 0%, #D4841A 55%, #B8661A 100%); padding: max(env(safe-area-inset-top, 0px), 16px) 24px 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; overflow: hidden; flex-shrink: 0; }
     .profil-avatar { width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 28px; font-weight: 900; color: white; overflow: hidden; flex-shrink: 0; }
             .badge-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
     .badge-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
@@ -547,7 +547,7 @@
     .event-status-full { font-size:11px; font-weight:700; color:white; background:#EF4444; padding:3px 8px; border-radius:10px; }
     .event-status-cancelled { font-size:11px; font-weight:700; color:white; background:#6B7280; padding:3px 8px; border-radius:10px; }
     /* Event detail */
-    .event-detail-header { background:linear-gradient(180deg,#F5A623 0%,#F5A623 40%,#D4841A 75%,#B8661A 100%); padding:52px 20px 24px; color:white; }
+    .event-detail-header { background:linear-gradient(180deg,#F5A623 0%,#D4841A 55%,#B8661A 100%); padding: max(env(safe-area-inset-top, 0px), 16px) 20px 20px; color:white; }
     .event-detail-title { font-size:22px; font-weight:800; margin-bottom:6px; line-height:1.3; }
     .event-detail-type-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.2); border-radius:12px; padding:4px 10px; font-size:12px; font-weight:700; margin-bottom:14px; }
     .event-detail-meta-row { display:flex; flex-wrap:wrap; gap:12px; }
