@@ -1032,5 +1032,21 @@
   </div>
 
 </div>
+<!-- TEMP-DIAGNOSE: misst echten Safe-Area-Wert auf dem Gerät; wird nach Messung wieder entfernt -->
+<div id="saDebug" style="position:fixed;left:8px;bottom:96px;z-index:99999;background:rgba(0,0,0,0.82);color:#3CFF6E;font:12px/1.4 monospace;padding:7px 9px;border-radius:8px;pointer-events:none;max-width:90vw"></div>
+<script>
+(function(){
+  var probe=document.createElement('div');
+  probe.style.cssText='position:fixed;top:0;left:0;width:1px;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';
+  document.body.appendChild(probe);
+  function upd(){
+    var sa=Math.round(probe.getBoundingClientRect().height);
+    var vv=window.visualViewport?Math.round(window.visualViewport.height):0;
+    var el=document.getElementById('saDebug');
+    if(el) el.textContent='SAtop='+sa+'px  ih='+window.innerHeight+'  sh='+screen.height+'  vv='+vv+'  dpr='+window.devicePixelRatio;
+  }
+  upd(); setTimeout(upd,400); setTimeout(upd,1200); window.addEventListener('resize',upd);
+})();
+</script>
 </body>
 </html>
