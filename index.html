@@ -17,17 +17,17 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Buscar – Deutsche in Paraguay</title>
-  <link rel="preload" href="styles.css?v=92" as="style">
-  <link rel="preload" href="app.js?v=92" as="script">
+  <link rel="preload" href="styles.css?v=93" as="style">
+  <link rel="preload" href="app.js?v=93" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-  <link href="styles.css?v=92" rel="stylesheet">
+  <link href="styles.css?v=93" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  <script defer src="app.js?v=92"></script>
+  <script defer src="app.js?v=93"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -1032,21 +1032,5 @@
   </div>
 
 </div>
-<!-- TEMP-DIAGNOSE: misst echten Safe-Area-Wert auf dem Gerät; wird nach Messung wieder entfernt -->
-<div id="saDebug" style="position:fixed;left:8px;bottom:96px;z-index:99999;background:rgba(0,0,0,0.82);color:#3CFF6E;font:12px/1.4 monospace;padding:7px 9px;border-radius:8px;pointer-events:none;max-width:90vw"></div>
-<script>
-(function(){
-  var probe=document.createElement('div');
-  probe.style.cssText='position:fixed;top:0;left:0;width:1px;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';
-  document.body.appendChild(probe);
-  function upd(){
-    var sa=Math.round(probe.getBoundingClientRect().height);
-    var vv=window.visualViewport?Math.round(window.visualViewport.height):0;
-    var el=document.getElementById('saDebug');
-    if(el) el.textContent='SAtop='+sa+'px  ih='+window.innerHeight+'  sh='+screen.height+'  vv='+vv+'  dpr='+window.devicePixelRatio;
-  }
-  upd(); setTimeout(upd,400); setTimeout(upd,1200); window.addEventListener('resize',upd);
-})();
-</script>
 </body>
 </html>
