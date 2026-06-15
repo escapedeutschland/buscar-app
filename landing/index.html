@@ -18,39 +18,41 @@
     --bg:#F7F3EC; --card:#FFFFFF; --text-1:#1A1407; --text-2:#6B5E4A; --text-3:#A99C86; --line:#ECE2D0;
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html{-webkit-text-size-adjust:100%}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
   body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--text-1);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-  .wrap{max-width:480px;margin:0 auto;padding:0 20px 48px;position:relative}
+  .wrap{max-width:480px;margin:0 auto;padding:0 20px 44px;position:relative}
 
-  .topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 2px 8px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 2px 8px}
   .brand-mini{font-family:'Fraunces',serif;font-weight:900;font-size:22px;color:var(--yellow-dark);letter-spacing:-0.5px}
   .lang{display:flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
   .lang button{border:none;background:transparent;font-family:'DM Sans',sans-serif;font-weight:700;font-size:12px;color:var(--text-3);padding:6px 12px;border-radius:999px;cursor:pointer;transition:.15s}
   .lang button.active{background:var(--yellow);color:#fff}
 
-  .hero{position:relative;margin-top:14px;border-radius:30px;padding:34px 26px 28px;text-align:center;color:#fff;overflow:hidden;
+  .hero{position:relative;margin-top:12px;border-radius:30px;padding:32px 26px 28px;text-align:center;color:#fff;overflow:hidden;
         background:linear-gradient(160deg,#F5A623 0%,#D4841A 58%,#B8661A 100%);box-shadow:0 20px 50px rgba(184,102,26,.32)}
   .hero::before{content:'';position:absolute;top:-70px;right:-60px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.10)}
   .hero::after{content:'';position:absolute;bottom:-90px;left:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.07)}
-  .app-icon{width:90px;height:90px;position:relative;z-index:1;filter:drop-shadow(0 12px 26px rgba(0,0,0,.28))}
-  .app-name{font-family:'Fraunces',serif;font-weight:900;font-size:42px;letter-spacing:-1px;margin-top:13px;position:relative;z-index:1;text-shadow:0 3px 12px rgba(0,0,0,.14)}
+  .app-icon{width:82px;height:82px;position:relative;z-index:1;filter:drop-shadow(0 12px 26px rgba(0,0,0,.28))}
+  .app-name{font-family:'Fraunces',serif;font-weight:900;font-size:40px;letter-spacing:-1px;margin-top:12px;position:relative;z-index:1;text-shadow:0 3px 12px rgba(0,0,0,.14)}
   .tagline{font-size:15px;font-weight:600;opacity:.97;margin-top:4px;position:relative;z-index:1}
-  .lead{font-size:13.5px;opacity:.92;margin-top:11px;position:relative;z-index:1}
+  .lead{font-size:13.5px;opacity:.92;margin-top:10px;position:relative;z-index:1}
+  .hero-cta{display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:#fff;color:var(--yellow-deep);font-weight:700;font-size:14px;padding:12px 24px;border-radius:999px;text-decoration:none;box-shadow:0 8px 22px rgba(0,0,0,.20);position:relative;z-index:1;transition:transform .15s}
+  .hero-cta:active{transform:scale(.96)}
+  .hero-cta svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
 
-  .showcase{margin-top:-30px;display:flex;justify-content:center;position:relative;z-index:3}
-  .phone{background:#15100a;box-shadow:0 26px 54px rgba(20,16,7,.34)}
-  .phone img{display:block;width:100%}
-  .phone.big{width:224px;border-radius:36px;padding:9px}
-  .phone.big img{border-radius:28px}
-  .showcase-cap{text-align:center;font-size:12.5px;color:var(--text-2);margin-top:12px;font-weight:500}
+  /* Coverflow-Karussell */
+  .carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;perspective:1100px;
+            padding:22px calc(50% - 120px) 8px;scroll-padding-inline:calc(50% - 120px);margin:8px -20px 0;scrollbar-width:none;-ms-overflow-style:none}
+  .carousel::-webkit-scrollbar{display:none}
+  .cslide{flex:0 0 240px;scroll-snap-align:center;display:flex;flex-direction:column;align-items:center}
+  .cphone{width:188px;background:#15100a;border-radius:32px;padding:8px;box-shadow:0 24px 48px rgba(20,16,7,.32);transition:transform .08s linear;will-change:transform}
+  .cphone img{display:block;width:100%;border-radius:25px;aspect-ratio:945/2048;object-fit:cover}
+  .ccap{margin-top:14px;font-size:12.5px;font-weight:600;color:var(--text-2);text-align:center;max-width:230px;transition:opacity .2s;min-height:34px}
+  .cdots{display:flex;justify-content:center;gap:7px;margin-top:2px}
+  .cdots i{width:7px;height:7px;border-radius:50%;background:#E0D3BD;transition:.2s}
+  .cdots i.on{background:var(--yellow);width:18px;border-radius:4px}
 
-  .gallery{display:flex;justify-content:center;gap:16px;margin-top:20px}
-  .phone.sm{width:148px;border-radius:26px;padding:6px;box-shadow:0 16px 34px rgba(20,16,7,.26)}
-  .phone.sm img{border-radius:21px}
-  .gallery figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:8px}
-  .gallery figcaption{font-size:11.5px;color:var(--text-2);font-weight:600}
-
-  .sec-title{font-family:'Fraunces',serif;font-weight:700;font-size:20px;color:var(--text-1);text-align:center;margin:30px 0 16px}
+  .sec-title{font-family:'Fraunces',serif;font-weight:700;font-size:20px;color:var(--text-1);text-align:center;margin:28px 0 16px}
 
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
   .tile{background:var(--card);border-radius:18px;padding:15px 14px;box-shadow:0 4px 16px rgba(0,0,0,.05);border:1px solid rgba(0,0,0,.015)}
@@ -69,7 +71,7 @@
   .biz-row .ic{width:30px;height:30px;border-radius:9px;background:rgba(212,132,26,.14);display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .biz-row .ic svg{width:17px;height:17px}
 
-  .dl{margin-top:34px;text-align:center}
+  .dl{margin-top:34px;text-align:center;scroll-margin-top:14px}
   .dl-title{font-family:'Fraunces',serif;font-weight:700;font-size:24px;color:var(--text-1)}
   .dl-sub{font-size:13.5px;color:var(--text-2);margin-top:4px}
   .badges{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:18px}
@@ -83,7 +85,7 @@
   .store-btn.primary{transform:scale(1.04)}
   .badge-note{font-size:11.5px;color:var(--text-3);margin-top:14px}
 
-  footer{text-align:center;margin-top:32px;font-size:12px;color:var(--text-3)}
+  footer{text-align:center;margin-top:30px;font-size:12px;color:var(--text-3)}
   footer a{color:var(--text-2);text-decoration:none;border-bottom:1px solid var(--line)}
 </style>
 </head>
@@ -110,17 +112,15 @@
     <div class="app-name">Buscar</div>
     <div class="tagline" data-i18n="tagline">Entdecke Paraguay – Orte, Events &amp; Angebote</div>
     <div class="lead" data-i18n="lead">Finde dich in Paraguay zurecht – und mach dein Lokal, deine Events und Angebote sichtbar.</div>
+    <a class="hero-cta" href="#dl" data-i18n="cta">Zum Download <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></a>
   </section>
 
-  <section class="showcase">
-    <div class="phone big"><img src="map.jpg" alt="Buscar Live-Karte" loading="lazy"></div>
-  </section>
-  <div class="showcase-cap" data-i18n="cap">Über 750 Orte auf der Live-Karte – ganz Paraguay auf einen Blick.</div>
-
-  <div class="gallery">
-    <figure><div class="phone sm"><img src="home.jpg" alt="Buscar Home" loading="lazy"></div><figcaption data-i18n="g_home">Suchen &amp; finden</figcaption></figure>
-    <figure><div class="phone sm"><img src="events.jpg" alt="Buscar Events" loading="lazy"></div><figcaption data-i18n="g_events">Events entdecken</figcaption></figure>
+  <div class="carousel" id="carousel">
+    <div class="cslide"><div class="cphone"><img src="map.jpg" alt="Live-Karte" loading="lazy"></div><div class="ccap" data-cap="0"></div></div>
+    <div class="cslide"><div class="cphone"><img src="home.jpg" alt="Suchen" loading="lazy"></div><div class="ccap" data-cap="1"></div></div>
+    <div class="cslide"><div class="cphone"><img src="events.jpg" alt="Events" loading="lazy"></div><div class="ccap" data-cap="2"></div></div>
   </div>
+  <div class="cdots" id="cdots"><i class="on"></i><i></i><i></i></div>
 
   <div class="sec-title" data-i18n="sec_title">Was Buscar dir bietet</div>
   <div class="grid" id="grid-users"></div>
@@ -132,7 +132,7 @@
     <div class="biz-points" id="biz-points"></div>
   </div>
 
-  <section class="dl">
+  <section class="dl" id="dl">
     <div class="dl-title" data-i18n="dl_title">Jetzt herunterladen</div>
     <div class="dl-sub" data-i18n="dl_sub">Kostenlos für iPhone und Android</div>
     <div class="badges">
@@ -204,21 +204,21 @@
         ['tag','Crea ofertas y atrae clientes'],
         ['ticket','Organiza tus eventos – gratis o con entrada']]
   };
+  var CAP={
+    de:['Live-Karte – über 750 Orte in ganz Paraguay','Suchen & finden – Orte, Ärzte, Restaurants','Events entdecken – gratis & mit Ticket'],
+    es:['Mapa en vivo – más de 750 lugares en Paraguay','Buscar y encontrar – lugares, médicos, etc.','Descubrir eventos – gratis y con entrada']
+  };
   var I18N={
     de:{tagline:'Entdecke Paraguay – Orte, Events & Angebote',
         lead:'Finde dich in Paraguay zurecht – und mach dein Lokal, deine Events und Angebote sichtbar.',
-        cap:'Über 750 Orte auf der Live-Karte – ganz Paraguay auf einen Blick.',
-        g_home:'Suchen & finden', g_events:'Events entdecken',
-        sec_title:'Was Buscar dir bietet', biz_tag:'Für Unternehmen',
+        cta:'Zum Download', sec_title:'Was Buscar dir bietet', biz_tag:'Für Unternehmen',
         biz_head:'Du hast ein Lokal oder Unternehmen?', biz_sub:'Mach es sichtbar – kostenlos.',
         dl_title:'Jetzt herunterladen', dl_sub:'Kostenlos für iPhone und Android',
         as_small:'Laden im', gp_small:'Jetzt bei',
         note:'Wähle deinen Store – beide sind kostenlos.', privacy:'Datenschutz'},
     es:{tagline:'Descubre Paraguay – lugares, eventos y ofertas',
         lead:'Encuentra todo en Paraguay – y haz visible tu local, tus eventos y ofertas.',
-        cap:'Más de 750 lugares en el mapa – todo Paraguay de un vistazo.',
-        g_home:'Buscar y encontrar', g_events:'Descubrir eventos',
-        sec_title:'Lo que Buscar te ofrece', biz_tag:'Para empresas',
+        cta:'Descargar', sec_title:'Lo que Buscar te ofrece', biz_tag:'Para empresas',
         biz_head:'¿Tienes un local o negocio?', biz_sub:'Hazlo visible – gratis.',
         dl_title:'Descárgala ahora', dl_sub:'Gratis para iPhone y Android',
         as_small:'Descárgalo en', gp_small:'Disponible en',
@@ -232,6 +232,7 @@
     document.getElementById('biz-points').innerHTML = BIZ[l].map(function(r){
       return '<div class="biz-row"><span class="ic">'+IC[r[0]]+'</span><span>'+r[1]+'</span></div>';
     }).join('');
+    document.querySelectorAll('.ccap').forEach(function(el){ el.textContent = CAP[l][+el.getAttribute('data-cap')]; });
   }
   function setLang(l){
     document.documentElement.lang=l;
@@ -242,6 +243,31 @@
     document.getElementById('btn-es').classList.toggle('active', l==='es');
   }
   setLang((navigator.language||'de').toLowerCase().indexOf('es')===0?'es':'de');
+
+  /* Coverflow-Effekt + Punkte */
+  (function(){
+    var car=document.getElementById('carousel');
+    var slides=[].slice.call(car.children);
+    var dots=[].slice.call(document.getElementById('cdots').children);
+    function update(){
+      var c=car.getBoundingClientRect(), cx=c.left+c.width/2, best=0, bestD=1e9;
+      slides.forEach(function(s,i){
+        var r=s.getBoundingClientRect(), sx=r.left+r.width/2, d=(sx-cx)/c.width;
+        var rot=Math.max(-55,Math.min(55,-d*65)), sc=Math.max(.8,1-Math.abs(d)*.34);
+        var ph=s.querySelector('.cphone'); ph.style.transform='rotateY('+rot+'deg) scale('+sc+')';
+        s.querySelector('.ccap').style.opacity=String(Math.max(0,1-Math.abs(d)*2.2));
+        if(Math.abs(d)<bestD){bestD=Math.abs(d);best=i;}
+      });
+      dots.forEach(function(dot,i){dot.className=i===best?'on':'';});
+    }
+    function center(i,smooth){var s=slides[i];var left=s.offsetLeft-(car.clientWidth-s.clientWidth)/2;car.scrollTo({left:left,behavior:smooth?'smooth':'auto'});}
+    dots.forEach(function(dot,i){dot.style.cursor='pointer';dot.addEventListener('click',function(){center(i,true);});});
+    car.addEventListener('scroll',function(){requestAnimationFrame(update);},{passive:true});
+    window.addEventListener('resize',function(){center(0,false);update();});
+    function init(){center(0,false);update();}
+    window.addEventListener('load',init);
+    setTimeout(init,60); setTimeout(update,400);
+  })();
 
   (function(){
     var ua=navigator.userAgent||'';
