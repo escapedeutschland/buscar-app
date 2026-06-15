@@ -83,6 +83,7 @@
   .store-btn .txt b{font-size:17px;font-weight:600;letter-spacing:.2px}
   .store-btn.dim{filter:opacity(.68)}
   .store-btn.primary{transform:scale(1.04)}
+  .store-btn.soon{filter:grayscale(.5);opacity:.6;pointer-events:none;cursor:default;box-shadow:none}
   .badge-note{font-size:11.5px;color:var(--text-3);margin-top:14px}
 
   footer{text-align:center;margin-top:30px;font-size:12px;color:var(--text-3)}
@@ -136,11 +137,11 @@
     <div class="dl-title" data-i18n="dl_title">Jetzt herunterladen</div>
     <div class="dl-sub" data-i18n="dl_sub">Kostenlos für iPhone und Android</div>
     <div class="badges">
-      <a class="store-btn" id="appstore" href="APP_STORE_URL" aria-label="App Store">
+      <a class="store-btn" id="appstore" href="https://apps.apple.com/app/id6770427542" aria-label="App Store">
         <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M16.36 12.78c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.78-3.32-1.8-1.41-.14-2.76.83-3.48.83-.72 0-1.82-.81-3-.79-1.54.02-2.96.9-3.75 2.28-1.6 2.78-.41 6.89 1.15 9.15.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.39 0 1.78.74 3 .72 1.24-.02 2.02-1.12 2.78-2.23.88-1.28 1.24-2.52 1.26-2.58-.03-.01-2.41-.93-2.43-3.68z M14.08 6.27c.64-.78 1.07-1.85.95-2.93-.92.04-2.03.61-2.69 1.38-.59.69-1.11 1.79-.97 2.85 1.02.08 2.07-.52 2.71-1.3z"/></svg>
         <span class="txt"><small data-i18n="as_small">Laden im</small><b>App Store</b></span>
       </a>
-      <a class="store-btn" id="gplay" href="PLAY_STORE_URL" aria-label="Google Play">
+      <a class="store-btn soon" id="gplay" aria-label="Google Play – bald verfügbar">
         <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
           <path fill="#34A853" d="M3.7 2.3 13 11.7l3-3L5.8 1.2C5.1.8 4.3.9 3.7 2.3z"/>
           <path fill="#FBBC04" d="m16.2 8.7 3.8 2.2c1 .6 1 1.8 0 2.4l-3.9 2.2L13 12z"/>
@@ -213,15 +214,15 @@
         lead:'Finde dich in Paraguay zurecht – und mach dein Lokal, deine Events und Angebote sichtbar.',
         cta:'Zum Download', sec_title:'Was Buscar dir bietet', biz_tag:'Für Unternehmen',
         biz_head:'Du hast ein Lokal oder Unternehmen?', biz_sub:'Mach es sichtbar – kostenlos.',
-        dl_title:'Jetzt herunterladen', dl_sub:'Kostenlos für iPhone und Android',
-        as_small:'Laden im', gp_small:'Jetzt bei',
+        dl_title:'Jetzt herunterladen', dl_sub:'Jetzt kostenlos für iPhone – Android folgt bald',
+        as_small:'Laden im', gp_small:'Bald verfügbar',
         note:'Wähle deinen Store – beide sind kostenlos.', privacy:'Datenschutz'},
     es:{tagline:'Descubre Paraguay – lugares, eventos y ofertas',
         lead:'Encuentra todo en Paraguay – y haz visible tu local, tus eventos y ofertas.',
         cta:'Descargar', sec_title:'Lo que Buscar te ofrece', biz_tag:'Para empresas',
         biz_head:'¿Tienes un local o negocio?', biz_sub:'Hazlo visible – gratis.',
-        dl_title:'Descárgala ahora', dl_sub:'Gratis para iPhone y Android',
-        as_small:'Descárgalo en', gp_small:'Disponible en',
+        dl_title:'Descárgala ahora', dl_sub:'Gratis para iPhone – Android muy pronto',
+        as_small:'Descárgalo en', gp_small:'Próximamente',
         note:'Elige tu tienda – ambas son gratis.', privacy:'Privacidad'}
   };
 
@@ -269,14 +270,8 @@
     setTimeout(init,60); setTimeout(update,400);
   })();
 
-  (function(){
-    var ua=navigator.userAgent||'';
-    var isIOS=/iPad|iPhone|iPod/.test(ua) || (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-    var isAndroid=/Android/.test(ua);
-    var app=document.getElementById('appstore'), gp=document.getElementById('gplay'), badges=document.querySelector('.badges');
-    if(isAndroid){ gp.classList.add('primary'); app.classList.add('dim'); badges.insertBefore(gp, app); }
-    else if(isIOS){ app.classList.add('primary'); gp.classList.add('dim'); }
-  })();
+  /* Nur App Store ist live; Google Play ist "Bald verfügbar" (Klasse soon) */
+  document.getElementById('appstore').classList.add('primary');
 </script>
 </body>
 </html>
