@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Buscar – Paraguay entdecken</title>
+<meta name="description" content="Buscar – Entdecke Paraguay: Live-Karte mit Orten, Ärzten, Restaurants, Events, Deals & Live-Wechselkursen. Für Nutzer und Unternehmen. Jetzt im App Store und bei Google Play.">
+<meta name="theme-color" content="#F5A623">
+<meta property="og:title" content="Buscar – Paraguay entdecken">
+<meta property="og:description" content="Live-Karte, Orte, Events, Deals & Wechselkurse – für Nutzer und Unternehmen.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --yellow:#F5A623; --yellow-dark:#D4841A; --yellow-deep:#B8661A;
+    --bg:#F7F3EC; --card:#FFFFFF; --text-1:#1A1407; --text-2:#6B5E4A; --text-3:#A99C86; --line:#ECE2D0;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--text-1);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:480px;margin:0 auto;padding:0 20px 48px;position:relative}
+
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 2px 8px}
+  .brand-mini{font-family:'Fraunces',serif;font-weight:900;font-size:22px;color:var(--yellow-dark);letter-spacing:-0.5px}
+  .lang{display:flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  .lang button{border:none;background:transparent;font-family:'DM Sans',sans-serif;font-weight:700;font-size:12px;color:var(--text-3);padding:6px 12px;border-radius:999px;cursor:pointer;transition:.15s}
+  .lang button.active{background:var(--yellow);color:#fff}
+
+  .hero{position:relative;margin-top:14px;border-radius:30px;padding:34px 26px 28px;text-align:center;color:#fff;overflow:hidden;
+        background:linear-gradient(160deg,#F5A623 0%,#D4841A 58%,#B8661A 100%);box-shadow:0 20px 50px rgba(184,102,26,.32)}
+  .hero::before{content:'';position:absolute;top:-70px;right:-60px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.10)}
+  .hero::after{content:'';position:absolute;bottom:-90px;left:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.07)}
+  .app-icon{width:90px;height:90px;position:relative;z-index:1;filter:drop-shadow(0 12px 26px rgba(0,0,0,.28))}
+  .app-name{font-family:'Fraunces',serif;font-weight:900;font-size:42px;letter-spacing:-1px;margin-top:13px;position:relative;z-index:1;text-shadow:0 3px 12px rgba(0,0,0,.14)}
+  .tagline{font-size:15px;font-weight:600;opacity:.97;margin-top:4px;position:relative;z-index:1}
+  .lead{font-size:13.5px;opacity:.92;margin-top:11px;position:relative;z-index:1}
+
+  .showcase{margin-top:-30px;display:flex;justify-content:center;position:relative;z-index:3}
+  .phone{background:#15100a;box-shadow:0 26px 54px rgba(20,16,7,.34)}
+  .phone img{display:block;width:100%}
+  .phone.big{width:224px;border-radius:36px;padding:9px}
+  .phone.big img{border-radius:28px}
+  .showcase-cap{text-align:center;font-size:12.5px;color:var(--text-2);margin-top:12px;font-weight:500}
+
+  .gallery{display:flex;justify-content:center;gap:16px;margin-top:20px}
+  .phone.sm{width:148px;border-radius:26px;padding:6px;box-shadow:0 16px 34px rgba(20,16,7,.26)}
+  .phone.sm img{border-radius:21px}
+  .gallery figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .gallery figcaption{font-size:11.5px;color:var(--text-2);font-weight:600}
+
+  .sec-title{font-family:'Fraunces',serif;font-weight:700;font-size:20px;color:var(--text-1);text-align:center;margin:30px 0 16px}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .tile{background:var(--card);border-radius:18px;padding:15px 14px;box-shadow:0 4px 16px rgba(0,0,0,.05);border:1px solid rgba(0,0,0,.015)}
+  .tile .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#FBEBD2;margin-bottom:10px}
+  .tile .ic svg{width:21px;height:21px}
+  .tile .t{font-size:14px;font-weight:700;color:var(--text-1);line-height:1.2}
+  .tile .s{font-size:11.5px;color:var(--text-2);margin-top:3px;line-height:1.35}
+  svg.i{fill:none;stroke:var(--yellow-dark);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  .biz{margin-top:14px;border-radius:20px;padding:20px;background:linear-gradient(150deg,#FFF4E2,#FDE7C6);border:1px solid #F3D9AE}
+  .biz-tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;background:var(--yellow-dark);border-radius:999px;padding:4px 11px}
+  .biz-head{font-family:'Fraunces',serif;font-weight:700;font-size:19px;color:var(--text-1);margin-top:11px}
+  .biz-sub{font-size:13px;color:var(--text-2);margin-top:2px}
+  .biz-points{margin-top:14px;display:flex;flex-direction:column;gap:11px}
+  .biz-row{display:flex;align-items:center;gap:11px;font-size:13.5px;font-weight:500;color:var(--text-1)}
+  .biz-row .ic{width:30px;height:30px;border-radius:9px;background:rgba(212,132,26,.14);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .biz-row .ic svg{width:17px;height:17px}
+
+  .dl{margin-top:34px;text-align:center}
+  .dl-title{font-family:'Fraunces',serif;font-weight:700;font-size:24px;color:var(--text-1)}
+  .dl-sub{font-size:13.5px;color:var(--text-2);margin-top:4px}
+  .badges{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:18px}
+  .store-btn{display:inline-flex;align-items:center;gap:11px;background:#121212;border-radius:14px;padding:11px 22px;min-width:212px;text-decoration:none;transition:transform .15s, filter .15s;box-shadow:0 6px 18px rgba(0,0,0,.16)}
+  .store-btn:active{transform:scale(.97)}
+  .store-btn .logo{width:25px;height:25px;flex-shrink:0}
+  .store-btn .txt{display:flex;flex-direction:column;line-height:1.12;text-align:left;color:#fff}
+  .store-btn .txt small{font-size:10px;font-weight:500;opacity:.9;letter-spacing:.2px}
+  .store-btn .txt b{font-size:17px;font-weight:600;letter-spacing:.2px}
+  .store-btn.dim{filter:opacity(.68)}
+  .store-btn.primary{transform:scale(1.04)}
+  .badge-note{font-size:11.5px;color:var(--text-3);margin-top:14px}
+
+  footer{text-align:center;margin-top:32px;font-size:12px;color:var(--text-3)}
+  footer a{color:var(--text-2);text-decoration:none;border-bottom:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand-mini">Buscar</div>
+    <div class="lang" role="group" aria-label="Sprache / Idioma">
+      <button id="btn-de" class="active" onclick="setLang('de')">DE</button>
+      <button id="btn-es" onclick="setLang('es')">ES</button>
+    </div>
+  </div>
+
+  <section class="hero">
+    <svg class="app-icon" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-label="Buscar">
+      <defs><linearGradient id="ig" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#FBB03B"/><stop offset="1" stop-color="#DD871B"/></linearGradient></defs>
+      <rect width="120" height="120" rx="28" fill="url(#ig)"/>
+      <circle cx="52" cy="52" r="27" fill="none" stroke="#fff" stroke-width="8"/>
+      <line x1="72" y1="72" x2="92" y2="92" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+      <path d="M52 36 l5.1 10.3 11.4 1.6 -8.3 8 2 11.3 -10.2-5.4 -10.2 5.4 2-11.3 -8.3-8 11.4-1.6z" fill="#fff"/>
+    </svg>
+    <div class="app-name">Buscar</div>
+    <div class="tagline" data-i18n="tagline">Entdecke Paraguay – Orte, Events &amp; Angebote</div>
+    <div class="lead" data-i18n="lead">Finde dich in Paraguay zurecht – und mach dein Lokal, deine Events und Angebote sichtbar.</div>
+  </section>
+
+  <section class="showcase">
+    <div class="phone big"><img src="map.jpg" alt="Buscar Live-Karte" loading="lazy"></div>
+  </section>
+  <div class="showcase-cap" data-i18n="cap">Über 750 Orte auf der Live-Karte – ganz Paraguay auf einen Blick.</div>
+
+  <div class="gallery">
+    <figure><div class="phone sm"><img src="home.jpg" alt="Buscar Home" loading="lazy"></div><figcaption data-i18n="g_home">Suchen &amp; finden</figcaption></figure>
+    <figure><div class="phone sm"><img src="events.jpg" alt="Buscar Events" loading="lazy"></div><figcaption data-i18n="g_events">Events entdecken</figcaption></figure>
+  </div>
+
+  <div class="sec-title" data-i18n="sec_title">Was Buscar dir bietet</div>
+  <div class="grid" id="grid-users"></div>
+
+  <div class="biz">
+    <span class="biz-tag" data-i18n="biz_tag">Für Unternehmen</span>
+    <div class="biz-head" data-i18n="biz_head">Du hast ein Lokal oder Unternehmen?</div>
+    <div class="biz-sub" data-i18n="biz_sub">Mach es sichtbar – kostenlos.</div>
+    <div class="biz-points" id="biz-points"></div>
+  </div>
+
+  <section class="dl">
+    <div class="dl-title" data-i18n="dl_title">Jetzt herunterladen</div>
+    <div class="dl-sub" data-i18n="dl_sub">Kostenlos für iPhone und Android</div>
+    <div class="badges">
+      <a class="store-btn" id="appstore" href="APP_STORE_URL" aria-label="App Store">
+        <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M16.36 12.78c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.78-3.32-1.8-1.41-.14-2.76.83-3.48.83-.72 0-1.82-.81-3-.79-1.54.02-2.96.9-3.75 2.28-1.6 2.78-.41 6.89 1.15 9.15.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.39 0 1.78.74 3 .72 1.24-.02 2.02-1.12 2.78-2.23.88-1.28 1.24-2.52 1.26-2.58-.03-.01-2.41-.93-2.43-3.68z M14.08 6.27c.64-.78 1.07-1.85.95-2.93-.92.04-2.03.61-2.69 1.38-.59.69-1.11 1.79-.97 2.85 1.02.08 2.07-.52 2.71-1.3z"/></svg>
+        <span class="txt"><small data-i18n="as_small">Laden im</small><b>App Store</b></span>
+      </a>
+      <a class="store-btn" id="gplay" href="PLAY_STORE_URL" aria-label="Google Play">
+        <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="#34A853" d="M3.7 2.3 13 11.7l3-3L5.8 1.2C5.1.8 4.3.9 3.7 2.3z"/>
+          <path fill="#FBBC04" d="m16.2 8.7 3.8 2.2c1 .6 1 1.8 0 2.4l-3.9 2.2L13 12z"/>
+          <path fill="#EA4335" d="M3.7 21.7 13 12.3l3 3-10.2 5.9c-.7.4-1.4.4-2.1.5z"/>
+          <path fill="#4285F4" d="M3 2.6c-.4.4-.5 1-.5 1.7v15.4c0 .7.1 1.3.5 1.7L12.7 12 3 2.6z"/>
+        </svg>
+        <span class="txt"><small data-i18n="gp_small">Jetzt bei</small><b>Google Play</b></span>
+      </a>
+    </div>
+    <div class="badge-note" data-i18n="note">Wähle deinen Store – beide sind kostenlos.</div>
+  </section>
+
+  <footer>
+    <div>© 2026 Buscar · <a href="https://escapedeutschland.github.io/buscar-app/privacy.html" data-i18n="privacy">Datenschutz</a></div>
+  </footer>
+
+</div>
+
+<script>
+  var IC={
+    search:'<svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>',
+    map:'<svg class="i" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>',
+    calendar:'<svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+    exchange:'<svg class="i" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
+    star:'<svg class="i" viewBox="0 0 24 24"><polygon points="12 2 15.1 8.6 22 9.3 17 14 18.2 21 12 17.6 5.8 21 7 14 2 9.3 8.9 8.6 12 2"/></svg>',
+    nav:'<svg class="i" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>',
+    trophy:'<svg class="i" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 0 12 0V4H6z"/><path d="M6 5H4a2 2 0 0 0 0 4h2"/><path d="M18 5h2a2 2 0 0 1 0 4h-2"/><line x1="12" y1="15" x2="12" y2="19"/><line x1="8" y1="21" x2="16" y2="21"/></svg>',
+    plus:'<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>',
+    store:'<svg class="i" viewBox="0 0 24 24"><path d="M4 4h16l1 5a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M4 11v9h16v-9"/><path d="M9 20v-5h6v5"/></svg>',
+    tag:'<svg class="i" viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0l-7-7A2 2 0 0 1 3 12V4h8a2 2 0 0 1 1.4.6l8.2 8.2a1.9 1.9 0 0 1 0 2.6z"/><circle cx="7.5" cy="7.5" r="1.3"/></svg>',
+    ticket:'<svg class="i" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 0 0 8v2a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-2a2 2 0 0 1 0-8V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1z"/><line x1="14" y1="6" x2="14" y2="18"/></svg>'
+  };
+
+  var GRID={
+    de:[
+      ['search','Alles finden','Orte, Ärzte, Restaurants & Services'],
+      ['map','Live-Karte','Alle Orte auf einen Blick'],
+      ['calendar','Events','Gratis & mit Ticket – auf der Karte'],
+      ['exchange','Wechselkurse','Live-Kurse der Wechselstuben'],
+      ['star','Bewertungen','Sterne, Kommentare & Fotos'],
+      ['nav','Route & Anruf','Direkt aus jedem Eintrag'],
+      ['trophy','Belohnungen','Favoriten & Erfolge sammeln'],
+      ['plus','Mitmachen','Fehlende Orte selbst hinzufügen']
+    ],
+    es:[
+      ['search','Encuentra todo','Lugares, médicos, restaurantes y servicios'],
+      ['map','Mapa en vivo','Todos los lugares de un vistazo'],
+      ['calendar','Eventos','Gratis y con entrada – en el mapa'],
+      ['exchange','Tipo de cambio','En vivo, de las casas de cambio'],
+      ['star','Reseñas','Estrellas, comentarios y fotos'],
+      ['nav','Ruta y llamada','Directo desde cada lugar'],
+      ['trophy','Recompensas','Guarda favoritos y gana logros'],
+      ['plus','Participa','Agrega lugares que falten']
+    ]
+  };
+  var BIZ={
+    de:[['store','Lokal oder Unternehmen kostenlos eintragen'],
+        ['tag','Eigene Deals erstellen & Kunden anlocken'],
+        ['ticket','Eigene Events veranstalten – gratis oder mit Ticket']],
+    es:[['store','Registra tu local o negocio gratis'],
+        ['tag','Crea ofertas y atrae clientes'],
+        ['ticket','Organiza tus eventos – gratis o con entrada']]
+  };
+  var I18N={
+    de:{tagline:'Entdecke Paraguay – Orte, Events & Angebote',
+        lead:'Finde dich in Paraguay zurecht – und mach dein Lokal, deine Events und Angebote sichtbar.',
+        cap:'Über 750 Orte auf der Live-Karte – ganz Paraguay auf einen Blick.',
+        g_home:'Suchen & finden', g_events:'Events entdecken',
+        sec_title:'Was Buscar dir bietet', biz_tag:'Für Unternehmen',
+        biz_head:'Du hast ein Lokal oder Unternehmen?', biz_sub:'Mach es sichtbar – kostenlos.',
+        dl_title:'Jetzt herunterladen', dl_sub:'Kostenlos für iPhone und Android',
+        as_small:'Laden im', gp_small:'Jetzt bei',
+        note:'Wähle deinen Store – beide sind kostenlos.', privacy:'Datenschutz'},
+    es:{tagline:'Descubre Paraguay – lugares, eventos y ofertas',
+        lead:'Encuentra todo en Paraguay – y haz visible tu local, tus eventos y ofertas.',
+        cap:'Más de 750 lugares en el mapa – todo Paraguay de un vistazo.',
+        g_home:'Buscar y encontrar', g_events:'Descubrir eventos',
+        sec_title:'Lo que Buscar te ofrece', biz_tag:'Para empresas',
+        biz_head:'¿Tienes un local o negocio?', biz_sub:'Hazlo visible – gratis.',
+        dl_title:'Descárgala ahora', dl_sub:'Gratis para iPhone y Android',
+        as_small:'Descárgalo en', gp_small:'Disponible en',
+        note:'Elige tu tienda – ambas son gratis.', privacy:'Privacidad'}
+  };
+
+  function renderGrid(l){
+    document.getElementById('grid-users').innerHTML = GRID[l].map(function(r){
+      return '<div class="tile"><div class="ic">'+IC[r[0]]+'</div><div class="t">'+r[1]+'</div><div class="s">'+r[2]+'</div></div>';
+    }).join('');
+    document.getElementById('biz-points').innerHTML = BIZ[l].map(function(r){
+      return '<div class="biz-row"><span class="ic">'+IC[r[0]]+'</span><span>'+r[1]+'</span></div>';
+    }).join('');
+  }
+  function setLang(l){
+    document.documentElement.lang=l;
+    var d=I18N[l];
+    document.querySelectorAll('[data-i18n]').forEach(function(el){var k=el.getAttribute('data-i18n'); if(d[k]) el.textContent=d[k];});
+    renderGrid(l);
+    document.getElementById('btn-de').classList.toggle('active', l==='de');
+    document.getElementById('btn-es').classList.toggle('active', l==='es');
+  }
+  setLang((navigator.language||'de').toLowerCase().indexOf('es')===0?'es':'de');
+
+  (function(){
+    var ua=navigator.userAgent||'';
+    var isIOS=/iPad|iPhone|iPod/.test(ua) || (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+    var isAndroid=/Android/.test(ua);
+    var app=document.getElementById('appstore'), gp=document.getElementById('gplay'), badges=document.querySelector('.badges');
+    if(isAndroid){ gp.classList.add('primary'); app.classList.add('dim'); badges.insertBefore(gp, app); }
+    else if(isIOS){ app.classList.add('primary'); gp.classList.add('dim'); }
+  })();
+</script>
+</body>
+</html>
