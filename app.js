@@ -3490,6 +3490,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       </div>`;
       return;
     }
+    // Eintrag hat bereits einen verifizierten Inhaber -> kein Claim-Button fuer andere Nutzer
+    if (listing.owner_id) {
+      section.innerHTML = `<div class="detail-card owner-section verified" style="padding:14px 16px;margin-top:14px;text-align:center">
+        <div class="owner-badge">⭐ Verifizierter Inhaber</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:6px;line-height:1.4">Dieser Ort wird bereits von einem verifizierten Inhaber verwaltet.</div>
+      </div>`;
+      return;
+    }
     const claimSnap = await db.collection('claims').where('listing_id','==',listing.id).where('user_id','==',currentUser.uid).get();
     if (!claimSnap.empty) {
       const c = claimSnap.docs[0].data();
