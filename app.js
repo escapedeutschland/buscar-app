@@ -2725,9 +2725,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         return e.lat != null && e.lng != null;
       }).map(function(e){ return { e:e, ev:true, km:_haversineKm(_radarLat, _radarLng, e.lat, e.lng) }; });
     } else {
-      var cat = mapCategory;
-      arr = (typeof allListings!=='undefined'?allListings:[]).filter(function(l){
-        return l.verified && l.lat != null && l.lng != null && (cat === 'Alle' || l.category_id === cat);
+      var base = (typeof getFilteredListings === 'function') ? getFilteredListings() : (typeof allListings!=='undefined'?allListings:[]);
+      arr = base.filter(function(l){
+        return l.verified && l.lat != null && l.lng != null;
       }).map(function(l){ return { l:l, ev:false, km:_haversineKm(_radarLat, _radarLng, l.lat, l.lng) }; });
     }
     arr = arr.filter(function(x){ return x.km <= _radarRadiusKm; });
@@ -2764,26 +2764,49 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function _radarStageHTML(cand){
     var es = (currentLang === 'es');
     var C = 100, MAX = 88;
+    var grid = '';
+    for (var gi = 20; gi <= 180; gi += 20){
+      grid += '<line x1="'+gi+'" y1="12" x2="'+gi+'" y2="188"/><line x1="12" y1="'+gi+'" x2="188" y2="'+gi+'"/>';
+    }
     var dots = cand.slice(0, 36).map(function(x){
-      var tlat, tlng, col, id, nm, fn;
-      if (x.ev){ tlat=x.e.lat; tlng=x.e.lng; col=RADAR_EVENT_COLOR; id=x.e.id; nm=(x.e.title||''); fn='showEventDetail'; }
-      else { tlat=x.l.lat; tlng=x.l.lng; col=catColors[x.l.category_id]||catColors.default; id=x.l.id; nm=(x.l.name||''); fn='showDetail'; }
+      var tlat, tlng, id, fn;
+      if (x.ev){ tlat=x.e.lat; tlng=x.e.lng; id=x.e.id; fn='showEventDetail'; }
+      else { tlat=x.l.lat; tlng=x.l.lng; id=x.l.id; fn='showDetail'; }
       var br = _bearing(_radarLat, _radarLng, tlat, tlng);
       var rr = Math.min(1, x.km/_radarRadiusKm) * MAX;
       var rad = br*Math.PI/180;
       var px = C + rr*Math.sin(rad), py = C - rr*Math.cos(rad);
-      return '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="3.6" fill="'+col+'" stroke="#fff" stroke-width="1" style="cursor:pointer" onclick="'+fn+'(\''+id+'\')"><title>'+nm.replace(/[<>"]/g,'')+' · '+_fmtDist(x.km)+'</title></circle>';
+      if (x.ev){
+        var emoji = (typeof EVENT_TYPE_EMOJIS!=='undefined' && EVENT_TYPE_EMOJIS[x.e.type]) ? EVENT_TYPE_EMOJIS[x.e.type] : '🎪';
+        var nmE = (x.e.title||'').replace(/[<>"]/g,'');
+        return '<g style="cursor:pointer" onclick="'+fn+'(\''+id+'\')"><title>'+nmE+' · '+_fmtDist(x.km)+'</title>'
+          + '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="8" fill="#fff" stroke="'+RADAR_EVENT_COLOR+'" stroke-width="1.6"/>'
+          + '<text x="'+px.toFixed(1)+'" y="'+(py+0.4).toFixed(1)+'" font-size="9" text-anchor="middle" dominant-baseline="central">'+emoji+'</text></g>';
+      }
+      var col = catColors[x.l.category_id] || catColors.default;
+      var nmL = (x.l.name||'').replace(/[<>"]/g,'');
+      return '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="3.8" fill="'+col+'" stroke="#fff" stroke-width="1" style="cursor:pointer" onclick="'+fn+'(\''+id+'\')"><title>'+nmL+' · '+_fmtDist(x.km)+'</title></circle>';
     }).join('');
     return '<div class="radar-stage"><svg viewBox="0 0 200 200" aria-hidden="true">'
-      + '<defs><radialGradient id="rgSweep"><stop offset="0%" stop-color="#F5A623" stop-opacity="0.5"/><stop offset="100%" stop-color="#F5A623" stop-opacity="0"/></radialGradient></defs>'
+      + '<defs>'
+      + '<radialGradient id="rgSweep"><stop offset="0%" stop-color="#F5A623" stop-opacity="0.5"/><stop offset="100%" stop-color="#F5A623" stop-opacity="0"/></radialGradient>'
+      + '<clipPath id="radarClip"><circle cx="100" cy="100" r="88"/></clipPath>'
+      + '</defs>'
+      + '<circle cx="100" cy="100" r="88" fill="#F1F4F6"/>'
+      + '<g clip-path="url(#radarClip)" stroke="var(--border)" stroke-width="0.5" opacity="0.7">'+grid+'</g>'
       + '<circle cx="100" cy="100" r="88" fill="none" stroke="var(--border)" stroke-width="1"/>'
       + '<circle cx="100" cy="100" r="59" fill="none" stroke="var(--border)" stroke-width="1"/>'
       + '<circle cx="100" cy="100" r="30" fill="none" stroke="var(--border)" stroke-width="1"/>'
-      + '<line x1="100" y1="12" x2="100" y2="188" stroke="var(--border)" stroke-width="0.7"/>'
-      + '<line x1="12" y1="100" x2="188" y2="100" stroke="var(--border)" stroke-width="0.7"/>'
+      + '<line x1="100" y1="12" x2="100" y2="188" stroke="var(--border)" stroke-width="0.8"/>'
+      + '<line x1="12" y1="100" x2="188" y2="100" stroke="var(--border)" stroke-width="0.8"/>'
+      + '<text x="100" y="9" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">N</text>'
+      + '<text x="194" y="103" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">'+(es?'E':'O')+'</text>'
+      + '<text x="100" y="199" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">S</text>'
+      + '<text x="6" y="103" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">'+(es?'O':'W')+'</text>'
       + '<g class="radar-sweep"><path d="M100 100 L100 12 A88 88 0 0 1 162.2 37.8 Z" fill="url(#rgSweep)"/></g>'
       + dots
-      + '<circle cx="100" cy="100" r="4.5" fill="#F5A623" stroke="#fff" stroke-width="1.5"/>'
+      + '<circle cx="100" cy="100" r="12" fill="#007AFF" opacity="0.16"/>'
+      + '<circle cx="100" cy="100" r="5" fill="#007AFF" stroke="#fff" stroke-width="2"/>'
       + '</svg><div class="radar-stage-cap">'+(es?'Tú':'Du')+' · '+_radarRadiusKm+' km</div></div>';
   }
   function renderRadar(){
@@ -4260,6 +4283,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if (coords) maplibreMap.flyTo({center:[coords[1],coords[0]],zoom:13,animate:false});
     }
     renderMap();
+    if (mapMode === 'radar') renderRadar();
   }
 
   function openMapFilterSheet(mode) {
@@ -4307,6 +4331,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (mapMinStars > 0) { starBtn.classList.add('active'); document.getElementById('mapFilterStarLabel').textContent = mapMinStars + '+ ★'; }
     else { starBtn.classList.remove('active'); document.getElementById('mapFilterStarLabel').textContent = '★'; }
     renderMap();
+    if (mapMode === 'radar') { if (_radarEvents) setRadarEvents(false); else renderRadar(); }
   }
 
   async function saveOwnerDeal(listingId) {
