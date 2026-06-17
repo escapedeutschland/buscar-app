@@ -1707,6 +1707,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
     return out;
   }
+  // Schalter: exakte Doppel in der App ausblenden? Aktuell AUS (Übergangslösung, damit die
+  // Eintrags-Zahl wieder ~767 zeigt). Auf true setzen, sobald 750+ einzigartige echte Einträge da sind.
+  var DEDUPE_HIDE_DUPLICATES = false;
   async function loadListings() {
     try {
       // Zeige gecachte Daten sofort waehrend frische Daten geladen werden
@@ -1723,7 +1726,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         db.collection('listings').where('verified', '==', true).get(),
         loadAllRatings()
       ]);
-      allListings = _dedupeListings(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      var _rawListings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      allListings = DEDUPE_HIDE_DUPLICATES ? _dedupeListings(_rawListings) : _rawListings;
       // Cache aktualisieren
       try { localStorage.setItem('buscar_listings', JSON.stringify(allListings)); localStorage.setItem('buscar_listings_ts', Date.now()); } catch(e) {}
       buildCityChips();
@@ -3223,7 +3227,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       const all = snap.docs.map(d => ({ id:d.id, ...d.data() }));
       const _uniqueCount = (typeof _dedupeListings === 'function') ? _dedupeListings(all).length : all.length;
       const _hiddenCount = all.length - _uniqueCount;
-      const countBanner = '<div style="margin:10px 12px;padding:12px;background:#0D9488;border-radius:10px;font-size:13px;color:#fff;text-align:center;font-weight:700;line-height:1.55">📊 '+all.length+' Einträge in der Datenbank<br><span style="font-weight:600;font-size:12px">davon '+_uniqueCount+' einzigartig (in der App sichtbar)'+(_hiddenCount>0?(' · '+_hiddenCount+' exakte Doppel werden ausgeblendet'):'')+'</span></div>';
+      const _hideOn = (typeof DEDUPE_HIDE_DUPLICATES !== 'undefined' && DEDUPE_HIDE_DUPLICATES);
+      const _shownNow = _hideOn ? _uniqueCount : all.length;
+      const _dupNote = _hiddenCount > 0 ? (_hideOn ? (' · '+_hiddenCount+' Doppel ausgeblendet') : (' · '+_hiddenCount+' Doppel (aktuell mitgezeigt)')) : '';
+      const countBanner = '<div style="margin:10px 12px;padding:12px;background:#0D9488;border-radius:10px;font-size:13px;color:#fff;text-align:center;font-weight:700;line-height:1.55">📊 '+all.length+' in der Datenbank · '+_uniqueCount+' einzigartig<br><span style="font-weight:600;font-size:12px">In der App sichtbar: '+_shownNow+_dupNote+'</span></div>';
       const groups = {};
       all.forEach(function(l){
         if (!(l.name||'').trim()) return;
