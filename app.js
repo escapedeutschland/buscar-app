@@ -3278,6 +3278,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       const cred = firebase.auth.EmailAuthProvider.credential(currentUser.email, pw);
       await currentUser.reauthenticateWithCredential(cred);
+      try { firebase.auth().languageCode = currentLang; } catch(e){}
       await currentUser.verifyBeforeUpdateEmail(newEmail);
       try { await db.collection('users').doc(currentUser.uid).set({ pending_email: newEmail }, { merge: true }); } catch(e){}
       succ.innerHTML = '✓ Bestätigungslink an <b>' + newEmail + '</b> gesendet. Bitte öffne diese E-Mail und klick den Link, dann ist die Änderung aktiv.';
