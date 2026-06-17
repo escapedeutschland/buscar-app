@@ -3375,8 +3375,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function loadPhotos(listingId) {
-    const snap = await db.collection('listing_photos').where('listing_id','==',listingId).where('pending','==',false).get();
-    const photos = snap.docs.map(d => ({id:d.id, ...d.data()}));
+    // Fotos eines bereits freigegebenen Eintrags immer zeigen (unabhaengig vom pending-Flag,
+    // falls die Foto-Freigabe beim approveEntry fehlschlug). Einzel-Where vermeidet Index-Probleme.
+    var _l = (typeof allListings !== 'undefined' ? allListings : []).find(function(x){ return x.id === listingId; });
+    var listingApproved = !!(_l && _l.verified);
+    const snap = await db.collection('listing_photos').where('listing_id','==',listingId).get();
+    const photos = snap.docs.map(d => ({id:d.id, ...d.data()})).filter(function(p){ return p.pending === false || listingApproved; });
     const grid = document.getElementById('photosGrid');
     const canDelete = currentUser && currentUser.email === ADMIN_EMAIL;
     let html = photos.map(p => `<div class="photo-thumb-wrap" style="position:relative"><img class="photo-thumb" src="${p.url}" onclick="openLightbox('${p.url}')">${canDelete ? `<button onclick="deletePhoto('${p.id}','${p.path}',event)" style="position:absolute;top:4px;right:4px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>` : ''}</div>`).join('');
