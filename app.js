@@ -1990,7 +1990,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       return '<div style="display:flex;justify-content:space-between;gap:14px;padding:9px 0;' + border + 'font-size:14px"><span style="color:var(--text-3)">' + it[0] + '</span><span style="font-weight:600;color:var(--text-1);text-align:right;word-break:break-word">' + it[1] + '</span></div>';
     }).join('');
     var title = es ? 'Detalles del inmueble' : 'Immobilien-Details';
-    return '<div class="detail-section-title">' + title + '</div><div style="padding:0 16px 16px">' + head + rows + '</div>';
+    var mapBtn = (l.lat != null && l.lng != null)
+      ? '<button onclick="showOnMap(\'' + l.id + '\')" style="width:100%;margin-top:14px;background:#fff;border:1.5px solid #0D9488;color:#0D9488;font-weight:700;font-size:14px;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#0D9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>' + (es ? 'Ver en el mapa' : 'Auf Karte anzeigen') + '</button>'
+      : '';
+    return '<div class="detail-section-title">' + title + '</div><div style="padding:0 16px 16px">' + head + rows + mapBtn + '</div>';
   }
 
   function immoPriceStr(l){
@@ -2026,6 +2029,21 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       +'</div></div>';
   }
   function openImmobilien(){ showScreen('screenImmobilien'); loadImmobilien(); }
+  function showOnMap(id){
+    var l=(typeof allListings!=='undefined'?allListings:[]).find(function(x){return x.id===id;});
+    if(!l || l.lat==null || l.lng==null){ alert(currentLang==='es'?'Este inmueble no tiene ubicación.':'Für diese Immobilie ist kein Standort hinterlegt.'); return; }
+    // Karte auf Immobilien-Kategorie stellen, damit der Pin sichtbar ist
+    mapCategory='kat-immobilien';
+    document.querySelectorAll('#mapCats .map-chip').forEach(function(c){ c.classList.remove('active'); });
+    var ic=document.querySelector('#mapCats .map-chip[data-cat="kat-immobilien"]'); if(ic) ic.classList.add('active');
+    _mapFitOnUpdate = false; window._skipMapFit = true;
+    setNav('navMap'); showScreen('screenMap');
+    var tries=0;
+    (function go(){ tries++;
+      if(maplibreMap){ try{ maplibreMap.flyTo({center:[l.lng, l.lat], zoom:15, essential:true}); return; }catch(e){} }
+      if(tries<25) setTimeout(go,160);
+    })();
+  }
   function loadImmobilien(){
     var es=(currentLang==='es');
     function _ts(x){ if(!x) return 0; if(typeof x.seconds==='number') return x.seconds; if(typeof x.toMillis==='function') return x.toMillis()/1000; var d=new Date(x); return isNaN(d.getTime())?0:d.getTime()/1000; }
