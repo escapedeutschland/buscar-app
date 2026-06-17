@@ -2671,6 +2671,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var lm = document.getElementById('leafletMap'); if (lm) lm.style.visibility = isR ? 'hidden' : 'visible';
     var ml = document.getElementById('mapList'); if (ml) ml.style.display = isR ? 'none' : '';
     var nc = document.getElementById('mapNoCoords'); if (nc && isR) nc.style.display = 'none';
+    // Stadt-Auswahl + Karten-Events-Button im Radar ausblenden (passen dort nicht)
+    var cityBtn = document.getElementById('mapCityPickerBtn'); if (cityBtn) cityBtn.style.display = isR ? 'none' : 'flex';
+    var evBtn = document.getElementById('eventsMapBtn'); if (evBtn) evBtn.style.display = isR ? 'none' : 'flex';
     if (isR) {
       var lbl = document.getElementById('radarRefreshLabel'); if (lbl) lbl.textContent = (currentLang==='es'?'Actualizar':'Aktualisieren');
       var sp = document.getElementById('radarSegPlaces'); if (sp) sp.textContent = (currentLang==='es'?'Lugares':'Orte');
@@ -2725,9 +2728,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         return e.lat != null && e.lng != null;
       }).map(function(e){ return { e:e, ev:true, km:_haversineKm(_radarLat, _radarLng, e.lat, e.lng) }; });
     } else {
-      var base = (typeof getFilteredListings === 'function') ? getFilteredListings() : (typeof allListings!=='undefined'?allListings:[]);
-      arr = base.filter(function(l){
-        return l.verified && l.lat != null && l.lng != null;
+      var cat = mapCategory;
+      arr = (typeof allListings!=='undefined'?allListings:[]).filter(function(l){
+        if (!l.verified || l.lat == null || l.lng == null) return false;
+        if (cat !== 'Alle' && l.category_id !== cat) return false;
+        // Stadt-Filter im Radar bewusst ignorieren — Radar = Umkreis um dich, nicht Stadt
+        if (typeof mapSubcatFilter !== 'undefined' && mapSubcatFilter !== 'Alle' && norm(l.subcategory||'') !== norm(mapSubcatFilter)) return false;
+        if (typeof mapMinStars !== 'undefined' && mapMinStars > 0) { var a = getAvgRating(l.id); if (!(a && a >= mapMinStars)) return false; }
+        if (typeof activeDeal !== 'undefined' && activeDeal && !(l.deal_text && l.deal_text.trim() !== '')) return false;
+        return true;
       }).map(function(l){ return { l:l, ev:false, km:_haversineKm(_radarLat, _radarLng, l.lat, l.lng) }; });
     }
     arr = arr.filter(function(x){ return x.km <= _radarRadiusKm; });
