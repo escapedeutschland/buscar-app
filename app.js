@@ -2654,13 +2654,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     chip.classList.add('active');
     mapCategory = chip.dataset.cat;
     renderMap();
-    if (mapMode === 'radar') renderRadar();
+    if (mapMode === 'radar') { if (_radarEvents) setRadarEvents(false); else renderRadar(); }
   });
 
   // ══ RADAR / UMKREIS ════════════════════════════════════════════════════════
   var mapMode = 'map';
   var _radarLat = null, _radarLng = null, _radarRadiusKm = 5;
   var RADAR_RADII = [1, 2, 5, 10, 25];
+  var _radarEvents = false;
+  var RADAR_EVENT_COLOR = '#7C3AED';
   function setMapMode(mode){
     mapMode = mode;
     var isR = (mode === 'radar');
@@ -2671,6 +2673,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var nc = document.getElementById('mapNoCoords'); if (nc && isR) nc.style.display = 'none';
     if (isR) {
       var lbl = document.getElementById('radarRefreshLabel'); if (lbl) lbl.textContent = (currentLang==='es'?'Actualizar':'Aktualisieren');
+      var sp = document.getElementById('radarSegPlaces'); if (sp) sp.textContent = (currentLang==='es'?'Lugares':'Orte');
+      var se = document.getElementById('radarSegEvents'); if (se) se.textContent = (currentLang==='es'?'Eventos':'Events');
       if (_radarLat == null) refreshRadarLocation(); else renderRadar();
     } else if (maplibreMap) { try { setTimeout(function(){ maplibreMap.resize(); }, 60); } catch(e){} }
   }
@@ -2695,6 +2699,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }, function(){ if (status) status.textContent = es?'No se pudo obtener la ubicación':'Standort konnte nicht ermittelt werden'; }, { enableHighAccuracy:true, timeout:10000, maximumAge:60000 });
   }
   function setRadarRadius(km){ _radarRadiusKm = km; renderRadar(); }
+  async function setRadarEvents(on){
+    _radarEvents = !!on;
+    var sp = document.getElementById('radarSegPlaces'), se = document.getElementById('radarSegEvents');
+    if (sp) sp.classList.toggle('active', !on);
+    if (se) se.classList.toggle('active', on);
+    if (on && (typeof allEvents === 'undefined' || !allEvents || !allEvents.length)){
+      var status = document.getElementById('radarStatus');
+      if (status) status.textContent = (currentLang==='es'?'Cargando eventos…':'Events werden geladen…');
+      try { await loadEvents(); } catch(e){}
+    }
+    renderRadar();
+  }
   function _renderRadarRadiusChips(){
     var el = document.getElementById('radarRadiusChips'); if (!el) return;
     el.innerHTML = RADAR_RADII.map(function(km){
@@ -2703,15 +2719,35 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
   function _radarCandidates(){
     if (_radarLat == null) return [];
-    var cat = mapCategory;
-    var arr = (typeof allListings!=='undefined'?allListings:[]).filter(function(l){
-      return l.verified && l.lat != null && l.lng != null && (cat === 'Alle' || l.category_id === cat);
-    }).map(function(l){ return { l:l, km:_haversineKm(_radarLat, _radarLng, l.lat, l.lng) }; })
-      .filter(function(x){ return x.km <= _radarRadiusKm; });
+    var arr;
+    if (_radarEvents){
+      arr = (typeof allEvents!=='undefined' && allEvents ? allEvents : []).filter(function(e){
+        return e.lat != null && e.lng != null;
+      }).map(function(e){ return { e:e, ev:true, km:_haversineKm(_radarLat, _radarLng, e.lat, e.lng) }; });
+    } else {
+      var cat = mapCategory;
+      arr = (typeof allListings!=='undefined'?allListings:[]).filter(function(l){
+        return l.verified && l.lat != null && l.lng != null && (cat === 'Alle' || l.category_id === cat);
+      }).map(function(l){ return { l:l, ev:false, km:_haversineKm(_radarLat, _radarLng, l.lat, l.lng) }; });
+    }
+    arr = arr.filter(function(x){ return x.km <= _radarRadiusKm; });
     arr.sort(function(a,b){ return a.km - b.km; });
     return arr;
   }
-  function _radarRowHTML(l, km){
+  function _radarRowHTML(x){
+    var km = x.km, es = (currentLang === 'es');
+    if (x.ev){
+      var e = x.e;
+      var st = (e.date_start && e.date_start.toDate) ? e.date_start.toDate() : null;
+      var dateStr = st ? st.toLocaleDateString(es?'es-PY':'de-DE', {weekday:'short', day:'numeric', month:'short'}) : '';
+      var emoji = (typeof EVENT_TYPE_EMOJIS!=='undefined' && EVENT_TYPE_EMOJIS[e.type]) ? EVENT_TYPE_EMOJIS[e.type] : '🎪';
+      var esub = [dateStr, e.city].filter(Boolean).join(' · ');
+      return '<div class="radar-row" onclick="showEventDetail(\''+e.id+'\')">'
+        + '<div class="radar-row-dot" style="background:'+RADAR_EVENT_COLOR+'"></div>'
+        + '<div class="radar-row-main"><div class="radar-row-name">'+emoji+' '+(e.title||'')+'</div><div class="radar-row-sub">'+esub+'</div></div>'
+        + '<div class="radar-row-dist">'+_fmtDist(km)+'</div></div>';
+    }
+    var l = x.l;
     var col = catColors[l.category_id] || catColors.default;
     var sub = (catLabels[l.category_id] || catLabels.default) + (l.city ? ' · ' + l.city : '');
     return '<div class="radar-row" onclick="showDetail(\''+l.id+'\')">'
@@ -2729,13 +2765,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var es = (currentLang === 'es');
     var C = 100, MAX = 88;
     var dots = cand.slice(0, 36).map(function(x){
-      var br = _bearing(_radarLat, _radarLng, x.l.lat, x.l.lng);
+      var tlat, tlng, col, id, nm, fn;
+      if (x.ev){ tlat=x.e.lat; tlng=x.e.lng; col=RADAR_EVENT_COLOR; id=x.e.id; nm=(x.e.title||''); fn='showEventDetail'; }
+      else { tlat=x.l.lat; tlng=x.l.lng; col=catColors[x.l.category_id]||catColors.default; id=x.l.id; nm=(x.l.name||''); fn='showDetail'; }
+      var br = _bearing(_radarLat, _radarLng, tlat, tlng);
       var rr = Math.min(1, x.km/_radarRadiusKm) * MAX;
       var rad = br*Math.PI/180;
       var px = C + rr*Math.sin(rad), py = C - rr*Math.cos(rad);
-      var col = catColors[x.l.category_id] || catColors.default;
-      var nm = (x.l.name||'').replace(/[<>"]/g,'');
-      return '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="3.6" fill="'+col+'" stroke="#fff" stroke-width="1" style="cursor:pointer" onclick="showDetail(\''+x.l.id+'\')"><title>'+nm+' · '+_fmtDist(x.km)+'</title></circle>';
+      return '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="3.6" fill="'+col+'" stroke="#fff" stroke-width="1" style="cursor:pointer" onclick="'+fn+'(\''+id+'\')"><title>'+nm.replace(/[<>"]/g,'')+' · '+_fmtDist(x.km)+'</title></circle>';
     }).join('');
     return '<div class="radar-stage"><svg viewBox="0 0 200 200" aria-hidden="true">'
       + '<defs><radialGradient id="rgSweep"><stop offset="0%" stop-color="#F5A623" stop-opacity="0.5"/><stop offset="100%" stop-color="#F5A623" stop-opacity="0"/></radialGradient></defs>'
@@ -2760,13 +2797,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       return;
     }
     var cand = _radarCandidates();
-    if (status) status.textContent = cand.length + ' ' + (es ? ('en '+_radarRadiusKm+' km') : ('im Umkreis von '+_radarRadiusKm+' km'));
+    var noun = _radarEvents ? 'Events' : (es ? 'lugares' : 'Orte');
+    if (status) status.textContent = cand.length + ' ' + noun + ' ' + (es ? ('en '+_radarRadiusKm+' km') : ('im Umkreis von '+_radarRadiusKm+' km'));
     var stage = _radarStageHTML(cand);
     if (!cand.length){
-      list.innerHTML = stage + '<div class="empty-state" style="padding:24px 16px"><div class="empty-title">'+(es?'Nada cerca':'Nichts in der Nähe')+'</div><div class="empty-sub">'+(es?'Aumenta el radio o cambia el filtro':'Vergrößere den Radius oder ändere den Filter')+'</div></div>';
+      var et = _radarEvents ? (es?'Ningún evento cerca':'Keine Events in der Nähe') : (es?'Nada cerca':'Nichts in der Nähe');
+      list.innerHTML = stage + '<div class="empty-state" style="padding:24px 16px"><div class="empty-title">'+et+'</div><div class="empty-sub">'+(es?'Aumenta el radio o cambia el filtro':'Vergrößere den Radius oder ändere den Filter')+'</div></div>';
       return;
     }
-    list.innerHTML = stage + cand.slice(0, 60).map(function(x){ return _radarRowHTML(x.l, x.km); }).join('');
+    list.innerHTML = stage + cand.slice(0, 60).map(function(x){ return _radarRowHTML(x); }).join('');
   }
 
   function hasEmoji(str) { return /\p{Emoji}/u.test(str); }
