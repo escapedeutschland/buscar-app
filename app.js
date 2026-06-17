@@ -1185,19 +1185,24 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   async function uploadEvPhotos(eventId) {
     if (!evPendingPhotos.length) return;
     var progress = document.getElementById('evPhotoProgress');
-    progress.style.display = 'block';
+    if (progress) progress.style.display = 'block';
+    var ok = 0, fail = 0;
     for (var i = 0; i < evPendingPhotos.length; i++) {
-      var file = evPendingPhotos[i];
-      progress.textContent = 'Foto ' + (i+1) + ' von ' + evPendingPhotos.length + ' wird hochgeladen...';
-      var filename = Date.now() + '_' + i + '.' + file.name.split('.').pop();
-      var ref = storage.ref('events/' + eventId + '/' + filename);
-      var snap = await ref.put(file);
-      var url = await snap.ref.getDownloadURL();
-      await db.collection('events').doc(eventId).update({
-        photos: firebase.firestore.FieldValue.arrayUnion(url)
-      });
+      try {
+        if (progress) progress.textContent = 'Foto ' + (i+1) + ' von ' + evPendingPhotos.length + ' wird hochgeladen...';
+        // Komprimieren (verkleinert + JPEG) damit der Upload klein bleibt und nicht ans Größenlimit stößt
+        var blob = await compressImage(evPendingPhotos[i], 1280, 1280, 0.75);
+        var filename = Date.now() + '_' + i + '.jpg';
+        var ref = storage.ref('events/' + eventId + '/' + filename);
+        var snap = await ref.put(blob, { contentType: 'image/jpeg' });
+        var url = await snap.ref.getDownloadURL();
+        await db.collection('events').doc(eventId).update({
+          photos: firebase.firestore.FieldValue.arrayUnion(url)
+        });
+        ok++;
+      } catch(err) { fail++; console.warn('uploadEvPhotos: Foto ' + (i+1) + ' fehlgeschlagen', err); }
     }
-    progress.textContent = 'Fotos hochgeladen!';
+    if (progress) progress.textContent = fail ? (ok + ' Foto(s) hochgeladen, ' + fail + ' fehlgeschlagen') : 'Fotos hochgeladen!';
   }
 
   async function submitEvent() {
@@ -2805,44 +2810,52 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       + '<radialGradient id="rgSweep"><stop offset="0%" stop-color="#F5A623" stop-opacity="0.5"/><stop offset="100%" stop-color="#F5A623" stop-opacity="0"/></radialGradient>'
       + '<clipPath id="radarClip"><circle cx="100" cy="100" r="88"/></clipPath>'
       + '</defs>'
-      + '<circle cx="100" cy="100" r="88" fill="#F1F4F6"/>'
-      + '<g clip-path="url(#radarClip)" stroke="var(--border)" stroke-width="0.5" opacity="0.7">'+grid+'</g>'
-      + '<circle cx="100" cy="100" r="88" fill="none" stroke="var(--border)" stroke-width="1"/>'
-      + '<circle cx="100" cy="100" r="59" fill="none" stroke="var(--border)" stroke-width="1"/>'
-      + '<circle cx="100" cy="100" r="30" fill="none" stroke="var(--border)" stroke-width="1"/>'
-      + '<line x1="100" y1="12" x2="100" y2="188" stroke="var(--border)" stroke-width="0.8"/>'
-      + '<line x1="12" y1="100" x2="188" y2="100" stroke="var(--border)" stroke-width="0.8"/>'
+      + '<g clip-path="url(#radarClip)"><g id="radarZoomLayer">'
+      +   '<circle cx="100" cy="100" r="88" fill="#F1F4F6"/>'
+      +   '<g stroke="var(--border)" stroke-width="0.5" opacity="0.7">'+grid+'</g>'
+      +   '<circle cx="100" cy="100" r="88" fill="none" stroke="var(--border)" stroke-width="1"/>'
+      +   '<circle cx="100" cy="100" r="59" fill="none" stroke="var(--border)" stroke-width="1"/>'
+      +   '<circle cx="100" cy="100" r="30" fill="none" stroke="var(--border)" stroke-width="1"/>'
+      +   '<line x1="100" y1="12" x2="100" y2="188" stroke="var(--border)" stroke-width="0.8"/>'
+      +   '<line x1="12" y1="100" x2="188" y2="100" stroke="var(--border)" stroke-width="0.8"/>'
+      +   '<g class="radar-sweep"><path d="M100 100 L100 12 A88 88 0 0 1 162.2 37.8 Z" fill="url(#rgSweep)"/></g>'
+      +   dots
+      +   '<circle cx="100" cy="100" r="12" fill="#007AFF" opacity="0.16"/>'
+      +   '<circle cx="100" cy="100" r="5" fill="#007AFF" stroke="#fff" stroke-width="2"/>'
+      + '</g></g>'
       + '<text x="100" y="9" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">N</text>'
       + '<text x="194" y="103" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">'+(es?'E':'O')+'</text>'
       + '<text x="100" y="199" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">S</text>'
       + '<text x="6" y="103" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">'+(es?'O':'W')+'</text>'
-      + '<g class="radar-sweep"><path d="M100 100 L100 12 A88 88 0 0 1 162.2 37.8 Z" fill="url(#rgSweep)"/></g>'
-      + dots
-      + '<circle cx="100" cy="100" r="12" fill="#007AFF" opacity="0.16"/>'
-      + '<circle cx="100" cy="100" r="5" fill="#007AFF" stroke="#fff" stroke-width="2"/>'
       + '</svg>'
       + '<div id="radarPopup" class="radar-popup" style="display:none" onclick="event.stopPropagation();radarGoDetail()"></div>'
+      + '<div class="radar-zoom-ctrl"><button onclick="event.stopPropagation();radarZoomIn()">+</button><button onclick="event.stopPropagation();radarZoomOut()">&#8722;</button></div>'
+      + '<button id="radarZoomReset" class="radar-zoom-reset" style="display:none" onclick="event.stopPropagation();radarZoomReset()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>'
       + '<div class="radar-stage-cap">'+(es?'Tú':'Du')+' · '+_radarRadiusKm+' km</div></div>';
   }
   function radarPick(ev, kind, id, px, py){
     if (ev && ev.stopPropagation) ev.stopPropagation();
     var pop = document.getElementById('radarPopup'); if (!pop) return;
-    var es = (currentLang === 'es'), name = '', sub = '';
+    var es = (currentLang === 'es'), name = '', sub = '', km = null;
     if (kind === 'ev'){
       var e = (typeof allEvents!=='undefined' && allEvents ? allEvents : []).find(function(x){ return x.id === id; }); if (!e) return;
       var st = (e.date_start && e.date_start.toDate) ? e.date_start.toDate() : null;
       var ds = st ? st.toLocaleDateString(es?'es-PY':'de-DE', {weekday:'short', day:'numeric', month:'short'}) : '';
       var em = (typeof EVENT_TYPE_EMOJIS!=='undefined' && EVENT_TYPE_EMOJIS[e.type]) ? EVENT_TYPE_EMOJIS[e.type] : '🎪';
       name = em + ' ' + (e.title||''); sub = [ds, e.city].filter(Boolean).join(' · ');
+      if (_radarLat != null && e.lat != null && e.lng != null) km = _haversineKm(_radarLat, _radarLng, e.lat, e.lng);
     } else {
       var l = (typeof allListings!=='undefined' ? allListings : []).find(function(x){ return x.id === id; }); if (!l) return;
       name = l.name || ''; sub = (catLabels[l.category_id] || catLabels.default) + (l.city ? ' · ' + l.city : '');
+      if (_radarLat != null && l.lat != null && l.lng != null) km = _haversineKm(_radarLat, _radarLng, l.lat, l.lng);
     }
     pop.innerHTML = '<div class="radar-popup-name">'+name+'</div>'
       + (sub ? '<div class="radar-popup-sub">'+sub+'</div>' : '')
+      + (km != null ? '<div class="radar-popup-dist">'+(es ? ('a '+_fmtDist(km)) : (_fmtDist(km)+' entfernt'))+'</div>' : '')
       + '<div class="radar-popup-go">'+(es?'Ver detalle':'Zum Eintrag')+' →</div>';
-    pop.className = 'radar-popup' + (py < 70 ? ' below' : '');
-    pop.style.left = (px/2) + '%'; pop.style.top = (py/2) + '%';
+    var sx = _radarPanX + _radarZoom * px, sy = _radarPanY + _radarZoom * py;
+    pop.className = 'radar-popup' + (sy < 70 ? ' below' : '');
+    pop.style.left = (sx/2) + '%'; pop.style.top = (sy/2) + '%';
     pop.setAttribute('data-kind', kind); pop.setAttribute('data-id', id);
     pop.style.display = 'block';
   }
@@ -2853,6 +2866,67 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (kind === 'ev') showEventDetail(id); else showDetail(id);
   }
   function radarClosePopup(){ var pop = document.getElementById('radarPopup'); if (pop) pop.style.display = 'none'; }
+  // ── Radar-Zoom (Pinch + Buttons), entzerrt dicht beieinander liegende Pins ──
+  var _radarZoom = 1, _radarPanX = 0, _radarPanY = 0, _radarTouchInit = false;
+  var RADAR_ZOOM_MIN = 1, RADAR_ZOOM_MAX = 6;
+  function _radarClampPan(){
+    var span = 200 * _radarZoom, minP = 200 - span;
+    if (_radarPanX > 0) _radarPanX = 0; if (_radarPanX < minP) _radarPanX = minP;
+    if (_radarPanY > 0) _radarPanY = 0; if (_radarPanY < minP) _radarPanY = minP;
+  }
+  function _radarApplyZoom(){
+    var g = document.getElementById('radarZoomLayer');
+    if (g) g.setAttribute('transform', 'translate('+_radarPanX.toFixed(2)+' '+_radarPanY.toFixed(2)+') scale('+_radarZoom.toFixed(3)+')');
+    var rb = document.getElementById('radarZoomReset'); if (rb) rb.style.display = (_radarZoom > 1.01) ? 'flex' : 'none';
+  }
+  function _radarSetZoom(z1, fx, fy){
+    z1 = Math.max(RADAR_ZOOM_MIN, Math.min(RADAR_ZOOM_MAX, z1));
+    if (fx == null){ fx = 100; fy = 100; }
+    var z0 = _radarZoom;
+    _radarPanX = fx - z1 * ((fx - _radarPanX) / z0);
+    _radarPanY = fy - z1 * ((fy - _radarPanY) / z0);
+    _radarZoom = z1;
+    if (_radarZoom <= RADAR_ZOOM_MIN + 0.001){ _radarZoom = 1; _radarPanX = 0; _radarPanY = 0; }
+    _radarClampPan(); _radarApplyZoom(); radarClosePopup();
+  }
+  function radarZoomIn(){ _radarSetZoom(_radarZoom * 1.6, 100, 100); }
+  function radarZoomOut(){ _radarSetZoom(_radarZoom / 1.6, 100, 100); }
+  function radarZoomReset(){ _radarZoom = 1; _radarPanX = 0; _radarPanY = 0; _radarApplyZoom(); radarClosePopup(); }
+  function _radarAfterRender(){ _radarZoom = 1; _radarPanX = 0; _radarPanY = 0; _radarApplyZoom(); _radarInitTouch(); }
+  function _radarInitTouch(){
+    if (_radarTouchInit) return; var view = document.getElementById('radarView'); if (!view) return; _radarTouchInit = true;
+    function stageRect(){ var s = view.querySelector('.radar-stage'); return s ? s.getBoundingClientRect() : null; }
+    function toSvg(cx, cy, rect){ return { x:(cx-rect.left)/rect.width*200, y:(cy-rect.top)/rect.height*200 }; }
+    function dist(a, b){ var dx=a.clientX-b.clientX, dy=a.clientY-b.clientY; return Math.sqrt(dx*dx+dy*dy); }
+    var startDist = 0, startZoom = 1, isPinch = false, isPan = false, panStart = null;
+    view.addEventListener('touchstart', function(e){
+      if (mapMode !== 'radar') return;
+      var rect = stageRect(); if (!rect) { isPinch=false; isPan=false; return; }
+      var t0 = e.touches[0];
+      var inStage = t0.clientX>=rect.left && t0.clientX<=rect.right && t0.clientY>=rect.top && t0.clientY<=rect.bottom;
+      if (!inStage){ isPinch=false; isPan=false; return; }
+      if (e.touches.length === 2){ isPinch=true; isPan=false; startDist=dist(e.touches[0],e.touches[1]); startZoom=_radarZoom; e.preventDefault(); }
+      else if (e.touches.length === 1 && _radarZoom > 1){ isPan=true; isPinch=false; panStart={ x:t0.clientX, y:t0.clientY, panX:_radarPanX, panY:_radarPanY, rect:rect }; }
+      else { isPinch=false; isPan=false; }
+    }, { passive:false });
+    view.addEventListener('touchmove', function(e){
+      if (mapMode !== 'radar') return;
+      if (isPinch && e.touches.length === 2){
+        var rect = stageRect(); if (!rect) return;
+        var mx = (e.touches[0].clientX + e.touches[1].clientX)/2, my = (e.touches[0].clientY + e.touches[1].clientY)/2;
+        var f = toSvg(mx, my, rect);
+        _radarSetZoom(startZoom * (dist(e.touches[0],e.touches[1]) / (startDist||1)), f.x, f.y);
+        e.preventDefault();
+      } else if (isPan && e.touches.length === 1){
+        var r = panStart.rect;
+        _radarPanX = panStart.panX + (e.touches[0].clientX - panStart.x)/r.width*200;
+        _radarPanY = panStart.panY + (e.touches[0].clientY - panStart.y)/r.height*200;
+        _radarClampPan(); _radarApplyZoom(); radarClosePopup();
+        e.preventDefault();
+      }
+    }, { passive:false });
+    view.addEventListener('touchend', function(e){ if (e.touches.length === 0){ isPinch=false; isPan=false; } });
+  }
   function renderRadar(){
     _renderRadarRadiusChips();
     var list = document.getElementById('radarList'); if (!list) return;
@@ -2870,9 +2944,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!cand.length){
       var et = _radarEvents ? (es?'Ningún evento cerca':'Keine Events in der Nähe') : (es?'Nada cerca':'Nichts in der Nähe');
       list.innerHTML = stage + '<div class="empty-state" style="padding:24px 16px"><div class="empty-title">'+et+'</div><div class="empty-sub">'+(es?'Aumenta el radio o cambia el filtro':'Vergrößere den Radius oder ändere den Filter')+'</div></div>';
+      _radarAfterRender();
       return;
     }
     list.innerHTML = stage + cand.slice(0, 60).map(function(x){ return _radarRowHTML(x); }).join('');
+    _radarAfterRender();
   }
 
   function hasEmoji(str) { return /\p{Emoji}/u.test(str); }
