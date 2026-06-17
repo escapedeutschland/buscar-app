@@ -2028,6 +2028,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       +(l.city?'<div class="immo-card-city">'+l.city+'</div>':'')
       +'</div></div>';
   }
+  function handleReCover(e){
+    var f = e.target.files && e.target.files[0];
+    if(!f) return;
+    window._reCoverFile = f;
+    var r = new FileReader();
+    r.onload = function(ev){ var p=document.getElementById('reCoverPreview'); if(p){ p.style.backgroundImage="url('"+ev.target.result+"')"; p.style.display='block'; } };
+    r.readAsDataURL(f);
+  }
   function openImmobilien(){ showScreen('screenImmobilien'); loadImmobilien(); }
   function showOnMap(id){
     var l=(typeof allListings!=='undefined'?allListings:[]).find(function(x){return x.id===id;});
@@ -2201,6 +2209,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var _isImmo = (l.category_id === 'kat-immobilien');
     var _rc = document.getElementById('detailRatingsCard'); if (_rc) _rc.style.display = _isImmo ? 'none' : '';
     var _cc = document.getElementById('detailCommentsCard'); if (_cc) _cc.style.display = _isImmo ? 'none' : '';
+    var _disc = document.getElementById('detailImmoDisclaimer');
+    if (_disc) {
+      if (_isImmo) {
+        _disc.innerHTML = (currentLang === 'es')
+          ? '<b>⚠️ Aviso:</b> Buscar es una plataforma y no es parte del contrato. Los datos y precios provienen del anunciante y no están verificados ni garantizados. Verifica el inmueble y al anunciante con cuidado y nunca pagues por adelantado sin una visita personal. Buscar no se responsabiliza por los anuncios ni las transacciones.'
+          : '<b>⚠️ Hinweis:</b> Buscar ist eine Plattform und kein Vertragspartner. Angaben und Preise stammen vom Inserenten und werden nicht geprüft oder garantiert. Prüfe Objekt und Anbieter sorgfältig und leiste niemals Vorauszahlungen ohne persönliche Besichtigung. Buscar übernimmt keine Haftung für Inserate oder Transaktionen.';
+        _disc.style.display = 'block';
+      } else { _disc.style.display = 'none'; }
+    }
     if (!_isImmo) { loadReviews(id); loadComments(id); }
     loadPhotos(id);
     loadOwnerSection(l);
@@ -2576,6 +2593,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       }
       const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: (()=>{ const d=document.getElementById('hoursDay').value; const f=document.getElementById('hoursFrom').value; const t=document.getElementById('hoursTo').value; const f2=document.getElementById('hoursFrom2').value; const t2=document.getElementById('hoursTo2').value; let val=''; if(d&&f&&t){val=d+' '+f+'-'+t; if(f2&&t2) val+=' & '+f2+'-'+t2;} document.getElementById('newHours').value=val; return val||null; })(), lat: window._newLat, lng: window._newLng, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date(), ...reFields });
       if (pendingFormPhotos.length) await uploadFormPhotos(ref.id);
+      if (cat === 'kat-immobilien' && window._reCoverFile) {
+        try {
+          const cblob = await compressImage(window._reCoverFile, 1280, 1280, 0.75);
+          const cpath = 'covers/' + ref.id + '.jpg';
+          const csnap = await storage.ref(cpath).put(cblob, { contentType: 'image/jpeg' });
+          const curl = await csnap.ref.getDownloadURL();
+          await db.collection('listings').doc(ref.id).update({ cover_url: curl });
+        } catch (e) {}
+        window._reCoverFile = null;
+        var _rcp = document.getElementById('reCoverPreview'); if (_rcp) { _rcp.style.display = 'none'; _rcp.style.backgroundImage = ''; }
+        var _rci = document.getElementById('reCoverInput'); if (_rci) _rci.value = '';
+      }
       document.getElementById('formSuccess').textContent = t('submit_success'); document.getElementById('formSuccess').classList.add('visible');
       pendingFormPhotos = [];
       const grid2 = document.getElementById('formPhotoGrid');
