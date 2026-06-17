@@ -2135,8 +2135,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
 
     showScreen('screenDetail');
-    loadReviews(id);
-    loadComments(id);
+    // Bei Immobilien: Bewertungen, Kommentare und Inhaber-Anspruch ausblenden (passen dort nicht)
+    var _isImmo = (l.category_id === 'kat-immobilien');
+    var _rc = document.getElementById('detailRatingsCard'); if (_rc) _rc.style.display = _isImmo ? 'none' : '';
+    var _cc = document.getElementById('detailCommentsCard'); if (_cc) _cc.style.display = _isImmo ? 'none' : '';
+    if (!_isImmo) { loadReviews(id); loadComments(id); }
     loadPhotos(id);
     loadOwnerSection(l);
     loadFavoriteStatus(id);
@@ -3580,6 +3583,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function loadOwnerSection(listing) {
     const section = document.getElementById('detailOwnerSection');
+    if (listing && listing.category_id === 'kat-immobilien') { section.innerHTML = ''; return; }
     if (!currentUser) { section.innerHTML = ''; return; }
     if (listing.owner_id === currentUser.uid) {
       section.innerHTML = `<div class="detail-card owner-section verified">
