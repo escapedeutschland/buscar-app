@@ -17,17 +17,17 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Buscar – Deutsche in Paraguay</title>
-  <link rel="preload" href="styles.css?v=114" as="style">
-  <link rel="preload" href="app.js?v=114" as="script">
+  <link rel="preload" href="styles.css?v=115" as="style">
+  <link rel="preload" href="app.js?v=115" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-  <link href="styles.css?v=114" rel="stylesheet">
+  <link href="styles.css?v=115" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  <script defer src="app.js?v=114"></script>
+  <script defer src="app.js?v=115"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -1056,6 +1056,11 @@
       <div class="immo-filter-row" id="immoDealChips"></div>
       <div class="immo-filter-row" id="immoTypeChips"></div>
     </div>
+    <div class="makler-cta-bar" id="maklerCtaBar" onclick="openMaklerModal()">
+      <span class="makler-cta-icon">★</span>
+      <span class="makler-cta-text" id="maklerCtaText">Makler? Objekt hervorheben &amp; mehr Kunden erreichen</span>
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
     <div style="overflow-y:auto;flex:1;min-height:0;padding:14px 16px 100px" id="immobilienBody"></div>
   </div>
 
@@ -1174,6 +1179,11 @@
         <button onclick="retryLocation()" style="flex:1;padding:13px;background:var(--yellow);border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:white;cursor:pointer">Erneut versuchen</button>
       </div>
     </div>
+  </div>
+
+  <!-- MAKLER / HERVORHEBEN MODAL -->
+  <div id="maklerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px" onclick="if(event.target.id==='maklerModal')closeMaklerModal()">
+    <div id="maklerModalBox" style="background:var(--card);border-radius:20px;max-width:400px;width:100%;padding:22px;box-shadow:0 10px 40px rgba(0,0,0,0.2);max-height:92vh;overflow-y:auto"></div>
   </div>
 
 </div>

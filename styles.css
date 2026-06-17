@@ -610,3 +610,24 @@
 .adm-imo-field input { border:1.5px solid var(--border); border-radius:9px; padding:7px 10px; font-family:inherit; font-size:13px; color:var(--text-1); background:var(--card); }
 .adm-imo-save { width:100%; margin-top:8px; background:#0D9488; color:#fff; border:none; border-radius:12px; padding:12px; font-family:'DM Sans',sans-serif; font-weight:700; font-size:14px; cursor:pointer; }
 .adm-imo-save:disabled { opacity:.6; }
+
+/* Makler werden: CTA-Bar, Modal-Preiskarten, Promo-Hinweis */
+.makler-cta-bar { flex-shrink:0; display:flex; align-items:center; gap:10px; margin:2px 16px 0; padding:11px 14px; background:linear-gradient(100deg,#FEF3C7,#FFF8EC); border:1.5px solid #F5C24E; border-radius:13px; cursor:pointer; }
+.makler-cta-icon { width:26px; height:26px; border-radius:8px; background:#F5C24E; color:#7A4D00; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+.makler-cta-text { flex:1; font-size:12.5px; font-weight:700; color:#92660A; line-height:1.3; }
+.makler-cta-bar svg { color:#B45309; flex-shrink:0; }
+.makler-price-card { border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; margin-bottom:10px; }
+.makler-price-head { display:flex; align-items:center; gap:8px; font-size:14.5px; font-weight:700; color:var(--text-1); margin-bottom:5px; }
+.makler-price-badge { width:24px; height:24px; border-radius:7px; display:inline-flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+.makler-price-badge.feat { background:#FEF3C7; color:#B45309; }
+.makler-price-badge.ver { background:#CCFBF1; color:#0F766E; }
+.makler-price-desc { font-size:12.5px; color:var(--text-2); line-height:1.45; margin-bottom:8px; }
+.makler-price-val { font-size:15px; font-weight:700; color:#0D9488; }
+.makler-price-val span { font-size:12.5px; font-weight:600; color:var(--text-3); }
+.makler-wa-btn { display:flex; align-items:center; justify-content:center; gap:9px; width:100%; margin-top:6px; padding:14px; background:#25D366; color:#fff; border-radius:13px; font-family:'DM Sans',sans-serif; font-weight:700; font-size:14.5px; text-decoration:none; }
+.makler-promo-card { display:flex; align-items:center; gap:11px; padding:12px 14px; margin-top:8px; cursor:pointer; border:1.5px solid #F5C24E; background:linear-gradient(100deg,#FEF3C7,#FFF8EC); }
+.makler-promo-icon { width:30px; height:30px; border-radius:9px; background:#F5C24E; color:#7A4D00; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+.makler-promo-text { flex:1; }
+.makler-promo-title { font-size:13.5px; font-weight:700; color:#92660A; line-height:1.25; }
+.makler-promo-sub { font-size:11.5px; color:#B4842E; margin-top:1px; }
+.makler-promo-card svg { color:#B45309; flex-shrink:0; }
