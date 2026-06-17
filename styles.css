@@ -170,7 +170,7 @@
     .detail-badge.blue { background:#DBEAFE;color:#2563EB; }
     .detail-badge.open-status { background:#DCFCE7;color:#15803D; }
     .detail-badge.closed-status { background:#F1F5F9;color:#94A3B8; }
-    .detail-cta { display: flex; gap: 10px; margin-top: 6px; }
+    .detail-cta { display: flex; gap: 10px; margin-top: 6px; margin-bottom: 14px; }
     .detail-cta-btn { flex: 1; padding: 15px; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
     .detail-cta-btn.primary { background: var(--yellow); color: white; }
     .detail-cta-btn.secondary { background: var(--card); color: var(--text-1); border: 1.5px solid var(--border); }
