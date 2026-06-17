@@ -2036,7 +2036,17 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     r.onload = function(ev){ var p=document.getElementById('reCoverPreview'); if(p){ p.style.backgroundImage="url('"+ev.target.result+"')"; p.style.display='block'; } };
     r.readAsDataURL(f);
   }
-  function openImmobilien(){ showScreen('screenImmobilien'); loadImmobilien(); }
+  var immoDeal='Alle', immoType='Alle';
+  function renderImmoFilters(){
+    var es=(currentLang==='es');
+    var deals=[['Alle',es?'Todos':'Alle'],['kauf',es?'Venta':'Kauf'],['miete',es?'Alquiler':'Miete']];
+    var types=[['Alle',es?'Todos los tipos':'Alle Typen'],['wohnung',es?'Departamento':'Wohnung'],['haus',es?'Casa':'Haus'],['grundstueck',es?'Terreno':'Grundstück'],['land',es?'Campo':'Land'],['gewerbe',es?'Comercial':'Gewerbe']];
+    var dc=document.getElementById('immoDealChips'); if(dc) dc.innerHTML=deals.map(function(d){return '<div class="immo-fchip'+(immoDeal===d[0]?' active':'')+'" onclick="setImmoDeal(\''+d[0]+'\')">'+d[1]+'</div>';}).join('');
+    var tc=document.getElementById('immoTypeChips'); if(tc) tc.innerHTML=types.map(function(t){return '<div class="immo-fchip'+(immoType===t[0]?' active':'')+'" onclick="setImmoType(\''+t[0]+'\')">'+t[1]+'</div>';}).join('');
+  }
+  function setImmoDeal(v){ immoDeal=v; renderImmoFilters(); loadImmobilien(); }
+  function setImmoType(v){ immoType=v; renderImmoFilters(); loadImmobilien(); }
+  function openImmobilien(){ renderImmoFilters(); showScreen('screenImmobilien'); loadImmobilien(); }
   function showOnMap(id){
     var l=(typeof allListings!=='undefined'?allListings:[]).find(function(x){return x.id===id;});
     if(!l || l.lat==null || l.lng==null){ alert(currentLang==='es'?'Este inmueble no tiene ubicación.':'Für diese Immobilie ist kein Standort hinterlegt.'); return; }
@@ -2055,11 +2065,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function loadImmobilien(){
     var es=(currentLang==='es');
     function _ts(x){ if(!x) return 0; if(typeof x.seconds==='number') return x.seconds; if(typeof x.toMillis==='function') return x.toMillis()/1000; var d=new Date(x); return isNaN(d.getTime())?0:d.getTime()/1000; }
-    var list=(typeof allListings!=='undefined'?allListings:[]).filter(function(l){ return l.category_id==='kat-immobilien' && l.verified; });
+    var all=(typeof allListings!=='undefined'?allListings:[]).filter(function(l){ return l.category_id==='kat-immobilien' && l.verified; });
+    var list=all.filter(function(l){ return (immoDeal==='Alle'||l.re_deal===immoDeal) && (immoType==='Alle'||l.re_type===immoType); });
     list=list.slice().sort(function(a,b){ return _ts(b.created_at)-_ts(a.created_at); });
     var body=document.getElementById('immobilienBody'); if(!body) return;
     var cnt=document.getElementById('immobilienCount'); if(cnt) cnt.textContent=list.length+' '+(es?(list.length===1?'inmueble':'inmuebles'):(list.length===1?'Objekt':'Objekte'));
-    if(!list.length){ body.innerHTML='<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></div><div class="empty-title">'+(es?'Aún no hay inmuebles':'Noch keine Immobilien')+'</div><div class="empty-sub">'+(es?'Sé el primero en publicar uno':'Sei der Erste und inseriere eine')+'</div></div>'; return; }
+    if(!list.length){
+      var noneAtAll=(all.length===0);
+      var t1=noneAtAll?(es?'Aún no hay inmuebles':'Noch keine Immobilien'):(es?'Sin resultados':'Keine Treffer');
+      var t2=noneAtAll?(es?'Sé el primero en publicar uno':'Sei der Erste und inseriere eine'):(es?'Prueba con otro filtro':'Versuch einen anderen Filter');
+      body.innerHTML='<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></div><div class="empty-title">'+t1+'</div><div class="empty-sub">'+t2+'</div></div>';
+      return;
+    }
     body.innerHTML=list.map(renderImmoCard).join('');
   }
 
