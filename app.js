@@ -3221,7 +3221,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       const snap = await db.collection('listings').where('verified','==',true).get();
       const all = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-      const countBanner = '<div style="margin:10px 12px;padding:12px;background:#0D9488;border-radius:10px;font-size:13.5px;color:#fff;text-align:center;font-weight:700">📊 '+all.length+' verifizierte Einträge in der Datenbank</div>';
+      const _uniqueCount = (typeof _dedupeListings === 'function') ? _dedupeListings(all).length : all.length;
+      const _hiddenCount = all.length - _uniqueCount;
+      const countBanner = '<div style="margin:10px 12px;padding:12px;background:#0D9488;border-radius:10px;font-size:13px;color:#fff;text-align:center;font-weight:700;line-height:1.55">📊 '+all.length+' Einträge in der Datenbank<br><span style="font-weight:600;font-size:12px">davon '+_uniqueCount+' einzigartig (in der App sichtbar)'+(_hiddenCount>0?(' · '+_hiddenCount+' exakte Doppel werden ausgeblendet'):'')+'</span></div>';
       const groups = {};
       all.forEach(function(l){
         if (!(l.name||'').trim()) return;
