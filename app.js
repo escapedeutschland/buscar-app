@@ -2778,25 +2778,29 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       grid += '<line x1="'+gi+'" y1="12" x2="'+gi+'" y2="188"/><line x1="12" y1="'+gi+'" x2="188" y2="'+gi+'"/>';
     }
     var dots = cand.slice(0, 36).map(function(x){
-      var tlat, tlng, id, fn;
-      if (x.ev){ tlat=x.e.lat; tlng=x.e.lng; id=x.e.id; fn='showEventDetail'; }
-      else { tlat=x.l.lat; tlng=x.l.lng; id=x.l.id; fn='showDetail'; }
+      var tlat, tlng, id, kind;
+      if (x.ev){ tlat=x.e.lat; tlng=x.e.lng; id=x.e.id; kind='ev'; }
+      else { tlat=x.l.lat; tlng=x.l.lng; id=x.l.id; kind='list'; }
       var br = _bearing(_radarLat, _radarLng, tlat, tlng);
       var rr = Math.min(1, x.km/_radarRadiusKm) * MAX;
       var rad = br*Math.PI/180;
-      var px = C + rr*Math.sin(rad), py = C - rr*Math.cos(rad);
+      var px = +(C + rr*Math.sin(rad)).toFixed(1), py = +(C - rr*Math.cos(rad)).toFixed(1);
+      var pick = 'radarPick(event,\''+kind+'\',\''+id+'\','+px+','+py+')';
       if (x.ev){
         var emoji = (typeof EVENT_TYPE_EMOJIS!=='undefined' && EVENT_TYPE_EMOJIS[x.e.type]) ? EVENT_TYPE_EMOJIS[x.e.type] : '🎪';
         var nmE = (x.e.title||'').replace(/[<>"]/g,'');
-        return '<g style="cursor:pointer" onclick="'+fn+'(\''+id+'\')"><title>'+nmE+' · '+_fmtDist(x.km)+'</title>'
-          + '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="8" fill="#fff" stroke="'+RADAR_EVENT_COLOR+'" stroke-width="1.6"/>'
-          + '<text x="'+px.toFixed(1)+'" y="'+(py+0.4).toFixed(1)+'" font-size="9" text-anchor="middle" dominant-baseline="central">'+emoji+'</text></g>';
+        return '<g style="cursor:pointer" onclick="'+pick+'"><title>'+nmE+' · '+_fmtDist(x.km)+'</title>'
+          + '<circle cx="'+px+'" cy="'+py+'" r="8" fill="#fff" stroke="'+RADAR_EVENT_COLOR+'" stroke-width="1.6"/>'
+          + '<text x="'+px+'" y="'+(py+0.4)+'" font-size="9" text-anchor="middle" dominant-baseline="central">'+emoji+'</text></g>';
       }
       var col = catColors[x.l.category_id] || catColors.default;
+      var em = catEmojis[x.l.category_id] || '📍';
       var nmL = (x.l.name||'').replace(/[<>"]/g,'');
-      return '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="3.8" fill="'+col+'" stroke="#fff" stroke-width="1" style="cursor:pointer" onclick="'+fn+'(\''+id+'\')"><title>'+nmL+' · '+_fmtDist(x.km)+'</title></circle>';
+      return '<g style="cursor:pointer" onclick="'+pick+'"><title>'+nmL+' · '+_fmtDist(x.km)+'</title>'
+        + '<path d="M'+px+' '+py+' L'+(px-5)+' '+(py-8)+' A6 6 0 1 1 '+(px+5)+' '+(py-8)+' Z" fill="'+col+'" stroke="#fff" stroke-width="1"/>'
+        + '<text x="'+px+'" y="'+(py-11)+'" font-size="7" text-anchor="middle" dominant-baseline="central">'+em+'</text></g>';
     }).join('');
-    return '<div class="radar-stage"><svg viewBox="0 0 200 200" aria-hidden="true">'
+    return '<div class="radar-stage" onclick="radarClosePopup()"><svg viewBox="0 0 200 200" aria-hidden="true">'
       + '<defs>'
       + '<radialGradient id="rgSweep"><stop offset="0%" stop-color="#F5A623" stop-opacity="0.5"/><stop offset="100%" stop-color="#F5A623" stop-opacity="0"/></radialGradient>'
       + '<clipPath id="radarClip"><circle cx="100" cy="100" r="88"/></clipPath>'
@@ -2816,8 +2820,39 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       + dots
       + '<circle cx="100" cy="100" r="12" fill="#007AFF" opacity="0.16"/>'
       + '<circle cx="100" cy="100" r="5" fill="#007AFF" stroke="#fff" stroke-width="2"/>'
-      + '</svg><div class="radar-stage-cap">'+(es?'Tú':'Du')+' · '+_radarRadiusKm+' km</div></div>';
+      + '</svg>'
+      + '<div id="radarPopup" class="radar-popup" style="display:none" onclick="event.stopPropagation();radarGoDetail()"></div>'
+      + '<div class="radar-stage-cap">'+(es?'Tú':'Du')+' · '+_radarRadiusKm+' km</div></div>';
   }
+  function radarPick(ev, kind, id, px, py){
+    if (ev && ev.stopPropagation) ev.stopPropagation();
+    var pop = document.getElementById('radarPopup'); if (!pop) return;
+    var es = (currentLang === 'es'), name = '', sub = '';
+    if (kind === 'ev'){
+      var e = (typeof allEvents!=='undefined' && allEvents ? allEvents : []).find(function(x){ return x.id === id; }); if (!e) return;
+      var st = (e.date_start && e.date_start.toDate) ? e.date_start.toDate() : null;
+      var ds = st ? st.toLocaleDateString(es?'es-PY':'de-DE', {weekday:'short', day:'numeric', month:'short'}) : '';
+      var em = (typeof EVENT_TYPE_EMOJIS!=='undefined' && EVENT_TYPE_EMOJIS[e.type]) ? EVENT_TYPE_EMOJIS[e.type] : '🎪';
+      name = em + ' ' + (e.title||''); sub = [ds, e.city].filter(Boolean).join(' · ');
+    } else {
+      var l = (typeof allListings!=='undefined' ? allListings : []).find(function(x){ return x.id === id; }); if (!l) return;
+      name = l.name || ''; sub = (catLabels[l.category_id] || catLabels.default) + (l.city ? ' · ' + l.city : '');
+    }
+    pop.innerHTML = '<div class="radar-popup-name">'+name+'</div>'
+      + (sub ? '<div class="radar-popup-sub">'+sub+'</div>' : '')
+      + '<div class="radar-popup-go">'+(es?'Ver detalle':'Zum Eintrag')+' →</div>';
+    pop.className = 'radar-popup' + (py < 70 ? ' below' : '');
+    pop.style.left = (px/2) + '%'; pop.style.top = (py/2) + '%';
+    pop.setAttribute('data-kind', kind); pop.setAttribute('data-id', id);
+    pop.style.display = 'block';
+  }
+  function radarGoDetail(){
+    var pop = document.getElementById('radarPopup'); if (!pop) return;
+    var kind = pop.getAttribute('data-kind'), id = pop.getAttribute('data-id');
+    radarClosePopup();
+    if (kind === 'ev') showEventDetail(id); else showDetail(id);
+  }
+  function radarClosePopup(){ var pop = document.getElementById('radarPopup'); if (pop) pop.style.display = 'none'; }
   function renderRadar(){
     _renderRadarRadiusChips();
     var list = document.getElementById('radarList'); if (!list) return;
