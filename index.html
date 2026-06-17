@@ -17,17 +17,17 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Buscar – Deutsche in Paraguay</title>
-  <link rel="preload" href="styles.css?v=96" as="style">
-  <link rel="preload" href="app.js?v=96" as="script">
+  <link rel="preload" href="styles.css?v=97" as="style">
+  <link rel="preload" href="app.js?v=97" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-  <link href="styles.css?v=96" rel="stylesheet">
+  <link href="styles.css?v=97" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  <script defer src="app.js?v=96"></script>
+  <script defer src="app.js?v=97"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -368,7 +368,7 @@
     <div class="detail-hero" id="detailHero">
       <div class="detail-cover" id="detailCover"></div>
       <div class="detail-cover-overlay" id="detailCoverOverlay" style="display:none"></div>
-      <button class="detail-back" onclick="showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <button class="detail-back" onclick="detailBack()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       <button class="fav-btn" id="favBtn" onclick="toggleFavorite()"><svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
       <div style="position:relative;z-index:2">
       <div class="detail-hero-icon" id="detailIcon"></div>
@@ -759,6 +759,10 @@
           <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><span class="profil-row-label" data-i18n="change_password">Passwort ändern</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
+        <div class="profil-row" onclick="showEditEmail()">
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 6 12 13 2 6"/></svg></div><span class="profil-row-label" data-i18n="change_email">E-Mail ändern</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
       </div>
       <div class="profil-section" style="margin-bottom:16px">
         <div class="profil-row" onclick="showFavorites()">
@@ -831,6 +835,36 @@
         <div id="passwordChangeSuccess" style="display:none;background:var(--green-light);color:var(--green);padding:10px 14px;border-radius:10px;font-size:13px;margin-top:10px"></div>
       </div>
       <button class="form-submit" onclick="savePassword()">Passwort ändern</button>
+    </div>
+  </div>
+
+  <!-- E-MAIL AENDERN -->
+  <div class="screen" id="screenEditEmail">
+    <div class="form-header">
+      <button class="form-back" onclick="showScreen('screenProfil')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="form-title">E-Mail ändern</div>
+      <div class="form-sub">Bestätigung per Link an die neue Adresse</div>
+    </div>
+    <div class="form-body">
+      <div class="form-card">
+        <div class="form-card-title">Neue E-Mail-Adresse</div>
+        <div class="form-field">
+          <label class="field-label">Aktuelle E-Mail</label>
+          <input class="field-input" type="email" id="currentEmailDisplay" disabled>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Neue E-Mail</label>
+          <input class="field-input" type="email" id="newEmail" placeholder="neue@email.com" autocapitalize="off" autocomplete="email" autocorrect="off">
+        </div>
+        <div class="form-field">
+          <label class="field-label">Aktuelles Passwort</label>
+          <input class="field-input" type="password" id="emailCurrentPassword" placeholder="Zur Bestätigung">
+        </div>
+        <div id="emailChangeError" style="display:none;background:var(--red-light);color:var(--red);padding:10px 14px;border-radius:10px;font-size:13px;margin-top:10px"></div>
+        <div id="emailChangeSuccess" style="display:none;background:var(--green-light);color:var(--green);padding:10px 14px;border-radius:10px;font-size:13px;margin-top:10px"></div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:10px;line-height:1.5">Wir senden einen Bestätigungslink an die neue Adresse. Deine E-Mail wird erst geändert, nachdem du in dieser Mail auf den Link geklickt hast.</div>
+      </div>
+      <button class="form-submit" onclick="saveEmail()">Bestätigungslink senden</button>
     </div>
   </div>
 

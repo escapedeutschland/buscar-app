@@ -87,7 +87,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Profile
       to_home: 'Zur Startseite', suggest_entry_prof: 'Eintrag vorschlagen',
       admin_panel: 'Admin Panel', change_username: 'Benutzername ändern',
-      change_password: 'Passwort ändern', my_favorites: 'Meine Favoriten',
+      change_password: 'Passwort ändern', change_email: 'E-Mail ändern', my_favorites: 'Meine Favoriten',
       // Map
       map_title: 'Karte', map_sub_all: 'Alle Orte in Paraguay',
       // Filter
@@ -233,7 +233,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Perfil
       to_home: 'Ir al inicio', suggest_entry_prof: 'Sugerir lugar',
       admin_panel: 'Panel admin', change_username: 'Cambiar usuario',
-      change_password: 'Cambiar contraseña', my_favorites: 'Mis favoritos',
+      change_password: 'Cambiar contraseña', change_email: 'Cambiar correo', my_favorites: 'Mis favoritos',
       // Mapa
       map_title: 'Mapa', map_sub_all: 'Todos los lugares en Paraguay',
       // Filtros
@@ -646,6 +646,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   var _prevScreenId = null;
 
   function showScreen(id) {
+    if (id === 'screenDetail' && activeScreen && activeScreen !== 'screenDetail') { window._detailFrom = activeScreen; }
     activeScreen = id;
     // Build cache on first call
     if (!_screens) {
@@ -671,7 +672,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const mapScreen = document.getElementById('screenMap');
     if (mapScreen) mapScreen.style.display = id === 'screenMap' ? 'flex' : 'none';
     if (id === 'screenMap') {
-      _mapFitOnUpdate = true;
+      if (!window._skipMapFit) _mapFitOnUpdate = true;
+      window._skipMapFit = false;
       setTimeout(() => { if (maplibreMap) maplibreMap.resize(); renderMap(); }, 100);
     }
     if (id === 'screenProfil' && currentUser) {
@@ -3195,6 +3197,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch(e) { alert('Fehler.'); }
   }
 
+  function detailBack(){ var from = window._detailFrom || 'screenHome'; if (from === 'screenMap') window._skipMapFit = true; showScreen(from); }
+
   function showEditUsername() {
     const cur = document.getElementById('profilName').textContent;
     document.getElementById('newUsername').value = cur;
@@ -3249,6 +3253,42 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       setTimeout(() => showScreen('screenProfil'), 1500);
     } catch(e) {
       err.textContent = e.code === 'auth/wrong-password' ? 'Aktuelles Passwort falsch.' : 'Fehler.';
+      err.style.display='block';
+    }
+  }
+
+  function showEditEmail() {
+    document.getElementById('currentEmailDisplay').value = currentUser ? currentUser.email : '';
+    document.getElementById('newEmail').value = '';
+    document.getElementById('emailCurrentPassword').value = '';
+    document.getElementById('emailChangeError').style.display = 'none';
+    document.getElementById('emailChangeSuccess').style.display = 'none';
+    showScreen('screenEditEmail');
+  }
+
+  async function saveEmail() {
+    const newEmail = document.getElementById('newEmail').value.trim();
+    const pw = document.getElementById('emailCurrentPassword').value;
+    const err = document.getElementById('emailChangeError');
+    const succ = document.getElementById('emailChangeSuccess');
+    err.style.display='none'; succ.style.display='none';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) { err.textContent='Bitte eine gültige E-Mail eingeben.'; err.style.display='block'; return; }
+    if (newEmail.toLowerCase() === (currentUser.email||'').toLowerCase()) { err.textContent='Das ist bereits deine aktuelle E-Mail.'; err.style.display='block'; return; }
+    if (!pw) { err.textContent='Bitte aktuelles Passwort eingeben.'; err.style.display='block'; return; }
+    try {
+      const cred = firebase.auth.EmailAuthProvider.credential(currentUser.email, pw);
+      await currentUser.reauthenticateWithCredential(cred);
+      await currentUser.verifyBeforeUpdateEmail(newEmail);
+      try { await db.collection('users').doc(currentUser.uid).set({ pending_email: newEmail }, { merge: true }); } catch(e){}
+      succ.innerHTML = '✓ Bestätigungslink an <b>' + newEmail + '</b> gesendet. Bitte öffne diese E-Mail und klick den Link, dann ist die Änderung aktiv.';
+      succ.style.display='block';
+    } catch(e) {
+      if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') err.textContent='Aktuelles Passwort falsch.';
+      else if (e.code === 'auth/email-already-in-use') err.textContent='Diese E-Mail wird bereits verwendet.';
+      else if (e.code === 'auth/invalid-email') err.textContent='Ungültige E-Mail-Adresse.';
+      else if (e.code === 'auth/requires-recent-login') err.textContent='Bitte melde dich neu an und versuche es erneut.';
+      else if (e.code === 'auth/operation-not-allowed') err.textContent='E-Mail-Änderung ist derzeit nicht aktiviert.';
+      else err.textContent='Fehler: ' + (e.message || e.code || 'unbekannt');
       err.style.display='block';
     }
   }
