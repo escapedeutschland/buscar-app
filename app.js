@@ -2075,7 +2075,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     // Cover upload btn
     var oldCovBtn=document.getElementById('coverUploadBtn');if(oldCovBtn)oldCovBtn.remove();
     var oldWrap=document.getElementById('coverBtnWrap');if(oldWrap)oldWrap.remove();
-    if(currentUser&&(currentUser.email===ADMIN_EMAIL||(l.owner_id&&l.owner_id===currentUser.uid))){
+    if(currentUser&&(currentUser.email===ADMIN_EMAIL||(l.owner_id&&l.owner_id===currentUser.uid)||(l.created_by&&l.created_by===currentUser.uid))){
       var covBtn=document.createElement('button');covBtn.id='coverUploadBtn';covBtn.className='detail-cover-upload';
       covBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Titelbild';
       if(l.cover_url){
@@ -3780,6 +3780,19 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('editListingError').style.display = 'none';
     document.getElementById('editListingSuccess').style.display = 'none';
     document.getElementById('editListingBack').onclick = function() { showDetail(currentEditListingId); };
+    var _ef = document.getElementById('editImmoFields');
+    if (_ef) {
+      if (l.category_id === 'kat-immobilien') {
+        document.getElementById('editReDeal').value = l.re_deal || 'kauf';
+        document.getElementById('editReType').value = l.re_type || 'wohnung';
+        document.getElementById('editRePrice').value = (l.re_price != null ? l.re_price : '');
+        document.getElementById('editReCurrency').value = l.re_currency || 'USD';
+        document.getElementById('editReArea').value = (l.re_area != null ? l.re_area : '');
+        document.getElementById('editReAreaUnit').value = l.re_area_unit || 'm2';
+        document.getElementById('editReRooms').value = (l.re_rooms != null ? l.re_rooms : '');
+        _ef.style.display = 'block';
+      } else { _ef.style.display = 'none'; }
+    }
     showScreen('screenEditListing');
   }
 
@@ -3790,6 +3803,21 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const city = document.getElementById('editCity').value.trim();
     const desc = document.getElementById('editDesc').value.trim();
     if (!name || !city || desc.length < 50) { err.textContent='Bitte alle Pflichtfelder ausfüllen.'; err.style.display='block'; return; }
+    const _el = allListings.find(x => x.id === currentEditListingId);
+    var reEdit = {};
+    if (_el && _el.category_id === 'kat-immobilien') {
+      var _en = function(id){ var v = parseFloat(document.getElementById(id).value); return isNaN(v) ? null : v; };
+      reEdit = {
+        re_deal: document.getElementById('editReDeal').value || null,
+        re_type: document.getElementById('editReType').value || null,
+        re_price: _en('editRePrice'),
+        re_currency: document.getElementById('editReCurrency').value || null,
+        re_period: (document.getElementById('editReDeal').value === 'miete') ? 'monat' : null,
+        re_area: _en('editReArea'),
+        re_area_unit: document.getElementById('editReAreaUnit').value || null,
+        re_rooms: _en('editReRooms')
+      };
+    }
     try {
       await db.collection('listings').doc(currentEditListingId).update({
         name, city, description: desc,
@@ -3797,7 +3825,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         website: document.getElementById('editWebsite').value.trim() || null,
         address: document.getElementById('editAddress').value.trim() || null,
         opening_hours: document.getElementById('editHours').value.trim() || null,
-        updated_at: new Date()
+        updated_at: new Date(), ...reEdit
       });
       document.getElementById('editListingSuccess').style.display = 'block';
       await loadListings();
