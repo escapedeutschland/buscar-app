@@ -2721,6 +2721,36 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       + '<div class="radar-row-main"><div class="radar-row-name">'+(l.name||'')+'</div><div class="radar-row-sub">'+sub+'</div></div>'
       + '<div class="radar-row-dist">'+_fmtDist(km)+'</div></div>';
   }
+  function _bearing(la1, ln1, la2, ln2){
+    var p = Math.PI/180;
+    var y = Math.sin((ln2-ln1)*p) * Math.cos(la2*p);
+    var x = Math.cos(la1*p)*Math.sin(la2*p) - Math.sin(la1*p)*Math.cos(la2*p)*Math.cos((ln2-ln1)*p);
+    return (Math.atan2(y, x)*180/Math.PI + 360) % 360;
+  }
+  function _radarStageHTML(cand){
+    var es = (currentLang === 'es');
+    var C = 100, MAX = 88;
+    var dots = cand.slice(0, 36).map(function(x){
+      var br = _bearing(_radarLat, _radarLng, x.l.lat, x.l.lng);
+      var rr = Math.min(1, x.km/_radarRadiusKm) * MAX;
+      var rad = br*Math.PI/180;
+      var px = C + rr*Math.sin(rad), py = C - rr*Math.cos(rad);
+      var col = catColors[x.l.category_id] || catColors.default;
+      var nm = (x.l.name||'').replace(/[<>"]/g,'');
+      return '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="3.6" fill="'+col+'" stroke="#fff" stroke-width="1" style="cursor:pointer" onclick="showDetail(\''+x.l.id+'\')"><title>'+nm+' · '+_fmtDist(x.km)+'</title></circle>';
+    }).join('');
+    return '<div class="radar-stage"><svg viewBox="0 0 200 200" aria-hidden="true">'
+      + '<defs><radialGradient id="rgSweep"><stop offset="0%" stop-color="#0D9488" stop-opacity="0.45"/><stop offset="100%" stop-color="#0D9488" stop-opacity="0"/></radialGradient></defs>'
+      + '<circle cx="100" cy="100" r="88" fill="none" stroke="var(--border)" stroke-width="1"/>'
+      + '<circle cx="100" cy="100" r="59" fill="none" stroke="var(--border)" stroke-width="1"/>'
+      + '<circle cx="100" cy="100" r="30" fill="none" stroke="var(--border)" stroke-width="1"/>'
+      + '<line x1="100" y1="12" x2="100" y2="188" stroke="var(--border)" stroke-width="0.7"/>'
+      + '<line x1="12" y1="100" x2="188" y2="100" stroke="var(--border)" stroke-width="0.7"/>'
+      + '<g class="radar-sweep"><path d="M100 100 L100 12 A88 88 0 0 1 162.2 37.8 Z" fill="url(#rgSweep)"/></g>'
+      + dots
+      + '<circle cx="100" cy="100" r="4.5" fill="#0D9488" stroke="#fff" stroke-width="1.5"/>'
+      + '</svg><div class="radar-stage-cap">'+(es?'Tú':'Du')+' · '+_radarRadiusKm+' km</div></div>';
+  }
   function renderRadar(){
     _renderRadarRadiusChips();
     var list = document.getElementById('radarList'); if (!list) return;
@@ -2733,11 +2763,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
     var cand = _radarCandidates();
     if (status) status.textContent = cand.length + ' ' + (es ? ('en '+_radarRadiusKm+' km') : ('im Umkreis von '+_radarRadiusKm+' km'));
+    var stage = _radarStageHTML(cand);
     if (!cand.length){
-      list.innerHTML = '<div class="empty-state" style="padding:34px 16px"><div class="empty-title">'+(es?'Nada cerca':'Nichts in der Nähe')+'</div><div class="empty-sub">'+(es?'Aumenta el radio o cambia el filtro':'Vergrößere den Radius oder ändere den Filter')+'</div></div>';
+      list.innerHTML = stage + '<div class="empty-state" style="padding:24px 16px"><div class="empty-title">'+(es?'Nada cerca':'Nichts in der Nähe')+'</div><div class="empty-sub">'+(es?'Aumenta el radio o cambia el filtro':'Vergrößere den Radius oder ändere den Filter')+'</div></div>';
       return;
     }
-    list.innerHTML = cand.slice(0, 60).map(function(x){ return _radarRowHTML(x.l, x.km); }).join('');
+    list.innerHTML = stage + cand.slice(0, 60).map(function(x){ return _radarRowHTML(x.l, x.km); }).join('');
   }
 
   function hasEmoji(str) { return /\p{Emoji}/u.test(str); }
