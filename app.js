@@ -1979,22 +1979,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       priceStr = cur + ' ' + Number(l.re_price).toLocaleString(locale) + per;
     }
     var areaStr = (l.re_area != null) ? (Number(l.re_area).toLocaleString(locale) + ' ' + (l.re_area_unit === 'ha' ? 'ha' : 'm²')) : '';
-    var dealLabel = dealMap[l.re_deal] || '';
-    var head = '';
-    if (priceStr || dealLabel) {
-      head = '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:2px">'
-        + (priceStr ? '<span style="font-family:\'Fraunces\',serif;font-weight:700;font-size:26px;color:#0D9488;line-height:1.15;word-break:break-word">' + priceStr + '</span>' : '')
-        + (dealLabel ? '<span style="background:#CCFBF1;color:#0F766E;font-size:11px;font-weight:700;padding:3px 11px;border-radius:999px;text-transform:uppercase;letter-spacing:.5px">' + dealLabel + '</span>' : '')
-        + '</div>';
-    }
-    function tile(label, val){ return val ? '<div style="background:var(--bg);border-radius:12px;padding:10px 12px"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">' + label + '</div><div style="font-size:14.5px;font-weight:700;color:var(--text-1);word-break:break-word">' + val + '</div></div>' : ''; }
-    var tiles = '';
-    tiles += tile(es ? 'Tipo' : 'Typ', typeMap[l.re_type] || '');
-    tiles += tile(es ? 'Superficie' : 'Fläche', areaStr);
-    tiles += tile(es ? 'Habitaciones' : 'Zimmer', (l.re_rooms != null ? String(l.re_rooms) : ''));
-    var grid = tiles ? '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">' + tiles + '</div>' : '';
+    var head = priceStr ? '<div style="font-family:\'Fraunces\',serif;font-weight:700;font-size:26px;color:#0D9488;margin-bottom:12px;line-height:1.15;word-break:break-word">' + priceStr + '</div>' : '';
+    var items = [];
+    if (dealMap[l.re_deal]) items.push([es ? 'Operación' : 'Angebot', dealMap[l.re_deal]]);
+    if (typeMap[l.re_type]) items.push([es ? 'Tipo' : 'Typ', typeMap[l.re_type]]);
+    if (areaStr) items.push([es ? 'Superficie' : 'Fläche', areaStr]);
+    if (l.re_rooms != null) items.push([es ? 'Habitaciones' : 'Zimmer', String(l.re_rooms)]);
+    var rows = items.map(function(it, i){
+      var border = (i < items.length - 1) ? 'border-bottom:1px solid var(--border);' : '';
+      return '<div style="display:flex;justify-content:space-between;gap:14px;padding:9px 0;' + border + 'font-size:14px"><span style="color:var(--text-3)">' + it[0] + '</span><span style="font-weight:600;color:var(--text-1);text-align:right;word-break:break-word">' + it[1] + '</span></div>';
+    }).join('');
     var title = es ? 'Detalles del inmueble' : 'Immobilien-Details';
-    return '<div class="detail-section-title">' + title + '</div><div style="padding:0 16px 16px">' + head + grid + '</div>';
+    return '<div class="detail-section-title">' + title + '</div><div style="padding:0 16px 16px">' + head + rows + '</div>';
   }
 
   function showDetail(id) {
