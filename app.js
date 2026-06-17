@@ -13,7 +13,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       search_placeholder: 'Arzt, Restaurant, Anwalt...',
       // Categories
       cat_all: 'Alle', cat_restaurants: 'Restaurants', cat_services: 'Dienstleistungen',
-      cat_immobilien: 'Immobilien',
+      cat_immobilien: 'Immobilien', immo_tile: 'Immobilien', immo_tile_sub: 'Kaufen & mieten in Paraguay', immo_title: 'Immobilien',
       cat_places: 'Orte', cat_accommodation: 'Unterkünfte', cat_shops: 'Geschäfte',
       cat_sport: 'Sport & Fitness', cat_tankstelle: 'Tankstellen', cat_wechselstube: 'Wechselstuben', cat_beauty: 'Beauty & Wellness',
       // City picker
@@ -160,7 +160,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       search_placeholder: 'Médico, Restaurante, Abogado...',
       // Categorías
       cat_all: 'Todos', cat_restaurants: 'Restaurantes', cat_services: 'Servicios',
-      cat_immobilien: 'Inmuebles',
+      cat_immobilien: 'Inmuebles', immo_tile: 'Inmuebles', immo_tile_sub: 'Comprar y alquilar en Paraguay', immo_title: 'Inmuebles',
       cat_places: 'Lugares', cat_accommodation: 'Alojamientos', cat_shops: 'Tiendas',
       cat_sport: 'Deporte & Fitness', cat_tankstelle: 'Gasolineras', cat_wechselstube: 'Casas de cambio', cat_beauty: 'Belleza & Bienestar',
       // Selector de ciudad
@@ -1991,6 +1991,50 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }).join('');
     var title = es ? 'Detalles del inmueble' : 'Immobilien-Details';
     return '<div class="detail-section-title">' + title + '</div><div style="padding:0 16px 16px">' + head + rows + '</div>';
+  }
+
+  function immoPriceStr(l){
+    if(l.re_price==null) return '';
+    var es=(currentLang==='es'); var curMap={USD:'USD',PYG:'₲',EUR:'€'};
+    var per=(l.re_period==='monat')?(es?'/mes':'/Monat'):'';
+    return (curMap[l.re_currency]||l.re_currency||'')+' '+Number(l.re_price).toLocaleString(es?'es-PY':'de-DE')+per;
+  }
+  function immoMetaStr(l){
+    var es=(currentLang==='es');
+    var typeMap=es?{wohnung:'Departamento',haus:'Casa',grundstueck:'Terreno',land:'Campo',gewerbe:'Comercial'}:{wohnung:'Wohnung',haus:'Haus',grundstueck:'Grundstück',land:'Land',gewerbe:'Gewerbe'};
+    var parts=[];
+    if(typeMap[l.re_type]) parts.push(typeMap[l.re_type]);
+    if(l.re_area!=null) parts.push(Number(l.re_area).toLocaleString(es?'es-PY':'de-DE')+' '+(l.re_area_unit==='ha'?'ha':'m²'));
+    if(l.re_rooms!=null) parts.push(l.re_rooms+' '+(es?'hab.':'Zi.'));
+    return parts.join(' · ');
+  }
+  function renderImmoCard(l){
+    var es=(currentLang==='es');
+    var dealMap=es?{kauf:'Venta',miete:'Alquiler'}:{kauf:'Kauf',miete:'Miete'};
+    var media = l.cover_url
+      ? '<div class="immo-card-media" style="background-image:url(\''+l.cover_url+'\')"></div>'
+      : '<div class="immo-card-media immo-card-media-icon">'+(catIcons['kat-immobilien']||'')+'</div>';
+    var price = immoPriceStr(l);
+    var dealBadge = (l.re_deal && dealMap[l.re_deal]) ? '<span class="immo-deal-badge">'+dealMap[l.re_deal]+'</span>' : '';
+    var meta = immoMetaStr(l);
+    return '<div class="immo-card" onclick="showDetail(\''+l.id+'\')">'+media
+      +'<div class="immo-card-body">'+dealBadge
+      +(price?'<div class="immo-card-price">'+price+'</div>':'')
+      +'<div class="immo-card-name">'+(l.name||'')+'</div>'
+      +(meta?'<div class="immo-card-meta">'+meta+'</div>':'')
+      +(l.city?'<div class="immo-card-city">'+l.city+'</div>':'')
+      +'</div></div>';
+  }
+  function openImmobilien(){ showScreen('screenImmobilien'); loadImmobilien(); }
+  function loadImmobilien(){
+    var es=(currentLang==='es');
+    function _ts(x){ if(!x) return 0; if(typeof x.seconds==='number') return x.seconds; if(typeof x.toMillis==='function') return x.toMillis()/1000; var d=new Date(x); return isNaN(d.getTime())?0:d.getTime()/1000; }
+    var list=(typeof allListings!=='undefined'?allListings:[]).filter(function(l){ return l.category_id==='kat-immobilien' && l.verified; });
+    list=list.slice().sort(function(a,b){ return _ts(b.created_at)-_ts(a.created_at); });
+    var body=document.getElementById('immobilienBody'); if(!body) return;
+    var cnt=document.getElementById('immobilienCount'); if(cnt) cnt.textContent=list.length+' '+(es?(list.length===1?'inmueble':'inmuebles'):(list.length===1?'Objekt':'Objekte'));
+    if(!list.length){ body.innerHTML='<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></div><div class="empty-title">'+(es?'Aún no hay inmuebles':'Noch keine Immobilien')+'</div><div class="empty-sub">'+(es?'Sé el primero en publicar uno':'Sei der Erste und inseriere eines')+'</div></div>'; return; }
+    body.innerHTML=list.map(renderImmoCard).join('');
   }
 
   function showDetail(id) {

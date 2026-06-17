@@ -303,6 +303,24 @@
     .map-chip-wechselstube.active { background:#0EA5E9;border-color:#0EA5E9;color:white; }
     .map-chip-immobilien { background:#CCFBF1;border:1.5px solid #5EEAD4;color:#134E4A; }
     .map-chip-immobilien.active { background:#0D9488;border-color:#0D9488;color:white; }
+    /* IMMOBILIEN-Kachel + Liste */
+    .immo-tile { display:flex; align-items:center; gap:12px; margin:0 16px 8px; padding:14px 16px; border-radius:16px; background:linear-gradient(135deg,#CCFBF1,#99F6E4); cursor:pointer; }
+    .immo-tile:active { opacity:.85; }
+    .immo-tile-icon { width:42px; height:42px; border-radius:12px; background:#0D9488; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .immo-tile-icon svg { width:22px; height:22px; stroke:#fff; fill:none; }
+    .immo-tile-title { font-size:15px; font-weight:700; color:#134E4A; }
+    .immo-tile-sub { font-size:12px; color:#0F766E; }
+    .immo-tile-arrow { width:18px; height:18px; stroke:#0D9488; fill:none; flex-shrink:0; }
+    .immo-card { display:flex; gap:12px; background:var(--card); border-radius:18px; padding:10px; margin-bottom:12px; box-shadow:0 4px 16px rgba(0,0,0,0.05); cursor:pointer; }
+    .immo-card:active { opacity:.7; }
+    .immo-card-media { width:104px; min-width:104px; height:104px; border-radius:12px; background:var(--bg); background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; }
+    .immo-card-media-icon svg { width:36px; height:36px; stroke:#0D9488; fill:none; }
+    .immo-card-body { flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:3px; }
+    .immo-card-price { font-family:'Fraunces',serif; font-weight:700; font-size:19px; color:#0D9488; line-height:1.1; }
+    .immo-card-name { font-size:14px; font-weight:700; color:var(--text-1); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .immo-card-meta { font-size:12px; color:var(--text-2); }
+    .immo-card-city { font-size:12px; color:var(--text-3); }
+    .immo-deal-badge { align-self:flex-start; background:#CCFBF1; color:#0F766E; font-size:10px; font-weight:700; padding:2px 8px; border-radius:999px; text-transform:uppercase; letter-spacing:.5px; }
 
     /* DUPLICATE WARNING */
     .dupe-warning { background: #FFF8EC; border: 1.5px solid var(--yellow); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; display: none; }
