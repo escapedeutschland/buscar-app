@@ -1690,6 +1690,23 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
   }
 
+  // Blendet versehentliche Doppel-Eintraege aus: immer per ID (sicher) und – wenn
+  // Koordinaten vorhanden sind – per Name + exakter Position (gleicher Name an exakt
+  // gleicher Stelle = Duplikat). Unterschiedliche Orte bleiben unberuehrt.
+  function _dedupeListings(arr){
+    var seenId = {}, seenGeo = {}, out = [];
+    for (var i = 0; i < arr.length; i++){
+      var l = arr[i];
+      if (l.id){ if (seenId[l.id]) continue; seenId[l.id] = 1; }
+      if (l.lat != null && l.lng != null){
+        var k = (l.name||'').trim().toLowerCase() + '|' + Number(l.lat).toFixed(5) + '|' + Number(l.lng).toFixed(5);
+        if (seenGeo[k]) continue;
+        seenGeo[k] = 1;
+      }
+      out.push(l);
+    }
+    return out;
+  }
   async function loadListings() {
     try {
       // Zeige gecachte Daten sofort waehrend frische Daten geladen werden
@@ -1706,7 +1723,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         db.collection('listings').where('verified', '==', true).get(),
         loadAllRatings()
       ]);
-      allListings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      allListings = _dedupeListings(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       // Cache aktualisieren
       try { localStorage.setItem('buscar_listings', JSON.stringify(allListings)); localStorage.setItem('buscar_listings_ts', Date.now()); } catch(e) {}
       buildCityChips();
