@@ -2059,7 +2059,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     list=list.slice().sort(function(a,b){ return _ts(b.created_at)-_ts(a.created_at); });
     var body=document.getElementById('immobilienBody'); if(!body) return;
     var cnt=document.getElementById('immobilienCount'); if(cnt) cnt.textContent=list.length+' '+(es?(list.length===1?'inmueble':'inmuebles'):(list.length===1?'Objekt':'Objekte'));
-    if(!list.length){ body.innerHTML='<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></div><div class="empty-title">'+(es?'Aún no hay inmuebles':'Noch keine Immobilien')+'</div><div class="empty-sub">'+(es?'Sé el primero en publicar uno':'Sei der Erste und inseriere eines')+'</div></div>'; return; }
+    if(!list.length){ body.innerHTML='<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></div><div class="empty-title">'+(es?'Aún no hay inmuebles':'Noch keine Immobilien')+'</div><div class="empty-sub">'+(es?'Sé el primero en publicar uno':'Sei der Erste und inseriere eine')+'</div></div>'; return; }
     body.innerHTML=list.map(renderImmoCard).join('');
   }
 
