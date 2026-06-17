@@ -2664,9 +2664,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function setMapMode(mode){
     mapMode = mode;
     var isR = (mode === 'radar');
-    var bM = document.getElementById('mapModeMap'), bR = document.getElementById('mapModeRadar');
-    if (bM) bM.classList.toggle('active', !isR);
-    if (bR) bR.classList.toggle('active', isR);
+    var fab = document.getElementById('radarFab'); if (fab) fab.style.display = isR ? 'none' : 'flex';
     var rv = document.getElementById('radarView'); if (rv) rv.style.display = isR ? 'flex' : 'none';
     var lm = document.getElementById('leafletMap'); if (lm) lm.style.visibility = isR ? 'hidden' : 'visible';
     var ml = document.getElementById('mapList'); if (ml) ml.style.display = isR ? 'none' : '';
@@ -2740,7 +2738,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       return '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="3.6" fill="'+col+'" stroke="#fff" stroke-width="1" style="cursor:pointer" onclick="showDetail(\''+x.l.id+'\')"><title>'+nm+' · '+_fmtDist(x.km)+'</title></circle>';
     }).join('');
     return '<div class="radar-stage"><svg viewBox="0 0 200 200" aria-hidden="true">'
-      + '<defs><radialGradient id="rgSweep"><stop offset="0%" stop-color="#0D9488" stop-opacity="0.45"/><stop offset="100%" stop-color="#0D9488" stop-opacity="0"/></radialGradient></defs>'
+      + '<defs><radialGradient id="rgSweep"><stop offset="0%" stop-color="#F5A623" stop-opacity="0.5"/><stop offset="100%" stop-color="#F5A623" stop-opacity="0"/></radialGradient></defs>'
       + '<circle cx="100" cy="100" r="88" fill="none" stroke="var(--border)" stroke-width="1"/>'
       + '<circle cx="100" cy="100" r="59" fill="none" stroke="var(--border)" stroke-width="1"/>'
       + '<circle cx="100" cy="100" r="30" fill="none" stroke="var(--border)" stroke-width="1"/>'
@@ -2748,7 +2746,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       + '<line x1="12" y1="100" x2="188" y2="100" stroke="var(--border)" stroke-width="0.7"/>'
       + '<g class="radar-sweep"><path d="M100 100 L100 12 A88 88 0 0 1 162.2 37.8 Z" fill="url(#rgSweep)"/></g>'
       + dots
-      + '<circle cx="100" cy="100" r="4.5" fill="#0D9488" stroke="#fff" stroke-width="1.5"/>'
+      + '<circle cx="100" cy="100" r="4.5" fill="#F5A623" stroke="#fff" stroke-width="1.5"/>'
       + '</svg><div class="radar-stage-cap">'+(es?'Tú':'Du')+' · '+_radarRadiusKm+' km</div></div>';
   }
   function renderRadar(){
