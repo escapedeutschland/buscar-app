@@ -2654,7 +2654,91 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     chip.classList.add('active');
     mapCategory = chip.dataset.cat;
     renderMap();
+    if (mapMode === 'radar') renderRadar();
   });
+
+  // ══ RADAR / UMKREIS ════════════════════════════════════════════════════════
+  var mapMode = 'map';
+  var _radarLat = null, _radarLng = null, _radarRadiusKm = 5;
+  var RADAR_RADII = [1, 2, 5, 10, 25];
+  function setMapMode(mode){
+    mapMode = mode;
+    var isR = (mode === 'radar');
+    var bM = document.getElementById('mapModeMap'), bR = document.getElementById('mapModeRadar');
+    if (bM) bM.classList.toggle('active', !isR);
+    if (bR) bR.classList.toggle('active', isR);
+    var rv = document.getElementById('radarView'); if (rv) rv.style.display = isR ? 'flex' : 'none';
+    var lm = document.getElementById('leafletMap'); if (lm) lm.style.visibility = isR ? 'hidden' : 'visible';
+    var ml = document.getElementById('mapList'); if (ml) ml.style.display = isR ? 'none' : '';
+    var nc = document.getElementById('mapNoCoords'); if (nc && isR) nc.style.display = 'none';
+    if (isR) {
+      var lbl = document.getElementById('radarRefreshLabel'); if (lbl) lbl.textContent = (currentLang==='es'?'Actualizar':'Aktualisieren');
+      if (_radarLat == null) refreshRadarLocation(); else renderRadar();
+    } else if (maplibreMap) { try { setTimeout(function(){ maplibreMap.resize(); }, 60); } catch(e){} }
+  }
+  function _haversineKm(la1, ln1, la2, ln2){
+    var R = 6371, p = Math.PI/180;
+    var dLa = (la2-la1)*p, dLn = (ln2-ln1)*p;
+    var a = Math.sin(dLa/2)*Math.sin(dLa/2) + Math.cos(la1*p)*Math.cos(la2*p)*Math.sin(dLn/2)*Math.sin(dLn/2);
+    return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+  function _fmtDist(km){
+    if (km < 1) return Math.round(km*1000) + ' m';
+    if (km < 10) return km.toFixed(1).replace('.', ',') + ' km';
+    return Math.round(km) + ' km';
+  }
+  function refreshRadarLocation(){
+    var status = document.getElementById('radarStatus');
+    var es = (currentLang === 'es');
+    if (!navigator.geolocation){ if (status) status.textContent = es?'GPS no disponible':'GPS nicht verfügbar'; return; }
+    if (status) status.textContent = es?'Obteniendo ubicación…':'Standort wird ermittelt…';
+    navigator.geolocation.getCurrentPosition(function(pos){
+      _radarLat = pos.coords.latitude; _radarLng = pos.coords.longitude; renderRadar();
+    }, function(){ if (status) status.textContent = es?'No se pudo obtener la ubicación':'Standort konnte nicht ermittelt werden'; }, { enableHighAccuracy:true, timeout:10000, maximumAge:60000 });
+  }
+  function setRadarRadius(km){ _radarRadiusKm = km; renderRadar(); }
+  function _renderRadarRadiusChips(){
+    var el = document.getElementById('radarRadiusChips'); if (!el) return;
+    el.innerHTML = RADAR_RADII.map(function(km){
+      return '<div class="radar-rchip'+(_radarRadiusKm===km?' active':'')+'" onclick="setRadarRadius('+km+')">'+km+' km</div>';
+    }).join('');
+  }
+  function _radarCandidates(){
+    if (_radarLat == null) return [];
+    var cat = mapCategory;
+    var arr = (typeof allListings!=='undefined'?allListings:[]).filter(function(l){
+      return l.verified && l.lat != null && l.lng != null && (cat === 'Alle' || l.category_id === cat);
+    }).map(function(l){ return { l:l, km:_haversineKm(_radarLat, _radarLng, l.lat, l.lng) }; })
+      .filter(function(x){ return x.km <= _radarRadiusKm; });
+    arr.sort(function(a,b){ return a.km - b.km; });
+    return arr;
+  }
+  function _radarRowHTML(l, km){
+    var col = catColors[l.category_id] || catColors.default;
+    var sub = (catLabels[l.category_id] || catLabels.default) + (l.city ? ' · ' + l.city : '');
+    return '<div class="radar-row" onclick="showDetail(\''+l.id+'\')">'
+      + '<div class="radar-row-dot" style="background:'+col+'"></div>'
+      + '<div class="radar-row-main"><div class="radar-row-name">'+(l.name||'')+'</div><div class="radar-row-sub">'+sub+'</div></div>'
+      + '<div class="radar-row-dist">'+_fmtDist(km)+'</div></div>';
+  }
+  function renderRadar(){
+    _renderRadarRadiusChips();
+    var list = document.getElementById('radarList'); if (!list) return;
+    var status = document.getElementById('radarStatus');
+    var es = (currentLang === 'es');
+    if (_radarLat == null){
+      list.innerHTML = '';
+      if (status) status.textContent = es?'Activa el GPS para ver lo cercano':'Standort aktivieren, um die Umgebung zu sehen';
+      return;
+    }
+    var cand = _radarCandidates();
+    if (status) status.textContent = cand.length + ' ' + (es ? ('en '+_radarRadiusKm+' km') : ('im Umkreis von '+_radarRadiusKm+' km'));
+    if (!cand.length){
+      list.innerHTML = '<div class="empty-state" style="padding:34px 16px"><div class="empty-title">'+(es?'Nada cerca':'Nichts in der Nähe')+'</div><div class="empty-sub">'+(es?'Aumenta el radio o cambia el filtro':'Vergrößere den Radius oder ändere den Filter')+'</div></div>';
+      return;
+    }
+    list.innerHTML = cand.slice(0, 60).map(function(x){ return _radarRowHTML(x.l, x.km); }).join('');
+  }
 
   function hasEmoji(str) { return /\p{Emoji}/u.test(str); }
   function isValidPhone(str) { return !str || /^[0-9+\s\-().]+$/.test(str); }
