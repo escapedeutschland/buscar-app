@@ -1972,7 +1972,6 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       : {wohnung:'Wohnung', haus:'Haus', grundstueck:'Grundstück', land:'Land / Finca', gewerbe:'Gewerbe'};
     var curMap = {USD:'USD', PYG:'₲', EUR:'€'};
     var locale = es ? 'es-PY' : 'de-DE';
-    function row(label, val){ return val ? '<div style="display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13.5px"><span style="color:var(--text-3)">'+label+'</span><span style="font-weight:600;color:var(--text-1);text-align:right">'+val+'</span></div>' : ''; }
     var priceStr = '';
     if (l.re_price != null) {
       var cur = curMap[l.re_currency] || (l.re_currency || '');
@@ -1980,14 +1979,22 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       priceStr = cur + ' ' + Number(l.re_price).toLocaleString(locale) + per;
     }
     var areaStr = (l.re_area != null) ? (Number(l.re_area).toLocaleString(locale) + ' ' + (l.re_area_unit === 'ha' ? 'ha' : 'm²')) : '';
-    var head = priceStr ? '<div style="font-family:\'Fraunces\',serif;font-weight:700;font-size:24px;color:#0D9488;margin-bottom:10px">' + priceStr + '</div>' : '';
-    var rows = '';
-    rows += row(es ? 'Operación' : 'Angebot', dealMap[l.re_deal] || '');
-    rows += row(es ? 'Tipo' : 'Typ', typeMap[l.re_type] || '');
-    rows += row(es ? 'Superficie' : 'Fläche', areaStr);
-    rows += row(es ? 'Habitaciones' : 'Zimmer', (l.re_rooms != null ? String(l.re_rooms) : ''));
+    var dealLabel = dealMap[l.re_deal] || '';
+    var head = '';
+    if (priceStr || dealLabel) {
+      head = '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:2px">'
+        + (priceStr ? '<span style="font-family:\'Fraunces\',serif;font-weight:700;font-size:26px;color:#0D9488;line-height:1.15;word-break:break-word">' + priceStr + '</span>' : '')
+        + (dealLabel ? '<span style="background:#CCFBF1;color:#0F766E;font-size:11px;font-weight:700;padding:3px 11px;border-radius:999px;text-transform:uppercase;letter-spacing:.5px">' + dealLabel + '</span>' : '')
+        + '</div>';
+    }
+    function tile(label, val){ return val ? '<div style="background:var(--bg);border-radius:12px;padding:10px 12px"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">' + label + '</div><div style="font-size:14.5px;font-weight:700;color:var(--text-1);word-break:break-word">' + val + '</div></div>' : ''; }
+    var tiles = '';
+    tiles += tile(es ? 'Tipo' : 'Typ', typeMap[l.re_type] || '');
+    tiles += tile(es ? 'Superficie' : 'Fläche', areaStr);
+    tiles += tile(es ? 'Habitaciones' : 'Zimmer', (l.re_rooms != null ? String(l.re_rooms) : ''));
+    var grid = tiles ? '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">' + tiles + '</div>' : '';
     var title = es ? 'Detalles del inmueble' : 'Immobilien-Details';
-    return '<div class="detail-section-title">' + title + '</div>' + head + rows;
+    return '<div class="detail-section-title">' + title + '</div><div style="padding:0 16px 16px">' + head + grid + '</div>';
   }
 
   function showDetail(id) {
