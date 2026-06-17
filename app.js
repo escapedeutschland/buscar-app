@@ -2011,6 +2011,48 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if(l.re_rooms!=null) parts.push(l.re_rooms+' '+(es?'hab.':'Zi.'));
     return parts.join(' · ');
   }
+  // ── Phase 3: Featured / Verifizierter Makler (monetarisierungs-fertig) ──────
+  function _reDateActive(v){
+    if(!v) return false;
+    var d = v.toDate ? v.toDate() : new Date(typeof v.seconds==='number' ? v.seconds*1000 : v);
+    return !isNaN(d.getTime()) && d.getTime() >= Date.now();
+  }
+  function isFeatured(l){ return !!(l && l.re_featured) && _reDateActive(l.featured_until); }
+  function isMaklerVerified(l){
+    if(!l || !l.makler_verified) return false;
+    return l.makler_verified_until ? _reDateActive(l.makler_verified_until) : true;
+  }
+  function immoBadgesHTML(l){
+    var es=(currentLang==='es'); var h='';
+    if(isFeatured(l)) h+='<span class="immo-badge immo-badge-featured">★ '+(es?'Destacado':'Empfohlen')+'</span>';
+    if(isMaklerVerified(l)) h+='<span class="immo-badge immo-badge-verified">✓ '+(es?'Verificado':'Verifiziert')+'</span>';
+    return h ? '<div class="immo-badges">'+h+'</div>' : '';
+  }
+  function _dateInputVal(v){
+    if(!v) return '';
+    var d = v.toDate ? v.toDate() : new Date(typeof v.seconds==='number' ? v.seconds*1000 : v);
+    if(isNaN(d.getTime())) return '';
+    var m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+    return d.getFullYear()+'-'+m+'-'+day;
+  }
+  function _parseAdmDate(val){ if(!val) return null; var d=new Date(val+'T23:59:59'); return isNaN(d.getTime())?null:d; }
+  async function saveImmoAdmin(id){
+    if(!currentUser || currentUser.email!==ADMIN_EMAIL) return;
+    var es=(currentLang==='es');
+    var feat=document.getElementById('admFeatured').checked;
+    var ver=document.getElementById('admVerified').checked;
+    var fU=_parseAdmDate(document.getElementById('admFeaturedUntil').value);
+    var vU=_parseAdmDate(document.getElementById('admVerifiedUntil').value);
+    if(feat && !fU){ fU=new Date(Date.now()+30*86400000); }
+    var upd={ re_featured:!!feat, featured_until: feat?fU:null, makler_verified:!!ver, makler_verified_until: ver?(vU||null):null };
+    var btn=document.getElementById('admSaveBtn'); if(btn){ btn.disabled=true; btn.textContent='…'; }
+    try{
+      await db.collection('listings').doc(id).update(upd);
+      var l=allListings.find(function(x){return x.id===id;}); if(l) Object.assign(l, upd);
+      showToast('✅ '+(es?'Guardado':'Gespeichert'));
+      showDetail(id);
+    }catch(e){ if(btn){ btn.disabled=false; btn.textContent=(es?'Guardar':'Speichern'); } alert('Fehler: '+(e.message||e)); }
+  }
   function renderImmoCard(l){
     var es=(currentLang==='es');
     var dealMap=es?{kauf:'Venta',miete:'Alquiler'}:{kauf:'Kauf',miete:'Miete'};
@@ -2020,8 +2062,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var price = immoPriceStr(l);
     var dealBadge = (l.re_deal && dealMap[l.re_deal]) ? '<span class="immo-deal-badge">'+dealMap[l.re_deal]+'</span>' : '';
     var meta = immoMetaStr(l);
-    return '<div class="immo-card" onclick="showDetail(\''+l.id+'\')">'+media
-      +'<div class="immo-card-body">'+dealBadge
+    return '<div class="immo-card'+(isFeatured(l)?' immo-card-featured':'')+'" onclick="showDetail(\''+l.id+'\')">'+media
+      +'<div class="immo-card-body">'+immoBadgesHTML(l)+dealBadge
       +(price?'<div class="immo-card-price">'+price+'</div>':'')
       +'<div class="immo-card-name">'+(l.name||'')+'</div>'
       +(meta?'<div class="immo-card-meta">'+meta+'</div>':'')
@@ -2067,7 +2109,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     function _ts(x){ if(!x) return 0; if(typeof x.seconds==='number') return x.seconds; if(typeof x.toMillis==='function') return x.toMillis()/1000; var d=new Date(x); return isNaN(d.getTime())?0:d.getTime()/1000; }
     var all=(typeof allListings!=='undefined'?allListings:[]).filter(function(l){ return l.category_id==='kat-immobilien' && l.verified; });
     var list=all.filter(function(l){ return (immoDeal==='Alle'||l.re_deal===immoDeal) && (immoType==='Alle'||l.re_type===immoType); });
-    list=list.slice().sort(function(a,b){ return _ts(b.created_at)-_ts(a.created_at); });
+    list=list.slice().sort(function(a,b){ var fa=isFeatured(a)?1:0, fb=isFeatured(b)?1:0; if(fb!==fa) return fb-fa; return _ts(b.created_at)-_ts(a.created_at); });
     var body=document.getElementById('immobilienBody'); if(!body) return;
     var cnt=document.getElementById('immobilienCount'); if(cnt) cnt.textContent=list.length+' '+(es?(list.length===1?'inmueble':'inmuebles'):(list.length===1?'Objekt':'Objekte'));
     if(!list.length){
@@ -2125,8 +2167,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const badges = document.getElementById('detailBadges');
     const openStatus = isOpen(l.opening_hours);
     const openBadge = openStatus===true ? '<span class="detail-badge open-status">'+t('open_now')+'</span>' : openStatus===false ? '<span class="detail-badge closed-status">'+t('closed_now')+'</span>' : '';
-    document.getElementById('detailBadgeRow').innerHTML = (l.verified?'<span class="detail-badge green">'+t('verified')+'</span>':'') + (isNew(l.created_at)?'<span class="detail-badge blue">'+t('badge_new')+'</span>':'') + openBadge;
-    badges.style.display = (l.verified || isNew(l.created_at) || openStatus!==null) ? 'block' : 'none';
+    var _esb=(currentLang==='es');
+    var featBadge = isFeatured(l) ? '<span class="detail-badge featured">★ '+(_esb?'Destacado':'Empfohlen')+'</span>' : '';
+    var maklerBadge = isMaklerVerified(l) ? '<span class="detail-badge makler">✓ '+(_esb?'Agente verificado':'Verifizierter Makler')+'</span>' : '';
+    document.getElementById('detailBadgeRow').innerHTML = featBadge + maklerBadge + (l.verified?'<span class="detail-badge green">'+t('verified')+'</span>':'') + (isNew(l.created_at)?'<span class="detail-badge blue">'+t('badge_new')+'</span>':'') + openBadge;
+    badges.style.display = (featBadge || maklerBadge || l.verified || isNew(l.created_at) || openStatus!==null) ? 'block' : 'none';
     let infoHTML = '';
     if (l.phone) infoHTML += `<a class="detail-row" href="tel:${l.phone}"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Telefon</div><div class="detail-row-value">${l.phone}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
     if (l.website) infoHTML += `<a class="detail-row" href="https://${l.website}" target="_blank"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Website</div><div class="detail-row-value">${l.website}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
@@ -2246,6 +2291,22 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           + '</div>';
         _cre.style.display = 'block';
       } else { _cre.style.display = 'none'; _cre.innerHTML = ''; }
+    }
+    // Admin: Featured / Verifizierter Makler steuern (nur Immobilien)
+    var _adm = document.getElementById('detailImmoAdmin');
+    if (_adm) {
+      if (_isImmo && currentUser && currentUser.email === ADMIN_EMAIL) {
+        var _esa = (currentLang === 'es');
+        _adm.innerHTML = '<div class="detail-card" style="padding:14px">'
+          + '<div class="detail-section-title" style="padding:0 0 10px">&#128295; ' + (_esa ? 'Admin · Visibilidad' : 'Admin · Sichtbarkeit') + '</div>'
+          + '<label class="adm-imo-row"><input type="checkbox" id="admFeatured"' + (l.re_featured ? ' checked' : '') + '> ' + (_esa ? 'Destacado (Empfohlen)' : 'Empfohlen (Featured)') + '</label>'
+          + '<div class="adm-imo-field"><span>' + (_esa ? 'Válido hasta' : 'Gültig bis') + '</span><input type="date" id="admFeaturedUntil" value="' + _dateInputVal(l.featured_until) + '"></div>'
+          + '<label class="adm-imo-row"><input type="checkbox" id="admVerified"' + (l.makler_verified ? ' checked' : '') + '> ' + (_esa ? 'Agente verificado' : 'Verifizierter Makler') + '</label>'
+          + '<div class="adm-imo-field"><span>' + (_esa ? 'Hasta (opcional)' : 'Bis (optional)') + '</span><input type="date" id="admVerifiedUntil" value="' + _dateInputVal(l.makler_verified_until) + '"></div>'
+          + '<button id="admSaveBtn" class="adm-imo-save" onclick="saveImmoAdmin(\'' + l.id + '\')">' + (_esa ? 'Guardar' : 'Speichern') + '</button>'
+          + '</div>';
+        _adm.style.display = 'block';
+      } else { _adm.style.display = 'none'; _adm.innerHTML = ''; }
     }
     if (!_isImmo) { loadReviews(id); loadComments(id); }
     loadPhotos(id);

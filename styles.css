@@ -595,3 +595,18 @@
 /* Map no-coords notice: fade out after auto-dismiss */
 .map-no-coords { transition: opacity 0.45s ease, transform 0.45s ease; }
 .map-no-coords.fade-out { opacity: 0; transform: translateY(8px); pointer-events: none; }
+
+/* Phase 3: Immobilien Featured / Verifizierter Makler */
+.immo-badges { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:7px; }
+.immo-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:20px; font-size:10.5px; font-weight:700; letter-spacing:.2px; }
+.immo-badge-featured { background:#FEF3C7; color:#B45309; }
+.immo-badge-verified { background:#CCFBF1; color:#0F766E; }
+.immo-card-featured { box-shadow:0 0 0 2px #F5C24E, 0 4px 14px rgba(0,0,0,.07); }
+.detail-badge.featured { background:#FEF3C7; color:#B45309; }
+.detail-badge.makler { background:#CCFBF1; color:#0F766E; }
+.adm-imo-row { display:flex; align-items:center; gap:9px; font-size:13.5px; font-weight:600; color:var(--text-1); padding:7px 0; cursor:pointer; }
+.adm-imo-row input { width:18px; height:18px; accent-color:#0D9488; flex-shrink:0; }
+.adm-imo-field { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:2px 0 9px 27px; font-size:12.5px; color:var(--text-3); }
+.adm-imo-field input { border:1.5px solid var(--border); border-radius:9px; padding:7px 10px; font-family:inherit; font-size:13px; color:var(--text-1); background:var(--card); }
+.adm-imo-save { width:100%; margin-top:8px; background:#0D9488; color:#fff; border:none; border-radius:12px; padding:12px; font-family:'DM Sans',sans-serif; font-weight:700; font-size:14px; cursor:pointer; }
+.adm-imo-save:disabled { opacity:.6; }
