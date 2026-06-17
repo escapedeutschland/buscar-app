@@ -3783,6 +3783,65 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
   }
 
+  // ── Standort im Bearbeiten-Screen (inline Mini-Karte) ──────────────────────
+  var _editLocMap = null, _editLocMarker = null;
+  function initEditLocationMap(lat, lng) {
+    var es = (currentLang === 'es');
+    var hasLoc = (typeof lat === 'number' && !isNaN(lat) && typeof lng === 'number' && !isNaN(lng));
+    window._editLat = hasLoc ? lat : null;
+    window._editLng = hasLoc ? lng : null;
+    var clat = hasLoc ? lat : -25.2867, clng = hasLoc ? lng : -57.6470;
+    var status = document.getElementById('editLocationStatus');
+    if (status) status.textContent = hasLoc
+      ? ((es ? 'Ubicación: ' : 'Standort: ') + clat.toFixed(5) + ', ' + clng.toFixed(5))
+      : (es ? 'Aún sin ubicación – toca el mapa.' : 'Noch kein Standort gesetzt – tippe auf die Karte.');
+    var setStatus = function(la, ln) {
+      var s = document.getElementById('editLocationStatus');
+      if (s) s.textContent = (es ? 'Ubicación: ' : 'Standort: ') + la.toFixed(5) + ', ' + ln.toFixed(5);
+    };
+    setTimeout(function() {
+      try {
+        if (!_editLocMap) {
+          _editLocMap = new maplibregl.Map({ container:'editLocationMap', style: ML_STYLE, center:[clng, clat], zoom: hasLoc?15:5.5, interactive:true, dragRotate:false, attributionControl:false });
+          _editLocMap.dragRotate.disable();
+          _editLocMap.touchZoomRotate.disableRotation();
+          _editLocMarker = new maplibregl.Marker({ color:'#0D9488', draggable:true }).setLngLat([clng, clat]).addTo(_editLocMap);
+          _editLocMarker.on('dragend', function() {
+            var p = _editLocMarker.getLngLat();
+            window._editLat = p.lat; window._editLng = p.lng; setStatus(p.lat, p.lng);
+          });
+          _editLocMap.on('click', function(e) {
+            window._editLat = e.lngLat.lat; window._editLng = e.lngLat.lng;
+            _editLocMarker.setLngLat([e.lngLat.lng, e.lngLat.lat]); setStatus(e.lngLat.lat, e.lngLat.lng);
+          });
+        } else {
+          _editLocMap.resize();
+          _editLocMap.setCenter([clng, clat]);
+          _editLocMap.setZoom(hasLoc?15:5.5);
+          _editLocMarker.setLngLat([clng, clat]);
+        }
+        setTimeout(function(){ if (_editLocMap) _editLocMap.resize(); }, 120);
+      } catch(e) { console.error('Edit-Standortkarte Fehler', e); }
+    }, 150);
+  }
+  function useMyLocationEdit() {
+    var es = (currentLang === 'es');
+    if (!navigator.geolocation) return;
+    var btn = document.getElementById('editLocationBtn');
+    var orig = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.textContent = es ? 'Obteniendo ubicación…' : 'Standort wird ermittelt…'; }
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      var la = pos.coords.latitude, ln = pos.coords.longitude;
+      window._editLat = la; window._editLng = ln;
+      if (_editLocMap && _editLocMarker) { _editLocMap.flyTo({ center:[ln, la], zoom:15 }); _editLocMarker.setLngLat([ln, la]); }
+      var s = document.getElementById('editLocationStatus'); if (s) s.textContent = (es ? 'Ubicación: ' : 'Standort: ') + la.toFixed(5) + ', ' + ln.toFixed(5);
+      if (btn) { btn.disabled = false; btn.innerHTML = orig; }
+    }, function() {
+      if (btn) { btn.disabled = false; btn.innerHTML = orig; }
+      var s = document.getElementById('editLocationStatus'); if (s) s.textContent = es ? 'No se pudo obtener la ubicación.' : 'Standort konnte nicht ermittelt werden.';
+    });
+  }
+
   function openEditListing(id) {
     const l = allListings.find(x => x.id === id);
     if (!l) return;
@@ -3811,6 +3870,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       } else { _ef.style.display = 'none'; }
     }
     showScreen('screenEditListing');
+    initEditLocationMap(l.lat, l.lng);
   }
 
   async function saveListingEdits() {
@@ -3835,6 +3895,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         re_rooms: _en('editReRooms')
       };
     }
+    var locUpdate = {};
+    if (typeof window._editLat === 'number' && !isNaN(window._editLat) && typeof window._editLng === 'number' && !isNaN(window._editLng)) {
+      locUpdate = { lat: window._editLat, lng: window._editLng };
+    }
     try {
       await db.collection('listings').doc(currentEditListingId).update({
         name, city, description: desc,
@@ -3842,8 +3906,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         website: document.getElementById('editWebsite').value.trim() || null,
         address: document.getElementById('editAddress').value.trim() || null,
         opening_hours: document.getElementById('editHours').value.trim() || null,
-        updated_at: new Date(), ...reEdit
+        updated_at: new Date(), ...reEdit, ...locUpdate
       });
+      if (_el && locUpdate.lat != null) { _el.lat = locUpdate.lat; _el.lng = locUpdate.lng; }
       document.getElementById('editListingSuccess').style.display = 'block';
       await loadListings();
       setTimeout(() => showDetail(currentEditListingId), 1500);
