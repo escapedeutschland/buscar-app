@@ -3221,6 +3221,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       const snap = await db.collection('listings').where('verified','==',true).get();
       const all = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      const countBanner = '<div style="margin:10px 12px;padding:12px;background:#0D9488;border-radius:10px;font-size:13.5px;color:#fff;text-align:center;font-weight:700">📊 '+all.length+' verifizierte Einträge in der Datenbank</div>';
       const groups = {};
       all.forEach(function(l){
         if (!(l.name||'').trim()) return;
@@ -3229,8 +3230,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         (groups[k] = groups[k] || []).push(l);
       });
       const dupGroups = Object.keys(groups).map(function(k){ return groups[k]; }).filter(function(g){ return g.length > 1; });
-      if (!dupGroups.length){ body.innerHTML = '<div class="admin-empty"><div class="admin-empty-icon">&#10003;</div><div class="admin-empty-text">Keine Duplikate</div><div class="admin-empty-sub">Alle Einträge sind eindeutig.</div></div>'; return; }
-      body.innerHTML = '<div style="margin:10px 12px;padding:10px 12px;background:rgba(255,255,255,0.12);border-radius:10px;font-size:11.5px;color:#fff;line-height:1.5">⚠️ Es werden nur Eintr&auml;ge mit <b>identischem Namen an exakt gleicher Position</b> angezeigt (echte Doppel). Pr&uuml;fe Telefon/Stadt, bevor du l&ouml;schst.</div>' +
+      if (!dupGroups.length){ body.innerHTML = countBanner + '<div class="admin-empty"><div class="admin-empty-icon">&#10003;</div><div class="admin-empty-text">Keine Duplikate</div><div class="admin-empty-sub">Alle Einträge sind eindeutig.</div></div>'; return; }
+      body.innerHTML = countBanner +
+        '<div style="margin:10px 12px;padding:10px 12px;background:rgba(255,255,255,0.12);border-radius:10px;font-size:11.5px;color:#fff;line-height:1.5">⚠️ Es werden nur Eintr&auml;ge mit <b>identischem Namen an exakt gleicher Position</b> angezeigt (echte Doppel). Pr&uuml;fe Telefon/Stadt, bevor du l&ouml;schst.</div>' +
         '<div style="padding:0 0 4px;font-size:12px;color:rgba(255,255,255,0.6);text-align:center">'+dupGroups.length+' Duplikat-Gruppe(n)</div>' +
         dupGroups.map(function(g){
           const sorted = g.slice().sort(function(a,b){ return _adminTs(a.created_at) - _adminTs(b.created_at); });
