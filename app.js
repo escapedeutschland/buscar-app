@@ -2780,8 +2780,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var C = 100, MAX = 88;
     var grid = '';
     for (var gi = 20; gi <= 180; gi += 20){
-      grid += '<line x1="'+gi+'" y1="12" x2="'+gi+'" y2="188"/><line x1="12" y1="'+gi+'" x2="188" y2="'+gi+'"/>';
+      grid += '<line x1="'+gi+'" y1="12" x2="'+gi+'" y2="188" vector-effect="non-scaling-stroke"/><line x1="12" y1="'+gi+'" x2="188" y2="'+gi+'" vector-effect="non-scaling-stroke"/>';
     }
+    // Marker werden um den eigenen Ursprung (0,0) gezeichnet und per äußerem translate platziert;
+    // der innere .radar-marker-inner bekommt scale(1/zoom) -> beim Zoom spreizen sich die Positionen,
+    // die Pins selbst bleiben aber gleich groß (Entzerren statt Vergrößern).
     var dots = cand.slice(0, 36).map(function(x){
       var tlat, tlng, id, kind;
       if (x.ev){ tlat=x.e.lat; tlng=x.e.lng; id=x.e.id; kind='ev'; }
@@ -2791,19 +2794,20 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var rad = br*Math.PI/180;
       var px = +(C + rr*Math.sin(rad)).toFixed(1), py = +(C - rr*Math.cos(rad)).toFixed(1);
       var pick = 'radarPick(event,\''+kind+'\',\''+id+'\','+px+','+py+')';
+      var geo, ttl;
       if (x.ev){
         var emoji = (typeof EVENT_TYPE_EMOJIS!=='undefined' && EVENT_TYPE_EMOJIS[x.e.type]) ? EVENT_TYPE_EMOJIS[x.e.type] : '🎪';
-        var nmE = (x.e.title||'').replace(/[<>"]/g,'');
-        return '<g style="cursor:pointer" onclick="'+pick+'"><title>'+nmE+' · '+_fmtDist(x.km)+'</title>'
-          + '<circle cx="'+px+'" cy="'+py+'" r="8" fill="#fff" stroke="'+RADAR_EVENT_COLOR+'" stroke-width="1.6"/>'
-          + '<text x="'+px+'" y="'+(py+0.4)+'" font-size="9" text-anchor="middle" dominant-baseline="central">'+emoji+'</text></g>';
+        ttl = (x.e.title||'').replace(/[<>"]/g,'') + ' · ' + _fmtDist(x.km);
+        geo = '<circle cx="0" cy="0" r="8" fill="#fff" stroke="'+RADAR_EVENT_COLOR+'" stroke-width="1.6"/>'
+            + '<text x="0" y="0.4" font-size="9" text-anchor="middle" dominant-baseline="central">'+emoji+'</text>';
+      } else {
+        var col = catColors[x.l.category_id] || catColors.default;
+        var em = catEmojis[x.l.category_id] || '📍';
+        ttl = (x.l.name||'').replace(/[<>"]/g,'') + ' · ' + _fmtDist(x.km);
+        geo = '<path d="M0 0 L-5 -8 A6 6 0 1 1 5 -8 Z" fill="'+col+'" stroke="#fff" stroke-width="1"/>'
+            + '<text x="0" y="-11" font-size="7" text-anchor="middle" dominant-baseline="central">'+em+'</text>';
       }
-      var col = catColors[x.l.category_id] || catColors.default;
-      var em = catEmojis[x.l.category_id] || '📍';
-      var nmL = (x.l.name||'').replace(/[<>"]/g,'');
-      return '<g style="cursor:pointer" onclick="'+pick+'"><title>'+nmL+' · '+_fmtDist(x.km)+'</title>'
-        + '<path d="M'+px+' '+py+' L'+(px-5)+' '+(py-8)+' A6 6 0 1 1 '+(px+5)+' '+(py-8)+' Z" fill="'+col+'" stroke="#fff" stroke-width="1"/>'
-        + '<text x="'+px+'" y="'+(py-11)+'" font-size="7" text-anchor="middle" dominant-baseline="central">'+em+'</text></g>';
+      return '<g transform="translate('+px+' '+py+')"><g class="radar-marker-inner" style="cursor:pointer" onclick="'+pick+'"><title>'+ttl+'</title>'+geo+'</g></g>';
     }).join('');
     return '<div class="radar-stage" onclick="radarClosePopup()"><svg viewBox="0 0 200 200" aria-hidden="true">'
       + '<defs>'
@@ -2813,15 +2817,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       + '<g clip-path="url(#radarClip)"><g id="radarZoomLayer">'
       +   '<circle cx="100" cy="100" r="88" fill="#F1F4F6"/>'
       +   '<g stroke="var(--border)" stroke-width="0.5" opacity="0.7">'+grid+'</g>'
-      +   '<circle cx="100" cy="100" r="88" fill="none" stroke="var(--border)" stroke-width="1"/>'
-      +   '<circle cx="100" cy="100" r="59" fill="none" stroke="var(--border)" stroke-width="1"/>'
-      +   '<circle cx="100" cy="100" r="30" fill="none" stroke="var(--border)" stroke-width="1"/>'
-      +   '<line x1="100" y1="12" x2="100" y2="188" stroke="var(--border)" stroke-width="0.8"/>'
-      +   '<line x1="12" y1="100" x2="188" y2="100" stroke="var(--border)" stroke-width="0.8"/>'
+      +   '<circle cx="100" cy="100" r="88" fill="none" stroke="var(--border)" stroke-width="1" vector-effect="non-scaling-stroke"/>'
+      +   '<circle cx="100" cy="100" r="59" fill="none" stroke="var(--border)" stroke-width="1" vector-effect="non-scaling-stroke"/>'
+      +   '<circle cx="100" cy="100" r="30" fill="none" stroke="var(--border)" stroke-width="1" vector-effect="non-scaling-stroke"/>'
+      +   '<line x1="100" y1="12" x2="100" y2="188" stroke="var(--border)" stroke-width="0.8" vector-effect="non-scaling-stroke"/>'
+      +   '<line x1="12" y1="100" x2="188" y2="100" stroke="var(--border)" stroke-width="0.8" vector-effect="non-scaling-stroke"/>'
       +   '<g class="radar-sweep"><path d="M100 100 L100 12 A88 88 0 0 1 162.2 37.8 Z" fill="url(#rgSweep)"/></g>'
       +   dots
-      +   '<circle cx="100" cy="100" r="12" fill="#007AFF" opacity="0.16"/>'
-      +   '<circle cx="100" cy="100" r="5" fill="#007AFF" stroke="#fff" stroke-width="2"/>'
+      +   '<g transform="translate(100 100)"><g class="radar-marker-inner"><circle cx="0" cy="0" r="12" fill="#007AFF" opacity="0.16"/><circle cx="0" cy="0" r="5" fill="#007AFF" stroke="#fff" stroke-width="2"/></g></g>'
       + '</g></g>'
       + '<text x="100" y="9" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">N</text>'
       + '<text x="194" y="103" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">'+(es?'E':'O')+'</text>'
@@ -2829,7 +2832,6 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       + '<text x="6" y="103" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">'+(es?'O':'W')+'</text>'
       + '</svg>'
       + '<div id="radarPopup" class="radar-popup" style="display:none" onclick="event.stopPropagation();radarGoDetail()"></div>'
-      + '<div class="radar-zoom-ctrl"><button onclick="event.stopPropagation();radarZoomIn()">+</button><button onclick="event.stopPropagation();radarZoomOut()">&#8722;</button></div>'
       + '<button id="radarZoomReset" class="radar-zoom-reset" style="display:none" onclick="event.stopPropagation();radarZoomReset()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>'
       + '<div class="radar-stage-cap">'+(es?'Tú':'Du')+' · '+_radarRadiusKm+' km</div></div>';
   }
@@ -2876,7 +2878,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
   function _radarApplyZoom(){
     var g = document.getElementById('radarZoomLayer');
-    if (g) g.setAttribute('transform', 'translate('+_radarPanX.toFixed(2)+' '+_radarPanY.toFixed(2)+') scale('+_radarZoom.toFixed(3)+')');
+    if (g){
+      g.setAttribute('transform', 'translate('+_radarPanX.toFixed(2)+' '+_radarPanY.toFixed(2)+') scale('+_radarZoom.toFixed(3)+')');
+      // Marker gegen-skalieren, damit die Pins beim Zoom gleich groß bleiben (nur Abstand wächst)
+      var inv = (1/_radarZoom).toFixed(4);
+      var ms = g.querySelectorAll('.radar-marker-inner');
+      for (var i = 0; i < ms.length; i++) ms[i].setAttribute('transform', 'scale('+inv+')');
+    }
     var rb = document.getElementById('radarZoomReset'); if (rb) rb.style.display = (_radarZoom > 1.01) ? 'flex' : 'none';
   }
   function _radarSetZoom(z1, fx, fy){
