@@ -301,6 +301,8 @@
     .map-chip-beauty.active { background:#EC4899;border-color:#EC4899;color:white; }
     .map-chip-wechselstube { background:#E0F2FE;border:1.5px solid #7DD3FC;color:#0C4A6E; }
     .map-chip-wechselstube.active { background:#0EA5E9;border-color:#0EA5E9;color:white; }
+    .map-chip-immobilien { background:#CCFBF1;border:1.5px solid #5EEAD4;color:#134E4A; }
+    .map-chip-immobilien.active { background:#0D9488;border-color:#0D9488;color:white; }
 
     /* DUPLICATE WARNING */
     .dupe-warning { background: #FFF8EC; border: 1.5px solid var(--yellow); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; display: none; }

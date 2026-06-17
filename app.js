@@ -13,6 +13,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       search_placeholder: 'Arzt, Restaurant, Anwalt...',
       // Categories
       cat_all: 'Alle', cat_restaurants: 'Restaurants', cat_services: 'Dienstleistungen',
+      cat_immobilien: 'Immobilien',
       cat_places: 'Orte', cat_accommodation: 'Unterkünfte', cat_shops: 'Geschäfte',
       cat_sport: 'Sport & Fitness', cat_tankstelle: 'Tankstellen', cat_wechselstube: 'Wechselstuben', cat_beauty: 'Beauty & Wellness',
       // City picker
@@ -159,6 +160,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       search_placeholder: 'Médico, Restaurante, Abogado...',
       // Categorías
       cat_all: 'Todos', cat_restaurants: 'Restaurantes', cat_services: 'Servicios',
+      cat_immobilien: 'Inmuebles',
       cat_places: 'Lugares', cat_accommodation: 'Alojamientos', cat_shops: 'Tiendas',
       cat_sport: 'Deporte & Fitness', cat_tankstelle: 'Gasolineras', cat_wechselstube: 'Casas de cambio', cat_beauty: 'Belleza & Bienestar',
       // Selector de ciudad
@@ -616,6 +618,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     'kat-tankstelle': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 22V10a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12"/><rect x="3" y="10" width="10" height="12"/><path d="M13 6h2l2 5h2"/><line x1="3" y1="22" x2="13" y2="22"/></svg>',
     'kat-wechselstube': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M22 10H18a2 2 0 0 0 0 4h4"/><circle cx="18" cy="12" r="1" fill="currentColor" stroke="none"/></svg>',
     'kat-beauty': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+    'kat-immobilien': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><circle cx="12" cy="14" r="1.7"/><line x1="12" y1="15.7" x2="12" y2="18"/></svg>',
         'default': '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
   };
   const catEmojis = {
@@ -628,9 +631,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     'kat-dienstleistung': '🏥',
     'kat-tankstelle':     '⛽',
     'kat-wechselstube':   '💱',
+    'kat-immobilien':     '🏠',
     'default':            '📍',
   };
-  const catNames = { 'kat-restaurants': 'Restaurants', 'kat-dienstleistung': 'Dienstleistungen', 'kat-orte': 'Orte', 'kat-unterkunft': 'Unterkünfte', 'kat-geschaefte': 'Geschäfte', 'kat-sport': 'Sport & Fitness' };
+  const catNames = { 'kat-restaurants': 'Restaurants', 'kat-dienstleistung': 'Dienstleistungen', 'kat-orte': 'Orte', 'kat-unterkunft': 'Unterkünfte', 'kat-geschaefte': 'Geschäfte', 'kat-sport': 'Sport & Fitness', 'kat-immobilien': 'Immobilien' };
 
   function setNav(active) {
     ['navHome','navMap','navEvents','navForm','navProfil'].forEach(id => {
@@ -1943,6 +1947,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function _doRenderListings() {
     if (activeScreen !== 'screenHome') return;
     let filtered = allListings;
+    filtered = filtered.filter(l => l.category_id !== 'kat-immobilien'); // Immobilien haben eine eigene Seite
     if (activeCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === activeCategory);
     if (activeCity !== 'Alle') filtered = filtered.filter(l => norm(l.city||'') === norm(activeCity));
     if (activeSubcat !== 'Alle') filtered = filtered.filter(l => norm(l.subcategory||'') === norm(activeSubcat));
@@ -1957,6 +1962,32 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
     container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.name||''}</div><div style="display:flex;gap:3px;align-items:center;flex-shrink:0">${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${isNew(l.created_at)?`<span class='badge-neu'>${t('badge_new')}</span>`:''}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div></div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+  }
+
+  function renderReFacts(l) {
+    var es = (currentLang === 'es');
+    var dealMap = es ? {kauf:'Venta', miete:'Alquiler'} : {kauf:'Kauf', miete:'Miete'};
+    var typeMap = es
+      ? {wohnung:'Departamento', haus:'Casa', grundstueck:'Terreno', land:'Campo / Finca', gewerbe:'Comercial'}
+      : {wohnung:'Wohnung', haus:'Haus', grundstueck:'Grundstück', land:'Land / Finca', gewerbe:'Gewerbe'};
+    var curMap = {USD:'USD', PYG:'₲', EUR:'€'};
+    var locale = es ? 'es-PY' : 'de-DE';
+    function row(label, val){ return val ? '<div style="display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13.5px"><span style="color:var(--text-3)">'+label+'</span><span style="font-weight:600;color:var(--text-1);text-align:right">'+val+'</span></div>' : ''; }
+    var priceStr = '';
+    if (l.re_price != null) {
+      var cur = curMap[l.re_currency] || (l.re_currency || '');
+      var per = (l.re_period === 'monat') ? (es ? '/mes' : '/Monat') : '';
+      priceStr = cur + ' ' + Number(l.re_price).toLocaleString(locale) + per;
+    }
+    var areaStr = (l.re_area != null) ? (Number(l.re_area).toLocaleString(locale) + ' ' + (l.re_area_unit === 'ha' ? 'ha' : 'm²')) : '';
+    var head = priceStr ? '<div style="font-family:\'Fraunces\',serif;font-weight:700;font-size:24px;color:#0D9488;margin-bottom:10px">' + priceStr + '</div>' : '';
+    var rows = '';
+    rows += row(es ? 'Operación' : 'Angebot', dealMap[l.re_deal] || '');
+    rows += row(es ? 'Tipo' : 'Typ', typeMap[l.re_type] || '');
+    rows += row(es ? 'Superficie' : 'Fläche', areaStr);
+    rows += row(es ? 'Habitaciones' : 'Zimmer', (l.re_rooms != null ? String(l.re_rooms) : ''));
+    var title = es ? 'Detalles del inmueble' : 'Immobilien-Details';
+    return '<div class="detail-section-title">' + title + '</div>' + head + rows;
   }
 
   function showDetail(id) {
@@ -2088,6 +2119,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       exDiv.innerHTML = '';
     }
 
+    // Immobilien-Fakten (Preis, Typ, Fläche, Zimmer)
+    const reEl = document.getElementById('detailReFacts');
+    if (reEl) {
+      if (l.category_id === 'kat-immobilien') {
+        reEl.innerHTML = renderReFacts(l);
+        reEl.style.display = 'block';
+      } else {
+        reEl.style.display = 'none';
+        reEl.innerHTML = '';
+      }
+    }
+
     showScreen('screenDetail');
     loadReviews(id);
     loadComments(id);
@@ -2113,6 +2156,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     'kat-tankstelle': '#EF4444',
     'kat-wechselstube': '#0EA5E9',
     'kat-beauty': '#EC4899',
+    'kat-immobilien': '#0D9488',
     'default': '#6B6B6B'
   };
 
@@ -2124,6 +2168,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     'kat-geschaefte': 'Geschäft',
     'kat-sport': 'Sport',
     'kat-wechselstube': 'Wechselstube',
+    'kat-immobilien': 'Immobilie',
     'default': 'Ort'
   };
 
@@ -2315,6 +2360,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           { id:'pin-dienstleistung', color:'#3B82F6', emoji:'🏥' },
           { id:'pin-tankstelle',     color:'#F97316', emoji:'⛽' },
           { id:'pin-wechselstube', color:'#0EA5E9', emoji:'💱' },
+          { id:'pin-immobilien',   color:'#0D9488', emoji:'🏠' },
           { id:'pin-default',        color:'#6B6B6B', emoji:'📍' },
         ];
 
@@ -2349,6 +2395,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
                 'kat-dienstleistung', 'pin-dienstleistung',
                 'kat-tankstelle',     'pin-tankstelle',
                 'kat-wechselstube', 'pin-wechselstube',
+                'kat-immobilien', 'pin-immobilien',
                 'pin-default'
               ],
               'icon-size': ['interpolate',['linear'],['zoom'], 5,0.5, 10,0.7, 15,1.0],
@@ -2445,7 +2492,21 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const btn = document.getElementById('formSubmitBtn');
     btn.disabled = true; btn.textContent = 'Wird eingereicht...';
     try {
-      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: (()=>{ const d=document.getElementById('hoursDay').value; const f=document.getElementById('hoursFrom').value; const t=document.getElementById('hoursTo').value; const f2=document.getElementById('hoursFrom2').value; const t2=document.getElementById('hoursTo2').value; let val=''; if(d&&f&&t){val=d+' '+f+'-'+t; if(f2&&t2) val+=' & '+f2+'-'+t2;} document.getElementById('newHours').value=val; return val||null; })(), lat: window._newLat, lng: window._newLng, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date() });
+      var reFields = {};
+      if (cat === 'kat-immobilien') {
+        var _num = function(id){ var v = parseFloat(document.getElementById(id).value); return isNaN(v) ? null : v; };
+        reFields = {
+          re_deal: document.getElementById('reDeal').value || null,
+          re_type: document.getElementById('reType').value || null,
+          re_price: _num('rePrice'),
+          re_currency: document.getElementById('reCurrency').value || null,
+          re_period: (document.getElementById('reDeal').value === 'miete') ? 'monat' : null,
+          re_area: _num('reArea'),
+          re_area_unit: document.getElementById('reAreaUnit').value || null,
+          re_rooms: _num('reRooms')
+        };
+      }
+      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: (()=>{ const d=document.getElementById('hoursDay').value; const f=document.getElementById('hoursFrom').value; const t=document.getElementById('hoursTo').value; const f2=document.getElementById('hoursFrom2').value; const t2=document.getElementById('hoursTo2').value; let val=''; if(d&&f&&t){val=d+' '+f+'-'+t; if(f2&&t2) val+=' & '+f2+'-'+t2;} document.getElementById('newHours').value=val; return val||null; })(), lat: window._newLat, lng: window._newLng, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date(), ...reFields });
       if (pendingFormPhotos.length) await uploadFormPhotos(ref.id);
       document.getElementById('formSuccess').textContent = t('submit_success'); document.getElementById('formSuccess').classList.add('visible');
       pendingFormPhotos = [];
@@ -3665,6 +3726,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       sel.innerHTML = '<option value="">Bitte wählen...</option>' + opts.map(s => `<option value="${s}">${s}</option>`).join('');
       field.style.display = 'block';
     } else { field.style.display = 'none'; }
+    var imo = document.getElementById('immobilienFields');
+    if (imo) imo.style.display = (cat === 'kat-immobilien') ? 'block' : 'none';
   }
 
   let mapSubcatFilter = 'Alle';

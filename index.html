@@ -17,17 +17,17 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Buscar – Deutsche in Paraguay</title>
-  <link rel="preload" href="styles.css?v=98" as="style">
-  <link rel="preload" href="app.js?v=98" as="script">
+  <link rel="preload" href="styles.css?v=99" as="style">
+  <link rel="preload" href="app.js?v=99" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-  <link href="styles.css?v=98" rel="stylesheet">
+  <link href="styles.css?v=99" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  <script defer src="app.js?v=98"></script>
+  <script defer src="app.js?v=99"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -378,6 +378,7 @@
     </div>
     <div class="detail-body">
       <div id="detailBadges" class="detail-card" style="display:none"><div class="detail-badge-row" id="detailBadgeRow"></div></div>
+      <div class="detail-card" id="detailReFacts" style="display:none"></div>
       <div class="detail-card"><div class="detail-section-title" data-i18n="description">Beschreibung</div><div class="detail-desc" id="detailDesc">-</div></div>
       <div class="detail-card" id="detailInfoCard" style="display:none"></div>
       <div class="detail-cta" id="detailCta"></div>
@@ -455,6 +456,7 @@
         <div class="map-chip map-chip-tankstelle" data-cat="kat-tankstelle"><span class="chip-dot"></span><span>Tankstellen</span></div>
         <div class="map-chip map-chip-beauty" data-cat="kat-beauty"><span class="chip-dot"></span><span>Beauty</span></div>
         <div class="map-chip map-chip-wechselstube" data-cat="kat-wechselstube"><span class="chip-dot"></span><span>Wechselstuben</span></div>
+        <div class="map-chip map-chip-immobilien" data-cat="kat-immobilien"><span class="chip-dot"></span><span data-i18n="cat_immobilien">Immobilien</span></div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;padding:6px 16px 10px">
         <div id="mapCityPickerBtn" onclick="openMapCitySheet()" style="flex:1;display:flex;align-items:center;gap:8px;padding:9px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-2)">
@@ -542,6 +544,7 @@
           <option value="kat-tankstelle">Tankstellen & Kfz</option>
           <option value="kat-beauty">Beauty & Wellness</option>
           <option value="kat-wechselstube">Wechselstuben</option>
+          <option value="kat-immobilien">Immobilien</option>
           </select>
         </div>
         <div class="form-field" id="subcatField" style="display:none">
@@ -553,6 +556,52 @@
         <div class="form-field">
           <label class="field-label">Stadt *</label>
           <input class="field-input" type="text" id="newCity" placeholder="z.B. Asunción, Encarnación">
+        </div>
+      </div>
+      <div class="form-card" id="immobilienFields" style="display:none">
+        <div class="form-card-title">Immobilien-Details</div>
+        <div class="form-field">
+          <label class="field-label">Angebot</label>
+          <select class="field-select" id="reDeal" onchange="document.getElementById('rePriceHint').style.display=(this.value==='miete')?'block':'none'">
+            <option value="kauf">Kauf</option>
+            <option value="miete">Miete</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Objekttyp</label>
+          <select class="field-select" id="reType">
+            <option value="wohnung">Wohnung</option>
+            <option value="haus">Haus</option>
+            <option value="grundstueck">Grundstück</option>
+            <option value="land">Land / Finca</option>
+            <option value="gewerbe">Gewerbe</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Preis</label>
+          <div style="display:flex;gap:8px">
+            <input class="field-input" type="number" inputmode="numeric" id="rePrice" placeholder="z.B. 85000" style="flex:2;min-width:0">
+            <select class="field-select" id="reCurrency" style="flex:1;min-width:0">
+              <option value="USD">USD</option>
+              <option value="PYG">₲ PYG</option>
+              <option value="EUR">€ EUR</option>
+            </select>
+          </div>
+          <div class="form-hint" id="rePriceHint" style="display:none">Mietpreis pro Monat</div>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Fläche</label>
+          <div style="display:flex;gap:8px">
+            <input class="field-input" type="number" inputmode="numeric" id="reArea" placeholder="z.B. 320" style="flex:2;min-width:0">
+            <select class="field-select" id="reAreaUnit" style="flex:1;min-width:0">
+              <option value="m2">m²</option>
+              <option value="ha">Hektar</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Zimmer (optional)</label>
+          <input class="field-input" type="number" inputmode="numeric" id="reRooms" placeholder="z.B. 4">
         </div>
       </div>
       <div class="form-card">
