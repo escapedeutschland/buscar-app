@@ -3206,8 +3206,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   function _adminTs(x){ if(!x) return 0; if(typeof x.seconds==='number') return x.seconds; if(x.toMillis) return x.toMillis()/1000; var d=new Date(x); return isNaN(d.getTime())?0:d.getTime()/1000; }
   function _adminGroupKey(l){
-    if (l.lat != null && l.lng != null) return (l.name||'').trim().toLowerCase()+'|'+Number(l.lat).toFixed(5)+'|'+Number(l.lng).toFixed(5);
-    return (l.name||'').trim().toLowerCase()+'|'+(l.city||'').trim().toLowerCase()+'|'+(l.category_id||'');
+    // NUR echte geografische Duplikate: gleicher Name an EXAKT gleicher Position.
+    // Eintraege OHNE Koordinaten werden NICHT mehr gruppiert (zu unsicher -> Gefahr von Fehl-Loeschungen).
+    if (l.lat == null || l.lng == null) return null;
+    return (l.name||'').trim().toLowerCase()+'|'+Number(l.lat).toFixed(5)+'|'+Number(l.lng).toFixed(5);
   }
   async function loadAdminDuplicates() {
     ['adminTabListings','adminTabClaims','adminTabDeals','adminTabReports','adminTabDuplicates'].forEach(function(t){
@@ -3223,19 +3225,22 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       all.forEach(function(l){
         if (!(l.name||'').trim()) return;
         const k = _adminGroupKey(l);
+        if (!k) return;
         (groups[k] = groups[k] || []).push(l);
       });
       const dupGroups = Object.keys(groups).map(function(k){ return groups[k]; }).filter(function(g){ return g.length > 1; });
       if (!dupGroups.length){ body.innerHTML = '<div class="admin-empty"><div class="admin-empty-icon">&#10003;</div><div class="admin-empty-text">Keine Duplikate</div><div class="admin-empty-sub">Alle Einträge sind eindeutig.</div></div>'; return; }
-      body.innerHTML = '<div style="padding:12px 0 4px;font-size:12px;color:rgba(255,255,255,0.6);text-align:center">'+dupGroups.length+' Duplikat-Gruppe(n) — behalte je einen, lösche die anderen</div>' +
+      body.innerHTML = '<div style="margin:10px 12px;padding:10px 12px;background:rgba(255,255,255,0.12);border-radius:10px;font-size:11.5px;color:#fff;line-height:1.5">⚠️ Es werden nur Eintr&auml;ge mit <b>identischem Namen an exakt gleicher Position</b> angezeigt (echte Doppel). Pr&uuml;fe Telefon/Stadt, bevor du l&ouml;schst.</div>' +
+        '<div style="padding:0 0 4px;font-size:12px;color:rgba(255,255,255,0.6);text-align:center">'+dupGroups.length+' Duplikat-Gruppe(n)</div>' +
         dupGroups.map(function(g){
           const sorted = g.slice().sort(function(a,b){ return _adminTs(a.created_at) - _adminTs(b.created_at); });
           return '<div class="admin-card"><div class="admin-card-name">'+(sorted[0].name||'Ohne Name')+'</div>'
             + '<div class="admin-card-meta">'+((typeof catNames!=='undefined' && catNames[sorted[0].category_id])||'')+' &middot; '+(sorted[0].city||'')+' &middot; '+g.length+'&times;</div>'
             + sorted.map(function(l, idx){
                 const keep = (idx === 0);
+                const info = [l.city, l.phone].filter(Boolean).join(' · ') || '—';
                 return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--border)">'
-                  + '<div style="min-width:0"><div style="font-size:12px;font-weight:700;color:'+(keep?'#15803D':'var(--text-1)')+'">'+(keep?'✅ Behalten (Original)':'Duplikat')+'</div><div style="font-size:11px;color:var(--text-3)">'+(l.lat!=null?'mit Standort':'ohne Standort')+'</div></div>'
+                  + '<div style="min-width:0"><div style="font-size:12px;font-weight:700;color:'+(keep?'#15803D':'var(--text-1)')+'">'+(keep?'✅ Behalten (Original)':'Duplikat')+'</div><div style="font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+info+'</div></div>'
                   + (keep ? '' : '<button class="admin-btn reject" style="flex-shrink:0;width:auto;padding:8px 14px" onclick="deleteDuplicate(\''+l.id+'\')">Löschen</button>')
                   + '</div>';
               }).join('')
