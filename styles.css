@@ -578,6 +578,8 @@
     .event-detail-type-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.2); border-radius:12px; padding:4px 10px; font-size:12px; font-weight:700; margin-bottom:14px; }
     .event-detail-meta-row { display:flex; flex-wrap:wrap; gap:12px; }
     .event-detail-meta { display:flex; align-items:center; gap:6px; font-size:13px; opacity:0.92; }
+    .ev-route-btn { flex-basis:100%; display:flex; align-items:center; justify-content:center; gap:7px; margin-top:4px; padding:10px 16px; background:rgba(255,255,255,0.2); color:#fff; border:1px solid rgba(255,255,255,0.45); border-radius:12px; font-family:'DM Sans',sans-serif; font-size:13.5px; font-weight:700; text-decoration:none; -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px); }
+    .ev-route-btn:active { background:rgba(255,255,255,0.33); }
     /* Event form */
     .event-form-section { background:var(--card); border-radius:var(--radius-lg); padding:16px; margin-bottom:14px; }
     .event-form-section-title { font-size:12px; font-weight:700; color:var(--text-2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }

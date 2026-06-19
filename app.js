@@ -1114,10 +1114,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var timeStr    = start ? start.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) : '';
     var timeEndStr = end   ? end.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})   : '';
 
+    var evRouteUrl = (ev.lat && ev.lng) ? 'https://maps.google.com/?q=' + ev.lat + ',' + ev.lng
+      : ((ev.address || ev.city) ? 'https://maps.google.com/?q=' + encodeURIComponent([ev.address, ev.city].filter(Boolean).join(', ')) : '');
     document.getElementById('evDetailMeta').innerHTML =
       '<div class="event-detail-meta">📅 ' + dateStr + '</div>'
       + (timeStr ? '<div class="event-detail-meta">🕐 ' + timeStr + (timeEndStr ? ' – ' + timeEndStr : '') + '</div>' : '')
-      + '<div class="event-detail-meta">📍 ' + (ev.city||'') + (ev.address ? ', ' + ev.address : '') + '</div>';
+      + '<div class="event-detail-meta">📍 ' + (prettyCity(ev.city||'')) + (ev.address ? ', ' + ev.address : '') + '</div>'
+      + (evRouteUrl ? '<a class="ev-route-btn" href="' + evRouteUrl + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Route starten</a>' : '');
 
     var isFull = ev.has_signup && ev.capacity > 0 && (ev.signups_count||0) >= ev.capacity;
     var isCancelled = ev.status === 'cancelled';
