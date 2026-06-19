@@ -304,9 +304,8 @@
     .map-chip-immobilien { background:#CCFBF1;border:1.5px solid #5EEAD4;color:#134E4A; }
     .map-chip-immobilien.active { background:#0D9488;border-color:#0D9488;color:white; }
     /* IMMOBILIEN-Chip (in der Kategorie-Reihe) + Liste */
-    .cat-chip-immo { display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:20px; border:1.5px solid #0D9488; background:#0D9488; color:#fff; cursor:pointer; white-space:nowrap; font-size:13px; font-weight:700; flex-shrink:0; letter-spacing:-0.1px; box-shadow:0 4px 14px rgba(13,148,136,0.35); }
-    .cat-chip-immo:active { opacity:.7; }
-    .cat-chip-immo svg { width:15px; height:15px; stroke:#fff; fill:none; stroke-width:2; }
+    .cat-chip-immo { display:flex; align-items:center; gap:6px; padding:8px 16px; border-radius:20px; border:1.5px solid var(--border); background:var(--card); color:var(--text-2); cursor:pointer; white-space:nowrap; font-size:13px; font-weight:600; flex-shrink:0; letter-spacing:-0.1px; }
+    .cat-chip-immo:active { opacity:.6; }
     .immo-card { display:flex; gap:12px; background:var(--card); border-radius:18px; padding:10px; margin-bottom:12px; box-shadow:0 4px 16px rgba(0,0,0,0.05); cursor:pointer; }
     .immo-card:active { opacity:.7; }
     .immo-card-media { width:104px; min-width:104px; height:104px; border-radius:12px; background:var(--bg); background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; }

@@ -3674,23 +3674,27 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       const now = new Date();
       const day = now.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-      const h = now.getHours();
-      const m = now.getMinutes();
-      const nowMin = h * 60 + m;
-
-      // Parse "Mo-Fr 08:00-18:00" or "täglich 08:00-22:00" etc.
+      const nowMin = now.getHours() * 60 + now.getMinutes();
       const lower = hours.toLowerCase();
-      let activeToday = false;
-      if (lower.includes('täglich')) activeToday = true;
-      else if (lower.includes('mo-fr') && day >= 1 && day <= 5) activeToday = true;
-      else if (lower.includes('mo-sa') && day >= 1 && day <= 6) activeToday = true;
-      else if (lower.includes('mo-so') && day >= 1) activeToday = true;
-      else if (lower.includes('mo-so') && day === 0) activeToday = true;
-      else if (lower.includes('sa-so') && (day === 0 || day === 6)) activeToday = true;
-      if (!activeToday) return false;
 
-      // Extract time blocks like "08:00-18:00" (can have two blocks separated by &)
+      // Durchgehend / 24-7 geöffnet -> immer offen
+      if (/24\s*\/\s*7|24\s*h(?:rs?|ours?|s)?\b|24\s*stunden|24\s*horas|durchgehend|rund um die uhr|immer ge[öo]ffnet|always open|abierto las 24|las 24 horas/.test(lower)) return true;
+
+      // Wochentag bestimmen (DE + ES). hasDayInfo = ob überhaupt eine Tagesangabe erkannt wurde.
+      let hasDayInfo = false, activeToday = false;
+      if (lower.includes('täglich') || lower.includes('taeglich') || lower.includes('todos los') || lower.includes('diario')) { hasDayInfo = true; activeToday = true; }
+      else {
+        if (lower.includes('mo-fr') || lower.includes('lun-vie')) { hasDayInfo = true; if (day >= 1 && day <= 5) activeToday = true; }
+        if (lower.includes('mo-sa') || lower.includes('lun-sa')) { hasDayInfo = true; if (day >= 1 && day <= 6) activeToday = true; }
+        if (lower.includes('mo-so') || lower.includes('lun-do')) { hasDayInfo = true; activeToday = true; }
+        if (lower.includes('sa-so') || lower.includes('wochenende') || lower.includes('fin de semana')) { hasDayInfo = true; if (day === 0 || day === 6) activeToday = true; }
+      }
+
       const blocks = hours.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/g);
+
+      // Tagesangabe vorhanden, aber heute nicht dabei -> heute geschlossen.
+      if (hasDayInfo && !activeToday) return false;
+      // Keine erkennbaren Zeitblöcke -> Format unbekannt, lieber kein Badge als falsch "geschlossen".
       if (!blocks) return null;
 
       for (const block of blocks) {
@@ -3698,10 +3702,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         if (!match) continue;
         const fromMin = parseInt(match[1])*60 + parseInt(match[2]);
         let toMin = parseInt(match[3])*60 + parseInt(match[4]);
-        if (toMin === 0) toMin = 24*60; // 00:00 = end of day
+        if (toMin === 0) toMin = 24*60; // 00:00 = Tagesende
+        if (fromMin === 0 && toMin >= 24*60) return true; // voller Tag (00:00-24:00)
         if (toMin < fromMin) {
-          // Overnight - check if now is after from OR before to
-          if (nowMin >= fromMin || nowMin < toMin) return true;
+          if (nowMin >= fromMin || nowMin < toMin) return true; // über Mitternacht
         } else {
           if (nowMin >= fromMin && nowMin < toMin) return true;
         }
