@@ -636,6 +636,75 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   };
   const catNames = { 'kat-restaurants': 'Restaurants', 'kat-dienstleistung': 'Dienstleistungen', 'kat-orte': 'Orte', 'kat-unterkunft': 'Unterkünfte', 'kat-geschaefte': 'Geschäfte', 'kat-sport': 'Sport & Fitness', 'kat-immobilien': 'Immobilien' };
 
+  // ══ ANDROID-ZURÜCK ABFANGEN ════════════════════════════════════════════════
+  // Im PWA-Wrapper (TWA) schließt die System-Zurück-Geste sonst die ganze App,
+  // weil der Browser-Verlauf leer ist. Wir fangen "popstate" ab und gehen statt-
+  // dessen ein Overlay / einen Screen zurück, und re-pushen einen Sentinel-State,
+  // damit der nächste Zurück-Druck wieder bei uns landet.
+  var _lastHomeBack = 0;
+  function _closeAnyOverlay(){
+    var sheets = ['filterSheetOverlay','citySheetOverlay','mapCitySheetOverlay','mapFilterSheetOverlay','reportOverlay','photoLightbox'];
+    for (var i=0;i<sheets.length;i++){
+      var el = document.getElementById(sheets[i]);
+      if (el && el.classList.contains('visible')){ el.classList.remove('visible'); return true; }
+    }
+    var disp = ['maklerModal','locationPermissionModal'];
+    for (var j=0;j<disp.length;j++){
+      var m = document.getElementById(disp[j]);
+      if (m && m.style.display && m.style.display !== 'none'){ m.style.display = 'none'; return true; }
+    }
+    return false;
+  }
+  function _screenBackTarget(){
+    switch (activeScreen){
+      case 'screenDetail': return '__detailBack';
+      case 'screenEditListing': return '__editBack';
+      case 'screenEventDetail': return 'screenEvents';
+      case 'screenEventForm': return 'screenEvents';
+      case 'screenAdmin': return 'screenProfil';
+      case 'screenEditUsername':
+      case 'screenEditPassword':
+      case 'screenEditEmail': return 'screenProfil';
+      case 'screenImpressum':
+      case 'screenDatenschutz':
+      case 'screenAGB': return 'screenProfil';
+      case 'screenFavorites': return 'screenProfil';
+      case 'screenCoordEditor': return 'screenDetail';
+      case 'screenImmobilien':
+      case 'screenMap':
+      case 'screenEvents':
+      case 'screenForm':
+      case 'screenProfil': return 'screenHome';
+      default: return null; // screenHome / screenAuth -> Exit-Logik
+    }
+  }
+  function _handleSystemBack(){
+    if (_closeAnyOverlay()) return true;
+    var t = _screenBackTarget();
+    if (t === '__detailBack'){ if (typeof detailBack === 'function') detailBack(); else { setNav('navHome'); showScreen('screenHome'); } return true; }
+    if (t === '__editBack'){ if (typeof currentEditListingId !== 'undefined' && currentEditListingId) showDetail(currentEditListingId); else { setNav('navHome'); showScreen('screenHome'); } return true; }
+    if (t){
+      var navMap = { screenHome:'navHome', screenMap:'navMap', screenEvents:'navEvents', screenForm:'navForm', screenProfil:'navProfil' };
+      if (navMap[t]) setNav(navMap[t]);
+      showScreen(t);
+      return true;
+    }
+    // Auf Home/Auth: zweimal "Zurück" zum Beenden
+    var now = Date.now();
+    if (_lastHomeBack && (now - _lastHomeBack) < 2000) return false;
+    _lastHomeBack = now;
+    try { showToast(currentLang === 'es' ? 'Pulsa atrás de nuevo para salir' : 'Nochmal „Zurück" zum Beenden'); } catch(e){}
+    return true;
+  }
+  (function(){
+    try { history.pushState({ buscarNav: 1 }, ''); } catch(e){}
+    window.addEventListener('popstate', function(){
+      var handled = false;
+      try { handled = _handleSystemBack(); } catch(e){ handled = false; }
+      if (handled){ try { history.pushState({ buscarNav: 1 }, ''); } catch(e){} }
+    });
+  })();
+
   function setNav(active) {
     ['navHome','navMap','navEvents','navForm','navProfil'].forEach(id => {
       const el = document.getElementById(id);
