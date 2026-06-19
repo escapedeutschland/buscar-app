@@ -705,6 +705,20 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     });
   })();
 
+  // ── Hochformat erzwingen (zusätzlich zum Manifest "orientation":"portrait") ──
+  (function(){
+    function lockPortrait(){
+      try {
+        if (screen && screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('portrait').catch(function(){});
+        }
+      } catch(e){}
+    }
+    lockPortrait();
+    window.addEventListener('orientationchange', lockPortrait);
+    document.addEventListener('visibilitychange', function(){ if (!document.hidden) lockPortrait(); });
+  })();
+
   function setNav(active) {
     ['navHome','navMap','navEvents','navForm','navProfil'].forEach(id => {
       const el = document.getElementById(id);
