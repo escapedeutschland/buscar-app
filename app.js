@@ -1165,7 +1165,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
 
     if (currentUser && ev.created_by === currentUser.uid) {
-      bodyHtml += '<div style="display:flex;gap:8px;margin-top:0">'
+      bodyHtml += '<button onclick="openEditEvent(\'' + id + '\')" style="width:100%;background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;font-size:14px;font-weight:700;color:var(--text-1);cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' + (currentLang==='es'?'Editar evento':'Event bearbeiten') + '</button>'
+        + '<div style="display:flex;gap:8px;margin-top:0">'
         + '<button onclick="cancelEvent(\'' + id + '\')" style="flex:1;background:var(--surface-2);border:none;border-radius:var(--radius-lg);padding:14px;font-size:14px;font-weight:600;color:var(--text-2);cursor:pointer">' + t('ev_cancel_btn') + '</button>'
         + '<button onclick="deleteEvent(\'' + id + '\')" style="flex:1;background:#FEE2E2;border:none;border-radius:var(--radius-lg);padding:14px;font-size:14px;font-weight:600;color:#EF4444;cursor:pointer">' + t('ev_delete_btn') + '</button>'
         + '</div>';
@@ -1175,8 +1176,52 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     showScreen('screenEventDetail');
   }
 
+  var _editingEventId = null;
+  function _toDateInput(d){ var m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0'); return d.getFullYear()+'-'+m+'-'+day; }
+  function _toTimeInput(d){ return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+  async function openEditEvent(id){
+    if (!currentUser){ showScreen('screenAuth'); return; }
+    var ev = (typeof allEvents!=='undefined' && allEvents) ? allEvents.find(function(e){ return e.id===id; }) : null;
+    if (!ev){
+      try { var d = await db.collection('events').doc(id).get(); if (!d.exists) return; ev = Object.assign({id:d.id}, d.data()); } catch(e){ alert('Event konnte nicht geladen werden.'); return; }
+    }
+    if (ev.created_by !== currentUser.uid && currentUser.email !== ADMIN_EMAIL){ alert('Nur der Ersteller kann das Event bearbeiten.'); return; }
+    _editingEventId = id;
+    document.getElementById('evFormTitle').value = ev.title || '';
+    document.getElementById('evFormType').value = ev.type || '';
+    document.getElementById('evFormDesc').value = ev.description || '';
+    var st = (ev.date_start && ev.date_start.toDate) ? ev.date_start.toDate() : (ev.date_start ? new Date(ev.date_start) : null);
+    var en = (ev.date_end && ev.date_end.toDate) ? ev.date_end.toDate() : (ev.date_end ? new Date(ev.date_end) : null);
+    document.getElementById('evFormDate').value = st ? _toDateInput(st) : '';
+    document.getElementById('evFormTimeStart').value = st ? _toTimeInput(st) : '';
+    document.getElementById('evFormTimeEnd').value = en ? _toTimeInput(en) : '';
+    document.getElementById('evFormCity').value = ev.city || '';
+    document.getElementById('evFormAddress').value = ev.address || '';
+    document.getElementById('evFormIsPaid').checked = !!ev.is_paid;
+    document.getElementById('evFormPrice').value = (ev.ticket_price ? ev.ticket_price : '');
+    document.getElementById('evFormPriceRow').style.display = ev.is_paid ? 'block' : 'none';
+    document.getElementById('evFormHasSignup').checked = !!ev.has_signup;
+    document.getElementById('evFormCapacity').value = (ev.capacity ? ev.capacity : '');
+    document.getElementById('evFormCapacityRow').style.display = ev.has_signup ? 'block' : 'none';
+    document.getElementById('evFormRules').value = ev.rules || '';
+    document.getElementById('evFormError').style.display = 'none';
+    document.getElementById('evFormPhotoGrid').innerHTML = '';
+    evPendingPhotos = [];
+    _evLat = (ev.lat != null ? ev.lat : null); _evLng = (ev.lng != null ? ev.lng : null);
+    var ls = document.getElementById('evLocationStatus');
+    if (ls){ if (_evLat != null){ ls.style.display='block'; ls.textContent = '📍 ' + Number(_evLat).toFixed(4) + ', ' + Number(_evLng).toFixed(4); } else { ls.style.display='none'; } }
+    var ft = document.querySelector('#screenEventForm .form-title'); if (ft) ft.textContent = (currentLang==='es'?'Editar evento':'Event bearbeiten');
+    var sb = document.getElementById('evFormSubmitBtn'); if (sb){ sb.textContent = (currentLang==='es'?'Guardar cambios':'Änderungen speichern'); sb.disabled = false; }
+    showScreen('screenEventForm');
+    if (_evLat != null && typeof initEvMap === 'function'){ setTimeout(function(){ try { initEvMap(_evLat, _evLng); } catch(e){} }, 200); }
+    else if (_evMapPicker) { setTimeout(function(){ _evMapPicker.resize(); }, 200); }
+  }
+
   function showEventForm() {
     if (!currentUser) { showScreen('screenAuth'); return; }
+    _editingEventId = null;
+    var _ft = document.querySelector('#screenEventForm .form-title'); if (_ft) _ft.textContent = (currentLang==='es'?'Crear evento':'Event erstellen');
+    var _sb = document.getElementById('evFormSubmitBtn'); if (_sb){ _sb.textContent = t('ev_publish'); _sb.disabled = false; }
     ['evFormTitle','evFormDesc','evFormCity','evFormAddress','evFormPrice','evFormCapacity','evFormRules'].forEach(function(id){
       var el = document.getElementById(id);
       if (el) el.value = '';
@@ -1316,7 +1361,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var isPaid    = document.getElementById('evFormIsPaid').checked;
       var hasSignup = document.getElementById('evFormHasSignup').checked;
 
-      var evRef = await db.collection('events').add({
+      var common = {
         title: title, type: type, description: desc,
         date_start: dateStart, date_end: dateEnd,
         city: city, address: document.getElementById('evFormAddress').value.trim() || null,
@@ -1325,13 +1370,25 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         ticket_price: isPaid ? (Number(document.getElementById('evFormPrice').value)||0) : 0,
         has_signup: hasSignup,
         capacity: hasSignup ? (Number(document.getElementById('evFormCapacity').value)||0) : 0,
-        signups_count: 0, signups: [],
-        photos: [],
-        rules: document.getElementById('evFormRules').value.trim() || null,
-        status: 'open',
-        created_by: currentUser.uid,
-        created_at: new Date()
-      });
+        rules: document.getElementById('evFormRules').value.trim() || null
+      };
+      if (_editingEventId) {
+        // Bearbeiten: nur die Felder aktualisieren, Anmeldungen/Fotos/Ersteller nicht anfassen
+        var editId = _editingEventId;
+        await db.collection('events').doc(editId).update(Object.assign({}, common, { updated_at: new Date() }));
+        if (evPendingPhotos.length) await uploadEvPhotos(editId);
+        _editingEventId = null;
+        await loadEvents();
+        showToast(currentLang==='es'?'Evento actualizado':'Event aktualisiert');
+        if (activeScreen === 'screenProfil' || _evDetailSource === 'profil') { setNav('navProfil'); showScreen('screenProfil'); loadMyEvents(); }
+        else { setNav('navEvents'); showScreen('screenEvents'); }
+        var _sbR = document.getElementById('evFormSubmitBtn'); if (_sbR){ _sbR.disabled = false; _sbR.textContent = t('ev_publish'); }
+        return;
+      }
+      var evRef = await db.collection('events').add(Object.assign({}, common, {
+        signups_count: 0, signups: [], photos: [],
+        status: 'open', created_by: currentUser.uid, created_at: new Date()
+      }));
 
       if (evPendingPhotos.length) await uploadEvPhotos(evRef.id);
       showScreen('screenEvents');
@@ -1371,12 +1428,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('events').doc(id).delete();
       allEvents = allEvents.filter(function(e){ return e.id !== id; });
       showToast(t('ev_delete_ok'));
-      if (_evDetailSource === 'profil') {
+      if (activeScreen === 'screenProfil') {
+        // direkt aus "Meine Events" gelöscht -> Liste an Ort und Stelle aktualisieren
+        loadMyEvents(); if (typeof loadMySignups === 'function') loadMySignups();
+      } else if (_evDetailSource === 'profil') {
         setNav('navProfil'); showScreen('screenProfil'); loadMyEvents();
       } else {
         setNav('navEvents'); showScreen('screenEvents'); renderEvents();
       }
-    } catch(e) { alert('Fehler: ' + e.message); }
+    } catch(e) { alert('Event konnte nicht gelöscht werden: ' + (e && e.message ? e.message : e)); }
   }
 
   async function cancelEvent(id) {
@@ -1530,6 +1590,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         var start = ev.date_start ? ev.date_start.toDate() : null;
         var dateStr = start ? start.toLocaleDateString('de-DE',{day:'numeric',month:'short',year:'numeric'}) : '';
         var isCancelled = ev.status === 'cancelled';
+        var _now = new Date();
+        var _endD = ev.date_end ? ev.date_end.toDate() : (ev.date_start ? ev.date_start.toDate() : null);
+        var isPast = _endD && _endD < _now;
         var signups = ev.signups_count || 0;
         var cap = ev.capacity || 0;
         var spotsStr = ev.has_signup ? (cap > 0 ? signups + '/' + cap + ' Anmeldungen' : signups + ' Anmeldungen') : '';
@@ -1541,8 +1604,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           + (spotsStr ? '<div style="font-size:12px;color:var(--yellow);margin-top:2px;font-weight:600">' + spotsStr + '</div>' : '')
           + '</div>'
           + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
-          + (isCancelled ? '<span style="font-size:10px;font-weight:700;background:#EF4444;color:white;padding:2px 7px;border-radius:8px">Abgesagt</span>' : '<span style="font-size:10px;font-weight:700;background:#22C55E;color:white;padding:2px 7px;border-radius:8px">Aktiv</span>')
+          + (isCancelled ? '<span style="font-size:10px;font-weight:700;background:#EF4444;color:white;padding:2px 7px;border-radius:8px">Abgesagt</span>' : isPast ? '<span style="font-size:10px;font-weight:700;background:#9CA3AF;color:white;padding:2px 7px;border-radius:8px">Vergangen</span>' : '<span style="font-size:10px;font-weight:700;background:#22C55E;color:white;padding:2px 7px;border-radius:8px">Aktiv</span>')
           + '<button onclick="showEventDetailFromProfile(\'' + ev.id + '\')" style="font-size:11px;color:var(--yellow);background:none;border:none;cursor:pointer;font-weight:600;padding:0">Details →</button>'
+          + '<button onclick="openEditEvent(\'' + ev.id + '\')" style="font-size:11px;color:var(--text-2);background:none;border:none;cursor:pointer;font-weight:600;padding:0">Bearbeiten</button>'
           + '<button onclick="deleteEvent(\'' + ev.id + '\')" style="font-size:11px;color:#EF4444;background:none;border:none;cursor:pointer;font-weight:600;padding:0">Löschen</button>'
           + '</div>'
           + '</div>'
