@@ -1834,7 +1834,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     'Alle',
     // Großraum Asunción
     'Asunción','San Lorenzo','Luque','Capiatá','Lambaré','Fernando de la Mora',
-    'Limpio','Nemby','Mariano Roque Alonso','Villa Elisa','Itauguá','Areguá',
+    'Limpio','Ñemby','Mariano Roque Alonso','Villa Elisa','Itauguá','Areguá',
     'Itá','San Antonio','Ypané','Guarambaré','Nueva Italia',
     // Cordillera
     'San Bernardino','Caacupé','Altos','Tobatí','Emboscada','Piribebuy','Eusebio Ayala',
@@ -1858,6 +1858,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     // Alto Paraguay
     'Fuerte Olimpo','Puerto Casado',
   ];
+
+  // Einheitliche Schreibweise einer Stadt für die ANZEIGE (z.B. "Nemby" -> "Ñemby",
+  // "asuncion" -> "Asunción"). Vergleich/Filterung läuft weiter accent-insensitiv über norm().
+  var _cityCanon = null;
+  function prettyCity(c){
+    if (!c) return c || '';
+    if (!_cityCanon){ _cityCanon = {}; ALL_PY_CITIES.forEach(function(x){ if (x !== 'Alle') _cityCanon[norm(x)] = x; }); }
+    return _cityCanon[norm(c)] || c;
+  }
 
   // Filter state
   let activeSubcat = 'Alle';
@@ -1978,8 +1987,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   function renderCitySheet(query) {
     const list = document.getElementById('citySheetList');
-    const q = query.toLowerCase().trim();
-    const filtered = ALL_PY_CITIES.filter(c => !q || c.toLowerCase().includes(q));
+    const q = norm(query);
+    const filtered = ALL_PY_CITIES.filter(c => !q || norm(c).includes(q));
     if (!filtered.length) {
       list.innerHTML = '<div class="city-sheet-empty">Keine Stadt gefunden</div>';
       return;
@@ -2056,7 +2065,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
-    container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.name||''}</div><div style="display:flex;gap:3px;align-items:center;flex-shrink:0">${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${isNew(l.created_at)?`<span class='badge-neu'>${t('badge_new')}</span>`:''}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div></div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+    container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.name||''}</div><div style="display:flex;gap:3px;align-items:center;flex-shrink:0">${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${isNew(l.created_at)?`<span class='badge-neu'>${t('badge_new')}</span>`:''}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div></div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${prettyCity(l.city)}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
   }
 
   function renderReFacts(l) {
@@ -2290,7 +2299,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const svg = document.getElementById('detailIcon').querySelector('svg');
     if (svg) { svg.style.width='34px'; svg.style.height='34px'; svg.style.stroke='white'; }
     document.getElementById('detailTitle').textContent = l.name||'';
-    document.getElementById('detailCity').innerHTML = l.city?`<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.city}`:'';
+    document.getElementById('detailCity').innerHTML = l.city?`<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${prettyCity(l.city)}`:'';
     const descEl = document.getElementById('detailDesc');
     const descContent = l.description || '';
     descEl.innerHTML = descContent || t('no_description');
@@ -2721,7 +2730,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
               .setLngLat(coords)
               .setHTML(`<div class="map-popup" onclick="showDetail('${p.id}')">
                 <div class="map-popup-name">${p.name}${p.deal?'<span style="margin-left:5px;font-size:11px">⚡</span>':''}</div>
-                <div class="map-popup-city">${p.city}</div>
+                <div class="map-popup-city">${prettyCity(p.city)}</div>
                 <div class="map-popup-cat">${p.catLabel}</div>
               </div>`)
               .addTo(maplibreMap);
@@ -4433,8 +4442,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   function renderMapCitySheet(query) {
     const list = document.getElementById('mapCitySheetList');
-    const q = query.toLowerCase().trim();
-    const filtered = ALL_PY_CITIES.filter(c => !q || c.toLowerCase().includes(q));
+    const q = norm(query);
+    const filtered = ALL_PY_CITIES.filter(c => !q || norm(c).includes(q));
     list.innerHTML = filtered.map(c => `
       <div class="city-sheet-item${mapCityFilter===c?' selected':''}" onclick="selectMapCity('${c}')">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
