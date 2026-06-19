@@ -4166,26 +4166,37 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   var _lbUrls = [], _lbIndex = 0, _lbSwiped = false, _lbGesturesInit = false;
   function openLightbox(i) {
     if (typeof i === 'string') { _lbUrls = [i]; _lbIndex = 0; }   // Rückwärtskompatibel (URL direkt)
-    else { _lbIndex = i || 0; }
+    else { _lbIndex = Math.max(0, Math.min(_lbUrls.length - 1, i || 0)); }
     if (!_lbUrls.length) return;
-    _lbRender();
+    _lbBuildTrack();
+    _lbApply(false);
+    _lbUpdateChrome();
     document.getElementById('photoLightbox').classList.add('visible');
     _lbInitGestures();
   }
-  function _lbRender() {
-    var img = document.getElementById('lightboxImg');
-    if (img && _lbUrls[_lbIndex]) img.src = _lbUrls[_lbIndex];
+  function _lbBuildTrack() {
+    var track = document.getElementById('lbTrack'); if (!track) return;
+    track.innerHTML = _lbUrls.map(function(u){ return '<div class="lb-slide"><img src="' + u + '" alt="" draggable="false"></div>'; }).join('');
+  }
+  function _lbApply(animate) {
+    var track = document.getElementById('lbTrack'); if (!track) return;
+    track.style.transition = animate ? 'transform 0.33s cubic-bezier(0.22,0.61,0.36,1)' : 'none';
+    track.style.transform = 'translateX(' + (-_lbIndex * 100) + '%)';
+  }
+  function _lbUpdateChrome() {
     var multi = _lbUrls.length > 1;
     var prev = document.getElementById('lbPrev'), next = document.getElementById('lbNext'), counter = document.getElementById('lbCounter');
-    if (prev) prev.style.display = multi ? 'flex' : 'none';
-    if (next) next.style.display = multi ? 'flex' : 'none';
+    if (prev) prev.style.display = (multi && _lbIndex > 0) ? 'flex' : 'none';
+    if (next) next.style.display = (multi && _lbIndex < _lbUrls.length - 1) ? 'flex' : 'none';
     if (counter) { counter.style.display = multi ? 'block' : 'none'; counter.textContent = (_lbIndex + 1) + ' / ' + _lbUrls.length; }
   }
   function lightboxNav(dir, ev) {
     if (ev && ev.stopPropagation) ev.stopPropagation();
     if (_lbUrls.length < 2) return;
-    _lbIndex = (_lbIndex + dir + _lbUrls.length) % _lbUrls.length;
-    _lbRender();
+    var ni = _lbIndex + dir;
+    if (ni < 0 || ni > _lbUrls.length - 1) return;
+    _lbIndex = ni;
+    _lbApply(true); _lbUpdateChrome();
   }
   function closeLightbox() {
     if (_lbSwiped) { _lbSwiped = false; return; }   // ein Swipe schließt nicht
@@ -4193,12 +4204,34 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
   function _lbInitGestures() {
     if (_lbGesturesInit) return; _lbGesturesInit = true;
-    var lb = document.getElementById('photoLightbox'); if (!lb) return;
-    var sx = 0, sy = 0;
-    lb.addEventListener('touchstart', function(e){ var t = e.changedTouches[0]; sx = t.clientX; sy = t.clientY; }, { passive: true });
-    lb.addEventListener('touchend', function(e){
-      var t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
-      if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) { lightboxNav(dx < 0 ? 1 : -1); _lbSwiped = true; setTimeout(function(){ _lbSwiped = false; }, 60); }
+    var lb = document.getElementById('photoLightbox');
+    var vp = document.getElementById('lbViewport');
+    var track = document.getElementById('lbTrack');
+    if (!lb || !vp || !track) return;
+    var startX = 0, startY = 0, dragging = false, vw = 0, decided = false, horiz = false;
+    vp.addEventListener('touchstart', function(e){
+      if (_lbUrls.length < 2) return;
+      startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+      vw = vp.clientWidth || window.innerWidth;
+      dragging = true; decided = false; horiz = false;
+      track.style.transition = 'none';
+    }, { passive: true });
+    vp.addEventListener('touchmove', function(e){
+      if (!dragging) return;
+      var dx = e.touches[0].clientX - startX, dy = e.touches[0].clientY - startY;
+      if (!decided) { decided = true; horiz = Math.abs(dx) > Math.abs(dy); }
+      if (!horiz) return;
+      if ((_lbIndex === 0 && dx > 0) || (_lbIndex === _lbUrls.length - 1 && dx < 0)) dx *= 0.35; // Randwiderstand
+      track.style.transform = 'translateX(' + (-_lbIndex * vw + dx) + 'px)';
+    }, { passive: true });
+    vp.addEventListener('touchend', function(e){
+      if (!dragging) return; dragging = false;
+      var dx = e.changedTouches[0].clientX - startX;
+      if (horiz && Math.abs(dx) > 45) {
+        if (dx < 0 && _lbIndex < _lbUrls.length - 1) { _lbIndex++; _lbSwiped = true; setTimeout(function(){ _lbSwiped = false; }, 80); }
+        else if (dx > 0 && _lbIndex > 0) { _lbIndex--; _lbSwiped = true; setTimeout(function(){ _lbSwiped = false; }, 80); }
+      }
+      _lbApply(true); _lbUpdateChrome();
     }, { passive: true });
     document.addEventListener('keydown', function(e){
       if (!lb.classList.contains('visible')) return;
