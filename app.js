@@ -2280,6 +2280,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function setImmoDeal(v){ immoDeal=v; renderImmoFilters(); loadImmobilien(); }
   function setImmoType(v){ immoType=v; renderImmoFilters(); loadImmobilien(); }
   function openImmobilien(){ renderImmoFilters(); updateMaklerCta(); showScreen('screenImmobilien'); loadImmobilien(); }
+  function openImmobilienForm(){
+    if (!currentUser){ showScreen('screenAuth'); return; }
+    setNav('navForm'); showScreen('screenForm');
+    var cat = document.getElementById('newCategory');
+    if (cat){ cat.value = 'kat-immobilien'; if (typeof updateSubcatOptions === 'function') updateSubcatOptions(); }
+  }
   // ── Makler werden / Inserat hervorheben (Kontakt + Preise) ─────────────────
   var MAKLER_WA = '4915222487351';
   function updateMaklerCta(){
@@ -4057,7 +4063,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const photos = snap.docs.map(d => ({id:d.id, ...d.data()})).filter(function(p){ return p.pending === false || listingApproved; });
     const grid = document.getElementById('photosGrid');
     const canDelete = currentUser && currentUser.email === ADMIN_EMAIL;
-    let html = photos.map(p => `<div class="photo-thumb-wrap" style="position:relative"><img class="photo-thumb" src="${p.url}" onclick="openLightbox('${p.url}')">${canDelete ? `<button onclick="deletePhoto('${p.id}','${p.path}',event)" style="position:absolute;top:4px;right:4px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>` : ''}</div>`).join('');
+    _lbUrls = photos.map(function(p){ return p.url; });
+    let html = photos.map((p, _i) => `<div class="photo-thumb-wrap" style="position:relative"><img class="photo-thumb" src="${p.url}" onclick="openLightbox(${_i})">${canDelete ? `<button onclick="deletePhoto('${p.id}','${p.path}',event)" style="position:absolute;top:4px;right:4px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>` : ''}</div>`).join('');
     if (currentUser) html += `<div class="photo-upload" onclick="document.getElementById('photoFileInput').click()" style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="22" height="22"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span></div>`;
     grid.innerHTML = html + `<input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="uploadPhoto(event)">`;
   }
@@ -4156,8 +4163,50 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
   }
 
-  function openLightbox(url) { document.getElementById('lightboxImg').src = url; document.getElementById('photoLightbox').classList.add('visible'); }
-  function closeLightbox() { document.getElementById('photoLightbox').classList.remove('visible'); }
+  var _lbUrls = [], _lbIndex = 0, _lbSwiped = false, _lbGesturesInit = false;
+  function openLightbox(i) {
+    if (typeof i === 'string') { _lbUrls = [i]; _lbIndex = 0; }   // Rückwärtskompatibel (URL direkt)
+    else { _lbIndex = i || 0; }
+    if (!_lbUrls.length) return;
+    _lbRender();
+    document.getElementById('photoLightbox').classList.add('visible');
+    _lbInitGestures();
+  }
+  function _lbRender() {
+    var img = document.getElementById('lightboxImg');
+    if (img && _lbUrls[_lbIndex]) img.src = _lbUrls[_lbIndex];
+    var multi = _lbUrls.length > 1;
+    var prev = document.getElementById('lbPrev'), next = document.getElementById('lbNext'), counter = document.getElementById('lbCounter');
+    if (prev) prev.style.display = multi ? 'flex' : 'none';
+    if (next) next.style.display = multi ? 'flex' : 'none';
+    if (counter) { counter.style.display = multi ? 'block' : 'none'; counter.textContent = (_lbIndex + 1) + ' / ' + _lbUrls.length; }
+  }
+  function lightboxNav(dir, ev) {
+    if (ev && ev.stopPropagation) ev.stopPropagation();
+    if (_lbUrls.length < 2) return;
+    _lbIndex = (_lbIndex + dir + _lbUrls.length) % _lbUrls.length;
+    _lbRender();
+  }
+  function closeLightbox() {
+    if (_lbSwiped) { _lbSwiped = false; return; }   // ein Swipe schließt nicht
+    document.getElementById('photoLightbox').classList.remove('visible');
+  }
+  function _lbInitGestures() {
+    if (_lbGesturesInit) return; _lbGesturesInit = true;
+    var lb = document.getElementById('photoLightbox'); if (!lb) return;
+    var sx = 0, sy = 0;
+    lb.addEventListener('touchstart', function(e){ var t = e.changedTouches[0]; sx = t.clientX; sy = t.clientY; }, { passive: true });
+    lb.addEventListener('touchend', function(e){
+      var t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+      if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) { lightboxNav(dx < 0 ? 1 : -1); _lbSwiped = true; setTimeout(function(){ _lbSwiped = false; }, 60); }
+    }, { passive: true });
+    document.addEventListener('keydown', function(e){
+      if (!lb.classList.contains('visible')) return;
+      if (e.key === 'ArrowRight') lightboxNav(1);
+      else if (e.key === 'ArrowLeft') lightboxNav(-1);
+      else if (e.key === 'Escape') closeLightbox();
+    });
+  }
 
   function handleFormPhotos(event) {
     const files = Array.from(event.target.files).slice(0, 3 - pendingFormPhotos.length);

@@ -240,6 +240,11 @@
     .photo-lightbox img { max-width: 95%; max-height: 90vh; object-fit: contain; border-radius: 8px; }
     .photo-lightbox-close { position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .photo-lightbox-close svg { width: 18px; height: 18px; stroke: white; }
+    .lb-nav { position: fixed; top: 50%; transform: translateY(-50%); width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,0.14); border: none; color: white; cursor: pointer; align-items: center; justify-content: center; z-index: 2; -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+    .lb-nav:active { background: rgba(255,255,255,0.3); }
+    .lb-prev { left: 14px; }
+    .lb-next { right: 14px; }
+    .lb-counter { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); color: white; font-size: 13px; font-weight: 700; background: rgba(0,0,0,0.45); padding: 4px 13px; border-radius: 14px; z-index: 2; }
 
     /* FILTER PANEL */
     .filter-bar { flex-shrink: 0; padding-bottom: 10px; overflow: hidden; }
@@ -321,6 +326,8 @@
     .immo-filter-row::-webkit-scrollbar { display:none; }
     .immo-fchip { flex-shrink:0; padding:7px 14px; border-radius:18px; border:1.5px solid var(--border); background:var(--card); font-size:12.5px; font-weight:600; color:var(--text-2); cursor:pointer; white-space:nowrap; transition:all .15s ease; }
     .immo-fchip.active { background:#0D9488; border-color:#0D9488; color:#fff; }
+    .immo-fab { position:fixed; right:18px; bottom:24px; width:56px; height:56px; border-radius:50%; background:#0D9488; border:none; box-shadow:0 6px 20px rgba(13,148,136,0.45); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:50; }
+    .immo-fab:active { background:#0a7d72; transform:scale(0.94); }
     .immo-screen-header { position:relative; overflow:hidden; }
     .immo-screen-header::before { content:''; position:absolute; top:-45px; right:-45px; width:175px; height:175px; border-radius:50%; background:rgba(255,255,255,0.09); pointer-events:none; }
     .immo-screen-header::after { content:''; position:absolute; bottom:-55px; left:-35px; width:135px; height:135px; border-radius:50%; background:rgba(255,255,255,0.06); pointer-events:none; }
