@@ -1575,6 +1575,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       var snap = await db.collection('events').where('created_by','==',currentUser.uid).get();
       var events = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      // Vergangene Events nicht mehr listen (verschwinden, sobald sie vorbei sind)
+      var _nowMy = new Date();
+      events = events.filter(function(ev){
+        var endD = ev.date_end ? ev.date_end.toDate() : (ev.date_start ? ev.date_start.toDate() : null);
+        return !endD || endD >= _nowMy;
+      });
       events.sort(function(a,b){
         var da = a.date_start ? a.date_start.toDate() : new Date(0);
         var db2 = b.date_start ? b.date_start.toDate() : new Date(0);
@@ -3108,6 +3114,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         var _rci = document.getElementById('reCoverInput'); if (_rci) _rci.value = '';
       }
       document.getElementById('formSuccess').textContent = t('submit_success'); document.getElementById('formSuccess').classList.add('visible');
+      showToast(t('submit_success'));
+      var _lhReset = document.getElementById('locationHint'); if (_lhReset) _lhReset.style.display = '';
       pendingFormPhotos = [];
       const grid2 = document.getElementById('formPhotoGrid');
       grid2.innerHTML = `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span></label><input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">`;
@@ -3160,6 +3168,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   async function useMyLocation() {
     const btn = document.getElementById('locationBtn');
     const status = document.getElementById('locationStatus');
+    var _lh = document.getElementById('locationHint'); if (_lh) _lh.style.display = 'none';
 
     if (!navigator.geolocation) {
       status.style.color = 'var(--red)';
