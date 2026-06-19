@@ -993,7 +993,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   };
   const EVENT_TYPE_EMOJIS = {
     'Party':'🎊','Festival':'🎪','Konzert':'🎵','Retreat':'🧘',
-    'Workshop':'🛠','Sport':'⚽','Markt':'🛒','Sonstiges':'📌'
+    'Workshop':'🛠','Sport':'⚽','Kultur':'🎭','Treffen':'🤝','Markt':'🛒','Sonstiges':'📌'
   };
 
   async function loadEvents() {
