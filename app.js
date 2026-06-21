@@ -1059,6 +1059,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function evTypeName(ty){ return (currentLang==='es' && EVENT_TYPE_ES[ty]) ? EVENT_TYPE_ES[ty] : (ty||''); }
 
   async function loadEvents() {
+    // Instant: render from in-memory cache if we already have events
+    if (allEvents && allEvents.length) { renderEvents(); }
     try {
       const now = new Date();
       const snap = await db.collection('events')
@@ -1069,8 +1071,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       renderEvents();
     } catch(e) {
       console.error('loadEvents error', e);
-      document.getElementById('eventsList').innerHTML =
-        '<div style="text-align:center;padding:40px;color:var(--text-3)">Fehler beim Laden.</div>';
+      // Keep showing cached events on error; only show error if we have nothing
+      if (!(allEvents && allEvents.length)) {
+        document.getElementById('eventsList').innerHTML =
+          '<div style="text-align:center;padding:40px;color:var(--text-3)">Fehler beim Laden.</div>';
+      }
     }
   }
 
@@ -1875,6 +1880,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       updateGreeting();
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
       updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
+      if (!window._evPreloaded) { window._evPreloaded = true; setTimeout(function(){ loadEvents(); }, 1200); }
       var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden');
     } else { showScreen('screenAuth'); var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden'); }
   });
