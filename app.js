@@ -338,38 +338,46 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function translateVisibleContent() {
-    const btn = document.getElementById('langToggle');
-    const origText = btn.textContent;
-    btn.textContent = '⏳';
-    btn.disabled = true;
-
     const targetLang = currentLang === 'es' ? 'es' : 'de';
 
-    // Collect all elements needing translation
+    // Collect all dynamic-content elements (entries, reviews, comments, replies, detail desc)
     const allEls = [
       ...document.querySelectorAll('.listing-desc[data-original]'),
       ...document.querySelectorAll('.review-item-text[data-original]'),
       ...document.querySelectorAll('.comment-item-text[data-original]'),
       ...document.querySelectorAll('.reply-item-text[data-original]'),
-    ].filter(el => el.dataset.original && el.dataset.original.length > 3);
-
+    ];
     const detailDesc = document.getElementById('detailDesc');
-    if (detailDesc && detailDesc.dataset.original && detailDesc.dataset.original.length > 3) {
-      allEls.unshift(detailDesc);
+    if (detailDesc && detailDesc.dataset.original) allEls.unshift(detailDesc);
+
+    // Only those not already shown in the target language
+    const todo = allEls.filter(el =>
+      el.dataset.original && el.dataset.original.length > 3 && el.dataset.tlang !== targetLang
+    );
+    if (!todo.length) return;
+
+    // Back to German: just restore the originals — no API needed
+    if (targetLang === 'de') {
+      todo.forEach(el => { el.textContent = el.dataset.original; el.dataset.tlang = 'de'; });
+      return;
     }
+
+    const btn = document.getElementById('langToggle');
+    const origText = btn ? btn.textContent : '';
+    if (btn) { btn.textContent = '⏳'; btn.disabled = true; }
 
     // Translate in parallel batches of 4
     const batchSize = 4;
-    for (let i = 0; i < allEls.length; i += batchSize) {
-      const batch = allEls.slice(i, i + batchSize);
+    for (let i = 0; i < todo.length; i += batchSize) {
+      const batch = todo.slice(i, i + batchSize);
       await Promise.all(batch.map(async el => {
         const translated = await detectAndTranslate(el.dataset.original, targetLang);
-        if (translated) el.textContent = translated;
+        el.textContent = translated || el.dataset.original;
+        el.dataset.tlang = targetLang;
       }));
     }
 
-    btn.textContent = origText;
-    btn.disabled = false;
+    if (btn) { btn.textContent = origText; btn.disabled = false; }
     contentTranslated = true;
   }
 
@@ -391,9 +399,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       el.placeholder = t(el.getAttribute('data-i18n-ph'));
     });
 
-    // Header
-    const headerSub = document.querySelector('.header-sub');
-    if (headerSub) headerSub.textContent = t('header_sub');
+    // Header greeting (header_sub now handled via data-i18n)
     updateGreeting();
 
     // City picker
@@ -2153,6 +2159,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
     container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.name||''}</div><div style="display:flex;gap:3px;align-items:center;flex-shrink:0">${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${isNew(l.created_at)?`<span class='badge-neu'>${t('badge_new')}</span>`:''}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div></div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${prettyCity(l.city)}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+    if (currentLang !== 'de') translateVisibleContent();
   }
 
   function renderReFacts(l) {
@@ -2397,6 +2404,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const descContent = l.description || '';
     descEl.innerHTML = descContent || t('no_description');
     descEl.dataset.original = descContent;
+    descEl.dataset.tlang = '';
     const badges = document.getElementById('detailBadges');
     const openStatus = isOpen(l.opening_hours);
     const openBadge = openStatus===true ? '<span class="detail-badge open-status">'+t('open_now')+'</span>' : openStatus===false ? '<span class="detail-badge closed-status">'+t('closed_now')+'</span>' : '';
@@ -3691,6 +3699,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         <div class="review-item-text" data-original="${r.comment}">${r.comment}</div>
         <div class="review-item-date">${formatDate(r.created_at)}</div>
       </div>`).join('');
+    if (currentLang !== 'de') translateVisibleContent();
   }
 
   window.addEventListener('load', function() { (function() {
@@ -3886,6 +3895,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         </div>
       </div>`;
     }).join('');
+    if (currentLang !== 'de') translateVisibleContent();
   }
 
   async function deleteReview(reviewId, listingId) {
