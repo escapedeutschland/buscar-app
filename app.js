@@ -9,22 +9,6 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Header
       greet_morning: 'Guten Morgen', greet_day: 'Guten Tag', greet_evening: 'Guten Abend', greet_night: 'Gute Nacht',
       header_sub: 'Was suchst du heute?',
-      location_tip: '💡 Tipp: Tippe auf „Meinen Standort verwenden" – danach kannst du den Pin auf der Karte frei verschieben oder antippen, um den Ort genau zu setzen.',
-      timeblock1: '1. Zeitblock', timeblock2: '2. Zeitblock (optional)',
-      refresh_btn: 'Aktualisieren', map_no_coords: 'Einige Orte haben noch keine Koordinaten', remove_photo: 'Foto entfernen',
-      grundstueck_lbl: 'Grundstück', flaeche_lbl: 'Fläche',
-      day_daily: 'Täglich', day_mofr: 'Mo – Fr', day_mosa: 'Mo – Sa', day_moso: 'Mo – So', day_saso: 'Sa – So',
-      pub_visible: 'Öffentlich sichtbar in der App', owner_only: 'Nur für verifizierte Inhaber',
-      email_change_hint: 'Bestätigung per Link an die neue Adresse', send_confirm_link: 'Bestätigungslink senden',
-      save_changes: 'Änderungen speichern', changes_saved: 'Änderungen gespeichert!',
-      pin_hint: 'Pin auf der Karte verschieben oder antippen, um den Standort zu ändern.',
-      choose_city: 'Stadt wählen',
-      adm_all_entries: 'Alle Einträge', adm_review: 'Einträge prüfen', adm_all_checked: 'Alles geprüft!', adm_none_open: 'Keine offenen Einträge.', adm_similar: '⚠️ Ähnliche Einträge gefunden – bitte prüfen:',
-      err_generic: 'Fehler.', err_prefix: t('err_prefix'),
-      del_entry_confirm: 'Eintrag wirklich löschen?', del_review_confirm: 'Bewertung löschen?', del_comment_confirm: 'Kommentar löschen?', del_photo_confirm: 'Foto löschen?', del_deal_confirm: 'Deal wirklich entfernen?', cancel_event_confirm: 'Event wirklich absagen?',
-      toast_coords_saved: '✅ Koordinaten gespeichert!', toast_no_entry: 'Kein Eintrag gewählt.', toast_photo_uploaded: '✓ Foto hochgeladen', toast_photo_submitted: '✓ Foto eingereicht – wird geprüft und nach Freigabe sichtbar', toast_report_sent: '✅ Meldung gesendet. Danke!', toast_entry_deleted: '✓ Eintrag gelöscht',
-      err_event_load: 'Event konnte nicht geladen werden.', err_sold_out: t('err_sold_out'), err_already_signed: t('err_already_signed'), err_reason: 'Bitte begründen.', err_upload: 'Fehler beim Hochladen',
-      ev_type_party: '🎊 Party', ev_type_festival: '🎪 Festival', ev_type_konzert: '🎵 Konzert', ev_type_retreat: '🧘 Retreat', ev_type_workshop: '🛠 Workshop',
       // Search
       search_placeholder: 'Arzt, Restaurant, Anwalt...',
       // Categories
@@ -157,7 +141,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ev_unsignup_confirm: 'Von diesem Event abmelden?', ev_unsignup_ok: '✅ Abgemeldet.',
       ev_already_signed_up: '✅ Du bist angemeldet', ev_unsignup_btn: 'Abmelden',
       ev_signups_label: 'Anmeldungen',
-      ev_signup_ok: '✅ Anmeldung erfolgreich!', ev_already_signed: t('err_already_signed'),
+      ev_signup_ok: '✅ Anmeldung erfolgreich!', ev_already_signed: 'Du bist bereits angemeldet.',
       ev_full_msg: 'Ausgebucht', ev_error_fields: 'Bitte alle Pflichtfelder (*) ausfüllen.',
       // Badges
       badge_title: 'Meine Auszeichnungen',
@@ -172,22 +156,6 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Encabezado
       greet_morning: 'Buenos días', greet_day: 'Buenas tardes', greet_evening: 'Buenas tardes', greet_night: 'Buenas noches',
       header_sub: '¿Qué estás buscando?',
-      location_tip: '💡 Consejo: Toca „Usar mi ubicación" – luego puedes mover el pin en el mapa o tocarlo para fijar el lugar con precisión.',
-      timeblock1: 'Horario 1', timeblock2: 'Horario 2 (opcional)',
-      refresh_btn: 'Actualizar', map_no_coords: 'Algunos lugares aún no tienen coordenadas', remove_photo: 'Quitar foto',
-      grundstueck_lbl: 'Terreno', flaeche_lbl: 'Superficie',
-      day_daily: 'A diario', day_mofr: 'Lu – Vi', day_mosa: 'Lu – Sá', day_moso: 'Lu – Do', day_saso: 'Sá – Do',
-      pub_visible: 'Visible públicamente en la app', owner_only: 'Solo para propietarios verificados',
-      email_change_hint: 'Confirmación por enlace a la nueva dirección', send_confirm_link: 'Enviar enlace de confirmación',
-      save_changes: 'Guardar cambios', changes_saved: '¡Cambios guardados!',
-      pin_hint: 'Mueve o toca el pin en el mapa para cambiar la ubicación.',
-      choose_city: 'Elegir ciudad',
-      adm_all_entries: 'Todas las entradas', adm_review: 'Revisar entradas', adm_all_checked: '¡Todo revisado!', adm_none_open: 'No hay entradas pendientes.', adm_similar: '⚠️ Se encontraron entradas similares — por favor revisa:',
-      err_generic: 'Error.', err_prefix: 'Error: ',
-      del_entry_confirm: '¿Eliminar la entrada de verdad?', del_review_confirm: '¿Eliminar la reseña?', del_comment_confirm: '¿Eliminar el comentario?', del_photo_confirm: '¿Eliminar la foto?', del_deal_confirm: '¿Quitar la oferta de verdad?', cancel_event_confirm: '¿Cancelar el evento de verdad?',
-      toast_coords_saved: '✅ ¡Coordenadas guardadas!', toast_no_entry: 'Ninguna entrada seleccionada.', toast_photo_uploaded: '✓ Foto subida', toast_photo_submitted: '✓ Foto enviada – se revisará y será visible tras la aprobación', toast_report_sent: '✅ ¡Reporte enviado. Gracias!', toast_entry_deleted: '✓ Entrada eliminada',
-      err_event_load: 'No se pudo cargar el evento.', err_sold_out: 'Lamentablemente agotado.', err_already_signed: 'Ya estás inscrito.', err_reason: 'Por favor indica un motivo.', err_upload: 'Error al subir',
-      ev_type_party: '🎊 Fiesta', ev_type_festival: '🎪 Festival', ev_type_konzert: '🎵 Concierto', ev_type_retreat: '🧘 Retiro', ev_type_workshop: '🛠 Taller',
       // Búsqueda
       search_placeholder: 'Médico, Restaurante, Abogado...',
       // Categorías
@@ -335,13 +303,6 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     return (translations[currentLang] && translations[currentLang][key]) || translations['de'][key] || key;
   }
 
-  // Escape user-generated text before inserting into innerHTML (prevents XSS & broken attributes)
-  function esc(s) {
-    return String(s == null ? '' : s)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
-
   let contentTranslated = false;
 
   function toggleLangAuth() {
@@ -361,88 +322,58 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     localStorage.setItem('buscar_lang', currentLang);
     contentTranslated = false;
     applyLang();
-    // re-render dynamic t()-based content so prices/types/labels switch immediately
-    try { renderListings(); } catch(e){}
-    try { renderEvents(); } catch(e){}
     translateVisibleContent();
   }
 
-  const translationCache = {};
   async function detectAndTranslate(text, targetLang) {
-    const ck = targetLang + '|' + text;
-    if (translationCache[ck]) return translationCache[ck];
     try {
       const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text.substring(0,500))}`;
       const res = await fetch(url);
       const data = await res.json();
       // Google returns [[["translated","original",...],...],...]
       const translated = data?.[0]?.map(item => item?.[0]).filter(Boolean).join('');
-      if (translated && translated !== text) { translationCache[ck] = translated; return translated; }
+      if (translated && translated !== text) return translated;
     } catch(e) {}
     return null;
   }
 
   async function translateVisibleContent() {
+    const btn = document.getElementById('langToggle');
+    const origText = btn.textContent;
+    btn.textContent = '⏳';
+    btn.disabled = true;
+
     const targetLang = currentLang === 'es' ? 'es' : 'de';
 
-    // Collect all dynamic-content elements (entries, reviews, comments, replies, detail desc)
+    // Collect all elements needing translation
     const allEls = [
       ...document.querySelectorAll('.listing-desc[data-original]'),
       ...document.querySelectorAll('.review-item-text[data-original]'),
       ...document.querySelectorAll('.comment-item-text[data-original]'),
       ...document.querySelectorAll('.reply-item-text[data-original]'),
-      ...document.querySelectorAll('.event-card-title[data-original]'),
-      ...document.querySelectorAll('.event-card-desc[data-original]'),
-    ];
+    ].filter(el => el.dataset.original && el.dataset.original.length > 3);
+
     const detailDesc = document.getElementById('detailDesc');
-    if (detailDesc && detailDesc.dataset.original) allEls.unshift(detailDesc);
-
-    // Only those not already shown in the target language
-    const todo = allEls.filter(el =>
-      el.dataset.original && el.dataset.original.length > 3 && el.dataset.tlang !== targetLang
-    );
-    if (!todo.length) return;
-
-    // Back to German: just restore the originals — no API needed
-    if (targetLang === 'de') {
-      todo.forEach(el => { el.textContent = el.dataset.original; el.dataset.tlang = 'de'; });
-      return;
+    if (detailDesc && detailDesc.dataset.original && detailDesc.dataset.original.length > 3) {
+      allEls.unshift(detailDesc);
     }
-
-    const btn = document.getElementById('langToggle');
-    const origText = btn ? btn.textContent : '';
-    if (btn) { btn.textContent = '⏳'; btn.disabled = true; }
 
     // Translate in parallel batches of 4
     const batchSize = 4;
-    for (let i = 0; i < todo.length; i += batchSize) {
-      const batch = todo.slice(i, i + batchSize);
+    for (let i = 0; i < allEls.length; i += batchSize) {
+      const batch = allEls.slice(i, i + batchSize);
       await Promise.all(batch.map(async el => {
         const translated = await detectAndTranslate(el.dataset.original, targetLang);
-        el.textContent = translated || el.dataset.original;
-        el.dataset.tlang = targetLang;
+        if (translated) el.textContent = translated;
       }));
     }
 
-    if (btn) { btn.textContent = origText; btn.disabled = false; }
+    btn.textContent = origText;
+    btn.disabled = false;
     contentTranslated = true;
   }
 
-  // Auto-wire: any leaf element whose German text exactly matches a dictionary
-  // value gets the matching data-i18n key — covers elements where a key exists
-  // but the attribute was never added. Runs once. Exact-match only = safe.
-  function autoWireI18n() {
-    const de = translations.de, rev = {};
-    Object.keys(de).forEach(k => { if (typeof de[k] === 'string') { const v = de[k].trim(); if (v && !(v in rev)) rev[v] = k; } });
-    document.querySelectorAll('body *:not(script):not(style)').forEach(el => {
-      if (el.hasAttribute('data-i18n') || el.children.length) return;
-      const txt = el.textContent.trim();
-      if (txt && rev[txt]) el.setAttribute('data-i18n', rev[txt]);
-    });
-  }
-
   function applyLang() {
-    if (!applyLang._wired) { try { autoWireI18n(); } catch(e){} applyLang._wired = true; }
     const btn = document.getElementById('langToggle');
     if (btn) btn.textContent = currentLang === 'de' ? 'ES' : 'DE';
     const btnAuth = document.getElementById('langToggleAuth');
@@ -460,7 +391,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       el.placeholder = t(el.getAttribute('data-i18n-ph'));
     });
 
-    // Header greeting (header_sub now handled via data-i18n)
+    // Header
+    const headerSub = document.querySelector('.header-sub');
+    if (headerSub) headerSub.textContent = t('header_sub');
     updateGreeting();
 
     // City picker
@@ -1062,12 +995,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     'Party':'🎊','Festival':'🎪','Konzert':'🎵','Retreat':'🧘',
     'Workshop':'🛠','Sport':'⚽','Kultur':'🎭','Treffen':'🤝','Markt':'🛒','Sonstiges':'📌'
   };
-  const EVENT_TYPE_ES = {'Party':'Fiesta','Festival':'Festival','Konzert':'Concierto','Retreat':'Retiro','Workshop':'Taller','Sport':'Deporte','Kultur':'Cultura','Treffen':'Encuentro','Markt':'Mercado','Sonstiges':'Otro'};
-  function evTypeName(ty){ return (currentLang==='es' && EVENT_TYPE_ES[ty]) ? EVENT_TYPE_ES[ty] : (ty||''); }
 
   async function loadEvents() {
-    // Instant: render from in-memory cache if we already have events
-    if (allEvents && allEvents.length) { renderEvents(); }
     try {
       const now = new Date();
       const snap = await db.collection('events')
@@ -1078,11 +1007,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       renderEvents();
     } catch(e) {
       console.error('loadEvents error', e);
-      // Keep showing cached events on error; only show error if we have nothing
-      if (!(allEvents && allEvents.length)) {
-        document.getElementById('eventsList').innerHTML =
-          '<div style="text-align:center;padding:40px;color:var(--text-3)">Fehler beim Laden.</div>';
-      }
+      document.getElementById('eventsList').innerHTML =
+        '<div style="text-align:center;padding:40px;color:var(--text-3)">Fehler beim Laden.</div>';
     }
   }
 
@@ -1140,7 +1066,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var typeClass = 'type-' + (ev.type||'').toLowerCase();
       var isFull = ev.has_signup && ev.capacity > 0 && (ev.signups_count||0) >= ev.capacity;
       var isCancelled = ev.status === 'cancelled';
-      var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' ₲' : t('ev_paid_label')) : t('ev_free');
+      var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' ₲' : 'Kostenpflichtig') : 'Kostenlos';
       var spotsLeft = ev.has_signup && ev.capacity > 0 ? (ev.capacity - (ev.signups_count||0)) + ' ' + t('ev_spots') : '';
       var statusHtml = isCancelled ? '<span class=\"event-status-cancelled\">'+t('ev_cancelled')+'</span>' :
                        isFull ? '<span class=\"event-status-full\">'+t('ev_full')+'</span>' :
@@ -1150,23 +1076,22 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         + '<div class="event-card-banner ' + typeClass + '"></div>'
         + '<div class="event-card-body">'
         + '<div class="event-card-top">'
-        + '<div class="event-card-title" data-original="' + esc(ev.title) + '">' + esc(ev.title) + '</div>'
-        + '<div class="event-card-type">' + emoji + ' ' + evTypeName(ev.type) + '</div>'
+        + '<div class="event-card-title">' + (ev.title||'') + '</div>'
+        + '<div class="event-card-type">' + emoji + ' ' + (ev.type||'') + '</div>'
         + '</div>'
         + '<div class="event-card-meta">'
         + '<div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> '
         + dateStr + (timeStr ? ' · ' + timeStr : '') + '</div>'
         + '<div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> '
-        + esc(ev.city) + '</div>'
+        + (ev.city||'') + '</div>'
         + '</div>'
-        + '<div class="event-card-desc" data-original="' + esc(ev.description) + '">' + esc(ev.description) + '</div>'
+        + '<div class="event-card-desc">' + (ev.description||'') + '</div>'
         + '<div class="event-card-footer">'
         + '<span class="event-price">' + priceStr + '</span>'
         + statusHtml
         + '</div>'
         + '</div></div>';
     }).join('');
-    if (currentLang !== 'de') translateVisibleContent();
   }
 
   var _currentEventId = null;
@@ -1194,15 +1119,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('evDetailMeta').innerHTML =
       '<div class="event-detail-meta">📅 ' + dateStr + '</div>'
       + (timeStr ? '<div class="event-detail-meta">🕐 ' + timeStr + (timeEndStr ? ' – ' + timeEndStr : '') + '</div>' : '')
-      + '<div class="event-detail-meta">📍 ' + esc(prettyCity(ev.city||'')) + (ev.address ? ', ' + esc(ev.address) : '') + '</div>'
+      + '<div class="event-detail-meta">📍 ' + (prettyCity(ev.city||'')) + (ev.address ? ', ' + ev.address : '') + '</div>'
       + (evRouteUrl ? '<a class="ev-route-btn" href="' + evRouteUrl + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Route starten</a>' : '');
 
     var isFull = ev.has_signup && ev.capacity > 0 && (ev.signups_count||0) >= ev.capacity;
     var isCancelled = ev.status === 'cancelled';
-    var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' Guaraní' : t('ev_paid_label')) : t('ev_free');
+    var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' Guaraní' : 'Kostenpflichtig') : 'Kostenlos';
 
     var bodyHtml = '<div style="background:var(--card);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px">'
-      + '<p style="font-size:15px;line-height:1.6;color:var(--text-1);margin:0">' + esc(ev.description) + '</p>'
+      + '<p style="font-size:15px;line-height:1.6;color:var(--text-1);margin:0">' + (ev.description||'') + '</p>'
       + '</div>';
 
     bodyHtml += '<div style="background:var(--card);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px">';
@@ -1258,7 +1183,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!currentUser){ showScreen('screenAuth'); return; }
     var ev = (typeof allEvents!=='undefined' && allEvents) ? allEvents.find(function(e){ return e.id===id; }) : null;
     if (!ev){
-      try { var d = await db.collection('events').doc(id).get(); if (!d.exists) return; ev = Object.assign({id:d.id}, d.data()); } catch(e){ alert(t('err_event_load')); return; }
+      try { var d = await db.collection('events').doc(id).get(); if (!d.exists) return; ev = Object.assign({id:d.id}, d.data()); } catch(e){ alert('Event konnte nicht geladen werden.'); return; }
     }
     if (ev.created_by !== currentUser.uid && currentUser.email !== ADMIN_EMAIL){ alert('Nur der Ersteller kann das Event bearbeiten.'); return; }
     _editingEventId = id;
@@ -1469,7 +1394,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       showScreen('screenEvents');
       loadEvents();
     } catch(e) {
-      errEl.textContent = t('err_prefix') + e.message;
+      errEl.textContent = 'Fehler: ' + e.message;
       errEl.style.display = 'block';
       btn.disabled = false;
       btn.textContent = t('ev_publish');
@@ -1493,7 +1418,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       showToast(t('ev_signup_ok'));
       showEventDetail(id);
     } catch(e) {
-      alert(e.message === 'Ausgebucht' ? t('err_sold_out') : e.message === 'Bereits angemeldet' ? t('err_already_signed') : t('err_prefix') + e.message);
+      alert(e.message === 'Ausgebucht' ? 'Leider ausgebucht.' : e.message === 'Bereits angemeldet' ? 'Du bist bereits angemeldet.' : 'Fehler: ' + e.message);
     }
   }
 
@@ -1515,7 +1440,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function cancelEvent(id) {
-    if (!confirm(t('cancel_event_confirm'))) return;
+    if (!confirm('Event wirklich absagen?')) return;
     try {
       await db.collection('events').doc(id).update({ status: 'cancelled' });
       var ev = allEvents.find(function(e){ return e.id === id; });
@@ -1523,7 +1448,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       showToast('Event wurde abgesagt.');
       showScreen('screenEvents');
       renderEvents();
-    } catch(e) { alert(t('err_prefix') + e.message); }
+    } catch(e) { alert('Fehler: ' + e.message); }
   }
   // ══ END EVENTS SYSTEM ══════════════════════════════════════════════════════
 
@@ -1680,8 +1605,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         return '<div style="padding:10px 0;border-bottom:1px solid var(--border)">'
           + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
           + '<div style="flex:1">'
-          + '<div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:2px">' + esc(ev.title) + '</div>'
-          + '<div style="font-size:12px;color:var(--text-3)">' + dateStr + (ev.city ? ' · ' + esc(ev.city) : '') + '</div>'
+          + '<div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:2px">' + (ev.title||'') + '</div>'
+          + '<div style="font-size:12px;color:var(--text-3)">' + dateStr + (ev.city ? ' · ' + ev.city : '') + '</div>'
           + (spotsStr ? '<div style="font-size:12px;color:var(--yellow);margin-top:2px;font-weight:600">' + spotsStr + '</div>' : '')
           + '</div>'
           + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
@@ -1729,8 +1654,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           + '<div style="display:flex;gap:10px;align-items:flex-start">'
           + '<div style="width:36px;height:36px;border-radius:50%;background:' + (isCancelled ? '#EF4444' : color) + ';display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">' + (isCancelled ? '❌' : emoji) + '</div>'
           + '<div style="flex:1;min-width:0">'
-          + '<div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:2px">' + esc(ev.title) + '</div>'
-          + '<div style="font-size:12px;color:var(--text-3)">' + dateStr + (timeStr ? ' · ' + timeStr : '') + (ev.city ? ' · ' + esc(ev.city) : '') + '</div>'
+          + '<div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:2px">' + (ev.title||'') + '</div>'
+          + '<div style="font-size:12px;color:var(--text-3)">' + dateStr + (timeStr ? ' · ' + timeStr : '') + (ev.city ? ' · ' + ev.city : '') + '</div>'
           + (isCancelled ? '<div style="font-size:12px;font-weight:700;color:#EF4444;margin-top:3px">⚠️ Dieses Event wurde abgesagt</div>' : '')
           + (isPast && !isCancelled ? '<div style="font-size:11px;color:var(--text-3);margin-top:2px">Vergangen</div>' : '')
           + '</div>'
@@ -1774,7 +1699,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       }
       showToast(t('ev_unsignup_ok'));
       loadMySignups();
-    } catch(e) { alert(t('err_prefix') + e.message); }
+    } catch(e) { alert('Fehler: ' + e.message); }
   }
   // ── END PROFIL EVENTS ──────────────────────────────────────────────────────
 
@@ -1856,11 +1781,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Update local cache
       var l = allListings.find(function(x){ return x.id === _coordListingId; });
       if (l) { l.lat = _coordLat; l.lng = _coordLng; }
-      showToast(t('toast_coords_saved'));
+      showToast('✅ Koordinaten gespeichert!');
       closeCoordEditor();
       if (maplibreMap && mapLoaded) renderMap();
     } catch(e) {
-      alert(t('err_prefix') + e.message);
+      alert('Fehler: ' + e.message);
       btn.disabled = false;
       btn.textContent = 'Koordinaten speichern';
     }
@@ -1887,7 +1812,6 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       updateGreeting();
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
       updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
-      if (!window._evPreloaded) { window._evPreloaded = true; setTimeout(function(){ loadEvents(); }, 1200); }
       var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden');
     } else { showScreen('screenAuth'); var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden'); }
   });
@@ -2159,7 +2083,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     list.innerHTML = filtered.map(c => `
       <div class="city-sheet-item${activeCity===c?' selected':''}" onclick="selectCity('${c}')">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>${c === 'Alle' ? t('city_all') : c}</span>
+        <span>${c === 'Alle' ? '🌍 Alle Städte' : c}</span>
       </div>`).join('');
   }
 
@@ -2173,7 +2097,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const label = document.getElementById('cityPickerLabel');
     if (city === 'Alle') {
       btn.classList.remove('active');
-      label.textContent = t('city_select');
+      label.textContent = 'Stadt wählen...';
       btn.onclick = openCitySheet;
     } else {
       btn.classList.add('active');
@@ -2228,8 +2152,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
-    container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.name)}</div><div style="display:flex;gap:3px;align-items:center;flex-shrink:0">${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${isNew(l.created_at)?`<span class='badge-neu'>${t('badge_new')}</span>`:''}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div></div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(prettyCity(l.city))}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${esc(l.description)}">${esc(l.description)}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
-    if (currentLang !== 'de') translateVisibleContent();
+    container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.name||''}</div><div style="display:flex;gap:3px;align-items:center;flex-shrink:0">${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${isNew(l.created_at)?`<span class='badge-neu'>${t('badge_new')}</span>`:''}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div></div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${prettyCity(l.city)}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
   }
 
   function renderReFacts(l) {
@@ -2319,7 +2242,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var l=allListings.find(function(x){return x.id===id;}); if(l) Object.assign(l, upd);
       showToast('✅ '+(es?'Guardado':'Gespeichert'));
       showDetail(id);
-    }catch(e){ if(btn){ btn.disabled=false; btn.textContent=(es?'Guardar':'Speichern'); } alert(t('err_prefix')+(e.message||e)); }
+    }catch(e){ if(btn){ btn.disabled=false; btn.textContent=(es?'Guardar':'Speichern'); } alert('Fehler: '+(e.message||e)); }
   }
   function renderImmoCard(l){
     var es=(currentLang==='es');
@@ -2333,9 +2256,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     return '<div class="immo-card'+(isFeatured(l)?' immo-card-featured':'')+'" onclick="showDetail(\''+l.id+'\')">'+media
       +'<div class="immo-card-body">'+immoBadgesHTML(l)+dealBadge
       +(price?'<div class="immo-card-price">'+price+'</div>':'')
-      +'<div class="immo-card-name">'+esc(l.name)+'</div>'
+      +'<div class="immo-card-name">'+(l.name||'')+'</div>'
       +(meta?'<div class="immo-card-meta">'+meta+'</div>':'')
-      +(l.city?'<div class="immo-card-city">'+esc(l.city)+'</div>':'')
+      +(l.city?'<div class="immo-card-city">'+l.city+'</div>':'')
       +'</div></div>';
   }
   function handleReCover(e){
@@ -2469,12 +2392,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const svg = document.getElementById('detailIcon').querySelector('svg');
     if (svg) { svg.style.width='34px'; svg.style.height='34px'; svg.style.stroke='white'; }
     document.getElementById('detailTitle').textContent = l.name||'';
-    document.getElementById('detailCity').innerHTML = l.city?`<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(prettyCity(l.city))}`:'';
+    document.getElementById('detailCity').innerHTML = l.city?`<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${prettyCity(l.city)}`:'';
     const descEl = document.getElementById('detailDesc');
     const descContent = l.description || '';
-    descEl.innerHTML = esc(descContent) || t('no_description');
+    descEl.innerHTML = descContent || t('no_description');
     descEl.dataset.original = descContent;
-    descEl.dataset.tlang = '';
     const badges = document.getElementById('detailBadges');
     const openStatus = isOpen(l.opening_hours);
     const openBadge = openStatus===true ? '<span class="detail-badge open-status">'+t('open_now')+'</span>' : openStatus===false ? '<span class="detail-badge closed-status">'+t('closed_now')+'</span>' : '';
@@ -3031,10 +2953,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
     var l = x.l;
     var col = catColors[l.category_id] || catColors.default;
-    var sub = (catLabels[l.category_id] || catLabels.default) + (l.city ? ' · ' + esc(l.city) : '');
+    var sub = (catLabels[l.category_id] || catLabels.default) + (l.city ? ' · ' + l.city : '');
     return '<div class="radar-row" onclick="showDetail(\''+l.id+'\')">'
       + '<div class="radar-row-dot" style="background:'+col+'"></div>'
-      + '<div class="radar-row-main"><div class="radar-row-name">'+esc(l.name)+'</div><div class="radar-row-sub">'+sub+'</div></div>'
+      + '<div class="radar-row-main"><div class="radar-row-name">'+(l.name||'')+'</div><div class="radar-row-sub">'+sub+'</div></div>'
       + '<div class="radar-row-dist">'+_fmtDist(km)+'</div></div>';
   }
   function _bearing(la1, ln1, la2, ln2){
@@ -3202,7 +3124,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var _lhReset = document.getElementById('locationHint'); if (_lhReset) _lhReset.style.display = '';
       pendingFormPhotos = [];
       const grid2 = document.getElementById('formPhotoGrid');
-      grid2.innerHTML = `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">${t('photo_add_label')}</span></label><input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">`;
+      grid2.innerHTML = `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span></label><input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">`;
       ['newName','newCity','newDesc','newPhone','newWebsite','newAddress','newHours'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('newCategory').value = '';
       document.getElementById('nameCounter').textContent = '0 / 60';
@@ -3518,7 +3440,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       showToast('✓ Duplikat gelöscht');
       await loadListings();
       loadAdminDuplicates();
-    } catch(e){ alert(t('err_prefix') + (e.message || e)); }
+    } catch(e){ alert('Fehler: ' + (e.message || e)); }
   }
 
   async function loadAdminListings() {
@@ -3589,7 +3511,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('claims').doc(claimId).update({ status: 'approved' });
       await db.collection('listings').doc(listingId).update({ owner_id: userId });
       document.getElementById('claimCard_' + claimId).remove();
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { alert('Fehler.'); }
   }
 
   async function rejectClaim(claimId) {
@@ -3597,7 +3519,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       await db.collection('claims').doc(claimId).update({ status: 'rejected' });
       document.getElementById('claimCard_' + claimId).remove();
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { alert('Fehler.'); }
   }
 
   async function approveEntry(id) {
@@ -3678,25 +3600,25 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       const btn = event.target;
       btn.textContent = '✓ Gespeichert!';
       setTimeout(() => { btn.textContent = 'Deal speichern'; }, 2000);
-    } catch(e) { alert(t('err_prefix') + (e.message || e)); }
+    } catch(e) { alert('Fehler: ' + (e.message || e)); }
   }
 
   async function removeDeal(listingId) {
-    if (!confirm(t('del_deal_confirm'))) return;
+    if (!confirm('Deal wirklich entfernen?')) return;
     try {
       await db.collection('listings').doc(listingId).update({ deal_text: null, deal_code: null, deal_expiry: null });
       await loadListings();
       loadAdminDeals();
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { alert('Fehler.'); }
   }
 
   async function rejectEntry(id) {
-    if (!confirm(t('del_entry_confirm'))) return;
+    if (!confirm('Eintrag wirklich löschen?')) return;
     try {
       await db.collection('listings').doc(id).delete();
       var card = document.getElementById('adminCard_' + id);
       if (card) card.remove();
-      showToast(t('toast_entry_deleted'));
+      showToast('✓ Eintrag gelöscht');
     } catch (err) {
       console.error('rejectEntry failed', err);
       var msg = (err && err.message) ? err.message : 'Unbekannter Fehler';
@@ -3763,13 +3685,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('reviewsList').innerHTML = reviews.filter(r => r.comment).map(r => `
       <div class="review-item">
         <div class="review-item-top">
-          <span class="review-item-name">${esc(r.user_name||'Anonym')}</span>
+          <span class="review-item-name">${r.user_name||'Anonym'}</span>
           <div class="review-item-stars">${starsHTML(r.rating,12)}</div>
         </div>
-        <div class="review-item-text" data-original="${esc(r.comment)}">${esc(r.comment)}</div>
+        <div class="review-item-text" data-original="${r.comment}">${r.comment}</div>
         <div class="review-item-date">${formatDate(r.created_at)}</div>
       </div>`).join('');
-    if (currentLang !== 'de') translateVisibleContent();
   }
 
   window.addEventListener('load', function() { (function() {
@@ -3818,7 +3739,6 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function isNew(c){if(!c)return false;try{var d=c.toDate?c.toDate():new Date(c);return(Date.now()-d.getTime())<1209600000;}catch(e){return false;}}
 
   const subcatTranslations = {
-    'Sonstiges': 'Otros', 'Tierarzt': 'Veterinario', 'Genossenschaft': 'Cooperativa', 'Wechselstube': 'Casa de cambio',
     'Alle': 'Todo', 'Restaurant': 'Restaurante', 'Café': 'Café', 'Bar': 'Bar',
     'Parrilla': 'Parrilla', 'Fast Food': 'Comida rápida', 'Bäckerei': 'Panadería',
     'Arzt': 'Médico', 'Zahnarzt': 'Dentista', 'Anwalt': 'Abogado', 'Notar': 'Notario',
@@ -3921,7 +3841,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await loadAllRatings();
       loadReviews(listingId);
       renderListings();
-    } catch (err) { alert(t('err_generic')); btn.disabled=false; btn.textContent='Bewertung abschicken'; }
+    } catch (err) { alert('Fehler.'); btn.disabled=false; btn.textContent='Bewertung abschicken'; }
   }
 
   async function loadComments(listingId) {
@@ -3944,20 +3864,20 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         const myReply = currentUser && r.user_id === currentUser.uid;
         return `<div class="reply-item">
           <div class="reply-item-top">
-            <span class="reply-item-name">${esc(r.user_name||'Anonym')}</span>
+            <span class="reply-item-name">${r.user_name||'Anonym'}</span>
             <span class="reply-item-date">${formatDate(r.created_at)}</span>
             ${myReply ? `<button onclick="deleteComment('${r.id}','${listingId}')" style="margin-left:6px;font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;padding:0">${t('delete')}</button>` : ''}
           </div>
-          <div class="reply-item-text" data-original="${esc(r.text)}">${esc(r.text)}</div>
+          <div class="reply-item-text" data-original="${r.text}">${r.text}</div>
         </div>`;
       }).join('');
       return `<div class="comment-item">
         <div class="comment-item-top">
-          <span class="comment-item-name">${esc(c.user_name||'Anonym')}</span>
+          <span class="comment-item-name">${c.user_name||'Anonym'}</span>
           <span class="comment-item-date">${formatDate(c.created_at)}</span>
           ${myComment ? `<button onclick="deleteComment('${c.id}','${listingId}')" style="margin-left:6px;font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;padding:0">${t('delete')}</button>` : ''}
         </div>
-        <div class="comment-item-text" data-original="${esc(c.text)}">${esc(c.text)}</div>
+        <div class="comment-item-text" data-original="${c.text}">${c.text}</div>
         <button class="reply-btn" onclick="toggleReplyForm('${c.id}')">${t('reply')}</button>
         ${repliesHTML}
         <div class="reply-form" id="replyForm_${c.id}" style="display:none;margin-top:8px">
@@ -3966,12 +3886,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         </div>
       </div>`;
     }).join('');
-    if (currentLang !== 'de') translateVisibleContent();
   }
 
   async function deleteReview(reviewId, listingId) {
-    if (!confirm(t('del_review_confirm'))) return;
-    try { await db.collection('reviews').doc(reviewId).delete(); await loadAllRatings(); loadReviews(listingId); renderListings(); } catch(e) { alert(t('err_generic')); }
+    if (!confirm('Bewertung löschen?')) return;
+    try { await db.collection('reviews').doc(reviewId).delete(); await loadAllRatings(); loadReviews(listingId); renderListings(); } catch(e) { alert('Fehler.'); }
   }
 
   function editReview(reviewId, listingId, oldRating) {
@@ -3992,12 +3911,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         rating: currentUserRating, comment: document.getElementById('reviewText').value.trim(), updated_at: new Date()
       });
       await loadAllRatings(); loadReviews(listingId); renderListings();
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { alert('Fehler.'); }
   }
 
   async function deleteComment(commentId, listingId) {
-    if (!confirm(t('del_comment_confirm'))) return;
-    try { await db.collection('comments').doc(commentId).delete(); loadComments(listingId); } catch(e) { alert(t('err_generic')); }
+    if (!confirm('Kommentar löschen?')) return;
+    try { await db.collection('comments').doc(commentId).delete(); loadComments(listingId); } catch(e) { alert('Fehler.'); }
   }
 
   function toggleReplyForm(commentId) {
@@ -4016,7 +3935,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         text: txt, created_at: new Date()
       });
       loadComments(listingId);
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { alert('Fehler.'); }
   }
 
   function detailBack(){ var from = window._detailFrom || 'screenHome'; if (from === 'screenMap') window._skipMapFit = true; showScreen(from); }
@@ -4111,7 +4030,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       else if (e.code === 'auth/invalid-email') err.textContent='Ungültige E-Mail-Adresse.';
       else if (e.code === 'auth/requires-recent-login') err.textContent='Bitte melde dich neu an und versuche es erneut.';
       else if (e.code === 'auth/operation-not-allowed') err.textContent='E-Mail-Änderung ist derzeit nicht aktiviert.';
-      else err.textContent=t('err_prefix') + (e.message || e.code || 'unbekannt');
+      else err.textContent='Fehler: ' + (e.message || e.code || 'unbekannt');
       err.style.display='block';
     }
   }
@@ -4132,7 +4051,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       });
       document.getElementById('commentInput').value = '';
       loadComments(currentListingId);
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { alert('Fehler.'); }
   }
 
   async function loadPhotos(listingId) {
@@ -4146,7 +4065,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const canDelete = currentUser && currentUser.email === ADMIN_EMAIL;
     _lbUrls = photos.map(function(p){ return p.url; });
     let html = photos.map((p, _i) => `<div class="photo-thumb-wrap" style="position:relative"><img class="photo-thumb" src="${p.url}" onclick="openLightbox(${_i})">${canDelete ? `<button onclick="deletePhoto('${p.id}','${p.path}',event)" style="position:absolute;top:4px;right:4px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>` : ''}</div>`).join('');
-    if (currentUser) html += `<div class="photo-upload" onclick="document.getElementById('photoFileInput').click()" style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="22" height="22"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">${t('photo_add_label')}</span></div>`;
+    if (currentUser) html += `<div class="photo-upload" onclick="document.getElementById('photoFileInput').click()" style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="22" height="22"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span></div>`;
     grid.innerHTML = html + `<input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="uploadPhoto(event)">`;
   }
 
@@ -4172,17 +4091,17 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function deletePhoto(photoId, path, event) {
     event.stopPropagation();
-    if (!confirm(t('del_photo_confirm'))) return;
+    if (!confirm('Foto löschen?')) return;
     try {
       if (path) await storage.ref(path).delete().catch(()=>{});
       await db.collection('listing_photos').doc(photoId).delete();
       loadPhotos(currentListingId);
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { alert('Fehler.'); }
   }
 
   async function uploadPhoto(event) {
     if (!currentUser) { showToast('Du musst eingeloggt sein.'); return; }
-    if (!currentListingId) { showToast(t('toast_no_entry')); return; }
+    if (!currentListingId) { showToast('Kein Eintrag gewählt.'); return; }
     const file = event.target.files[0];
     if (!file) return;
 
@@ -4220,14 +4139,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           prog.textContent = '✓ Hochgeladen!';
           setTimeout(function(){ if (prog) prog.classList.remove('visible'); }, 2500);
         }
-        showToast(t('toast_photo_uploaded'));
+        showToast('✓ Foto hochgeladen');
         loadPhotos(currentListingId);
       } else {
         if (prog) {
           prog.textContent = '✓ Foto wird geprüft und nach Freigabe sichtbar';
           setTimeout(function(){ if (prog) prog.classList.remove('visible'); }, 5000);
         }
-        showToast(t('toast_photo_submitted'));
+        showToast('✓ Foto eingereicht – wird geprüft und nach Freigabe sichtbar');
       }
 
       // Input zurücksetzen damit gleiches Foto erneut wählbar ist
@@ -4240,7 +4159,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         prog.textContent = '✗ ' + msg;
         setTimeout(function(){ if (prog) prog.classList.remove('visible'); }, 5000);
       }
-      showToast('✗ ' + t('err_prefix') + msg);
+      showToast('✗ Fehler: ' + msg);
     }
   }
 
@@ -4349,7 +4268,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const oldInput = document.getElementById('formPhotoInput');
     const photos = [...pendingFormPhotos];
     pendingFormPhotos = [];
-    grid.innerHTML = `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">${t('photo_add_label')}</span></label><input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">`;
+    grid.innerHTML = `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span></label><input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">`;
     photos.forEach(p => {
       pendingFormPhotos.push(p);
       const idx = pendingFormPhotos.length - 1;
@@ -4382,7 +4301,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function deleteAvatar() {
     if (!currentUser) return;
-    if (!confirm(t('del_photo_confirm'))) return;
+    if (!confirm('Foto wirklich entfernen?')) return;
     try {
       const userDoc = await db.collection('users').doc(currentUser.uid).get();
       if (userDoc.exists && userDoc.data().avatar_path) {
@@ -4391,7 +4310,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('users').doc(currentUser.uid).set({ avatar_url: null, avatar_path: null }, { merge: true });
       const name = document.getElementById('profilName').textContent;
       setAvatarDisplay(null, name.charAt(0).toUpperCase());
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { alert('Fehler.'); }
   }
 
   async function uploadAvatar(event) {
@@ -4469,7 +4388,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function submitClaim(listingId) {
     const reason = document.getElementById('claimReason').value.trim();
-    if (!reason) { alert(t('err_reason')); return; }
+    if (!reason) { alert('Bitte begründen.'); return; }
     try {
       const userDoc = await db.collection('users').doc(currentUser.uid).get();
       await db.collection('claims').add({
@@ -4478,7 +4397,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         reason, status: 'pending', created_at: new Date()
       });
       document.getElementById('claimDiv').innerHTML = `<div style="text-align:center;padding:8px"><div style="font-size:14px;color:var(--green);font-weight:600">✓ Anfrage gesendet!</div></div>`;
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { alert('Fehler.'); }
   }
 
   async function deleteOwnListing(id){
@@ -4660,7 +4579,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!favs.length) {
       body.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="empty-title">Noch keine Favoriten</div><div class="empty-sub">Tippe auf das Herz in der Detailansicht</div></div>`;
     } else {
-      body.innerHTML = favs.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-name">${esc(l.name)}</div><div class="listing-city">${esc(l.city)}</div><div class="listing-desc">${esc(l.description)}</div></div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+      body.innerHTML = favs.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-name">${l.name||''}</div><div class="listing-city">${l.city||''}</div><div class="listing-desc">${l.description||''}</div></div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
     }
     showScreen('screenFavorites');
   }
@@ -4700,7 +4619,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     list.innerHTML = filtered.map(c => `
       <div class="city-sheet-item${mapCityFilter===c?' selected':''}" onclick="selectMapCity('${c}')">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>${c === 'Alle' ? t('city_all') : c}</span>
+        <span>${c === 'Alle' ? '🌍 Alle Städte' : c}</span>
       </div>`).join('');
   }
 
@@ -4708,7 +4627,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   function selectMapCity(city) {
     mapCityFilter = city;
-    document.getElementById('mapCityPickerLabel').textContent = city === 'Alle' ? t('city_select') : city;
+    document.getElementById('mapCityPickerLabel').textContent = city === 'Alle' ? 'Stadt wählen...' : city;
     document.getElementById('mapCityPickerBtn').style.background = city === 'Alle' ? 'var(--bg)' : 'var(--yellow-light)';
     closeMapCitySheet();
     _mapFitOnUpdate = true;
@@ -4779,16 +4698,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await loadListings();
       const l = allListings.find(x => x.id === listingId);
       if (l) showDetail(listingId);
-    } catch(e) { alert(t('err_prefix') + e.message); }
+    } catch(e) { alert('Fehler: ' + e.message); }
   }
 
   async function removeOwnerDeal(listingId) {
-    if (!confirm(t('del_deal_confirm'))) return;
+    if (!confirm('Deal wirklich entfernen?')) return;
     try {
       await db.collection('listings').doc(listingId).update({ deal_text: null, deal_code: null, deal_expiry: null });
       await loadListings();
       showDetail(listingId);
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { alert('Fehler.'); }
   }
 
   function copyDealCode(code) {
@@ -4870,7 +4789,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('listings').doc(listingId).update({ cover_url: null });
       await loadListings();
       showDetail(listingId);
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { alert('Fehler.'); }
   }
 
   // Cover image file input
@@ -4894,7 +4813,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         await db.collection('listings').doc(currentListingId).update({cover_url:url});
         await loadListings();
         showDetail(currentListingId);
-      }catch(err){alert(t('err_upload'));}
+      }catch(err){alert('Fehler beim Hochladen');}
       hero.style.opacity='1';
     };
     document.body.appendChild(inp);
@@ -4936,7 +4855,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       await db.collection('reports').doc(reportId).update({ status: 'resolved' });
       document.getElementById('reportCard_'+reportId).remove();
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { alert('Fehler.'); }
   }
 
   function openReport() { document.getElementById('reportOverlay').classList.add('visible'); }
@@ -4950,8 +4869,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         reason: reason, status: 'pending', created_at: new Date()
       });
       closeReport();
-      showToast(t('toast_report_sent'));
-    } catch(e) { alert(t('err_generic')); closeReport(); }
+      showToast('✅ Meldung gesendet. Danke!');
+    } catch(e) { alert('Fehler.'); closeReport(); }
   }
 
   // Service Worker registrieren fuer Offline-Funktionalitaet
