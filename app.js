@@ -12,6 +12,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       location_tip: '💡 Tipp: Tippe auf „Meinen Standort verwenden" – danach kannst du den Pin auf der Karte frei verschieben oder antippen, um den Ort genau zu setzen.',
       timeblock1: '1. Zeitblock', timeblock2: '2. Zeitblock (optional)',
       refresh_btn: 'Aktualisieren', map_no_coords: 'Einige Orte haben noch keine Koordinaten', remove_photo: 'Foto entfernen',
+      grundstueck_lbl: 'Grundstück', flaeche_lbl: 'Fläche',
+      day_daily: 'Täglich', day_mofr: 'Mo – Fr', day_mosa: 'Mo – Sa', day_moso: 'Mo – So', day_saso: 'Sa – So',
+      pub_visible: 'Öffentlich sichtbar in der App', owner_only: 'Nur für verifizierte Inhaber',
+      email_change_hint: 'Bestätigung per Link an die neue Adresse', send_confirm_link: 'Bestätigungslink senden',
+      save_changes: 'Änderungen speichern', changes_saved: 'Änderungen gespeichert!',
+      pin_hint: 'Pin auf der Karte verschieben oder antippen, um den Standort zu ändern.',
+      choose_city: 'Stadt wählen',
+      adm_all_entries: 'Alle Einträge', adm_review: 'Einträge prüfen', adm_all_checked: 'Alles geprüft!', adm_none_open: 'Keine offenen Einträge.', adm_similar: '⚠️ Ähnliche Einträge gefunden – bitte prüfen:',
+      err_generic: 'Fehler.', err_prefix: t('err_prefix'),
+      del_entry_confirm: 'Eintrag wirklich löschen?', del_review_confirm: 'Bewertung löschen?', del_comment_confirm: 'Kommentar löschen?', del_photo_confirm: 'Foto löschen?', del_deal_confirm: 'Deal wirklich entfernen?', cancel_event_confirm: 'Event wirklich absagen?',
+      toast_coords_saved: '✅ Koordinaten gespeichert!', toast_no_entry: 'Kein Eintrag gewählt.', toast_photo_uploaded: '✓ Foto hochgeladen', toast_photo_submitted: '✓ Foto eingereicht – wird geprüft und nach Freigabe sichtbar', toast_report_sent: '✅ Meldung gesendet. Danke!', toast_entry_deleted: '✓ Eintrag gelöscht',
+      err_event_load: 'Event konnte nicht geladen werden.', err_sold_out: t('err_sold_out'), err_already_signed: t('err_already_signed'), err_reason: 'Bitte begründen.', err_upload: 'Fehler beim Hochladen',
       ev_type_party: '🎊 Party', ev_type_festival: '🎪 Festival', ev_type_konzert: '🎵 Konzert', ev_type_retreat: '🧘 Retreat', ev_type_workshop: '🛠 Workshop',
       // Search
       search_placeholder: 'Arzt, Restaurant, Anwalt...',
@@ -145,7 +157,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ev_unsignup_confirm: 'Von diesem Event abmelden?', ev_unsignup_ok: '✅ Abgemeldet.',
       ev_already_signed_up: '✅ Du bist angemeldet', ev_unsignup_btn: 'Abmelden',
       ev_signups_label: 'Anmeldungen',
-      ev_signup_ok: '✅ Anmeldung erfolgreich!', ev_already_signed: 'Du bist bereits angemeldet.',
+      ev_signup_ok: '✅ Anmeldung erfolgreich!', ev_already_signed: t('err_already_signed'),
       ev_full_msg: 'Ausgebucht', ev_error_fields: 'Bitte alle Pflichtfelder (*) ausfüllen.',
       // Badges
       badge_title: 'Meine Auszeichnungen',
@@ -163,6 +175,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       location_tip: '💡 Consejo: Toca „Usar mi ubicación" – luego puedes mover el pin en el mapa o tocarlo para fijar el lugar con precisión.',
       timeblock1: 'Horario 1', timeblock2: 'Horario 2 (opcional)',
       refresh_btn: 'Actualizar', map_no_coords: 'Algunos lugares aún no tienen coordenadas', remove_photo: 'Quitar foto',
+      grundstueck_lbl: 'Terreno', flaeche_lbl: 'Superficie',
+      day_daily: 'A diario', day_mofr: 'Lu – Vi', day_mosa: 'Lu – Sá', day_moso: 'Lu – Do', day_saso: 'Sá – Do',
+      pub_visible: 'Visible públicamente en la app', owner_only: 'Solo para propietarios verificados',
+      email_change_hint: 'Confirmación por enlace a la nueva dirección', send_confirm_link: 'Enviar enlace de confirmación',
+      save_changes: 'Guardar cambios', changes_saved: '¡Cambios guardados!',
+      pin_hint: 'Mueve o toca el pin en el mapa para cambiar la ubicación.',
+      choose_city: 'Elegir ciudad',
+      adm_all_entries: 'Todas las entradas', adm_review: 'Revisar entradas', adm_all_checked: '¡Todo revisado!', adm_none_open: 'No hay entradas pendientes.', adm_similar: '⚠️ Se encontraron entradas similares — por favor revisa:',
+      err_generic: 'Error.', err_prefix: 'Error: ',
+      del_entry_confirm: '¿Eliminar la entrada de verdad?', del_review_confirm: '¿Eliminar la reseña?', del_comment_confirm: '¿Eliminar el comentario?', del_photo_confirm: '¿Eliminar la foto?', del_deal_confirm: '¿Quitar la oferta de verdad?', cancel_event_confirm: '¿Cancelar el evento de verdad?',
+      toast_coords_saved: '✅ ¡Coordenadas guardadas!', toast_no_entry: 'Ninguna entrada seleccionada.', toast_photo_uploaded: '✓ Foto subida', toast_photo_submitted: '✓ Foto enviada – se revisará y será visible tras la aprobación', toast_report_sent: '✅ ¡Reporte enviado. Gracias!', toast_entry_deleted: '✓ Entrada eliminada',
+      err_event_load: 'No se pudo cargar el evento.', err_sold_out: 'Lamentablemente agotado.', err_already_signed: 'Ya estás inscrito.', err_reason: 'Por favor indica un motivo.', err_upload: 'Error al subir',
       ev_type_party: '🎊 Fiesta', ev_type_festival: '🎪 Festival', ev_type_konzert: '🎵 Concierto', ev_type_retreat: '🧘 Retiro', ev_type_workshop: '🛠 Taller',
       // Búsqueda
       search_placeholder: 'Médico, Restaurante, Abogado...',
@@ -330,6 +354,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     localStorage.setItem('buscar_lang', currentLang);
     contentTranslated = false;
     applyLang();
+    // re-render dynamic t()-based content so prices/types/labels switch immediately
+    try { renderListings(); } catch(e){}
+    try { renderEvents(); } catch(e){}
     translateVisibleContent();
   }
 
@@ -394,7 +421,21 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     contentTranslated = true;
   }
 
+  // Auto-wire: any leaf element whose German text exactly matches a dictionary
+  // value gets the matching data-i18n key — covers elements where a key exists
+  // but the attribute was never added. Runs once. Exact-match only = safe.
+  function autoWireI18n() {
+    const de = translations.de, rev = {};
+    Object.keys(de).forEach(k => { if (typeof de[k] === 'string') { const v = de[k].trim(); if (v && !(v in rev)) rev[v] = k; } });
+    document.querySelectorAll('body *:not(script):not(style)').forEach(el => {
+      if (el.hasAttribute('data-i18n') || el.children.length) return;
+      const txt = el.textContent.trim();
+      if (txt && rev[txt]) el.setAttribute('data-i18n', rev[txt]);
+    });
+  }
+
   function applyLang() {
+    if (!applyLang._wired) { try { autoWireI18n(); } catch(e){} applyLang._wired = true; }
     const btn = document.getElementById('langToggle');
     if (btn) btn.textContent = currentLang === 'de' ? 'ES' : 'DE';
     const btnAuth = document.getElementById('langToggleAuth');
@@ -1014,6 +1055,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     'Party':'🎊','Festival':'🎪','Konzert':'🎵','Retreat':'🧘',
     'Workshop':'🛠','Sport':'⚽','Kultur':'🎭','Treffen':'🤝','Markt':'🛒','Sonstiges':'📌'
   };
+  const EVENT_TYPE_ES = {'Party':'Fiesta','Festival':'Festival','Konzert':'Concierto','Retreat':'Retiro','Workshop':'Taller','Sport':'Deporte','Kultur':'Cultura','Treffen':'Encuentro','Markt':'Mercado','Sonstiges':'Otro'};
+  function evTypeName(ty){ return (currentLang==='es' && EVENT_TYPE_ES[ty]) ? EVENT_TYPE_ES[ty] : (ty||''); }
 
   async function loadEvents() {
     try {
@@ -1085,7 +1128,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var typeClass = 'type-' + (ev.type||'').toLowerCase();
       var isFull = ev.has_signup && ev.capacity > 0 && (ev.signups_count||0) >= ev.capacity;
       var isCancelled = ev.status === 'cancelled';
-      var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' ₲' : 'Kostenpflichtig') : 'Kostenlos';
+      var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' ₲' : t('ev_paid_label')) : t('ev_free');
       var spotsLeft = ev.has_signup && ev.capacity > 0 ? (ev.capacity - (ev.signups_count||0)) + ' ' + t('ev_spots') : '';
       var statusHtml = isCancelled ? '<span class=\"event-status-cancelled\">'+t('ev_cancelled')+'</span>' :
                        isFull ? '<span class=\"event-status-full\">'+t('ev_full')+'</span>' :
@@ -1096,7 +1139,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         + '<div class="event-card-body">'
         + '<div class="event-card-top">'
         + '<div class="event-card-title" data-original="' + (ev.title||'').replace(/"/g,'&quot;') + '">' + (ev.title||'') + '</div>'
-        + '<div class="event-card-type">' + emoji + ' ' + (ev.type||'') + '</div>'
+        + '<div class="event-card-type">' + emoji + ' ' + evTypeName(ev.type) + '</div>'
         + '</div>'
         + '<div class="event-card-meta">'
         + '<div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> '
@@ -1144,7 +1187,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
     var isFull = ev.has_signup && ev.capacity > 0 && (ev.signups_count||0) >= ev.capacity;
     var isCancelled = ev.status === 'cancelled';
-    var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' Guaraní' : 'Kostenpflichtig') : 'Kostenlos';
+    var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' Guaraní' : t('ev_paid_label')) : t('ev_free');
 
     var bodyHtml = '<div style="background:var(--card);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px">'
       + '<p style="font-size:15px;line-height:1.6;color:var(--text-1);margin:0">' + (ev.description||'') + '</p>'
@@ -1203,7 +1246,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!currentUser){ showScreen('screenAuth'); return; }
     var ev = (typeof allEvents!=='undefined' && allEvents) ? allEvents.find(function(e){ return e.id===id; }) : null;
     if (!ev){
-      try { var d = await db.collection('events').doc(id).get(); if (!d.exists) return; ev = Object.assign({id:d.id}, d.data()); } catch(e){ alert('Event konnte nicht geladen werden.'); return; }
+      try { var d = await db.collection('events').doc(id).get(); if (!d.exists) return; ev = Object.assign({id:d.id}, d.data()); } catch(e){ alert(t('err_event_load')); return; }
     }
     if (ev.created_by !== currentUser.uid && currentUser.email !== ADMIN_EMAIL){ alert('Nur der Ersteller kann das Event bearbeiten.'); return; }
     _editingEventId = id;
@@ -1414,7 +1457,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       showScreen('screenEvents');
       loadEvents();
     } catch(e) {
-      errEl.textContent = 'Fehler: ' + e.message;
+      errEl.textContent = t('err_prefix') + e.message;
       errEl.style.display = 'block';
       btn.disabled = false;
       btn.textContent = t('ev_publish');
@@ -1438,7 +1481,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       showToast(t('ev_signup_ok'));
       showEventDetail(id);
     } catch(e) {
-      alert(e.message === 'Ausgebucht' ? 'Leider ausgebucht.' : e.message === 'Bereits angemeldet' ? 'Du bist bereits angemeldet.' : 'Fehler: ' + e.message);
+      alert(e.message === 'Ausgebucht' ? t('err_sold_out') : e.message === 'Bereits angemeldet' ? t('err_already_signed') : t('err_prefix') + e.message);
     }
   }
 
@@ -1460,7 +1503,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function cancelEvent(id) {
-    if (!confirm('Event wirklich absagen?')) return;
+    if (!confirm(t('cancel_event_confirm'))) return;
     try {
       await db.collection('events').doc(id).update({ status: 'cancelled' });
       var ev = allEvents.find(function(e){ return e.id === id; });
@@ -1468,7 +1511,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       showToast('Event wurde abgesagt.');
       showScreen('screenEvents');
       renderEvents();
-    } catch(e) { alert('Fehler: ' + e.message); }
+    } catch(e) { alert(t('err_prefix') + e.message); }
   }
   // ══ END EVENTS SYSTEM ══════════════════════════════════════════════════════
 
@@ -1719,7 +1762,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       }
       showToast(t('ev_unsignup_ok'));
       loadMySignups();
-    } catch(e) { alert('Fehler: ' + e.message); }
+    } catch(e) { alert(t('err_prefix') + e.message); }
   }
   // ── END PROFIL EVENTS ──────────────────────────────────────────────────────
 
@@ -1801,11 +1844,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Update local cache
       var l = allListings.find(function(x){ return x.id === _coordListingId; });
       if (l) { l.lat = _coordLat; l.lng = _coordLng; }
-      showToast('✅ Koordinaten gespeichert!');
+      showToast(t('toast_coords_saved'));
       closeCoordEditor();
       if (maplibreMap && mapLoaded) renderMap();
     } catch(e) {
-      alert('Fehler: ' + e.message);
+      alert(t('err_prefix') + e.message);
       btn.disabled = false;
       btn.textContent = 'Koordinaten speichern';
     }
@@ -2103,7 +2146,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     list.innerHTML = filtered.map(c => `
       <div class="city-sheet-item${activeCity===c?' selected':''}" onclick="selectCity('${c}')">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>${c === 'Alle' ? '🌍 Alle Städte' : c}</span>
+        <span>${c === 'Alle' ? t('city_all') : c}</span>
       </div>`).join('');
   }
 
@@ -2117,7 +2160,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const label = document.getElementById('cityPickerLabel');
     if (city === 'Alle') {
       btn.classList.remove('active');
-      label.textContent = 'Stadt wählen...';
+      label.textContent = t('city_select');
       btn.onclick = openCitySheet;
     } else {
       btn.classList.add('active');
@@ -2263,7 +2306,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var l=allListings.find(function(x){return x.id===id;}); if(l) Object.assign(l, upd);
       showToast('✅ '+(es?'Guardado':'Gespeichert'));
       showDetail(id);
-    }catch(e){ if(btn){ btn.disabled=false; btn.textContent=(es?'Guardar':'Speichern'); } alert('Fehler: '+(e.message||e)); }
+    }catch(e){ if(btn){ btn.disabled=false; btn.textContent=(es?'Guardar':'Speichern'); } alert(t('err_prefix')+(e.message||e)); }
   }
   function renderImmoCard(l){
     var es=(currentLang==='es');
@@ -3462,7 +3505,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       showToast('✓ Duplikat gelöscht');
       await loadListings();
       loadAdminDuplicates();
-    } catch(e){ alert('Fehler: ' + (e.message || e)); }
+    } catch(e){ alert(t('err_prefix') + (e.message || e)); }
   }
 
   async function loadAdminListings() {
@@ -3533,7 +3576,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('claims').doc(claimId).update({ status: 'approved' });
       await db.collection('listings').doc(listingId).update({ owner_id: userId });
       document.getElementById('claimCard_' + claimId).remove();
-    } catch(e) { alert('Fehler.'); }
+    } catch(e) { alert(t('err_generic')); }
   }
 
   async function rejectClaim(claimId) {
@@ -3541,7 +3584,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       await db.collection('claims').doc(claimId).update({ status: 'rejected' });
       document.getElementById('claimCard_' + claimId).remove();
-    } catch(e) { alert('Fehler.'); }
+    } catch(e) { alert(t('err_generic')); }
   }
 
   async function approveEntry(id) {
@@ -3622,25 +3665,25 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       const btn = event.target;
       btn.textContent = '✓ Gespeichert!';
       setTimeout(() => { btn.textContent = 'Deal speichern'; }, 2000);
-    } catch(e) { alert('Fehler: ' + (e.message || e)); }
+    } catch(e) { alert(t('err_prefix') + (e.message || e)); }
   }
 
   async function removeDeal(listingId) {
-    if (!confirm('Deal wirklich entfernen?')) return;
+    if (!confirm(t('del_deal_confirm'))) return;
     try {
       await db.collection('listings').doc(listingId).update({ deal_text: null, deal_code: null, deal_expiry: null });
       await loadListings();
       loadAdminDeals();
-    } catch(e) { alert('Fehler.'); }
+    } catch(e) { alert(t('err_generic')); }
   }
 
   async function rejectEntry(id) {
-    if (!confirm('Eintrag wirklich löschen?')) return;
+    if (!confirm(t('del_entry_confirm'))) return;
     try {
       await db.collection('listings').doc(id).delete();
       var card = document.getElementById('adminCard_' + id);
       if (card) card.remove();
-      showToast('✓ Eintrag gelöscht');
+      showToast(t('toast_entry_deleted'));
     } catch (err) {
       console.error('rejectEntry failed', err);
       var msg = (err && err.message) ? err.message : 'Unbekannter Fehler';
@@ -3762,6 +3805,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function isNew(c){if(!c)return false;try{var d=c.toDate?c.toDate():new Date(c);return(Date.now()-d.getTime())<1209600000;}catch(e){return false;}}
 
   const subcatTranslations = {
+    'Sonstiges': 'Otros', 'Tierarzt': 'Veterinario', 'Genossenschaft': 'Cooperativa', 'Wechselstube': 'Casa de cambio',
     'Alle': 'Todo', 'Restaurant': 'Restaurante', 'Café': 'Café', 'Bar': 'Bar',
     'Parrilla': 'Parrilla', 'Fast Food': 'Comida rápida', 'Bäckerei': 'Panadería',
     'Arzt': 'Médico', 'Zahnarzt': 'Dentista', 'Anwalt': 'Abogado', 'Notar': 'Notario',
@@ -3864,7 +3908,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await loadAllRatings();
       loadReviews(listingId);
       renderListings();
-    } catch (err) { alert('Fehler.'); btn.disabled=false; btn.textContent='Bewertung abschicken'; }
+    } catch (err) { alert(t('err_generic')); btn.disabled=false; btn.textContent='Bewertung abschicken'; }
   }
 
   async function loadComments(listingId) {
@@ -3913,8 +3957,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function deleteReview(reviewId, listingId) {
-    if (!confirm('Bewertung löschen?')) return;
-    try { await db.collection('reviews').doc(reviewId).delete(); await loadAllRatings(); loadReviews(listingId); renderListings(); } catch(e) { alert('Fehler.'); }
+    if (!confirm(t('del_review_confirm'))) return;
+    try { await db.collection('reviews').doc(reviewId).delete(); await loadAllRatings(); loadReviews(listingId); renderListings(); } catch(e) { alert(t('err_generic')); }
   }
 
   function editReview(reviewId, listingId, oldRating) {
@@ -3935,12 +3979,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         rating: currentUserRating, comment: document.getElementById('reviewText').value.trim(), updated_at: new Date()
       });
       await loadAllRatings(); loadReviews(listingId); renderListings();
-    } catch(e) { alert('Fehler.'); }
+    } catch(e) { alert(t('err_generic')); }
   }
 
   async function deleteComment(commentId, listingId) {
-    if (!confirm('Kommentar löschen?')) return;
-    try { await db.collection('comments').doc(commentId).delete(); loadComments(listingId); } catch(e) { alert('Fehler.'); }
+    if (!confirm(t('del_comment_confirm'))) return;
+    try { await db.collection('comments').doc(commentId).delete(); loadComments(listingId); } catch(e) { alert(t('err_generic')); }
   }
 
   function toggleReplyForm(commentId) {
@@ -3959,7 +4003,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         text: txt, created_at: new Date()
       });
       loadComments(listingId);
-    } catch(e) { alert('Fehler.'); }
+    } catch(e) { alert(t('err_generic')); }
   }
 
   function detailBack(){ var from = window._detailFrom || 'screenHome'; if (from === 'screenMap') window._skipMapFit = true; showScreen(from); }
@@ -4054,7 +4098,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       else if (e.code === 'auth/invalid-email') err.textContent='Ungültige E-Mail-Adresse.';
       else if (e.code === 'auth/requires-recent-login') err.textContent='Bitte melde dich neu an und versuche es erneut.';
       else if (e.code === 'auth/operation-not-allowed') err.textContent='E-Mail-Änderung ist derzeit nicht aktiviert.';
-      else err.textContent='Fehler: ' + (e.message || e.code || 'unbekannt');
+      else err.textContent=t('err_prefix') + (e.message || e.code || 'unbekannt');
       err.style.display='block';
     }
   }
@@ -4075,7 +4119,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       });
       document.getElementById('commentInput').value = '';
       loadComments(currentListingId);
-    } catch(e) { alert('Fehler.'); }
+    } catch(e) { alert(t('err_generic')); }
   }
 
   async function loadPhotos(listingId) {
@@ -4115,17 +4159,17 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function deletePhoto(photoId, path, event) {
     event.stopPropagation();
-    if (!confirm('Foto löschen?')) return;
+    if (!confirm(t('del_photo_confirm'))) return;
     try {
       if (path) await storage.ref(path).delete().catch(()=>{});
       await db.collection('listing_photos').doc(photoId).delete();
       loadPhotos(currentListingId);
-    } catch(e) { alert('Fehler.'); }
+    } catch(e) { alert(t('err_generic')); }
   }
 
   async function uploadPhoto(event) {
     if (!currentUser) { showToast('Du musst eingeloggt sein.'); return; }
-    if (!currentListingId) { showToast('Kein Eintrag gewählt.'); return; }
+    if (!currentListingId) { showToast(t('toast_no_entry')); return; }
     const file = event.target.files[0];
     if (!file) return;
 
@@ -4163,14 +4207,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           prog.textContent = '✓ Hochgeladen!';
           setTimeout(function(){ if (prog) prog.classList.remove('visible'); }, 2500);
         }
-        showToast('✓ Foto hochgeladen');
+        showToast(t('toast_photo_uploaded'));
         loadPhotos(currentListingId);
       } else {
         if (prog) {
           prog.textContent = '✓ Foto wird geprüft und nach Freigabe sichtbar';
           setTimeout(function(){ if (prog) prog.classList.remove('visible'); }, 5000);
         }
-        showToast('✓ Foto eingereicht – wird geprüft und nach Freigabe sichtbar');
+        showToast(t('toast_photo_submitted'));
       }
 
       // Input zurücksetzen damit gleiches Foto erneut wählbar ist
@@ -4183,7 +4227,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         prog.textContent = '✗ ' + msg;
         setTimeout(function(){ if (prog) prog.classList.remove('visible'); }, 5000);
       }
-      showToast('✗ Fehler: ' + msg);
+      showToast('✗ ' + t('err_prefix') + msg);
     }
   }
 
@@ -4325,7 +4369,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function deleteAvatar() {
     if (!currentUser) return;
-    if (!confirm('Foto wirklich entfernen?')) return;
+    if (!confirm(t('del_photo_confirm'))) return;
     try {
       const userDoc = await db.collection('users').doc(currentUser.uid).get();
       if (userDoc.exists && userDoc.data().avatar_path) {
@@ -4334,7 +4378,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('users').doc(currentUser.uid).set({ avatar_url: null, avatar_path: null }, { merge: true });
       const name = document.getElementById('profilName').textContent;
       setAvatarDisplay(null, name.charAt(0).toUpperCase());
-    } catch(e) { alert('Fehler.'); }
+    } catch(e) { alert(t('err_generic')); }
   }
 
   async function uploadAvatar(event) {
@@ -4412,7 +4456,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function submitClaim(listingId) {
     const reason = document.getElementById('claimReason').value.trim();
-    if (!reason) { alert('Bitte begründen.'); return; }
+    if (!reason) { alert(t('err_reason')); return; }
     try {
       const userDoc = await db.collection('users').doc(currentUser.uid).get();
       await db.collection('claims').add({
@@ -4421,7 +4465,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         reason, status: 'pending', created_at: new Date()
       });
       document.getElementById('claimDiv').innerHTML = `<div style="text-align:center;padding:8px"><div style="font-size:14px;color:var(--green);font-weight:600">✓ Anfrage gesendet!</div></div>`;
-    } catch(e) { alert('Fehler.'); }
+    } catch(e) { alert(t('err_generic')); }
   }
 
   async function deleteOwnListing(id){
@@ -4643,7 +4687,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     list.innerHTML = filtered.map(c => `
       <div class="city-sheet-item${mapCityFilter===c?' selected':''}" onclick="selectMapCity('${c}')">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>${c === 'Alle' ? '🌍 Alle Städte' : c}</span>
+        <span>${c === 'Alle' ? t('city_all') : c}</span>
       </div>`).join('');
   }
 
@@ -4651,7 +4695,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   function selectMapCity(city) {
     mapCityFilter = city;
-    document.getElementById('mapCityPickerLabel').textContent = city === 'Alle' ? 'Stadt wählen...' : city;
+    document.getElementById('mapCityPickerLabel').textContent = city === 'Alle' ? t('city_select') : city;
     document.getElementById('mapCityPickerBtn').style.background = city === 'Alle' ? 'var(--bg)' : 'var(--yellow-light)';
     closeMapCitySheet();
     _mapFitOnUpdate = true;
@@ -4722,16 +4766,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await loadListings();
       const l = allListings.find(x => x.id === listingId);
       if (l) showDetail(listingId);
-    } catch(e) { alert('Fehler: ' + e.message); }
+    } catch(e) { alert(t('err_prefix') + e.message); }
   }
 
   async function removeOwnerDeal(listingId) {
-    if (!confirm('Deal wirklich entfernen?')) return;
+    if (!confirm(t('del_deal_confirm'))) return;
     try {
       await db.collection('listings').doc(listingId).update({ deal_text: null, deal_code: null, deal_expiry: null });
       await loadListings();
       showDetail(listingId);
-    } catch(e) { alert('Fehler.'); }
+    } catch(e) { alert(t('err_generic')); }
   }
 
   function copyDealCode(code) {
@@ -4813,7 +4857,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('listings').doc(listingId).update({ cover_url: null });
       await loadListings();
       showDetail(listingId);
-    } catch(e) { alert('Fehler.'); }
+    } catch(e) { alert(t('err_generic')); }
   }
 
   // Cover image file input
@@ -4837,7 +4881,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         await db.collection('listings').doc(currentListingId).update({cover_url:url});
         await loadListings();
         showDetail(currentListingId);
-      }catch(err){alert('Fehler beim Hochladen');}
+      }catch(err){alert(t('err_upload'));}
       hero.style.opacity='1';
     };
     document.body.appendChild(inp);
@@ -4879,7 +4923,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       await db.collection('reports').doc(reportId).update({ status: 'resolved' });
       document.getElementById('reportCard_'+reportId).remove();
-    } catch(e) { alert('Fehler.'); }
+    } catch(e) { alert(t('err_generic')); }
   }
 
   function openReport() { document.getElementById('reportOverlay').classList.add('visible'); }
@@ -4893,8 +4937,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         reason: reason, status: 'pending', created_at: new Date()
       });
       closeReport();
-      showToast('✅ Meldung gesendet. Danke!');
-    } catch(e) { alert('Fehler.'); closeReport(); }
+      showToast(t('toast_report_sent'));
+    } catch(e) { alert(t('err_generic')); closeReport(); }
   }
 
   // Service Worker registrieren fuer Offline-Funktionalitaet

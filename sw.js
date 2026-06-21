@@ -1,4 +1,4 @@
-const VERSION = 'v148';
+const VERSION = 'v149';
 const STATIC_CACHE = 'buscar-static-' + VERSION;
 const RUNTIME_CACHE = 'buscar-runtime-' + VERSION;
 const STATIC_ASSETS = [
