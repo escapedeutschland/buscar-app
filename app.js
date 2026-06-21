@@ -335,6 +335,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     return (translations[currentLang] && translations[currentLang][key]) || translations['de'][key] || key;
   }
 
+  // Escape user-generated text before inserting into innerHTML (prevents XSS & broken attributes)
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
   let contentTranslated = false;
 
   function toggleLangAuth() {
@@ -1143,16 +1150,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         + '<div class="event-card-banner ' + typeClass + '"></div>'
         + '<div class="event-card-body">'
         + '<div class="event-card-top">'
-        + '<div class="event-card-title" data-original="' + (ev.title||'').replace(/"/g,'&quot;') + '">' + (ev.title||'') + '</div>'
+        + '<div class="event-card-title" data-original="' + esc(ev.title) + '">' + esc(ev.title) + '</div>'
         + '<div class="event-card-type">' + emoji + ' ' + evTypeName(ev.type) + '</div>'
         + '</div>'
         + '<div class="event-card-meta">'
         + '<div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> '
         + dateStr + (timeStr ? ' · ' + timeStr : '') + '</div>'
         + '<div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> '
-        + (ev.city||'') + '</div>'
+        + esc(ev.city) + '</div>'
         + '</div>'
-        + '<div class="event-card-desc" data-original="' + (ev.description||'').replace(/"/g,'&quot;') + '">' + (ev.description||'') + '</div>'
+        + '<div class="event-card-desc" data-original="' + esc(ev.description) + '">' + esc(ev.description) + '</div>'
         + '<div class="event-card-footer">'
         + '<span class="event-price">' + priceStr + '</span>'
         + statusHtml
@@ -1187,7 +1194,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('evDetailMeta').innerHTML =
       '<div class="event-detail-meta">📅 ' + dateStr + '</div>'
       + (timeStr ? '<div class="event-detail-meta">🕐 ' + timeStr + (timeEndStr ? ' – ' + timeEndStr : '') + '</div>' : '')
-      + '<div class="event-detail-meta">📍 ' + (prettyCity(ev.city||'')) + (ev.address ? ', ' + ev.address : '') + '</div>'
+      + '<div class="event-detail-meta">📍 ' + esc(prettyCity(ev.city||'')) + (ev.address ? ', ' + esc(ev.address) : '') + '</div>'
       + (evRouteUrl ? '<a class="ev-route-btn" href="' + evRouteUrl + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Route starten</a>' : '');
 
     var isFull = ev.has_signup && ev.capacity > 0 && (ev.signups_count||0) >= ev.capacity;
@@ -1195,7 +1202,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' Guaraní' : t('ev_paid_label')) : t('ev_free');
 
     var bodyHtml = '<div style="background:var(--card);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px">'
-      + '<p style="font-size:15px;line-height:1.6;color:var(--text-1);margin:0">' + (ev.description||'') + '</p>'
+      + '<p style="font-size:15px;line-height:1.6;color:var(--text-1);margin:0">' + esc(ev.description) + '</p>'
       + '</div>';
 
     bodyHtml += '<div style="background:var(--card);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px">';
@@ -1673,8 +1680,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         return '<div style="padding:10px 0;border-bottom:1px solid var(--border)">'
           + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
           + '<div style="flex:1">'
-          + '<div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:2px">' + (ev.title||'') + '</div>'
-          + '<div style="font-size:12px;color:var(--text-3)">' + dateStr + (ev.city ? ' · ' + ev.city : '') + '</div>'
+          + '<div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:2px">' + esc(ev.title) + '</div>'
+          + '<div style="font-size:12px;color:var(--text-3)">' + dateStr + (ev.city ? ' · ' + esc(ev.city) : '') + '</div>'
           + (spotsStr ? '<div style="font-size:12px;color:var(--yellow);margin-top:2px;font-weight:600">' + spotsStr + '</div>' : '')
           + '</div>'
           + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
@@ -1722,8 +1729,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           + '<div style="display:flex;gap:10px;align-items:flex-start">'
           + '<div style="width:36px;height:36px;border-radius:50%;background:' + (isCancelled ? '#EF4444' : color) + ';display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">' + (isCancelled ? '❌' : emoji) + '</div>'
           + '<div style="flex:1;min-width:0">'
-          + '<div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:2px">' + (ev.title||'') + '</div>'
-          + '<div style="font-size:12px;color:var(--text-3)">' + dateStr + (timeStr ? ' · ' + timeStr : '') + (ev.city ? ' · ' + ev.city : '') + '</div>'
+          + '<div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:2px">' + esc(ev.title) + '</div>'
+          + '<div style="font-size:12px;color:var(--text-3)">' + dateStr + (timeStr ? ' · ' + timeStr : '') + (ev.city ? ' · ' + esc(ev.city) : '') + '</div>'
           + (isCancelled ? '<div style="font-size:12px;font-weight:700;color:#EF4444;margin-top:3px">⚠️ Dieses Event wurde abgesagt</div>' : '')
           + (isPast && !isCancelled ? '<div style="font-size:11px;color:var(--text-3);margin-top:2px">Vergangen</div>' : '')
           + '</div>'
@@ -2221,7 +2228,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
-    container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.name||''}</div><div style="display:flex;gap:3px;align-items:center;flex-shrink:0">${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${isNew(l.created_at)?`<span class='badge-neu'>${t('badge_new')}</span>`:''}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div></div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${prettyCity(l.city)}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${l.description||''}">${l.description||''}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+    container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.name)}</div><div style="display:flex;gap:3px;align-items:center;flex-shrink:0">${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${isNew(l.created_at)?`<span class='badge-neu'>${t('badge_new')}</span>`:''}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div></div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(prettyCity(l.city))}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${esc(l.description)}">${esc(l.description)}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
     if (currentLang !== 'de') translateVisibleContent();
   }
 
@@ -2326,9 +2333,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     return '<div class="immo-card'+(isFeatured(l)?' immo-card-featured':'')+'" onclick="showDetail(\''+l.id+'\')">'+media
       +'<div class="immo-card-body">'+immoBadgesHTML(l)+dealBadge
       +(price?'<div class="immo-card-price">'+price+'</div>':'')
-      +'<div class="immo-card-name">'+(l.name||'')+'</div>'
+      +'<div class="immo-card-name">'+esc(l.name)+'</div>'
       +(meta?'<div class="immo-card-meta">'+meta+'</div>':'')
-      +(l.city?'<div class="immo-card-city">'+l.city+'</div>':'')
+      +(l.city?'<div class="immo-card-city">'+esc(l.city)+'</div>':'')
       +'</div></div>';
   }
   function handleReCover(e){
@@ -2462,10 +2469,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const svg = document.getElementById('detailIcon').querySelector('svg');
     if (svg) { svg.style.width='34px'; svg.style.height='34px'; svg.style.stroke='white'; }
     document.getElementById('detailTitle').textContent = l.name||'';
-    document.getElementById('detailCity').innerHTML = l.city?`<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${prettyCity(l.city)}`:'';
+    document.getElementById('detailCity').innerHTML = l.city?`<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(prettyCity(l.city))}`:'';
     const descEl = document.getElementById('detailDesc');
     const descContent = l.description || '';
-    descEl.innerHTML = descContent || t('no_description');
+    descEl.innerHTML = esc(descContent) || t('no_description');
     descEl.dataset.original = descContent;
     descEl.dataset.tlang = '';
     const badges = document.getElementById('detailBadges');
@@ -3024,10 +3031,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
     var l = x.l;
     var col = catColors[l.category_id] || catColors.default;
-    var sub = (catLabels[l.category_id] || catLabels.default) + (l.city ? ' · ' + l.city : '');
+    var sub = (catLabels[l.category_id] || catLabels.default) + (l.city ? ' · ' + esc(l.city) : '');
     return '<div class="radar-row" onclick="showDetail(\''+l.id+'\')">'
       + '<div class="radar-row-dot" style="background:'+col+'"></div>'
-      + '<div class="radar-row-main"><div class="radar-row-name">'+(l.name||'')+'</div><div class="radar-row-sub">'+sub+'</div></div>'
+      + '<div class="radar-row-main"><div class="radar-row-name">'+esc(l.name)+'</div><div class="radar-row-sub">'+sub+'</div></div>'
       + '<div class="radar-row-dist">'+_fmtDist(km)+'</div></div>';
   }
   function _bearing(la1, ln1, la2, ln2){
@@ -3756,10 +3763,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('reviewsList').innerHTML = reviews.filter(r => r.comment).map(r => `
       <div class="review-item">
         <div class="review-item-top">
-          <span class="review-item-name">${r.user_name||'Anonym'}</span>
+          <span class="review-item-name">${esc(r.user_name||'Anonym')}</span>
           <div class="review-item-stars">${starsHTML(r.rating,12)}</div>
         </div>
-        <div class="review-item-text" data-original="${r.comment}">${r.comment}</div>
+        <div class="review-item-text" data-original="${esc(r.comment)}">${esc(r.comment)}</div>
         <div class="review-item-date">${formatDate(r.created_at)}</div>
       </div>`).join('');
     if (currentLang !== 'de') translateVisibleContent();
@@ -3937,20 +3944,20 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         const myReply = currentUser && r.user_id === currentUser.uid;
         return `<div class="reply-item">
           <div class="reply-item-top">
-            <span class="reply-item-name">${r.user_name||'Anonym'}</span>
+            <span class="reply-item-name">${esc(r.user_name||'Anonym')}</span>
             <span class="reply-item-date">${formatDate(r.created_at)}</span>
             ${myReply ? `<button onclick="deleteComment('${r.id}','${listingId}')" style="margin-left:6px;font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;padding:0">${t('delete')}</button>` : ''}
           </div>
-          <div class="reply-item-text" data-original="${r.text}">${r.text}</div>
+          <div class="reply-item-text" data-original="${esc(r.text)}">${esc(r.text)}</div>
         </div>`;
       }).join('');
       return `<div class="comment-item">
         <div class="comment-item-top">
-          <span class="comment-item-name">${c.user_name||'Anonym'}</span>
+          <span class="comment-item-name">${esc(c.user_name||'Anonym')}</span>
           <span class="comment-item-date">${formatDate(c.created_at)}</span>
           ${myComment ? `<button onclick="deleteComment('${c.id}','${listingId}')" style="margin-left:6px;font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;padding:0">${t('delete')}</button>` : ''}
         </div>
-        <div class="comment-item-text" data-original="${c.text}">${c.text}</div>
+        <div class="comment-item-text" data-original="${esc(c.text)}">${esc(c.text)}</div>
         <button class="reply-btn" onclick="toggleReplyForm('${c.id}')">${t('reply')}</button>
         ${repliesHTML}
         <div class="reply-form" id="replyForm_${c.id}" style="display:none;margin-top:8px">
@@ -4653,7 +4660,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!favs.length) {
       body.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="empty-title">Noch keine Favoriten</div><div class="empty-sub">Tippe auf das Herz in der Detailansicht</div></div>`;
     } else {
-      body.innerHTML = favs.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-name">${l.name||''}</div><div class="listing-city">${l.city||''}</div><div class="listing-desc">${l.description||''}</div></div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
+      body.innerHTML = favs.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-name">${esc(l.name)}</div><div class="listing-city">${esc(l.city)}</div><div class="listing-desc">${esc(l.description)}</div></div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
     }
     showScreen('screenFavorites');
   }
