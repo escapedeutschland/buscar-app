@@ -646,7 +646,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   let allListings = [], activeCategory = 'Alle', mapCategory = 'Alle', activeCity = 'Alle', searchQuery = '', currentUser = null;
   let activeScreen = 'screenHome'; // Track current screen
   let pendingFormPhotos = [];
-  let ratingsCache = {};
+  let ratingsCache = (function(){ try { return JSON.parse(localStorage.getItem('buscar_ratings')) || {}; } catch(e) { return {}; } })();
 
   async function loadAllRatings() {
     try {
@@ -657,6 +657,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         if (!ratingsCache[r.listing_id]) ratingsCache[r.listing_id] = [];
         ratingsCache[r.listing_id].push(r.rating);
       });
+      try { localStorage.setItem('buscar_ratings', JSON.stringify(ratingsCache)); } catch(e) {}
     } catch(e) {}
   }
 
