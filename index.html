@@ -2,6 +2,24 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
+  <script>
+    (function(){
+      var fatalShown=false;
+      function splashEl(){ return document.getElementById('splash'); }
+      function splashVisible(){ var s=splashEl(); if(!s||s.classList.contains('hidden'))return false; try{return getComputedStyle(s).display!=='none';}catch(e){return true;} }
+      function showFatal(msg){
+        var s=splashEl(); if(!s) return; fatalShown=true;
+        s.innerHTML='<div style="padding:24px;max-width:340px;margin:auto;font:14px/1.5 -apple-system,BlinkMacSystemFont,sans-serif;color:#fff;text-align:center">'
+          +'<div style="font-weight:700;margin-bottom:8px">Buscar konnte nicht starten</div>'
+          +'<div style="font-size:12px;opacity:.85;word-break:break-word;margin-bottom:16px">'+String(msg||'').replace(/[<>&]/g,' ').slice(0,260)+'</div>'
+          +'<button onclick="location.reload()" style="padding:10px 18px;border:0;border-radius:10px;background:#fff;color:#F5A623;font-weight:700">Neu laden</button></div>';
+        s.classList.remove('hidden'); s.style.display='flex';
+      }
+      window.addEventListener('error', function(e){ if(splashVisible()) showFatal((e.message||'Fehler')+' ('+((e.filename||'').split('/').pop())+':'+(e.lineno||'')+')'); });
+      window.addEventListener('unhandledrejection', function(e){ if(splashVisible()){ var r=e.reason; showFatal('Promise: '+((r&&r.message)||r||'')); } });
+      setTimeout(function(){ if(fatalShown) return; var s=splashEl(); if(s && !s.classList.contains('hidden')) s.classList.add('hidden'); }, 10000);
+    })();
+  </script>
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
