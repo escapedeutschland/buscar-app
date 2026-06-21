@@ -18,7 +18,9 @@
     html, body { height: 100%; font-family: 'DM Sans', -apple-system, sans-serif; background: var(--bg); color: var(--text-1); -webkit-font-smoothing: antialiased; margin: 0; padding: 0; }
     #app { display: flex; flex-direction: column; height: 100%; min-height: 100vh; max-width: 430px; margin: 0 auto; background: var(--bg); }
     .screen { display: none; flex-direction: column; min-height: 100vh; }
-    .screen.active { display: flex; }
+    .screen.active { display: flex; animation: screenIn .22s ease both; }
+    @keyframes screenIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) { .screen.active { animation: none; } }
 
     #splash { position:fixed;inset:0;background:linear-gradient(180deg,#F5A623 0%,#F5A623 40%,#D4841A 75%,#B8661A 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:99999; }
     #splash.hidden { display:none; }
