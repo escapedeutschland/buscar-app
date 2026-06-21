@@ -9,6 +9,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Header
       greet_morning: 'Guten Morgen', greet_day: 'Guten Tag', greet_evening: 'Guten Abend', greet_night: 'Gute Nacht',
       header_sub: 'Was suchst du heute?',
+      location_tip: '💡 Tipp: Tippe auf „Meinen Standort verwenden" – danach kannst du den Pin auf der Karte frei verschieben oder antippen, um den Ort genau zu setzen.',
+      timeblock1: '1. Zeitblock', timeblock2: '2. Zeitblock (optional)',
+      refresh_btn: 'Aktualisieren', map_no_coords: 'Einige Orte haben noch keine Koordinaten', remove_photo: 'Foto entfernen',
+      ev_type_party: '🎊 Party', ev_type_festival: '🎪 Festival', ev_type_konzert: '🎵 Konzert', ev_type_retreat: '🧘 Retreat', ev_type_workshop: '🛠 Workshop',
       // Search
       search_placeholder: 'Arzt, Restaurant, Anwalt...',
       // Categories
@@ -156,6 +160,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Encabezado
       greet_morning: 'Buenos días', greet_day: 'Buenas tardes', greet_evening: 'Buenas tardes', greet_night: 'Buenas noches',
       header_sub: '¿Qué estás buscando?',
+      location_tip: '💡 Consejo: Toca „Usar mi ubicación" – luego puedes mover el pin en el mapa o tocarlo para fijar el lugar con precisión.',
+      timeblock1: 'Horario 1', timeblock2: 'Horario 2 (opcional)',
+      refresh_btn: 'Actualizar', map_no_coords: 'Algunos lugares aún no tienen coordenadas', remove_photo: 'Quitar foto',
+      ev_type_party: '🎊 Fiesta', ev_type_festival: '🎪 Festival', ev_type_konzert: '🎵 Concierto', ev_type_retreat: '🧘 Retiro', ev_type_workshop: '🛠 Taller',
       // Búsqueda
       search_placeholder: 'Médico, Restaurante, Abogado...',
       // Categorías
@@ -325,14 +333,17 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     translateVisibleContent();
   }
 
+  const translationCache = {};
   async function detectAndTranslate(text, targetLang) {
+    const ck = targetLang + '|' + text;
+    if (translationCache[ck]) return translationCache[ck];
     try {
       const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text.substring(0,500))}`;
       const res = await fetch(url);
       const data = await res.json();
       // Google returns [[["translated","original",...],...],...]
       const translated = data?.[0]?.map(item => item?.[0]).filter(Boolean).join('');
-      if (translated && translated !== text) return translated;
+      if (translated && translated !== text) { translationCache[ck] = translated; return translated; }
     } catch(e) {}
     return null;
   }
@@ -346,6 +357,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ...document.querySelectorAll('.review-item-text[data-original]'),
       ...document.querySelectorAll('.comment-item-text[data-original]'),
       ...document.querySelectorAll('.reply-item-text[data-original]'),
+      ...document.querySelectorAll('.event-card-title[data-original]'),
+      ...document.querySelectorAll('.event-card-desc[data-original]'),
     ];
     const detailDesc = document.getElementById('detailDesc');
     if (detailDesc && detailDesc.dataset.original) allEls.unshift(detailDesc);
@@ -1082,7 +1095,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         + '<div class="event-card-banner ' + typeClass + '"></div>'
         + '<div class="event-card-body">'
         + '<div class="event-card-top">'
-        + '<div class="event-card-title">' + (ev.title||'') + '</div>'
+        + '<div class="event-card-title" data-original="' + (ev.title||'').replace(/"/g,'&quot;') + '">' + (ev.title||'') + '</div>'
         + '<div class="event-card-type">' + emoji + ' ' + (ev.type||'') + '</div>'
         + '</div>'
         + '<div class="event-card-meta">'
@@ -1091,13 +1104,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         + '<div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> '
         + (ev.city||'') + '</div>'
         + '</div>'
-        + '<div class="event-card-desc">' + (ev.description||'') + '</div>'
+        + '<div class="event-card-desc" data-original="' + (ev.description||'').replace(/"/g,'&quot;') + '">' + (ev.description||'') + '</div>'
         + '<div class="event-card-footer">'
         + '<span class="event-price">' + priceStr + '</span>'
         + statusHtml
         + '</div>'
         + '</div></div>';
     }).join('');
+    if (currentLang !== 'de') translateVisibleContent();
   }
 
   var _currentEventId = null;
@@ -3132,7 +3146,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var _lhReset = document.getElementById('locationHint'); if (_lhReset) _lhReset.style.display = '';
       pendingFormPhotos = [];
       const grid2 = document.getElementById('formPhotoGrid');
-      grid2.innerHTML = `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span></label><input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">`;
+      grid2.innerHTML = `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">${t('photo_add_label')}</span></label><input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">`;
       ['newName','newCity','newDesc','newPhone','newWebsite','newAddress','newHours'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('newCategory').value = '';
       document.getElementById('nameCounter').textContent = '0 / 60';
@@ -4075,7 +4089,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const canDelete = currentUser && currentUser.email === ADMIN_EMAIL;
     _lbUrls = photos.map(function(p){ return p.url; });
     let html = photos.map((p, _i) => `<div class="photo-thumb-wrap" style="position:relative"><img class="photo-thumb" src="${p.url}" onclick="openLightbox(${_i})">${canDelete ? `<button onclick="deletePhoto('${p.id}','${p.path}',event)" style="position:absolute;top:4px;right:4px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>` : ''}</div>`).join('');
-    if (currentUser) html += `<div class="photo-upload" onclick="document.getElementById('photoFileInput').click()" style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="22" height="22"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span></div>`;
+    if (currentUser) html += `<div class="photo-upload" onclick="document.getElementById('photoFileInput').click()" style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="22" height="22"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">${t('photo_add_label')}</span></div>`;
     grid.innerHTML = html + `<input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="uploadPhoto(event)">`;
   }
 
@@ -4278,7 +4292,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const oldInput = document.getElementById('formPhotoInput');
     const photos = [...pendingFormPhotos];
     pendingFormPhotos = [];
-    grid.innerHTML = `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">Foto hinzufügen</span></label><input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">`;
+    grid.innerHTML = `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">${t('photo_add_label')}</span></label><input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">`;
     photos.forEach(p => {
       pendingFormPhotos.push(p);
       const idx = pendingFormPhotos.length - 1;
