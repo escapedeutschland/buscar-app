@@ -1378,7 +1378,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     grid.innerHTML = evPendingPhotos.map(function(f, i) {
       var url = URL.createObjectURL(f);
       return '<div style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden">'
-        + '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover">'
+        + '<img loading="lazy" decoding="async" src="' + url + '" style="width:100%;height:100%;object-fit:cover">'
         + '<button onclick="removeEvPhoto(' + i + ')" style="position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>'
         + '</div>';
     }).join('');
@@ -3538,7 +3538,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ));
       body.innerHTML = pending.map((l, idx) => {
         const photos = photoSnaps[idx].docs.map(d => d.data());
-        const photoHTML = photos.length ? `<div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto">${photos.map(p => `<img src="${p.url}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0">`).join('')}</div>` : '';
+        const photoHTML = photos.length ? `<div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto">${photos.map(p => `<img loading="lazy" decoding="async" src="${p.url}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0">`).join('')}</div>` : '';
         const lName = (l.name||'').toLowerCase();
         const similar = allListings.filter(ex =>
           ex.id !== l.id &&
@@ -4146,7 +4146,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const grid = document.getElementById('photosGrid');
     const canDelete = currentUser && currentUser.email === ADMIN_EMAIL;
     _lbUrls = photos.map(function(p){ return p.url; });
-    let html = photos.map((p, _i) => `<div class="photo-thumb-wrap" style="position:relative"><img class="photo-thumb" src="${p.url}" onclick="openLightbox(${_i})">${canDelete ? `<button onclick="deletePhoto('${p.id}','${p.path}',event)" style="position:absolute;top:4px;right:4px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>` : ''}</div>`).join('');
+    let html = photos.map((p, _i) => `<div class="photo-thumb-wrap" style="position:relative"><img class="photo-thumb" loading="lazy" decoding="async" src="${p.url}" onclick="openLightbox(${_i})">${canDelete ? `<button onclick="deletePhoto('${p.id}','${p.path}',event)" style="position:absolute;top:4px;right:4px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>` : ''}</div>`).join('');
     if (currentUser) html += `<div class="photo-upload" onclick="document.getElementById('photoFileInput').click()" style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="22" height="22"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">${t('photo_add_label')}</span></div>`;
     grid.innerHTML = html + `<input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="uploadPhoto(event)">`;
   }
