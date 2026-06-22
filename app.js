@@ -3442,6 +3442,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // END STANDORT-PERMISSION-FIX
   // ══════════════════════════════════════════════════════════════════════════
 
+  function _adminActivateTab(activeId) {
+    ['adminTabListings','adminTabClaims','adminTabDeals','adminTabReports','adminTabFeedback','adminTabDuplicates'].forEach(function(t){
+      var el = document.getElementById(t); if (el){ el.style.color = 'rgba(255,255,255,0.6)'; el.style.borderBottom = 'none'; }
+    });
+    var a = document.getElementById(activeId); if (a){ a.style.color = 'white'; a.style.borderBottom = '2px solid white'; }
+  }
+
   async function loadAdmin() {
     showScreen('screenAdmin');
     const body = document.getElementById('adminBody');
@@ -3456,11 +3463,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
     document.getElementById('adminSub').innerHTML = `
       <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
-        <span id="adminTabListings" onclick="loadAdminListings()" style="cursor:pointer;font-weight:700;color:white;border-bottom:2px solid white;padding-bottom:2px">Einträge</span>
-        <span id="adminTabClaims" onclick="loadAdminClaims()" style="cursor:pointer;color:rgba(255,255,255,0.6)">Inhaber-Anfragen${claimBadge}</span>
-        <span id="adminTabDeals" onclick="loadAdminDeals()" style="cursor:pointer;color:rgba(255,255,255,0.6)">🏷 Deals</span>
-        <span id="adminTabReports" onclick="loadAdminReports()" style="cursor:pointer;color:rgba(255,255,255,0.6)">🚩 Meldungen</span>
-        <span id="adminTabDuplicates" onclick="loadAdminDuplicates()" style="cursor:pointer;color:rgba(255,255,255,0.6)">📋 Duplikate</span>
+        <span id="adminTabListings" onclick="_adminActivateTab('adminTabListings');loadAdminListings()" style="cursor:pointer;font-weight:700;color:white;border-bottom:2px solid white;padding-bottom:2px">Einträge</span>
+        <span id="adminTabClaims" onclick="_adminActivateTab('adminTabClaims');loadAdminClaims()" style="cursor:pointer;color:rgba(255,255,255,0.6)">Inhaber-Anfragen${claimBadge}</span>
+        <span id="adminTabDeals" onclick="_adminActivateTab('adminTabDeals');loadAdminDeals()" style="cursor:pointer;color:rgba(255,255,255,0.6)">🏷 Deals</span>
+        <span id="adminTabReports" onclick="_adminActivateTab('adminTabReports');loadAdminReports()" style="cursor:pointer;color:rgba(255,255,255,0.6)">🚩 Meldungen</span>
+        <span id="adminTabFeedback" onclick="_adminActivateTab('adminTabFeedback');loadAdminFeedback()" style="cursor:pointer;color:rgba(255,255,255,0.6)">💬 Feedback</span>
+        <span id="adminTabDuplicates" onclick="_adminActivateTab('adminTabDuplicates');loadAdminDuplicates()" style="cursor:pointer;color:rgba(255,255,255,0.6)">📋 Duplikate</span>
       </div>`;
     loadAdminListings();
   }
@@ -4941,6 +4949,31 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       await db.collection('reports').doc(reportId).update({ status: 'resolved' });
       document.getElementById('reportCard_'+reportId).remove();
+    } catch(e) { alert(t('err_generic')); }
+  }
+
+  async function loadAdminFeedback() {
+    const body = document.getElementById('adminBody');
+    body.innerHTML = '<div style="text-align:center;padding:40px">Wird geladen...</div>';
+    try {
+      const snap = await db.collection('feedback').where('status','==','new').get();
+      const items = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      items.sort(function(a,b){ return _adminTs(b.created_at) - _adminTs(a.created_at); });
+      if (!items.length) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-icon">✓</div><div class="admin-empty-text">Kein neues Feedback</div></div>'; return; }
+      body.innerHTML = items.map(function(f){
+        return '<div class="admin-card" id="feedbackCard_'+f.id+'">'
+          + '<div class="admin-card-meta">'+esc(f.email||'anonym')+' · '+formatDate(f.created_at)+(f.lang?' · '+esc(f.lang):'')+'</div>'
+          + '<div style="background:#FFF8EC;border-left:3px solid var(--yellow);padding:10px 12px;border-radius:6px;margin:8px 0;font-size:14px;color:var(--text-1);white-space:pre-wrap;line-height:1.5">'+esc(f.text||'')+'</div>'
+          + '<div class="admin-actions"><button class="admin-btn reject" onclick="resolveFeedback(\''+f.id+'\')">Erledigt</button></div>'
+          + '</div>';
+      }).join('');
+    } catch(e) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-text">Fehler beim Laden</div></div>'; }
+  }
+
+  async function resolveFeedback(feedbackId) {
+    try {
+      await db.collection('feedback').doc(feedbackId).update({ status: 'done' });
+      var c = document.getElementById('feedbackCard_'+feedbackId); if (c) c.remove();
     } catch(e) { alert(t('err_generic')); }
   }
 
