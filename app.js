@@ -21,6 +21,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       choose_city: 'Stadt wählen',
       adm_all_entries: 'Alle Einträge', adm_review: 'Einträge prüfen', adm_all_checked: 'Alles geprüft!', adm_none_open: 'Keine offenen Einträge.', adm_similar: '⚠️ Ähnliche Einträge gefunden – bitte prüfen:',
       err_generic: 'Fehler.', err_prefix: 'Fehler: ',
+      report_detail_ph: 'Kurz beschreiben, was nicht stimmt (optional)',
       del_entry_confirm: 'Eintrag wirklich löschen?', del_review_confirm: 'Bewertung löschen?', del_comment_confirm: 'Kommentar löschen?', del_photo_confirm: 'Foto löschen?', del_deal_confirm: 'Deal wirklich entfernen?', cancel_event_confirm: 'Event wirklich absagen?',
       toast_coords_saved: '✅ Koordinaten gespeichert!', toast_no_entry: 'Kein Eintrag gewählt.', toast_photo_uploaded: '✓ Foto hochgeladen', toast_photo_submitted: '✓ Foto eingereicht – wird geprüft und nach Freigabe sichtbar', toast_report_sent: '✅ Meldung gesendet. Danke!', toast_entry_deleted: '✓ Eintrag gelöscht',
       err_event_load: 'Event konnte nicht geladen werden.', err_sold_out: 'Leider ausgebucht.', err_already_signed: 'Du bist bereits angemeldet.', err_reason: 'Bitte begründen.', err_upload: 'Fehler beim Hochladen',
@@ -184,6 +185,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       choose_city: 'Elegir ciudad',
       adm_all_entries: 'Todas las entradas', adm_review: 'Revisar entradas', adm_all_checked: '¡Todo revisado!', adm_none_open: 'No hay entradas pendientes.', adm_similar: '⚠️ Se encontraron entradas similares — por favor revisa:',
       err_generic: 'Error.', err_prefix: 'Error: ',
+      report_detail_ph: 'Describe brevemente qué pasa (opcional)',
       del_entry_confirm: '¿Eliminar la entrada de verdad?', del_review_confirm: '¿Eliminar la reseña?', del_comment_confirm: '¿Eliminar el comentario?', del_photo_confirm: '¿Eliminar la foto?', del_deal_confirm: '¿Quitar la oferta de verdad?', cancel_event_confirm: '¿Cancelar el evento de verdad?',
       toast_coords_saved: '✅ ¡Coordenadas guardadas!', toast_no_entry: 'Ninguna entrada seleccionada.', toast_photo_uploaded: '✓ Foto subida', toast_photo_submitted: '✓ Foto enviada – se revisará y será visible tras la aprobación', toast_report_sent: '✅ ¡Reporte enviado. Gracias!', toast_entry_deleted: '✓ Entrada eliminada',
       err_event_load: 'No se pudo cargar el evento.', err_sold_out: 'Lamentablemente agotado.', err_already_signed: 'Ya estás inscrito.', err_reason: 'Por favor indica un motivo.', err_upload: 'Error al subir',
@@ -4923,7 +4925,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         return `<div class="admin-card" id="reportCard_${r.id}">
           <div class="admin-card-name">${l ? l.name : 'Eintrag gelöscht'}</div>
           <div class="admin-card-meta">${l ? l.city : ''} · ${formatDate(r.created_at)}</div>
-          <div style="background:#FFF8EC;border-left:3px solid var(--yellow);padding:8px 10px;border-radius:6px;margin:8px 0;font-size:13px"><strong>${reasonLabels[r.reason]||r.reason}</strong></div>
+          <div style="background:#FFF8EC;border-left:3px solid var(--yellow);padding:8px 10px;border-radius:6px;margin:8px 0;font-size:13px"><strong>${reasonLabels[r.reason]||r.reason}</strong>${r.detail?`<div style="margin-top:5px;font-weight:400;color:var(--text-2);white-space:pre-wrap">„${esc(r.detail)}"</div>`:''}</div>
           <div class="admin-actions">
             ${l ? `<button class="admin-btn approve" onclick="showDetail('${r.listing_id}')">Anschauen</button>` : ''}
             <button class="admin-btn reject" onclick="resolveReport('${r.id}')">Erledigt</button>
@@ -4940,15 +4942,23 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch(e) { alert(t('err_generic')); }
   }
 
-  function openReport() { document.getElementById('reportOverlay').classList.add('visible'); }
-  function closeReport() { document.getElementById('reportOverlay').classList.remove('visible'); }
+  function openReport() {
+    var _rd = document.getElementById('reportDetail'); if (_rd) _rd.value = '';
+    document.getElementById('reportOverlay').classList.add('visible');
+  }
+  function closeReport() {
+    document.getElementById('reportOverlay').classList.remove('visible');
+    var _rd = document.getElementById('reportDetail'); if (_rd) _rd.value = '';
+  }
 
   async function submitReport(reason) {
     if (!currentUser || !currentListingId) { closeReport(); return; }
+    var _rd = document.getElementById('reportDetail');
+    var detail = _rd ? _rd.value.trim().slice(0, 500) : '';
     try {
       await db.collection('reports').add({
         listing_id: currentListingId, user_id: currentUser.uid,
-        reason: reason, status: 'pending', created_at: new Date()
+        reason: reason, detail: detail, status: 'pending', created_at: new Date()
       });
       closeReport();
       showToast(t('toast_report_sent'));
