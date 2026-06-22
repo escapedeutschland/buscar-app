@@ -22,6 +22,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       adm_all_entries: 'Alle Einträge', adm_review: 'Einträge prüfen', adm_all_checked: 'Alles geprüft!', adm_none_open: 'Keine offenen Einträge.', adm_similar: '⚠️ Ähnliche Einträge gefunden – bitte prüfen:',
       err_generic: 'Fehler.', err_prefix: 'Fehler: ',
       report_detail_ph: 'Kurz beschreiben, was nicht stimmt (optional)',
+      feedback_row: 'Feedback senden', feedback_title: 'Feedback senden', feedback_sub: 'Was gefällt dir, was fehlt, was sollten wir verbessern?', feedback_ph: 'Deine Nachricht ...', feedback_send: 'Senden', feedback_sent: '✅ Danke für dein Feedback!', feedback_login: 'Bitte zuerst einloggen.',
       del_entry_confirm: 'Eintrag wirklich löschen?', del_review_confirm: 'Bewertung löschen?', del_comment_confirm: 'Kommentar löschen?', del_photo_confirm: 'Foto löschen?', del_deal_confirm: 'Deal wirklich entfernen?', cancel_event_confirm: 'Event wirklich absagen?',
       toast_coords_saved: '✅ Koordinaten gespeichert!', toast_no_entry: 'Kein Eintrag gewählt.', toast_photo_uploaded: '✓ Foto hochgeladen', toast_photo_submitted: '✓ Foto eingereicht – wird geprüft und nach Freigabe sichtbar', toast_report_sent: '✅ Meldung gesendet. Danke!', toast_entry_deleted: '✓ Eintrag gelöscht',
       err_event_load: 'Event konnte nicht geladen werden.', err_sold_out: 'Leider ausgebucht.', err_already_signed: 'Du bist bereits angemeldet.', err_reason: 'Bitte begründen.', err_upload: 'Fehler beim Hochladen',
@@ -186,6 +187,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       adm_all_entries: 'Todas las entradas', adm_review: 'Revisar entradas', adm_all_checked: '¡Todo revisado!', adm_none_open: 'No hay entradas pendientes.', adm_similar: '⚠️ Se encontraron entradas similares — por favor revisa:',
       err_generic: 'Error.', err_prefix: 'Error: ',
       report_detail_ph: 'Describe brevemente qué pasa (opcional)',
+      feedback_row: 'Enviar comentarios', feedback_title: 'Enviar comentarios', feedback_sub: '¿Qué te gusta, qué falta, qué deberíamos mejorar?', feedback_ph: 'Tu mensaje ...', feedback_send: 'Enviar', feedback_sent: '✅ ¡Gracias por tus comentarios!', feedback_login: 'Por favor inicia sesión primero.',
       del_entry_confirm: '¿Eliminar la entrada de verdad?', del_review_confirm: '¿Eliminar la reseña?', del_comment_confirm: '¿Eliminar el comentario?', del_photo_confirm: '¿Eliminar la foto?', del_deal_confirm: '¿Quitar la oferta de verdad?', cancel_event_confirm: '¿Cancelar el evento de verdad?',
       toast_coords_saved: '✅ ¡Coordenadas guardadas!', toast_no_entry: 'Ninguna entrada seleccionada.', toast_photo_uploaded: '✓ Foto subida', toast_photo_submitted: '✓ Foto enviada – se revisará y será visible tras la aprobación', toast_report_sent: '✅ ¡Reporte enviado. Gracias!', toast_entry_deleted: '✓ Entrada eliminada',
       err_event_load: 'No se pudo cargar el evento.', err_sold_out: 'Lamentablemente agotado.', err_already_signed: 'Ya estás inscrito.', err_reason: 'Por favor indica un motivo.', err_upload: 'Error al subir',
@@ -4963,6 +4965,34 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       closeReport();
       showToast(t('toast_report_sent'));
     } catch(e) { alert(t('err_generic')); closeReport(); }
+  }
+
+  function openFeedback() {
+    if (!currentUser) { showToast(t('feedback_login') || 'Bitte zuerst einloggen.'); return; }
+    var _f = document.getElementById('feedbackText'); if (_f) _f.value = '';
+    document.getElementById('feedbackOverlay').classList.add('visible');
+  }
+  function closeFeedback() {
+    document.getElementById('feedbackOverlay').classList.remove('visible');
+    var _f = document.getElementById('feedbackText'); if (_f) _f.value = '';
+  }
+  async function submitFeedback() {
+    var _f = document.getElementById('feedbackText');
+    var text = _f ? _f.value.trim().slice(0, 1000) : '';
+    if (!text) { return; }
+    if (!currentUser) { closeFeedback(); return; }
+    try {
+      await db.collection('feedback').add({
+        user_id: currentUser.uid,
+        email: (currentUser.email || ''),
+        text: text,
+        lang: (typeof currentLang !== 'undefined' ? currentLang : ''),
+        status: 'new',
+        created_at: new Date()
+      });
+      closeFeedback();
+      showToast(t('feedback_sent'));
+    } catch(e) { alert(t('err_generic')); closeFeedback(); }
   }
 
   // Service Worker registrieren fuer Offline-Funktionalitaet

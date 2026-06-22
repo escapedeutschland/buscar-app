@@ -880,6 +880,12 @@
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
+      <div class="profil-section" style="margin-bottom:16px">
+        <div class="profil-row" onclick="openFeedback()">
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span class="profil-row-label" data-i18n="feedback_row">Feedback senden</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
       <div class="profil-section" style="margin-bottom:16px"><div class="profil-row" onclick="showScreen('screenImpressum')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="profil-row-label" id="profilImpressumLabel">Impressum</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div><div class="profil-row" onclick="showScreen('screenDatenschutz')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="profil-row-label" id="profilDatenschutzLabel">Datenschutz</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div><div class="profil-row" onclick="showScreen('screenAGB')"><div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="profil-row-label" id="profilAgbLabel">Nutzungsbedingungen</span></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div></div>
       <button class="logout-btn" onclick="handleLogout()" data-i18n="logout">Ausloggen</button>
     </div>
@@ -1193,6 +1199,19 @@
       <div class="report-option" onclick="submitReport('content')">&#x26A0; Unangemessener Inhalt</div>
       <div class="report-option" onclick="submitReport('other')">&#x1F4AC; Sonstiges</div>
       <div class="report-option" onclick="closeReport()" style="color:var(--text-3);justify-content:center;font-weight:600">Abbrechen</div>
+    </div>
+  </div>
+  <!-- FEEDBACK SHEET -->
+  <div class="report-overlay" id="feedbackOverlay" onclick="if(event.target.id==='feedbackOverlay')closeFeedback()">
+    <div class="report-sheet">
+      <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 16px"></div>
+      <div style="font-size:16px;font-weight:700;padding:0 20px 4px;color:var(--text-1)" data-i18n="feedback_title">Feedback senden</div>
+      <div style="font-size:13px;color:var(--text-3);padding:0 20px 14px;line-height:1.4" data-i18n="feedback_sub">Was gefällt dir, was fehlt, was sollten wir verbessern?</div>
+      <div style="padding:0 20px 12px"><textarea id="feedbackText" rows="4" maxlength="1000" placeholder="Deine Nachricht ..." data-i18n-ph="feedback_ph" style="width:100%;box-sizing:border-box;border:1.5px solid var(--border);border-radius:10px;padding:12px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text-1);resize:none;background:var(--bg)"></textarea></div>
+      <div style="padding:0 20px 18px;display:flex;gap:10px">
+        <button onclick="closeFeedback()" style="flex:1;padding:13px;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--text-2);cursor:pointer" data-i18n="cancel">Abbrechen</button>
+        <button onclick="submitFeedback()" style="flex:2;padding:13px;background:var(--yellow);border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;color:white;cursor:pointer" data-i18n="feedback_send">Senden</button>
+      </div>
     </div>
   </div>
   <!-- LIGHTBOX -->
