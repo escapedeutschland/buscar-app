@@ -821,7 +821,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
-      <!-- Meine Events -->
+      <!-- Meine Events / Angemeldete Events / Favoriten -->
       <div class="profil-section" style="margin-bottom:16px" id="myEventsSection">
         <div class="profil-row" onclick="toggleMyEvents()">
           <div class="profil-row-left">
@@ -836,11 +836,7 @@
         <div id="myEventsPanel" style="display:none;padding:8px 16px 12px">
           <div id="myEventsList"></div>
         </div>
-      </div>
-
-      <!-- Meine Anmeldungen -->
-      <div class="profil-section" style="margin-bottom:16px" id="mySignupsSection">
-        <div class="profil-row" onclick="toggleMySignups()">
+        <div class="profil-row" id="mySignupsSection" onclick="toggleMySignups()">
           <div class="profil-row-left">
             <div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="12" x2="15" y2="12"/></svg></div>
             <div>
@@ -853,8 +849,18 @@
         <div id="mySignupsPanel" style="display:none;padding:8px 16px 12px">
           <div id="mySignupsList"></div>
         </div>
+        <div class="profil-row" onclick="showFavorites()">
+          <div class="profil-row-left">
+            <div class="profil-row-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <span class="profil-row-label" data-i18n="my_favorites">Meine Favoriten</span>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
       </div>
 
+      <!-- Konto-Einstellungen -->
       <div class="profil-section" style="margin-bottom:16px">
         <div class="profil-row" onclick="showEditUsername()">
           <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="profil-row-label" data-i18n="change_username">Benutzername ändern</span></div>
@@ -866,17 +872,6 @@
         </div>
         <div class="profil-row" onclick="showEditEmail()">
           <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 6 12 13 2 6"/></svg></div><span class="profil-row-label" data-i18n="change_email">E-Mail ändern</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-      </div>
-      <div class="profil-section" style="margin-bottom:16px">
-        <div class="profil-row" onclick="showFavorites()">
-          <div class="profil-row-left">
-            <div class="profil-row-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            </div>
-            <span class="profil-row-label" data-i18n="my_favorites">Meine Favoriten</span>
-          </div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
