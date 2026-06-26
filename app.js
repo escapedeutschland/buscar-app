@@ -142,6 +142,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ev_rules_placeholder: 'z.B. Nur 18+, max. 1 Begleitung...',
       ev_back: 'Zurück', ev_to_event: 'Zum Event →',
       ev_entry: 'Eintritt', ev_capacity: 'Kapazität', ev_rules: 'Regeln',
+      ev_website_label: 'Website / Tickets (optional)', ev_tickets_info: 'Tickets & Infos',
       ev_free: 'Kostenlos', ev_paid_label: 'Kostenpflichtig',
       ev_spots: 'Plätze frei', ev_full: 'Ausgebucht', ev_cancelled: 'Abgesagt',
       ev_none_filter: 'Keine Events für diesen Filter', ev_none_city: 'Aktuell keine Events in {city}', ev_show_all_cities: 'Alle Städte anzeigen',
@@ -307,6 +308,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ev_rules_placeholder: 'Ej: Solo mayores de 18, máx. 1 acompañante...',
       ev_back: 'Volver', ev_to_event: 'Ver evento →',
       ev_entry: 'Entrada', ev_capacity: 'Capacidad', ev_rules: 'Reglas',
+      ev_website_label: 'Sitio web / Entradas (opcional)', ev_tickets_info: 'Entradas e info',
       ev_free: 'Gratis', ev_paid_label: 'Con costo',
       ev_spots: 'lugares disponibles', ev_full: 'Agotado', ev_cancelled: 'Cancelado',
       ev_none_filter: 'No hay eventos para este filtro', ev_none_city: 'Actualmente no hay eventos en {city}', ev_show_all_cities: 'Mostrar todas las ciudades',
@@ -1279,6 +1281,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
     bodyHtml += '</div>';
 
+    if (ev.website) {
+      var _w = String(ev.website).trim();
+      if (!/^https?:\/\//i.test(_w)) _w = 'https://' + _w;
+      bodyHtml += '<a href="' + esc(_w) + '" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;background:var(--yellow);border:none;border-radius:var(--radius-lg);padding:14px;font-size:15px;font-weight:700;color:white;text-decoration:none;margin-bottom:14px">'
+        + '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4V7a2 2 0 0 1 2-2z"/><path d="M9 5v14"/></svg>'
+        + t('ev_tickets_info') + '</a>';
+    }
+
     if (ev.rules) {
       bodyHtml += '<div style="background:var(--card);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px">'
         + '<div style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Regeln</div>'
@@ -1335,6 +1345,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('evFormTimeEnd').value = en ? _toTimeInput(en) : '';
     document.getElementById('evFormCity').value = ev.city || '';
     document.getElementById('evFormAddress').value = ev.address || '';
+    document.getElementById('evFormWebsite').value = ev.website || '';
     document.getElementById('evFormIsPaid').checked = !!ev.is_paid;
     document.getElementById('evFormPrice').value = (ev.ticket_price ? ev.ticket_price : '');
     document.getElementById('evFormPriceRow').style.display = ev.is_paid ? 'block' : 'none';
@@ -1360,7 +1371,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     _editingEventId = null;
     var _ft = document.querySelector('#screenEventForm .form-title'); if (_ft) _ft.textContent = (currentLang==='es'?'Crear evento':'Event erstellen');
     var _sb = document.getElementById('evFormSubmitBtn'); if (_sb){ _sb.textContent = t('ev_publish'); _sb.disabled = false; }
-    ['evFormTitle','evFormDesc','evFormCity','evFormAddress','evFormPrice','evFormCapacity','evFormRules'].forEach(function(id){
+    ['evFormTitle','evFormDesc','evFormCity','evFormAddress','evFormWebsite','evFormPrice','evFormCapacity','evFormRules'].forEach(function(id){
       var el = document.getElementById(id);
       if (el) el.value = '';
     });
@@ -1503,6 +1514,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         title: title, type: type, description: desc,
         date_start: dateStart, date_end: dateEnd,
         city: city, address: document.getElementById('evFormAddress').value.trim() || null,
+        website: document.getElementById('evFormWebsite').value.trim() || null,
         lat: _evLat, lng: _evLng,
         is_paid: isPaid,
         ticket_price: isPaid ? (Number(document.getElementById('evFormPrice').value)||0) : 0,
