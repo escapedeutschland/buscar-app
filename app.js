@@ -144,6 +144,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ev_entry: 'Eintritt', ev_capacity: 'Kapazität', ev_rules: 'Regeln',
       ev_free: 'Kostenlos', ev_paid_label: 'Kostenpflichtig',
       ev_spots: 'Plätze frei', ev_full: 'Ausgebucht', ev_cancelled: 'Abgesagt',
+      ev_none_filter: 'Keine Events für diesen Filter', ev_none_city: 'Aktuell keine Events in {city}', ev_show_all_cities: 'Alle Städte anzeigen',
       ev_signup_btn: 'Anmelden', ev_login_signup: 'Einloggen zum Anmelden',
       ev_cancel_btn: 'Event absagen', ev_cancel_confirm: 'Event wirklich absagen?',
       ev_delete_btn: 'Löschen', ev_delete_confirm: 'Event endgültig löschen?', ev_delete_ok: 'Event gelöscht.',
@@ -308,6 +309,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ev_entry: 'Entrada', ev_capacity: 'Capacidad', ev_rules: 'Reglas',
       ev_free: 'Gratis', ev_paid_label: 'Con costo',
       ev_spots: 'lugares disponibles', ev_full: 'Agotado', ev_cancelled: 'Cancelado',
+      ev_none_filter: 'No hay eventos para este filtro', ev_none_city: 'Actualmente no hay eventos en {city}', ev_show_all_cities: 'Mostrar todas las ciudades',
       ev_signup_btn: 'Registrarse', ev_login_signup: 'Iniciar sesión para registrarse',
       ev_cancel_btn: 'Cancelar evento', ev_cancel_confirm: '¿Cancelar este evento?',
       ev_delete_btn: 'Eliminar', ev_delete_confirm: '¿Eliminar este evento definitivamente?', ev_delete_ok: 'Evento eliminado.',
@@ -1107,11 +1109,6 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     renderEvents();
   }
 
-  function eventCities() {
-    var set = {};
-    (allEvents || []).forEach(function(ev){ var c = prettyCity(ev.city || ''); if (c) set[c] = true; });
-    return Object.keys(set).sort(function(a,b){ return a.localeCompare(b); });
-  }
   function openEventCitySheet() {
     document.getElementById('eventCitySheetOverlay').classList.add('visible');
     var inp = document.getElementById('evCitySearchInput'); if (inp) inp.value = '';
@@ -1124,8 +1121,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function renderEventCitySheet(query) {
     var list = document.getElementById('evCitySheetList');
     var q = norm(query || '');
-    var cities = ['Alle'].concat(eventCities());
-    var filtered = cities.filter(function(c){ return c === 'Alle' || !q || norm(c).includes(q); });
+    var filtered = ALL_PY_CITIES.filter(function(c){ return !q || norm(c).includes(q); });
     if (!filtered.length) { list.innerHTML = '<div class="city-sheet-empty">Keine Stadt gefunden</div>'; return; }
     list.innerHTML = filtered.map(function(c){
       return '<div class="city-sheet-item' + (evCityFilter === c ? ' selected' : '') + '" onclick="selectEventCity(\'' + String(c).replace(/'/g, "\\'") + '\')">'
@@ -1189,8 +1185,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('eventsSubtitle').textContent = sub;
 
     if (filtered.length === 0) {
+      var _hasCity = evCityFilter && evCityFilter !== 'Alle';
+      var _msg = _hasCity ? t('ev_none_city').replace('{city}', esc(evCityFilter)) : t('ev_none_filter');
+      var _reset = _hasCity
+        ? '<div onclick="selectEventCity(\'Alle\')" style="margin-top:16px;display:inline-block;background:var(--yellow);color:white;font-weight:700;font-size:13px;padding:9px 18px;border-radius:20px;cursor:pointer">' + esc(t('ev_show_all_cities')) + '</div>'
+        : '';
       document.getElementById('eventsList').innerHTML =
-        '<div style="text-align:center;padding:60px 20px;color:var(--text-3);font-size:15px">🎪<br><br>Keine Events für diesen Filter</div>';
+        '<div style="text-align:center;padding:60px 20px;color:var(--text-3);font-size:15px">🎪<br><br>' + _msg + _reset + '</div>';
       return;
     }
 
