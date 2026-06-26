@@ -85,6 +85,10 @@
         <div class="event-chip" id="evType-markt" onclick="setEventType('Markt')">🛒 Markt</div>
         <div class="event-chip" id="evType-sonstiges" onclick="setEventType('Sonstiges')">📌 Sonstiges</div>
       </div>
+      <div id="evCityPickerBtn" class="city-picker-btn" onclick="openEventCitySheet()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span class="city-picker-label" id="evCityPickerLabel" data-i18n="city_select">Stadt wählen...</span>
+      </div>
       <div id="ptrEvents" style="text-align:center;height:0;overflow:hidden;transition:height 0.2s;color:var(--text-3);font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16" class="ptr-arrow" style="transition:transform 0.2s"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
         <span class="ptr-text" data-i18n="ptr_pull">Aktualisieren</span>
@@ -1144,6 +1148,21 @@
         <input type="text" id="citySearchInput" placeholder="Stadt suchen..." oninput="filterCitySheet()">
       </div>
       <div class="city-sheet-list" id="citySheetList"></div>
+    </div>
+  </div>
+
+  <div class="city-sheet-overlay" id="eventCitySheetOverlay" onclick="if(event.target.id==='eventCitySheetOverlay')closeEventCitySheet()">
+    <div class="city-sheet">
+      <div class="city-sheet-handle"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 20px 16px">
+        <div class="city-sheet-title" style="padding:0" data-i18n="choose_city">Stadt wählen</div>
+        <button onclick="closeEventCitySheet()" style="width:32px;height:32px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-2)">✕</button>
+      </div>
+      <div class="city-sheet-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="evCitySearchInput" placeholder="Stadt suchen..." oninput="filterEventCitySheet()">
+      </div>
+      <div class="city-sheet-list" id="evCitySheetList"></div>
     </div>
   </div>
 

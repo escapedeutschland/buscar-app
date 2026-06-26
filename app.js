@@ -1055,6 +1055,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   let allEvents = [];
   let evTimeFilter = 'all';
   let evTypeFilter = 'all';
+  let evCityFilter = 'Alle';
 
   const EVENT_TYPE_COLORS = {
     'Party':'#F5A623','Festival':'#8B5CF6','Konzert':'#EC4899',
@@ -1106,6 +1107,60 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     renderEvents();
   }
 
+  function eventCities() {
+    var set = {};
+    (allEvents || []).forEach(function(ev){ var c = prettyCity(ev.city || ''); if (c) set[c] = true; });
+    return Object.keys(set).sort(function(a,b){ return a.localeCompare(b); });
+  }
+  function openEventCitySheet() {
+    document.getElementById('eventCitySheetOverlay').classList.add('visible');
+    var inp = document.getElementById('evCitySearchInput'); if (inp) inp.value = '';
+    renderEventCitySheet('');
+    setTimeout(function(){ var i = document.getElementById('evCitySearchInput'); if (i) i.focus(); }, 100);
+  }
+  function closeEventCitySheet() {
+    document.getElementById('eventCitySheetOverlay').classList.remove('visible');
+  }
+  function renderEventCitySheet(query) {
+    var list = document.getElementById('evCitySheetList');
+    var q = norm(query || '');
+    var cities = ['Alle'].concat(eventCities());
+    var filtered = cities.filter(function(c){ return c === 'Alle' || !q || norm(c).includes(q); });
+    if (!filtered.length) { list.innerHTML = '<div class="city-sheet-empty">Keine Stadt gefunden</div>'; return; }
+    list.innerHTML = filtered.map(function(c){
+      return '<div class="city-sheet-item' + (evCityFilter === c ? ' selected' : '') + '" onclick="selectEventCity(\'' + String(c).replace(/'/g, "\\'") + '\')">'
+        + '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
+        + '<span>' + (c === 'Alle' ? t('city_all') : esc(c)) + '</span></div>';
+    }).join('');
+  }
+  function filterEventCitySheet() {
+    renderEventCitySheet(document.getElementById('evCitySearchInput').value);
+  }
+  function selectEventCity(city) {
+    evCityFilter = city;
+    var btn = document.getElementById('evCityPickerBtn');
+    var label = document.getElementById('evCityPickerLabel');
+    if (city === 'Alle') {
+      btn.classList.remove('active');
+      label.textContent = t('city_select');
+      var cb = document.getElementById('evCityPickerClear'); if (cb) cb.remove();
+    } else {
+      btn.classList.add('active');
+      label.textContent = city;
+      var clearBtn = document.getElementById('evCityPickerClear');
+      if (!clearBtn) {
+        clearBtn = document.createElement('button');
+        clearBtn.id = 'evCityPickerClear';
+        clearBtn.className = 'city-picker-clear';
+        clearBtn.textContent = '×';
+        clearBtn.onclick = function(e){ e.stopPropagation(); selectEventCity('Alle'); };
+        btn.appendChild(clearBtn);
+      }
+    }
+    closeEventCitySheet();
+    renderEvents();
+  }
+
   function renderEvents() {
     var now = new Date();
     var todayEnd = new Date(); todayEnd.setHours(23,59,59);
@@ -1123,6 +1178,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
     if (evTypeFilter !== 'all') {
       filtered = filtered.filter(function(ev){ return ev.type === evTypeFilter; });
+    }
+
+    if (evCityFilter && evCityFilter !== 'Alle') {
+      filtered = filtered.filter(function(ev){ return prettyCity(ev.city||'') === evCityFilter; });
     }
 
     var sub = filtered.length === 0 ? 'Keine Events gefunden' :
