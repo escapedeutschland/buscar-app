@@ -23,6 +23,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       err_generic: 'Fehler.', err_prefix: 'Fehler: ',
       report_detail_ph: 'Kurz beschreiben, was nicht stimmt (optional)',
       link_copied: '🔗 Link kopiert',
+      share_cta: 'Entdeckt auf Buscar – dem Guide für Paraguay. Lade dir die App auch herunter! 👇',
       del_entry_confirm: 'Eintrag wirklich löschen?', del_review_confirm: 'Bewertung löschen?', del_comment_confirm: 'Kommentar löschen?', del_photo_confirm: 'Foto löschen?', del_deal_confirm: 'Deal wirklich entfernen?', cancel_event_confirm: 'Event wirklich absagen?',
       toast_coords_saved: '✅ Koordinaten gespeichert!', toast_no_entry: 'Kein Eintrag gewählt.', toast_photo_uploaded: '✓ Foto hochgeladen', toast_photo_submitted: '✓ Foto eingereicht – wird geprüft und nach Freigabe sichtbar', toast_report_sent: '✅ Meldung gesendet. Danke!', toast_entry_deleted: '✓ Eintrag gelöscht',
       err_event_load: 'Event konnte nicht geladen werden.', err_sold_out: 'Leider ausgebucht.', err_already_signed: 'Du bist bereits angemeldet.', err_reason: 'Bitte begründen.', err_upload: 'Fehler beim Hochladen',
@@ -190,6 +191,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       err_generic: 'Error.', err_prefix: 'Error: ',
       report_detail_ph: 'Describe brevemente qué pasa (opcional)',
       link_copied: '🔗 Enlace copiado',
+      share_cta: 'Descubierto en Buscar – la guía para Paraguay. ¡Descargate la app también! 👇',
       del_entry_confirm: '¿Eliminar la entrada de verdad?', del_review_confirm: '¿Eliminar la reseña?', del_comment_confirm: '¿Eliminar el comentario?', del_photo_confirm: '¿Eliminar la foto?', del_deal_confirm: '¿Quitar la oferta de verdad?', cancel_event_confirm: '¿Cancelar el evento de verdad?',
       toast_coords_saved: '✅ ¡Coordenadas guardadas!', toast_no_entry: 'Ninguna entrada seleccionada.', toast_photo_uploaded: '✓ Foto subida', toast_photo_submitted: '✓ Foto enviada – se revisará y será visible tras la aprobación', toast_report_sent: '✅ ¡Reporte enviado. Gracias!', toast_entry_deleted: '✓ Entrada eliminada',
       err_event_load: 'No se pudo cargar el evento.', err_sold_out: 'Lamentablemente agotado.', err_already_signed: 'Ya estás inscrito.', err_reason: 'Por favor indica un motivo.', err_upload: 'Error al subir',
@@ -5019,24 +5021,26 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   // ── Teilen + Deep-Link ──────────────────────────────────────────────
   var SHARE_BASE = "https://buscar-share.maximechristalle.workers.dev";
-  function shareLink(title, url) {
+  function shareLink(title, text, url) {
     if (navigator.share) {
-      navigator.share({ title: title, url: url }).catch(function(){});
+      navigator.share({ title: title, text: text, url: url }).catch(function(){});
     } else if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(url).then(function(){ showToast(t('link_copied')); }).catch(function(){ window.prompt(t('link_copied'), url); });
+      navigator.clipboard.writeText(text + '\n' + url).then(function(){ showToast(t('link_copied')); }).catch(function(){ window.prompt(t('link_copied'), text + '\n' + url); });
     } else {
-      window.prompt(t('link_copied'), url);
+      window.prompt(t('link_copied'), text + '\n' + url);
     }
   }
   function shareCurrentListing() {
     if (!currentListingId) return;
     var l = allListings.find(function(x){ return x.id === currentListingId; });
-    shareLink(l ? l.name : 'Buscar', SHARE_BASE + '/ort/' + encodeURIComponent(currentListingId));
+    var name = l ? l.name : 'Buscar';
+    shareLink(name, '📍 ' + name + '\n' + t('share_cta'), SHARE_BASE + '/ort/' + encodeURIComponent(currentListingId));
   }
   function shareCurrentEvent() {
     if (!_currentEventId) return;
     var ev = (allEvents||[]).find(function(e){ return e.id === _currentEventId; });
-    shareLink(ev ? ev.title : 'Buscar', SHARE_BASE + '/event/' + encodeURIComponent(_currentEventId));
+    var name = ev ? ev.title : 'Buscar';
+    shareLink(name, '🎉 ' + name + '\n' + t('share_cta'), SHARE_BASE + '/event/' + encodeURIComponent(_currentEventId));
   }
   async function openSharedListing(id) {
     try {
