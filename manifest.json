@@ -1,8 +1,8 @@
 {
   "id": "/buscar-app/",
-  "name": "Buscar – Deutsche in Paraguay",
+  "name": "Buscar – Der Guide für Paraguay",
   "short_name": "Buscar",
-  "description": "Die App für Deutsche in Paraguay – Orte, Ärzte, Restaurants, Events & mehr.",
+  "description": "Der Guide für Paraguay – Orte, Ärzte, Restaurants, Events & mehr.",
   "start_url": "/buscar-app/",
   "scope": "/buscar-app/",
   "display": "standalone",

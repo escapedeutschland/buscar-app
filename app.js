@@ -66,7 +66,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       cat_serv: 'Dienstleistungen', cat_place: 'Orte und Sehenswürdigkeiten',
       cat_accom: 'Unterkünfte', cat_shop: 'Geschäfte und Märkte',
       desc_label: 'Deine Erfahrung *',
-      desc_placeholder: 'Beschreibe den Ort für andere Deutsche. Was macht ihn besonders? Worauf sollte man achten?',
+      desc_placeholder: 'Beschreibe den Ort für andere Nutzer. Was macht ihn besonders? Worauf sollte man achten?',
       contact_optional: 'Kontakt (optional)',
       tel_label: 'Telefon', web_label: 'Website', addr_label: 'Adresse', hours_label: 'Öffnungszeiten',
       location_btn: 'Meinen Standort verwenden', location_saved: 'Standort gespeichert',
