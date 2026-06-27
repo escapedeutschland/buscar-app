@@ -22,6 +22,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       adm_all_entries: 'Alle Einträge', adm_review: 'Einträge prüfen', adm_all_checked: 'Alles geprüft!', adm_none_open: 'Keine offenen Einträge.', adm_similar: '⚠️ Ähnliche Einträge gefunden – bitte prüfen:',
       err_generic: 'Fehler.', err_prefix: 'Fehler: ',
       report_detail_ph: 'Kurz beschreiben, was nicht stimmt (optional)',
+      link_copied: '🔗 Link kopiert',
       del_entry_confirm: 'Eintrag wirklich löschen?', del_review_confirm: 'Bewertung löschen?', del_comment_confirm: 'Kommentar löschen?', del_photo_confirm: 'Foto löschen?', del_deal_confirm: 'Deal wirklich entfernen?', cancel_event_confirm: 'Event wirklich absagen?',
       toast_coords_saved: '✅ Koordinaten gespeichert!', toast_no_entry: 'Kein Eintrag gewählt.', toast_photo_uploaded: '✓ Foto hochgeladen', toast_photo_submitted: '✓ Foto eingereicht – wird geprüft und nach Freigabe sichtbar', toast_report_sent: '✅ Meldung gesendet. Danke!', toast_entry_deleted: '✓ Eintrag gelöscht',
       err_event_load: 'Event konnte nicht geladen werden.', err_sold_out: 'Leider ausgebucht.', err_already_signed: 'Du bist bereits angemeldet.', err_reason: 'Bitte begründen.', err_upload: 'Fehler beim Hochladen',
@@ -188,6 +189,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       adm_all_entries: 'Todas las entradas', adm_review: 'Revisar entradas', adm_all_checked: '¡Todo revisado!', adm_none_open: 'No hay entradas pendientes.', adm_similar: '⚠️ Se encontraron entradas similares — por favor revisa:',
       err_generic: 'Error.', err_prefix: 'Error: ',
       report_detail_ph: 'Describe brevemente qué pasa (opcional)',
+      link_copied: '🔗 Enlace copiado',
       del_entry_confirm: '¿Eliminar la entrada de verdad?', del_review_confirm: '¿Eliminar la reseña?', del_comment_confirm: '¿Eliminar el comentario?', del_photo_confirm: '¿Eliminar la foto?', del_deal_confirm: '¿Quitar la oferta de verdad?', cancel_event_confirm: '¿Cancelar el evento de verdad?',
       toast_coords_saved: '✅ ¡Coordenadas guardadas!', toast_no_entry: 'Ninguna entrada seleccionada.', toast_photo_uploaded: '✓ Foto subida', toast_photo_submitted: '✓ Foto enviada – se revisará y será visible tras la aprobación', toast_report_sent: '✅ ¡Reporte enviado. Gracias!', toast_entry_deleted: '✓ Entrada eliminada',
       err_event_load: 'No se pudo cargar el evento.', err_sold_out: 'Lamentablemente agotado.', err_already_signed: 'Ya estás inscrito.', err_reason: 'Por favor indica un motivo.', err_upload: 'Error al subir',
@@ -1964,6 +1966,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
       if (!window._evPreloaded) { window._evPreloaded = true; setTimeout(function(){ loadEvents(); }, 1200); }
       var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden');
+      handleDeepLink();
     } else { showScreen('screenAuth'); var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden'); }
   });
 
@@ -5012,6 +5015,59 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('reports').doc(reportId).update({ status: 'resolved' });
       document.getElementById('reportCard_'+reportId).remove();
     } catch(e) { alert(t('err_generic')); }
+  }
+
+  // ── Teilen + Deep-Link ──────────────────────────────────────────────
+  function _shareBaseUrl() { return location.origin + location.pathname; }
+  function shareLink(title, url) {
+    if (navigator.share) {
+      navigator.share({ title: title, url: url }).catch(function(){});
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(function(){ showToast(t('link_copied')); }).catch(function(){ window.prompt(t('link_copied'), url); });
+    } else {
+      window.prompt(t('link_copied'), url);
+    }
+  }
+  function shareCurrentListing() {
+    if (!currentListingId) return;
+    var l = allListings.find(function(x){ return x.id === currentListingId; });
+    shareLink(l ? l.name : 'Buscar', _shareBaseUrl() + '?ort=' + encodeURIComponent(currentListingId));
+  }
+  function shareCurrentEvent() {
+    if (!_currentEventId) return;
+    var ev = (allEvents||[]).find(function(e){ return e.id === _currentEventId; });
+    shareLink(ev ? ev.title : 'Buscar', _shareBaseUrl() + '?event=' + encodeURIComponent(_currentEventId));
+  }
+  async function openSharedListing(id) {
+    try {
+      if (!allListings.find(function(x){ return x.id === id; })) {
+        var d = await db.collection('listings').doc(id).get();
+        if (!d.exists) return;
+        allListings.push(Object.assign({ id: d.id }, d.data()));
+      }
+      showDetail(id);
+    } catch(e) {}
+  }
+  async function openSharedEvent(id) {
+    try {
+      if (!(allEvents||[]).find(function(e){ return e.id === id; })) {
+        var d = await db.collection('events').doc(id).get();
+        if (!d.exists) return;
+        allEvents.push(Object.assign({ id: d.id }, d.data()));
+      }
+      showEventDetail(id, 'home');
+    } catch(e) {}
+  }
+  function handleDeepLink() {
+    try {
+      var p = new URLSearchParams(location.search);
+      var ort = p.get('ort'), evid = p.get('event');
+      if (!ort && !evid) return;
+      // URL säubern, damit ein Reload nicht erneut aufspringt
+      try { history.replaceState(null, '', location.pathname); } catch(e) {}
+      if (ort) openSharedListing(ort);
+      else if (evid) openSharedEvent(evid);
+    } catch(e) {}
   }
 
   function openReport() {

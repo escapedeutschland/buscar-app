@@ -35,17 +35,17 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Buscar – Deutsche in Paraguay</title>
-  <link rel="preload" href="styles.css?v=167" as="style">
-  <link rel="preload" href="app.js?v=167" as="script">
+  <link rel="preload" href="styles.css?v=168" as="style">
+  <link rel="preload" href="app.js?v=168" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-  <link href="styles.css?v=167" rel="stylesheet">
+  <link href="styles.css?v=168" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  <script defer src="app.js?v=167"></script>
+  <script defer src="app.js?v=168"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -113,6 +113,7 @@
     <div class="screen" id="screenEventDetail">
       <div class="event-detail-header" id="eventDetailHeader" style="background:linear-gradient(150deg,#F5A623 0%,#D4841A 100%)">
         <button onclick="evDetailBack()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;padding:6px 12px;color:white;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg data-i18n-btn="ev_back">Zurück</button>
+        <button class="share-btn" id="evShareBtn" onclick="shareCurrentEvent()" aria-label="Teilen"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
         <div class="event-detail-type-badge" id="evDetailTypeBadge"></div>
         <div class="event-detail-title" id="evDetailTitle"></div>
         <div class="event-detail-meta-row" id="evDetailMeta"></div>
@@ -405,6 +406,7 @@
       <div class="detail-cover-overlay" id="detailCoverOverlay" style="display:none"></div>
       <button class="detail-back" onclick="detailBack()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       <button class="fav-btn" id="favBtn" onclick="toggleFavorite()"><svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+      <button class="share-btn" id="detailShareBtn" onclick="shareCurrentListing()" aria-label="Teilen"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
       <div style="position:relative;z-index:2">
       <div class="detail-hero-icon" id="detailIcon"></div>
       <div class="detail-title" id="detailTitle">-</div>
