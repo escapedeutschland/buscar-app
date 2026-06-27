@@ -5018,7 +5018,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   // ── Teilen + Deep-Link ──────────────────────────────────────────────
-  function _shareBaseUrl() { return location.origin + location.pathname; }
+  var SHARE_BASE = "https://buscar-share.maximechristalle.workers.dev";
   function shareLink(title, url) {
     if (navigator.share) {
       navigator.share({ title: title, url: url }).catch(function(){});
@@ -5031,12 +5031,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function shareCurrentListing() {
     if (!currentListingId) return;
     var l = allListings.find(function(x){ return x.id === currentListingId; });
-    shareLink(l ? l.name : 'Buscar', _shareBaseUrl() + '?ort=' + encodeURIComponent(currentListingId));
+    shareLink(l ? l.name : 'Buscar', SHARE_BASE + '/ort/' + encodeURIComponent(currentListingId));
   }
   function shareCurrentEvent() {
     if (!_currentEventId) return;
     var ev = (allEvents||[]).find(function(e){ return e.id === _currentEventId; });
-    shareLink(ev ? ev.title : 'Buscar', _shareBaseUrl() + '?event=' + encodeURIComponent(_currentEventId));
+    shareLink(ev ? ev.title : 'Buscar', SHARE_BASE + '/event/' + encodeURIComponent(_currentEventId));
   }
   async function openSharedListing(id) {
     try {
