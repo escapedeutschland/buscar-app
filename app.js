@@ -5022,12 +5022,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // ── Teilen + Deep-Link ──────────────────────────────────────────────
   var SHARE_BASE = "https://buscar-share.maximechristalle.workers.dev";
   function shareLink(title, text, url) {
+    var msg = text + '\n' + url;
     if (navigator.share) {
-      navigator.share({ title: title, text: text, url: url }).catch(function(){});
+      // Link IM Text mitschicken (WhatsApp zeigt sonst oft nur den Link ohne Text)
+      navigator.share({ title: title, text: msg }).catch(function(){});
     } else if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text + '\n' + url).then(function(){ showToast(t('link_copied')); }).catch(function(){ window.prompt(t('link_copied'), text + '\n' + url); });
+      navigator.clipboard.writeText(msg).then(function(){ showToast(t('link_copied')); }).catch(function(){ window.prompt(t('link_copied'), msg); });
     } else {
-      window.prompt(t('link_copied'), text + '\n' + url);
+      window.prompt(t('link_copied'), msg);
     }
   }
   function shareCurrentListing() {
