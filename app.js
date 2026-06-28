@@ -2734,7 +2734,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     // Ersteller darf eigenen Eintrag bearbeiten/loeschen
     var _cre = document.getElementById('detailCreatorControls');
     if (_cre) {
-      if (currentUser && l.created_by && l.created_by === currentUser.uid) {
+      if (currentUser && (currentUser.email === ADMIN_EMAIL || (l.created_by && l.created_by === currentUser.uid))) {
         var _esc = (currentLang === 'es');
         _cre.innerHTML = '<div class="detail-card" style="display:flex;gap:8px;padding:12px">'
           + '<button onclick="openEditListing(\'' + l.id + '\')" style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:11px;font-family:\'DM Sans\',sans-serif;font-weight:600;font-size:13px;color:var(--text-1);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' + (_esc ? 'Editar' : 'Bearbeiten') + '</button>'
