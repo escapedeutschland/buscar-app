@@ -1878,6 +1878,17 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   var _coordLat = null;
   var _coordLng = null;
 
+  function clickLocFix() {
+    if (!currentListingId) return;
+    var l = allListings.find(function(x){ return x.id === currentListingId; });
+    if (!l) return;
+    var isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
+    var isOwner = currentUser && l.owner_id && l.owner_id === currentUser.uid;
+    if (l.owner_id && !isOwner && !isAdmin) return; // beansprucht -> nur Inhaber/Admin
+    if (!currentUser) { showScreen('screenAuth'); return; }
+    openCoordEditor(currentListingId, (isAdmin || isOwner) ? 'admin' : 'suggest');
+  }
+
   var _coordMode = 'admin'; // 'admin' = direkt speichern, 'suggest' = Vorschlag an Admin
   function openCoordEditor(listingId, mode) {
     var l = allListings.find(function(x){ return x.id === listingId; });
@@ -2636,12 +2647,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var claimed = !!l.owner_id;
       if (isAdmin || isOwner) {
         btn.style.display = ''; if (lbl) lbl.textContent = t('locfix_btn_edit');
-        btn.onclick = function(){ openCoordEditor(l.id, 'admin'); };
       } else if (currentUser && !claimed) {
         btn.style.display = ''; if (lbl) lbl.textContent = t('locfix_btn_suggest');
-        btn.onclick = function(){ openCoordEditor(l.id, 'suggest'); };
       } else {
-        btn.style.display = 'none'; btn.onclick = null;
+        btn.style.display = 'none';
       }
     })();
 
