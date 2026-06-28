@@ -24,6 +24,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       report_detail_ph: 'Kurz beschreiben, was nicht stimmt (optional)',
       link_copied: '🔗 Link kopiert',
       share_cta: 'Entdeckt auf Buscar – dem Guide für Paraguay. Lade dir die App auch herunter! 👇',
+      maps_import_title: 'Aus Google Maps übernehmen',
+      maps_import_hint: 'Spar dir das Tippen: Google-Maps-Link einfügen – Name, Adresse, Telefon, Öffnungszeiten & Standort werden automatisch ausgefüllt. Du ergänzt nur noch deine persönliche Empfehlung.',
+      maps_import_btn: 'Laden',
+      maps_loading: 'Hole Daten von Google…',
+      maps_success: '✓ Daten übernommen – bitte prüfen und deine persönliche Empfehlung ergänzen.',
+      maps_error: 'Konnte den Ort nicht laden. Bitte prüfe den Link oder gib die Daten manuell ein.',
       saving: 'Wird gespeichert...',
       locfix_btn_edit: 'Standort korrigieren', locfix_btn_suggest: 'Standort stimmt nicht?',
       locfix_edit_title: 'Standort korrigieren', locfix_suggest_title: 'Standort vorschlagen',
@@ -199,6 +205,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       report_detail_ph: 'Describe brevemente qué pasa (opcional)',
       link_copied: '🔗 Enlace copiado',
       share_cta: 'Descubierto en Buscar – la guía para Paraguay. ¡Descargate la app también! 👇',
+      maps_import_title: 'Importar desde Google Maps',
+      maps_import_hint: 'Ahorrate el tecleo: pegá el enlace de Google Maps y se completan automáticamente nombre, dirección, teléfono, horarios y ubicación. Vos solo agregás tu recomendación personal.',
+      maps_import_btn: 'Cargar',
+      maps_loading: 'Obteniendo datos de Google…',
+      maps_success: '✓ Datos cargados – revisalos y agregá tu recomendación personal.',
+      maps_error: 'No se pudo cargar el lugar. Revisá el enlace o ingresá los datos manualmente.',
       saving: 'Guardando...',
       locfix_btn_edit: 'Corregir ubicación', locfix_btn_suggest: '¿Ubicación incorrecta?',
       locfix_edit_title: 'Corregir ubicación', locfix_suggest_title: 'Sugerir ubicación',
@@ -3270,6 +3282,96 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('descCounter').classList.toggle('warn', len > 450);
   });
 
+  // ---- Aus Google Maps übernehmen (Weg B) ----
+  // Mappt Google-Place-Typen auf Buscar-Kategorien
+  function _mapsCatFromTypes(types, primary) {
+    const set = (types || []).map(x => String(x).toLowerCase());
+    if (primary) set.unshift(String(primary).toLowerCase());
+    const has = (...keys) => keys.some(k => set.some(x => x.indexOf(k) !== -1));
+    if (has('currency_exchange')) return 'kat-wechselstube';
+    if (has('lodging', 'hotel', 'motel', 'hostel', 'guest_house', 'resort', 'bed_and_breakfast', 'campground')) return 'kat-unterkunft';
+    if (has('restaurant', 'cafe', 'coffee', 'bar', 'bakery', 'meal_', 'food', 'pub', 'ice_cream', 'fast_food')) return 'kat-restaurants';
+    if (has('gas_station', 'car_repair', 'car_dealer', 'car_wash', 'car_rental')) return 'kat-tankstelle';
+    if (has('beauty', 'hair', 'spa', 'nail', 'barber')) return 'kat-beauty';
+    if (has('gym', 'fitness', 'sports', 'stadium', 'golf', 'swimming')) return 'kat-sport';
+    if (has('supermarket', 'grocery', 'store', 'shopping_mall', 'market', 'shop', 'pharmacy', 'convenience')) return 'kat-geschaefte';
+    if (has('tourist', 'museum', 'park', 'church', 'place_of_worship', 'art_gallery', 'zoo', 'aquarium', 'landmark', 'monument', 'attraction', 'national_park', 'point_of_interest')) return 'kat-orte';
+    if (has('doctor', 'dentist', 'hospital', 'lawyer', 'bank', 'atm', 'school', 'university', 'insurance', 'accounting', 'plumber', 'electrician', 'laundry', 'veterinary', 'real_estate', 'agency', 'clinic', 'notary')) return 'kat-dienstleistung';
+    return '';
+  }
+  // Versucht die Stadt aus der formatierten Adresse zu raten
+  function _mapsCityFromAddress(addr) {
+    if (!addr) return '';
+    let parts = String(addr).split(',').map(s => s.trim()).filter(Boolean).filter(p => !/^paraguay$/i.test(p));
+    if (!parts.length) return '';
+    let last = parts[parts.length - 1].replace(/\d{3,}/g, '').replace(/\s+/g, ' ').trim();
+    if (!last && parts.length > 1) last = parts[parts.length - 2].replace(/\d{3,}/g, '').replace(/\s+/g, ' ').trim();
+    return last;
+  }
+  async function importFromMaps() {
+    const input = document.getElementById('mapsImportLink');
+    const btn = document.getElementById('mapsImportBtn');
+    const status = document.getElementById('mapsImportStatus');
+    if (!input || !btn || !status) return;
+    const raw = (input.value || '').trim();
+    if (!raw) { input.focus(); return; }
+    status.style.display = 'block'; status.style.color = 'var(--text-2)';
+    status.textContent = t('maps_loading');
+    const oldBtn = btn.textContent; btn.disabled = true; btn.textContent = '…';
+    try {
+      const param = /https?:\/\//i.test(raw) ? ('url=' + encodeURIComponent(raw)) : ('q=' + encodeURIComponent(raw));
+      const r = await fetch(SHARE_BASE + '/place?' + param);
+      const d = await r.json();
+      if (!r.ok || !d || d.error) {
+        status.style.color = 'var(--red)';
+        status.textContent = t('maps_error');
+        btn.disabled = false; btn.textContent = oldBtn;
+        return;
+      }
+      // Felder füllen (überschreibt vorhandene Eingaben)
+      if (d.name) { const nmEl = document.getElementById('newName'); nmEl.value = d.name; const nc = document.getElementById('nameCounter'); if (nc) nc.textContent = Math.min(d.name.length, 60) + ' / 60'; }
+      const cat = _mapsCatFromTypes(d.types, d.primary_type);
+      if (cat) { document.getElementById('newCategory').value = cat; if (typeof updateSubcatOptions === 'function') updateSubcatOptions(); }
+      const city = _mapsCityFromAddress(d.address);
+      if (city) document.getElementById('newCity').value = city;
+      if (d.address) document.getElementById('newAddress').value = d.address;
+      if (d.phone) document.getElementById('newPhone').value = d.phone;
+      if (d.website) document.getElementById('newWebsite').value = d.website;
+      // Öffnungszeiten (komplette Wochenübersicht von Google)
+      const hoursDisplay = document.getElementById('importedHoursDisplay');
+      if (Array.isArray(d.hours) && d.hours.length) {
+        const htxt = d.hours.join('\n');
+        document.getElementById('newHours').value = htxt;
+        if (hoursDisplay) { hoursDisplay.style.display = 'block'; hoursDisplay.textContent = htxt; }
+      } else {
+        document.getElementById('newHours').value = '';
+        if (hoursDisplay) { hoursDisplay.style.display = 'none'; hoursDisplay.textContent = ''; }
+      }
+      // Standort exakt setzen + Mini-Karte
+      if (typeof d.lat === 'number' && typeof d.lng === 'number') {
+        window._newLat = d.lat; window._newLng = d.lng;
+        const locStatus = document.getElementById('locationStatus');
+        if (locStatus) { locStatus.style.display = 'block'; locStatus.style.color = 'var(--green)'; locStatus.textContent = 'Standort gespeichert: ' + d.lat.toFixed(5) + ', ' + d.lng.toFixed(5); }
+        const locBtn = document.getElementById('locationBtn');
+        if (locBtn) { locBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg> Standort gespeichert'; locBtn.style.background = 'var(--green-light)'; locBtn.style.borderColor = 'var(--green)'; locBtn.style.color = 'var(--green)'; locBtn.dataset.saved = 'true'; }
+        const removeBtn = document.getElementById('locationRemoveBtn'); if (removeBtn) removeBtn.style.display = 'inline-block';
+        const banner = document.getElementById('locationPermissionBanner'); if (banner) banner.style.display = 'none';
+        const lh = document.getElementById('locationHint'); if (lh) lh.style.display = 'none';
+        if (typeof initLocationMapPreview === 'function') initLocationMapPreview(d.lat, d.lng);
+      }
+      status.style.color = 'var(--green)';
+      status.textContent = t('maps_success');
+      input.value = '';
+      btn.disabled = false; btn.textContent = oldBtn;
+      // Sanft zum Namensfeld scrollen, damit der User die Übernahme sieht
+      const nm = document.getElementById('newName'); if (nm) nm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (e) {
+      status.style.color = 'var(--red)';
+      status.textContent = t('maps_error');
+      btn.disabled = false; btn.textContent = oldBtn;
+    }
+  }
+
   async function submitListing() {
     const name = document.getElementById('newName').value.trim();
     const cat = document.getElementById('newCategory').value;
@@ -3323,7 +3425,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           re_rooms: _num('reRooms')
         };
       }
-      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: (()=>{ const d=document.getElementById('hoursDay').value; const f=document.getElementById('hoursFrom').value; const t=document.getElementById('hoursTo').value; const f2=document.getElementById('hoursFrom2').value; const t2=document.getElementById('hoursTo2').value; let val=''; if(d&&f&&t){val=d+' '+f+'-'+t; if(f2&&t2) val+=' & '+f2+'-'+t2;} document.getElementById('newHours').value=val; return val||null; })(), lat: window._newLat, lng: window._newLng, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date(), ...reFields });
+      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: (()=>{ const d=document.getElementById('hoursDay').value; const f=document.getElementById('hoursFrom').value; const t=document.getElementById('hoursTo').value; const f2=document.getElementById('hoursFrom2').value; const t2=document.getElementById('hoursTo2').value; let val=''; if(d&&f&&t){val=d+' '+f+'-'+t; if(f2&&t2) val+=' & '+f2+'-'+t2;} const imported=(document.getElementById('newHours').value||'').trim(); if(val) document.getElementById('newHours').value=val; return val || imported || null; })(), lat: window._newLat, lng: window._newLng, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date(), ...reFields });
       if (pendingFormPhotos.length) await uploadFormPhotos(ref.id);
       if (cat === 'kat-immobilien' && window._reCoverFile) {
         try {
