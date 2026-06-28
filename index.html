@@ -35,17 +35,17 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Buscar – Der Guide für Paraguay</title>
-  <link rel="preload" href="styles.css?v=173" as="style">
-  <link rel="preload" href="app.js?v=173" as="script">
+  <link rel="preload" href="styles.css?v=174" as="style">
+  <link rel="preload" href="app.js?v=174" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-  <link href="styles.css?v=173" rel="stylesheet">
+  <link href="styles.css?v=174" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  <script defer src="app.js?v=173"></script>
+  <script defer src="app.js?v=174"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -443,6 +443,7 @@
         <div class="photo-upload-progress" id="photoProgress">Wird hochgeladen...</div>
       </div>
 
+      <button class="report-btn" id="locFixBtn" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> <span id="locFixLabel">Standort korrigieren</span></button>
       <button class="report-btn" onclick="openReport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="13" height="13"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Eintrag melden</button>
       <div id="detailImmoDisclaimer" style="display:none;margin:4px 2px 8px;padding:13px 15px;background:#FFF8EC;border:1px solid #F3D9AE;border-radius:12px;font-size:11.5px;line-height:1.55;color:#8a6d3b"></div>
       <!-- KOMMENTARE -->
@@ -1091,6 +1092,27 @@
       <div id="editListingError" style="display:none;background:var(--red-light);color:var(--red);padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:14px"></div>
       <div id="editListingSuccess" style="display:none;background:var(--green-light);color:var(--green);padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:14px">Änderungen gespeichert!</div>
       <button class="form-submit" onclick="saveListingEdits()">Änderungen speichern</button>
+    </div>
+  </div>
+
+  <!-- KOORDINATEN-EDITOR / STANDORT KORRIGIEREN -->
+  <div class="screen" id="screenCoordEditor">
+    <div class="form-header">
+      <button class="form-back" onclick="closeCoordEditor()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="form-title" id="coordEditorTitle">Standort korrigieren</div>
+      <div class="form-sub" id="coordEditorName">-</div>
+    </div>
+    <div class="form-body">
+      <div class="form-card">
+        <div id="coordEditorSub" style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:6px"></div>
+        <div id="coordEditorHint" style="font-size:13px;color:var(--text-3);margin-bottom:10px;line-height:1.45">Pin verschieben oder Karte antippen, um den Standort zu setzen.</div>
+        <div id="coordEditorMap" style="width:100%;height:300px;border-radius:12px;overflow:hidden;border:1.5px solid var(--border);background:var(--surface-2)"></div>
+        <div style="display:flex;gap:16px;justify-content:center;margin-top:10px;font-size:12px;color:var(--text-3)">
+          <span>Lat: <b id="coordLat" style="color:var(--text-1)">–</b></span>
+          <span>Lng: <b id="coordLng" style="color:var(--text-1)">–</b></span>
+        </div>
+      </div>
+      <button class="form-submit" id="coordSaveBtn" onclick="saveCoordinates()">Standort speichern</button>
     </div>
   </div>
 

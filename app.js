@@ -24,6 +24,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       report_detail_ph: 'Kurz beschreiben, was nicht stimmt (optional)',
       link_copied: '🔗 Link kopiert',
       share_cta: 'Entdeckt auf Buscar – dem Guide für Paraguay. Lade dir die App auch herunter! 👇',
+      saving: 'Wird gespeichert...',
+      locfix_btn_edit: 'Standort korrigieren', locfix_btn_suggest: 'Standort stimmt nicht?',
+      locfix_edit_title: 'Standort korrigieren', locfix_suggest_title: 'Standort vorschlagen',
+      locfix_hint_edit: 'Pin verschieben oder Karte antippen, um den Standort zu setzen.',
+      locfix_hint_suggest: 'Zieh den Pin an die richtige Stelle. Dein Vorschlag wird vom Team geprüft.',
+      locfix_save: 'Standort speichern', locfix_send: 'Vorschlag senden',
+      locfix_thanks: '✅ Danke! Dein Standort-Vorschlag wird geprüft.',
       del_entry_confirm: 'Eintrag wirklich löschen?', del_review_confirm: 'Bewertung löschen?', del_comment_confirm: 'Kommentar löschen?', del_photo_confirm: 'Foto löschen?', del_deal_confirm: 'Deal wirklich entfernen?', cancel_event_confirm: 'Event wirklich absagen?',
       toast_coords_saved: '✅ Koordinaten gespeichert!', toast_no_entry: 'Kein Eintrag gewählt.', toast_photo_uploaded: '✓ Foto hochgeladen', toast_photo_submitted: '✓ Foto eingereicht – wird geprüft und nach Freigabe sichtbar', toast_report_sent: '✅ Meldung gesendet. Danke!', toast_entry_deleted: '✓ Eintrag gelöscht',
       err_event_load: 'Event konnte nicht geladen werden.', err_sold_out: 'Leider ausgebucht.', err_already_signed: 'Du bist bereits angemeldet.', err_reason: 'Bitte begründen.', err_upload: 'Fehler beim Hochladen',
@@ -192,6 +199,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       report_detail_ph: 'Describe brevemente qué pasa (opcional)',
       link_copied: '🔗 Enlace copiado',
       share_cta: 'Descubierto en Buscar – la guía para Paraguay. ¡Descargate la app también! 👇',
+      saving: 'Guardando...',
+      locfix_btn_edit: 'Corregir ubicación', locfix_btn_suggest: '¿Ubicación incorrecta?',
+      locfix_edit_title: 'Corregir ubicación', locfix_suggest_title: 'Sugerir ubicación',
+      locfix_hint_edit: 'Mové el pin o tocá el mapa para fijar la ubicación.',
+      locfix_hint_suggest: 'Mové el pin al lugar correcto. Tu sugerencia será revisada por el equipo.',
+      locfix_save: 'Guardar ubicación', locfix_send: 'Enviar sugerencia',
+      locfix_thanks: '✅ ¡Gracias! Tu sugerencia de ubicación será revisada.',
       del_entry_confirm: '¿Eliminar la entrada de verdad?', del_review_confirm: '¿Eliminar la reseña?', del_comment_confirm: '¿Eliminar el comentario?', del_photo_confirm: '¿Eliminar la foto?', del_deal_confirm: '¿Quitar la oferta de verdad?', cancel_event_confirm: '¿Cancelar el evento de verdad?',
       toast_coords_saved: '✅ ¡Coordenadas guardadas!', toast_no_entry: 'Ninguna entrada seleccionada.', toast_photo_uploaded: '✓ Foto subida', toast_photo_submitted: '✓ Foto enviada – se revisará y será visible tras la aprobación', toast_report_sent: '✅ ¡Reporte enviado. Gracias!', toast_entry_deleted: '✓ Entrada eliminada',
       err_event_load: 'No se pudo cargar el evento.', err_sold_out: 'Lamentablemente agotado.', err_already_signed: 'Ya estás inscrito.', err_reason: 'Por favor indica un motivo.', err_upload: 'Error al subir',
@@ -1864,13 +1878,19 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   var _coordLat = null;
   var _coordLng = null;
 
-  function openCoordEditor(listingId) {
+  var _coordMode = 'admin'; // 'admin' = direkt speichern, 'suggest' = Vorschlag an Admin
+  function openCoordEditor(listingId, mode) {
     var l = allListings.find(function(x){ return x.id === listingId; });
     if (!l) return;
     _coordListingId = listingId;
+    _coordMode = mode || 'admin';
     _coordLat = l.lat || -25.2867;
     _coordLng = l.lng || -57.6470;
 
+    var _sug = _coordMode === 'suggest';
+    document.getElementById('coordEditorTitle').textContent = t(_sug ? 'locfix_suggest_title' : 'locfix_edit_title');
+    document.getElementById('coordEditorHint').textContent = t(_sug ? 'locfix_hint_suggest' : 'locfix_hint_edit');
+    var _csb = document.getElementById('coordSaveBtn'); _csb.disabled = false; _csb.textContent = t(_sug ? 'locfix_send' : 'locfix_save');
     document.getElementById('coordEditorName').textContent = l.name || 'Koordinaten setzen';
     document.getElementById('coordEditorSub').textContent = (l.city || '') + (l.address ? ' · ' + l.address : '');
     document.getElementById('coordLat').textContent = _coordLat ? _coordLat.toFixed(6) : '–';
@@ -1923,17 +1943,29 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function saveCoordinates() {
-    if (!_coordListingId || !_coordLat || !_coordLng) return;
+    if (!_coordListingId || _coordLat == null || _coordLng == null) return;
     var btn = document.getElementById('coordSaveBtn');
     btn.disabled = true;
-    btn.textContent = 'Wird gespeichert...';
+    btn.textContent = t('saving') || 'Wird gespeichert...';
+    var l = allListings.find(function(x){ return x.id === _coordListingId; });
     try {
-      await db.collection('listings').doc(_coordListingId).update({
-        lat: _coordLat,
-        lng: _coordLng
-      });
-      // Update local cache
-      var l = allListings.find(function(x){ return x.id === _coordListingId; });
+      if (_coordMode === 'suggest') {
+        // Normaler Nutzer: nur Vorschlag einreichen (Admin übernimmt), Eintrag nicht direkt ändern
+        await db.collection('location_suggestions').add({
+          listing_id: _coordListingId,
+          listing_name: l ? (l.name || '') : '',
+          lat: _coordLat, lng: _coordLng,
+          old_lat: l ? (l.lat || null) : null,
+          old_lng: l ? (l.lng || null) : null,
+          user_id: currentUser ? currentUser.uid : null,
+          status: 'pending', created_at: new Date()
+        });
+        showToast(t('locfix_thanks'));
+        closeCoordEditor();
+        return;
+      }
+      // Inhaber/Admin: direkt speichern
+      await db.collection('listings').doc(_coordListingId).update({ lat: _coordLat, lng: _coordLng });
       if (l) { l.lat = _coordLat; l.lng = _coordLng; }
       showToast(t('toast_coords_saved'));
       closeCoordEditor();
@@ -1941,7 +1973,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch(e) {
       alert(t('err_prefix') + e.message);
       btn.disabled = false;
-      btn.textContent = 'Koordinaten speichern';
+      btn.textContent = t(_coordMode === 'suggest' ? 'locfix_send' : 'locfix_save');
     }
   }
   // ══ END KOORDINATEN-EDITOR ═════════════════════════════════════════════════
@@ -2593,6 +2625,25 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
 
     currentListingId = id;
+
+    // Standort korrigieren: Inhaber/Admin direkt; bei NICHT beanspruchten Einträgen
+    // dürfen normale Nutzer einen Vorschlag einreichen. Beanspruchte Einträge: nur Inhaber/Admin.
+    (function(){
+      var btn = document.getElementById('locFixBtn'); if (!btn) return;
+      var lbl = document.getElementById('locFixLabel');
+      var isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
+      var isOwner = currentUser && l.owner_id && l.owner_id === currentUser.uid;
+      var claimed = !!l.owner_id;
+      if (isAdmin || isOwner) {
+        btn.style.display = ''; if (lbl) lbl.textContent = t('locfix_btn_edit');
+        btn.onclick = function(){ openCoordEditor(l.id, 'admin'); };
+      } else if (currentUser && !claimed) {
+        btn.style.display = ''; if (lbl) lbl.textContent = t('locfix_btn_suggest');
+        btn.onclick = function(){ openCoordEditor(l.id, 'suggest'); };
+      } else {
+        btn.style.display = 'none'; btn.onclick = null;
+      }
+    })();
 
     // Exchange rate widget for Wechselstube entries
     const exDiv = document.getElementById('detailExchange');
@@ -3535,6 +3586,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         <span id="adminTabClaims" onclick="loadAdminClaims()" style="cursor:pointer;color:rgba(255,255,255,0.6)">Inhaber-Anfragen${claimBadge}</span>
         <span id="adminTabDeals" onclick="loadAdminDeals()" style="cursor:pointer;color:rgba(255,255,255,0.6)">🏷 Deals</span>
         <span id="adminTabReports" onclick="loadAdminReports()" style="cursor:pointer;color:rgba(255,255,255,0.6)">🚩 Meldungen</span>
+        <span id="adminTabLocations" onclick="loadAdminLocationSuggestions()" style="cursor:pointer;color:rgba(255,255,255,0.6)">📍 Standorte</span>
         <span id="adminTabDuplicates" onclick="loadAdminDuplicates()" style="cursor:pointer;color:rgba(255,255,255,0.6)">📋 Duplikate</span>
       </div>`;
     loadAdminListings();
@@ -3548,7 +3600,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     return (l.name||'').trim().toLowerCase()+'|'+Number(l.lat).toFixed(5)+'|'+Number(l.lng).toFixed(5);
   }
   async function loadAdminDuplicates() {
-    ['adminTabListings','adminTabClaims','adminTabDeals','adminTabReports','adminTabDuplicates'].forEach(function(t){
+    ['adminTabListings','adminTabClaims','adminTabDeals','adminTabReports','adminTabLocations','adminTabDuplicates'].forEach(function(t){
       var el = document.getElementById(t); if (el){ el.style.color = 'rgba(255,255,255,0.6)'; el.style.borderBottom = 'none'; }
     });
     var dt = document.getElementById('adminTabDuplicates'); if (dt){ dt.style.color = 'white'; dt.style.borderBottom = '2px solid white'; }
@@ -5028,6 +5080,53 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       await db.collection('reports').doc(reportId).update({ status: 'resolved' });
       document.getElementById('reportCard_'+reportId).remove();
+    } catch(e) { alert(t('err_generic')); }
+  }
+
+  // ── STANDORT-VORSCHLÄGE (location_suggestions) ─────────────────────────────
+  async function loadAdminLocationSuggestions() {
+    ['adminTabListings','adminTabClaims','adminTabDeals','adminTabReports','adminTabLocations','adminTabDuplicates'].forEach(function(t){
+      var el = document.getElementById(t); if (el){ el.style.color = 'rgba(255,255,255,0.6)'; el.style.borderBottom = 'none'; }
+    });
+    var at = document.getElementById('adminTabLocations'); if (at){ at.style.color = 'white'; at.style.borderBottom = '2px solid white'; }
+    const body = document.getElementById('adminBody');
+    body.innerHTML = '<div style="text-align:center;padding:40px">Wird geladen...</div>';
+    try {
+      const snap = await db.collection('location_suggestions').where('status','==','pending').get();
+      const items = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      items.sort(function(a,b){ return _adminTs(b.created_at) - _adminTs(a.created_at); });
+      if (!items.length) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-icon">✓</div><div class="admin-empty-text">Keine Standort-Vorschläge</div></div>'; return; }
+      body.innerHTML = items.map(function(s){
+        var maps = 'https://maps.google.com/?q=' + s.lat + ',' + s.lng;
+        return '<div class="admin-card" id="locsugCard_' + s.id + '">'
+          + '<div class="admin-card-name">' + esc(s.listing_name || 'Eintrag') + '</div>'
+          + '<div class="admin-card-meta">' + formatDate(s.created_at) + '</div>'
+          + '<div style="background:#FFF8EC;border-left:3px solid var(--yellow);padding:8px 10px;border-radius:6px;margin:8px 0;font-size:12.5px;line-height:1.5">'
+            + 'Vorschlag: <b>' + Number(s.lat).toFixed(5) + ', ' + Number(s.lng).toFixed(5) + '</b>'
+            + (s.old_lat != null ? '<br><span style="color:var(--text-3)">bisher: ' + Number(s.old_lat).toFixed(5) + ', ' + Number(s.old_lng).toFixed(5) + '</span>' : '')
+            + '<br><a href="' + maps + '" target="_blank" rel="noopener" style="color:var(--yellow-dark);text-decoration:underline">Auf Karte prüfen ↗</a>'
+          + '</div>'
+          + '<div class="admin-actions">'
+            + '<button class="admin-btn approve" onclick="applyLocationSuggestion(\'' + s.id + '\',\'' + s.listing_id + '\',' + s.lat + ',' + s.lng + ')">Übernehmen</button>'
+            + '<button class="admin-btn reject" onclick="rejectLocationSuggestion(\'' + s.id + '\')">Verwerfen</button>'
+          + '</div></div>';
+      }).join('');
+    } catch(e) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-text">Fehler beim Laden</div></div>'; }
+  }
+  async function applyLocationSuggestion(sugId, listingId, lat, lng) {
+    try {
+      await db.collection('listings').doc(listingId).update({ lat: lat, lng: lng });
+      await db.collection('location_suggestions').doc(sugId).update({ status: 'applied' });
+      var l = allListings.find(function(x){ return x.id === listingId; }); if (l) { l.lat = lat; l.lng = lng; }
+      var c = document.getElementById('locsugCard_' + sugId); if (c) c.remove();
+      if (maplibreMap && mapLoaded) renderMap();
+      showToast(t('toast_coords_saved'));
+    } catch(e) { alert(t('err_generic')); }
+  }
+  async function rejectLocationSuggestion(sugId) {
+    try {
+      await db.collection('location_suggestions').doc(sugId).update({ status: 'rejected' });
+      var c = document.getElementById('locsugCard_' + sugId); if (c) c.remove();
     } catch(e) { alert(t('err_generic')); }
   }
 
