@@ -3955,20 +3955,32 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         if (lower.includes('sa-so') || lower.includes('wochenende') || lower.includes('fin de semana')) { hasDayInfo = true; if (day === 0 || day === 6) activeToday = true; }
       }
 
-      const blocks = hours.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/g);
+      // Trennzeichen normalisieren: diverse Gedankenstriche -> '-', und Wort-Trenner
+      // ("bis", "a", "hasta", "to", "às") zwischen zwei Zahlen -> '-'.
+      var nstr = lower
+        .replace(/[‐-―−]/g, '-')
+        .replace(/(\d)\s*(?:bis|hasta|às|a las|a|to)\s*(\d)/g, '$1-$2');
+
+      // Zeitblöcke tolerant erkennen: "8-18", "8:00-18:00", "8h-18h", "08.00-18.00", "8.30-12.30"
+      var re = /(\d{1,2})(?::|\.|h|hs|hrs)?(\d{2})?\s*(?:h|hs|hrs|uhr)?\s*-\s*(\d{1,2})(?::|\.|h|hs|hrs)?(\d{2})?\s*(?:h|hs|hrs|uhr)?/g;
+      var blocks = [], mm;
+      while ((mm = re.exec(nstr))) {
+        var fh = parseInt(mm[1], 10), fmin = parseInt(mm[2] || '0', 10);
+        var th = parseInt(mm[3], 10), tmin = parseInt(mm[4] || '0', 10);
+        if (fh > 24 || th > 24 || fmin > 59 || tmin > 59) continue; // unplausibel (z.B. Telefonnr.) -> ignorieren
+        blocks.push([fh, fmin, th, tmin]);
+      }
 
       // Tagesangabe vorhanden, aber heute nicht dabei -> heute geschlossen.
       if (hasDayInfo && !activeToday) return false;
       // Keine erkennbaren Zeitblöcke -> Format unbekannt, lieber kein Badge als falsch "geschlossen".
-      if (!blocks) return null;
+      if (!blocks.length) return null;
 
-      for (const block of blocks) {
-        const match = block.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
-        if (!match) continue;
-        const fromMin = parseInt(match[1])*60 + parseInt(match[2]);
-        let toMin = parseInt(match[3])*60 + parseInt(match[4]);
+      for (var bi = 0; bi < blocks.length; bi++) {
+        var fromMin = blocks[bi][0]*60 + blocks[bi][1];
+        var toMin = blocks[bi][2]*60 + blocks[bi][3];
         if (toMin === 0) toMin = 24*60; // 00:00 = Tagesende
-        if (fromMin === 0 && toMin >= 24*60) return true; // voller Tag (00:00-24:00)
+        if (fromMin === 0 && toMin >= 24*60) return true; // voller Tag
         if (toMin < fromMin) {
           if (nowMin >= fromMin || nowMin < toMin) return true; // über Mitternacht
         } else {
