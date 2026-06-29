@@ -745,3 +745,8 @@
 .answer-dot-text { background:var(--text-3,#8a857d); display:flex; align-items:center; justify-content:center; }
 .answer-text { font-size:14px; color:var(--text-1,#1a1a1a); line-height:1.42; white-space:pre-wrap; word-break:break-word; }
 .answer-by { font-size:11.5px; color:var(--text-3); margin-top:3px; font-weight:600; }
+
+/* ===== Frag die Community: Upvote/„ich auch" auf Karte (Phase 2c) ===== */
+.q-vote { display:inline-flex; align-items:center; gap:5px; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:800; border-radius:20px; padding:4px 11px; background:#FDEBCB; color:#B9790C; border:1px solid transparent; cursor:pointer; line-height:1; }
+.q-vote.on { background:var(--yellow,#F5A623); color:#3a2a06; border-color:var(--yellow-dark,#C9790A); }
+.q-vote:active { transform:scale(0.95); }

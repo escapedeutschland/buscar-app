@@ -3153,6 +3153,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         items = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
         if(!items.length){ list.innerHTML = _qEmpty(t('fc_empty_title'), t('fc_empty_sub')); return; }
       }
+      items.forEach(function(q){ _qCache[q.id]=q; });
       list.innerHTML = items.map(_renderQuestionCard).join('');
     } catch(e){ list.innerHTML = _qEmpty(t('fc_load_err'), t('fc_load_sub')); }
   }
@@ -3199,15 +3200,36 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       loadAnswers(_currentQuestion.id);
     } catch(e){ alert(t('err_generic')||'Fehler'); }
   }
+  var _qCache = {};
+  function _voteBtnHtml(q){
+    var seeking = currentUser && Array.isArray(q.seekers) && q.seekers.indexOf(currentUser.uid)>=0;
+    return '<button class="q-vote'+(seeking?' on':'')+'" id="qvote_'+q.id+'" onclick="event.stopPropagation();toggleSeekById(\''+q.id+'\')" aria-label="'+esc(t('fc_seek'))+'">'
+      + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>'
+      + '<span>'+(q.seekers_count||0)+'</span></button>';
+  }
   function _renderQuestionCard(q){
-    var seekers = q.seekers_count||0, answers = q.answers_count||0;
+    var answers = q.answers_count||0;
     var answered = (q.status==='answered' || answers>0);
     return '<div class="q-card" onclick="openQuestionDetail(\''+q.id+'\')">'
       + '<div class="q-card-text">'+esc(q.text||'')+'</div>'
       + '<div class="q-card-meta">'
-        + '<span class="q-chip hot">👀 '+seekers+' '+t('fc_seek_count')+'</span>'
+        + _voteBtnHtml(q)
         + (answered ? '<span class="q-chip ok">✓ '+answers+' '+t('fc_answers')+'</span>' : '<span class="q-chip">💬 '+t('fc_open')+'</span>')
       + '</div></div>';
+  }
+  async function toggleSeekById(qid){
+    if(!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
+    var q=_qCache[qid]; if(!q) return;
+    var seeking = Array.isArray(q.seekers) && q.seekers.indexOf(currentUser.uid)>=0;
+    // optimistisch aktualisieren
+    if(seeking){ q.seekers=(q.seekers||[]).filter(function(u){return u!==currentUser.uid;}); q.seekers_count=Math.max(0,(q.seekers_count||1)-1); }
+    else { if(!Array.isArray(q.seekers)) q.seekers=[]; q.seekers.push(currentUser.uid); q.seekers_count=(q.seekers_count||0)+1; }
+    var b=document.getElementById('qvote_'+qid); if(b){ var tmp=document.createElement('div'); tmp.innerHTML=_voteBtnHtml(q); b.replaceWith(tmp.firstChild); }
+    try {
+      await db.collection('questions').doc(qid).update(seeking
+        ? { seekers: firebase.firestore.FieldValue.arrayRemove(currentUser.uid), seekers_count: firebase.firestore.FieldValue.increment(-1) }
+        : { seekers: firebase.firestore.FieldValue.arrayUnion(currentUser.uid), seekers_count: firebase.firestore.FieldValue.increment(1) });
+    } catch(e){ /* bei Fehler bleibt optimistischer Stand; nächster Reload korrigiert */ }
   }
 
   function openAskQuestion(prefill){
@@ -3243,7 +3265,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       var doc = await db.collection('questions').doc(id).get();
       if(!doc.exists){ document.getElementById('qdTitle').textContent = t('err_generic')||'—'; return; }
-      var q = Object.assign({id:doc.id}, doc.data()); _currentQuestion = q;
+      var q = Object.assign({id:doc.id}, doc.data()); _currentQuestion = q; _qCache[q.id] = q;
       document.getElementById('qdTitle').textContent = q.text||'';
       document.getElementById('qdMeta').textContent = (q.seekers_count||0)+' '+t('fc_seek_count');
       _renderSeekBtn();
