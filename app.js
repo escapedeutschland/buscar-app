@@ -2113,6 +2113,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       updateGreeting();
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
       updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
+      setTimeout(function(){ try { updateMyAnswerBadge(true); } catch(e){} }, 1500);
       if (!window._evPreloaded) { window._evPreloaded = true; setTimeout(function(){ loadEvents(); }, 1200); }
       var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden');
       handleDeepLink();
@@ -2472,6 +2473,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
   function _doRenderListings() {
     if (activeScreen !== 'screenHome') return;
+    try { updateMyAnswerBadge(); } catch(e){}
     let filtered = allListings;
     filtered = filtered.filter(l => l.category_id !== 'kat-immobilien'); // Immobilien haben eine eigene Seite
     if (activeCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === activeCategory);
@@ -3145,20 +3147,28 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch(e){ list.innerHTML = _qEmpty(t('fc_load_err'), t('fc_load_sub')); }
   }
 
-  // „Frag die Community" – Badge am schwebenden Button (FAB) auf Home
+  // „Frag die Community" – FAB-Badge = eigene Fragen mit NEUEN (ungesehenen) Antworten
   var _homeQuestions = null;
-  async function renderHomeCommunity(){
+  function _getSeenMap(){ try { return JSON.parse(localStorage.getItem('buscar_q_seen')||'{}') || {}; } catch(e){ return {}; } }
+  function _markQuestionSeen(qid, answersCount){ try { var m=_getSeenMap(); m[qid]=answersCount||0; localStorage.setItem('buscar_q_seen', JSON.stringify(m)); } catch(e){} }
+  var _ansBadgeTs = 0, _ansBadgeBusy = false;
+  async function updateMyAnswerBadge(force){
     var badge = document.getElementById('communityFabBadge'); if(!badge) return;
-    if(_homeQuestions === null){
-      try {
-        var snap = await db.collection('questions').orderBy('created_at','desc').limit(50).get();
-        _homeQuestions = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
-      } catch(e){ _homeQuestions = []; }
-    }
-    var n = (_homeQuestions||[]).length;
-    if(n > 0){ badge.textContent = (n > 49 ? '49+' : n); badge.style.display = 'flex'; }
-    else { badge.style.display = 'none'; }
+    if(!currentUser){ badge.style.display='none'; return; }
+    var now = Date.now();
+    if(!force && _ansBadgeTs && (now - _ansBadgeTs) < 60000) return; // höchstens alle 60s neu abfragen
+    if(_ansBadgeBusy) return; _ansBadgeBusy = true;
+    try {
+      var snap = await db.collection('questions').where('created_by','==',currentUser.uid).get();
+      var seen = _getSeenMap(), n = 0;
+      snap.docs.forEach(function(d){ var ac = (d.data().answers_count)||0; if(ac > (seen[d.id]||0)) n++; });
+      _ansBadgeTs = now;
+      if(n > 0){ badge.textContent = (n > 9 ? '9+' : n); badge.style.display='flex'; }
+      else { badge.style.display='none'; }
+    } catch(e){ /* z.B. Rules/Offline – Badge unverändert lassen */ }
+    _ansBadgeBusy = false;
   }
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden){ try { updateMyAnswerBadge(true); } catch(e){} } });
 
   async function deleteQuestion(id){
     if(!currentUser) return;
@@ -3229,6 +3239,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       _renderSeekBtn();
       var delBtn=document.getElementById('qdDeleteBtn');
       if(delBtn){ var canDel = currentUser && (currentUser.email===ADMIN_EMAIL || (q.created_by && q.created_by===currentUser.uid)); delBtn.style.display = canDel?'inline-flex':'none'; delBtn.onclick=function(){ deleteQuestion(q.id); }; }
+      _markQuestionSeen(q.id, q.answers_count||0);
+      updateMyAnswerBadge(true);
       loadAnswers(id);
     } catch(e){ document.getElementById('qdTitle').textContent = t('err_generic')||'—'; }
   }
@@ -3309,6 +3321,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       });
       await db.collection('questions').doc(_currentQuestion.id).update({ answers_count: firebase.firestore.FieldValue.increment(1), status:'answered' });
       _currentQuestion.answers_count=(_currentQuestion.answers_count||0)+1; _currentQuestion.status='answered';
+      _markQuestionSeen(_currentQuestion.id, _currentQuestion.answers_count);
       _homeQuestions=null;
       closeAnswerPick();
       showToast(t('fc_answer_thanks'));
