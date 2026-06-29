@@ -24,6 +24,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       report_detail_ph: 'Kurz beschreiben, was nicht stimmt (optional)',
       link_copied: '🔗 Link kopiert',
       share_cta: 'Entdeckt auf Buscar – dem Guide für Paraguay. Lade dir die App auch herunter! 👇',
+      tags_title: 'Merkmale & Tags',
+      tags_hint: 'Hilf anderen, diesen Ort zu finden. Wähle passende Merkmale oder füge eigene Stichwörter hinzu (z. B. „fluoridfreie Zahnpasta").',
       maps_import_title: 'Aus Google Maps übernehmen',
       maps_import_hint: 'Spar dir das Tippen: Google-Maps-Link einfügen – Name, Adresse, Telefon, Öffnungszeiten & Standort werden automatisch ausgefüllt. Du ergänzt nur noch deine persönliche Empfehlung.',
       maps_import_btn: 'Laden',
@@ -205,6 +207,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       report_detail_ph: 'Describe brevemente qué pasa (opcional)',
       link_copied: '🔗 Enlace copiado',
       share_cta: 'Descubierto en Buscar – la guía para Paraguay. ¡Descargate la app también! 👇',
+      tags_title: 'Características y etiquetas',
+      tags_hint: 'Ayudá a otros a encontrar este lugar. Elegí características o agregá tus propias palabras clave (p. ej. „pasta dental sin flúor").',
       maps_import_title: 'Importar desde Google Maps',
       maps_import_hint: 'Ahorrate el tecleo: pegá el enlace de Google Maps y se completan automáticamente nombre, dirección, teléfono, horarios y ubicación. Vos solo agregás tu recomendación personal.',
       maps_import_btn: 'Cargar',
@@ -2356,7 +2360,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (activeMinStars > 0) filtered = filtered.filter(l => { const avg = getAvgRating(l.id); return avg && avg >= activeMinStars; });
     if (activeOpenNow) filtered = filtered.filter(l => isOpen(l.opening_hours) === true);
     if (activeDeal) filtered = filtered.filter(l => l.deal_text && l.deal_text.trim() !== '');
-    if (searchQuery) { const q = norm(searchQuery); filtered = filtered.filter(l => norm(l.name||'').includes(q)||norm(l.description||'').includes(q)||norm(l.city||'').includes(q)||norm(l.subcategory||'').includes(q)); }
+    if (searchQuery) { const q = norm(searchQuery); filtered = filtered.filter(l => norm(l.name||'').includes(q)||norm(l.description||'').includes(q)||norm(l.city||'').includes(q)||norm(l.subcategory||'').includes(q)||norm(tagSearchStr(l.tags)).includes(q)); }
     filtered = filtered.slice().sort(function(a, b) {
       return scoreEntry(b) - scoreEntry(a);
     });
@@ -2610,6 +2614,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     descEl.innerHTML = esc(descContent) || t('no_description');
     descEl.dataset.original = descContent;
     descEl.dataset.tlang = '';
+    (function(){
+      var tc=document.getElementById('detailTagsCard'), te=document.getElementById('detailTags');
+      if(tc&&te){ var tags=Array.isArray(l.tags)?l.tags:[]; if(tags.length){ te.innerHTML=tags.map(function(k){return '<span class="detail-tag">'+esc(tagLabel(k))+'</span>';}).join(''); tc.style.display='block'; } else { tc.style.display='none'; } }
+    })();
     const badges = document.getElementById('detailBadges');
     const openStatus = isOpen(l.opening_hours);
     const openBadge = openStatus===true ? '<span class="detail-badge open-status">'+t('open_now')+'</span>' : openStatus===false ? '<span class="detail-badge closed-status">'+t('closed_now')+'</span>' : '';
@@ -2812,6 +2820,75 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     'kat-immobilien': 'Immobilie',
     'default': 'Ort'
   };
+
+  // ===== Tags / Merkmale (Phase 1) =====
+  // Bekannte Merkmal-Keys mit lokalisierten Labels (de/es). Freitext-Tags werden so wie eingegeben gespeichert.
+  var TAG_LABELS = {
+    vegetarisch:{de:'Vegetarisch',es:'Vegetariano'}, vegan:{de:'Vegan',es:'Vegano'},
+    glutenfrei:{de:'Glutenfrei',es:'Sin gluten'}, lieferung:{de:'Lieferung',es:'Delivery'},
+    reservierung:{de:'Reservierung',es:'Reservas'}, wlan:{de:'WLAN',es:'WiFi'},
+    kartenzahlung:{de:'Kartenzahlung',es:'Pago con tarjeta'}, terrasse:{de:'Terrasse',es:'Terraza'},
+    fruehstueck:{de:'Frühstück',es:'Desayuno'}, bar:{de:'Bar',es:'Bar'},
+    bio:{de:'Bio',es:'Orgánico'}, naturkosmetik:{de:'Naturkosmetik',es:'Cosmética natural'},
+    importware:{de:'Importware',es:'Productos importados'}, lokale_produkte:{de:'Lokale Produkte',es:'Productos locales'},
+    grosshandel:{de:'Großhandel',es:'Mayorista'},
+    englisch:{de:'Englisch gesprochen',es:'Se habla inglés'}, deutsch:{de:'Deutsch gesprochen',es:'Se habla alemán'},
+    hausbesuch:{de:'Hausbesuch',es:'A domicilio'}, termin_online:{de:'Online-Termin',es:'Cita online'},
+    notdienst:{de:'Notdienst',es:'Urgencias'}, wochenende:{de:'Am Wochenende offen',es:'Abierto finde'},
+    pool:{de:'Pool',es:'Piscina'}, klimaanlage:{de:'Klimaanlage',es:'Aire acondicionado'},
+    haustiere:{de:'Haustiere erlaubt',es:'Admite mascotas'}, parkplatz:{de:'Parkplatz',es:'Estacionamiento'},
+    familienfreundlich:{de:'Familienfreundlich',es:'Para familias'}, barrierefrei:{de:'Barrierefrei',es:'Accesible'},
+    kostenlos:{de:'Kostenlos',es:'Gratis'}, fotospot:{de:'Fotospot',es:'Para fotos'},
+    kurse:{de:'Kurse',es:'Clases'}, sauna:{de:'Sauna',es:'Sauna'}, outdoor:{de:'Outdoor',es:'Al aire libre'},
+    offen24:{de:'24h geöffnet',es:'Abierto 24h'}, werkstatt:{de:'Werkstatt',es:'Taller'},
+    reifen:{de:'Reifen',es:'Neumáticos'}, glp:{de:'GLP / Autogas',es:'GLP'},
+    herren:{de:'Herren',es:'Caballeros'}, damen:{de:'Damen',es:'Damas'},
+    naegel:{de:'Nägel',es:'Uñas'}, massage:{de:'Massage',es:'Masajes'},
+    usd:{de:'US-Dollar',es:'Dólares'}, eur:{de:'Euro',es:'Euros'}, brl:{de:'Brasil. Real',es:'Reales'},
+    western_union:{de:'Western Union',es:'Western Union'}
+  };
+  var TAG_PRESETS = {
+    'kat-restaurants':['vegetarisch','vegan','glutenfrei','lieferung','reservierung','wlan','kartenzahlung','terrasse','fruehstueck'],
+    'kat-geschaefte':['bio','naturkosmetik','importware','glutenfrei','lokale_produkte','lieferung','kartenzahlung','grosshandel'],
+    'kat-dienstleistung':['englisch','deutsch','hausbesuch','termin_online','kartenzahlung','notdienst','wochenende'],
+    'kat-unterkunft':['wlan','pool','klimaanlage','fruehstueck','haustiere','parkplatz','kartenzahlung'],
+    'kat-orte':['kostenlos','familienfreundlich','parkplatz','barrierefrei','fotospot','outdoor'],
+    'kat-sport':['kurse','sauna','damen','herren','outdoor','parkplatz'],
+    'kat-tankstelle':['offen24','werkstatt','reifen','glp','kartenzahlung'],
+    'kat-beauty':['termin_online','damen','herren','naegel','massage','kartenzahlung'],
+    'kat-wechselstube':['usd','eur','brl','western_union','wochenende'],
+    'kat-immobilien':[]
+  };
+  function tagLabel(k){ var e=TAG_LABELS[k]; if(e) return e[currentLang]||e.de||k; return k; }
+  function tagSearchStr(tags){ if(!tags||!tags.length) return ''; return tags.map(function(k){var e=TAG_LABELS[k]; return e?(k+' '+(e.de||'')+' '+(e.es||'')):k;}).join(' '); }
+
+  // Tag-Auswahl im Formular (Create + Edit)
+  var formTags = [], editTags = [], _editCatId = '';
+  function _tagState(mode){ return mode==='edit'?editTags:formTags; }
+  function _renderTagPresets(mode){
+    var catId = mode==='edit' ? _editCatId : (document.getElementById('newCategory')||{}).value;
+    var c = document.getElementById(mode==='edit'?'editTagPresets':'tagPresets'); if(!c) return;
+    var keys = TAG_PRESETS[catId]||[], arr=_tagState(mode);
+    c.innerHTML = keys.map(function(k){var on=arr.indexOf(k)>=0;return '<button type="button" class="tag-preset'+(on?' active':'')+'" onclick="toggleTag(\''+mode+'\',\''+k+'\')">'+esc(tagLabel(k))+'</button>';}).join('');
+    c.style.display = keys.length ? 'flex' : 'none';
+  }
+  function _renderTagChips(mode){
+    var c = document.getElementById(mode==='edit'?'editTagChips':'tagChips'); if(!c) return;
+    var catId = mode==='edit' ? _editCatId : (document.getElementById('newCategory')||{}).value;
+    var presetKeys = TAG_PRESETS[catId]||[], arr=_tagState(mode), html='';
+    arr.forEach(function(k,idx){ if(presetKeys.indexOf(k)>=0) return; html+='<span class="tag-chip">'+esc(tagLabel(k))+'<i onclick="removeTagAt(\''+mode+'\','+idx+')">×</i></span>'; });
+    c.innerHTML = html;
+  }
+  function _refreshTags(mode){ _renderTagPresets(mode); _renderTagChips(mode); }
+  function toggleTag(mode,key){ var arr=_tagState(mode), i=arr.indexOf(key); if(i>=0) arr.splice(i,1); else arr.push(key); _refreshTags(mode); }
+  function removeTagAt(mode,idx){ _tagState(mode).splice(idx,1); _refreshTags(mode); }
+  function addFreeTag(mode){
+    var inp=document.getElementById(mode==='edit'?'editTagInput':'tagInput'); if(!inp) return;
+    var v=(inp.value||'').trim(); if(!v) return;
+    var arr=_tagState(mode);
+    if(!arr.some(function(x){return String(x).toLowerCase()===v.toLowerCase();})) arr.push(v);
+    inp.value=''; _refreshTags(mode);
+  }
 
   function makeMarkerIcon(color, emoji) {
     const ic = emoji || '📍';
@@ -3425,7 +3502,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           re_rooms: _num('reRooms')
         };
       }
-      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: (()=>{ const d=document.getElementById('hoursDay').value; const f=document.getElementById('hoursFrom').value; const t=document.getElementById('hoursTo').value; const f2=document.getElementById('hoursFrom2').value; const t2=document.getElementById('hoursTo2').value; let val=''; if(d&&f&&t){val=d+' '+f+'-'+t; if(f2&&t2) val+=' & '+f2+'-'+t2;} const imported=(document.getElementById('newHours').value||'').trim(); if(val) document.getElementById('newHours').value=val; return val || imported || null; })(), lat: window._newLat, lng: window._newLng, verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date(), ...reFields });
+      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: (()=>{ const d=document.getElementById('hoursDay').value; const f=document.getElementById('hoursFrom').value; const t=document.getElementById('hoursTo').value; const f2=document.getElementById('hoursFrom2').value; const t2=document.getElementById('hoursTo2').value; let val=''; if(d&&f&&t){val=d+' '+f+'-'+t; if(f2&&t2) val+=' & '+f2+'-'+t2;} const imported=(document.getElementById('newHours').value||'').trim(); if(val) document.getElementById('newHours').value=val; return val || imported || null; })(), lat: window._newLat, lng: window._newLng, tags: formTags.slice(), verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date(), ...reFields });
       if (pendingFormPhotos.length) await uploadFormPhotos(ref.id);
       if (cat === 'kat-immobilien' && window._reCoverFile) {
         try {
@@ -3447,6 +3524,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       grid2.innerHTML = `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">${t('photo_add_label')}</span></label><input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">`;
       ['newName','newCity','newDesc','newPhone','newWebsite','newAddress','newHours'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('newCategory').value = '';
+      formTags = []; _refreshTags('form');
       document.getElementById('nameCounter').textContent = '0 / 60';
       document.getElementById('descCounter').textContent = '0 / 500';
       window._newLat = null; window._newLng = null;
@@ -4822,6 +4900,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('editListingError').style.display = 'none';
     document.getElementById('editListingSuccess').style.display = 'none';
     document.getElementById('editListingBack').onclick = function() { showDetail(currentEditListingId); };
+    _editCatId = l.category_id || ''; editTags = Array.isArray(l.tags) ? l.tags.slice() : []; _refreshTags('edit');
     var _ef = document.getElementById('editImmoFields');
     if (_ef) {
       if (l.category_id === 'kat-immobilien') {
@@ -4872,8 +4951,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         website: document.getElementById('editWebsite').value.trim() || null,
         address: document.getElementById('editAddress').value.trim() || null,
         opening_hours: document.getElementById('editHours').value.trim() || null,
+        tags: editTags.slice(),
         updated_at: new Date(), ...reEdit, ...locUpdate
       });
+      if (_el) _el.tags = editTags.slice();
       if (_el && locUpdate.lat != null) { _el.lat = locUpdate.lat; _el.lng = locUpdate.lng; }
       document.getElementById('editListingSuccess').style.display = 'block';
       await loadListings();
@@ -4931,6 +5012,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } else { field.style.display = 'none'; }
     var imo = document.getElementById('immobilienFields');
     if (imo) imo.style.display = (cat === 'kat-immobilien') ? 'block' : 'none';
+    _refreshTags('form');
   }
 
   let mapSubcatFilter = 'Alle';
