@@ -50,8 +50,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_no_answers: 'Noch keine Antworten – kennst du einen Ort?',
       fc_answer_btn: 'Ort vorschlagen',
       fc_pick_title: 'Welcher Ort bietet das?',
-      fc_pick_hint: 'Wähle einen Eintrag aus Buscar als Antwort.',
+      fc_pick_hint: 'Tippe oben zum Suchen und wähle den passenden Eintrag.',
       fc_pick_none: 'Kein passender Eintrag gefunden.',
+      fc_pick_more: 'Tippe oben, um alle Einträge zu durchsuchen.',
       fc_answer_thanks: 'Danke für deine Antwort!',
       fc_entry_prof: 'Frag die Community',
       fc_entry_mine: 'Meine Fragen',
@@ -275,8 +276,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_no_answers: 'Aún sin respuestas: ¿conocés un lugar?',
       fc_answer_btn: 'Sugerir un lugar',
       fc_pick_title: '¿Qué lugar lo ofrece?',
-      fc_pick_hint: 'Elegí un lugar de Buscar como respuesta.',
+      fc_pick_hint: 'Tocá arriba para buscar y elegí el lugar correcto.',
       fc_pick_none: 'No se encontró ningún lugar.',
+      fc_pick_more: 'Tocá arriba para buscar entre todos los lugares.',
       fc_answer_thanks: '¡Gracias por tu respuesta!',
       fc_entry_prof: 'Preguntá a la comunidad',
       fc_entry_mine: 'Mis preguntas',
@@ -2470,7 +2472,6 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
   function _doRenderListings() {
     if (activeScreen !== 'screenHome') return;
-    try { renderHomeCommunity(); } catch(e){}
     let filtered = allListings;
     filtered = filtered.filter(l => l.category_id !== 'kat-immobilien'); // Immobilien haben eine eigene Seite
     if (activeCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === activeCategory);
@@ -3287,10 +3288,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function renderAnswerPick(query){
     var q=norm(query||''), c=document.getElementById('answerPickResults'); if(!c) return;
     var pool=(allListings||[]).filter(function(l){ return l.category_id!=='kat-immobilien'; });
-    var res = q ? pool.filter(function(l){ return norm(l.name||'').includes(q) || norm(l.city||'').includes(q); }) : pool.slice(0,25);
-    res = res.slice(0,40);
+    var matched = q ? pool.filter(function(l){ return norm(l.name||'').includes(q) || norm(l.city||'').includes(q); }) : pool;
+    var res = matched.slice(0,60);
+    var hint = '';
+    if(!q && pool.length > res.length){ hint = '<div style="color:var(--text-3);font-size:11.5px;padding:2px 2px 8px">'+t('fc_pick_more')+'</div>'; }
     if(!res.length){ c.innerHTML='<div style="color:var(--text-3);font-size:13px;padding:8px 2px">'+t('fc_pick_none')+'</div>'; return; }
-    c.innerHTML = res.map(function(l){
+    c.innerHTML = hint + res.map(function(l){
       var col=catColors[l.category_id]||'#6B6B6B';
       return '<div class="answer-pick-item" onclick="selectAnswerListing(\''+l.id+'\')"><div class="answer-dot" style="background:'+col+'"></div><div style="flex:1;min-width:0"><div class="answer-name">'+esc(l.name||'')+'</div>'+(l.city?'<div class="answer-note">'+esc(prettyCity(l.city))+'</div>':'')+'</div></div>';
     }).join('');
