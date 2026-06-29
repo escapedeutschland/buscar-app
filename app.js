@@ -3140,29 +3140,19 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch(e){ list.innerHTML = _qEmpty(t('err_generic')||'Fehler'); }
   }
 
-  // Home-Sektion „Frag die Community"
+  // „Frag die Community" – Badge am schwebenden Button (FAB) auf Home
   var _homeQuestions = null;
   async function renderHomeCommunity(){
-    var box = document.getElementById('homeCommunity'); if(!box) return;
-    var showIt = (activeCategory === 'Alle' && !searchQuery && !activeTags.length);
-    if(!showIt){ box.style.display='none'; return; }
+    var badge = document.getElementById('communityFabBadge'); if(!badge) return;
     if(_homeQuestions === null){
       try {
-        var snap = await db.collection('questions').orderBy('created_at','desc').limit(4).get();
+        var snap = await db.collection('questions').orderBy('created_at','desc').limit(50).get();
         _homeQuestions = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
       } catch(e){ _homeQuestions = []; }
     }
-    var rows = (_homeQuestions||[]).slice(0,3).map(function(q){
-      var ans=(q.answers_count||0), answered=(q.status==='answered'||ans>0);
-      return '<div class="hc-q" onclick="openQuestionDetail(\''+q.id+'\')"><span class="hc-q-text">'+esc(q.text||'')+'</span>'+(answered?'<span class="q-chip ok">✓ '+ans+'</span>':'<span class="q-chip hot">👀 '+(q.seekers_count||0)+'</span>')+'</div>';
-    }).join('');
-    box.innerHTML = '<div class="home-community-card">'
-      + '<div class="hc-head"><div><div class="hc-title">💬 '+t('fc_title')+'</div><div class="hc-sub">'+t('fc_home_sub')+'</div></div>'
-      + '<button class="hc-all" onclick="openQuestions(\'all\')">'+t('fc_all')+' ›</button></div>'
-      + (rows ? '<div class="hc-list">'+rows+'</div>' : '')
-      + '<button class="hc-ask" onclick="openAskQuestion(\'\')">＋ '+t('fc_ask_btn')+'</button>'
-      + '</div>';
-    box.style.display='block';
+    var n = (_homeQuestions||[]).length;
+    if(n > 0){ badge.textContent = (n > 49 ? '49+' : n); badge.style.display = 'flex'; }
+    else { badge.style.display = 'none'; }
   }
 
   async function deleteQuestion(id){
