@@ -54,6 +54,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_pick_none: 'Kein passender Eintrag gefunden.',
       fc_answer_thanks: 'Danke für deine Antwort!',
       fc_entry_prof: 'Frag die Community',
+      fc_entry_mine: 'Meine Fragen',
+      fc_entry_answers: 'Meine Antworten',
+      fc_mine: 'Meine Fragen',
+      fc_my_answers: 'Meine Antworten',
+      fc_no_my_questions: 'Du hast noch keine Frage gestellt',
+      fc_no_my_answers: 'Du hast noch nichts beantwortet',
+      fc_you_recommended: 'Von dir empfohlen',
+      fc_home_sub: 'Finde, was kein Eintrag verrät',
+      fc_all: 'Alle',
+      fc_note_ph: 'Notiz (optional)',
+      fc_del_q_confirm: 'Diese Frage wirklich löschen?',
+      fc_deleted: 'Gelöscht',
       maps_import_title: 'Aus Google Maps übernehmen',
       maps_import_hint: 'Spar dir das Tippen: Google-Maps-Link einfügen – Name, Adresse, Telefon, Öffnungszeiten & Standort werden automatisch ausgefüllt. Du ergänzt nur noch deine persönliche Empfehlung.',
       maps_import_btn: 'Laden',
@@ -265,6 +277,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_pick_none: 'No se encontró ningún lugar.',
       fc_answer_thanks: '¡Gracias por tu respuesta!',
       fc_entry_prof: 'Preguntá a la comunidad',
+      fc_entry_mine: 'Mis preguntas',
+      fc_entry_answers: 'Mis respuestas',
+      fc_mine: 'Mis preguntas',
+      fc_my_answers: 'Mis respuestas',
+      fc_no_my_questions: 'Todavía no hiciste ninguna pregunta',
+      fc_no_my_answers: 'Todavía no respondiste nada',
+      fc_you_recommended: 'Recomendado por vos',
+      fc_home_sub: 'Encontrá lo que ningún lugar revela',
+      fc_all: 'Todas',
+      fc_note_ph: 'Nota (opcional)',
+      fc_del_q_confirm: '¿Eliminar esta pregunta?',
+      fc_deleted: 'Eliminado',
       maps_import_title: 'Importar desde Google Maps',
       maps_import_hint: 'Ahorrate el tecleo: pegá el enlace de Google Maps y se completan automáticamente nombre, dirección, teléfono, horarios y ubicación. Vos solo agregás tu recomendación personal.',
       maps_import_btn: 'Cargar',
@@ -2442,6 +2466,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
   function _doRenderListings() {
     if (activeScreen !== 'screenHome') return;
+    try { renderHomeCommunity(); } catch(e){}
     let filtered = allListings;
     filtered = filtered.filter(l => l.category_id !== 'kat-immobilien'); // Immobilien haben eine eigene Seite
     if (activeCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === activeCategory);
@@ -3063,17 +3088,101 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // ══════════ FRAG DIE COMMUNITY (Phase 2) ══════════
   var _currentQuestion = null;
 
-  function openQuestions(){ setNav('navHome'); showScreen('screenQuestions'); loadQuestions(); }
-
+  var _qBoardMode = 'all';
+  function openQuestions(mode){
+    _qBoardMode = mode || 'all';
+    if(_qBoardMode === 'all') setNav('navHome');
+    showScreen('screenQuestions');
+    _updateBoardHeader();
+    loadQuestions();
+  }
+  function _updateBoardHeader(){
+    var title = document.querySelector('#screenQuestions .form-title');
+    var sub = document.querySelector('#screenQuestions .form-sub');
+    var askBtn = document.getElementById('qBoardAskBtn');
+    if(_qBoardMode === 'mine'){ if(title) title.textContent = t('fc_mine'); if(sub) sub.textContent = ''; if(askBtn) askBtn.style.display='block'; }
+    else if(_qBoardMode === 'answers'){ if(title) title.textContent = t('fc_my_answers'); if(sub) sub.textContent = ''; if(askBtn) askBtn.style.display='none'; }
+    else { if(title) title.textContent = t('fc_title'); if(sub) sub.textContent = t('fc_sub'); if(askBtn) askBtn.style.display='block'; }
+  }
+  function _qEmpty(title, sub){
+    return '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="empty-title">'+title+'</div><div class="empty-sub">'+(sub||'')+'</div></div>';
+  }
   async function loadQuestions(){
     var list = document.getElementById('questionsList'); if(!list) return;
     list.innerHTML = '<div style="text-align:center;padding:34px;color:var(--text-3)">'+(t('loading')||'…')+'</div>';
     try {
-      var snap = await db.collection('questions').orderBy('created_at','desc').limit(100).get();
-      var items = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
-      if(!items.length){ list.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="empty-title">'+t('fc_empty_title')+'</div><div class="empty-sub">'+t('fc_empty_sub')+'</div></div>'; return; }
+      if(_qBoardMode === 'answers'){
+        if(!currentUser){ list.innerHTML = _qEmpty(t('fc_no_my_answers')); return; }
+        var snapA = await db.collection('answers').where('created_by','==',currentUser.uid).get();
+        var ans = snapA.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+        ans.sort(function(a,b){ return _adminTs(b.created_at)-_adminTs(a.created_at); });
+        if(!ans.length){ list.innerHTML = _qEmpty(t('fc_no_my_answers')); return; }
+        list.innerHTML = ans.map(function(a){
+          var l = allListings.find(function(x){ return x.id===a.listing_id; });
+          var col = catColors[(l&&l.category_id)] || '#6B6B6B';
+          return '<div class="answer-card" onclick="showDetail(\''+a.listing_id+'\')"><div class="answer-dot" style="background:'+col+'"></div><div style="flex:1;min-width:0"><div class="answer-name">'+esc(a.listing_name||(l&&l.name)||'Eintrag')+'</div><div class="answer-note">'+t('fc_you_recommended')+'</div></div><svg class="answer-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></div>';
+        }).join('');
+        return;
+      }
+      var items;
+      if(_qBoardMode === 'mine'){
+        if(!currentUser){ list.innerHTML = _qEmpty(t('fc_empty_title'), t('fc_empty_sub')); return; }
+        var snapM = await db.collection('questions').where('created_by','==',currentUser.uid).get();
+        items = snapM.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+        items.sort(function(a,b){ return _adminTs(b.created_at)-_adminTs(a.created_at); });
+        if(!items.length){ list.innerHTML = _qEmpty(t('fc_no_my_questions'), t('fc_empty_sub')); return; }
+      } else {
+        var snap = await db.collection('questions').orderBy('created_at','desc').limit(100).get();
+        items = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+        if(!items.length){ list.innerHTML = _qEmpty(t('fc_empty_title'), t('fc_empty_sub')); return; }
+      }
       list.innerHTML = items.map(_renderQuestionCard).join('');
-    } catch(e){ list.innerHTML = '<div class="empty-state"><div class="empty-title">'+(t('err_generic')||'Fehler')+'</div></div>'; }
+    } catch(e){ list.innerHTML = _qEmpty(t('err_generic')||'Fehler'); }
+  }
+
+  // Home-Sektion „Frag die Community"
+  var _homeQuestions = null;
+  async function renderHomeCommunity(){
+    var box = document.getElementById('homeCommunity'); if(!box) return;
+    var showIt = (activeCategory === 'Alle' && !searchQuery && !activeTags.length);
+    if(!showIt){ box.style.display='none'; return; }
+    if(_homeQuestions === null){
+      try {
+        var snap = await db.collection('questions').orderBy('created_at','desc').limit(4).get();
+        _homeQuestions = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      } catch(e){ _homeQuestions = []; }
+    }
+    var rows = (_homeQuestions||[]).slice(0,3).map(function(q){
+      var ans=(q.answers_count||0), answered=(q.status==='answered'||ans>0);
+      return '<div class="hc-q" onclick="openQuestionDetail(\''+q.id+'\')"><span class="hc-q-text">'+esc(q.text||'')+'</span>'+(answered?'<span class="q-chip ok">✓ '+ans+'</span>':'<span class="q-chip hot">👀 '+(q.seekers_count||0)+'</span>')+'</div>';
+    }).join('');
+    box.innerHTML = '<div class="home-community-card">'
+      + '<div class="hc-head"><div><div class="hc-title">💬 '+t('fc_title')+'</div><div class="hc-sub">'+t('fc_home_sub')+'</div></div>'
+      + '<button class="hc-all" onclick="openQuestions(\'all\')">'+t('fc_all')+' ›</button></div>'
+      + (rows ? '<div class="hc-list">'+rows+'</div>' : '')
+      + '<button class="hc-ask" onclick="openAskQuestion(\'\')">＋ '+t('fc_ask_btn')+'</button>'
+      + '</div>';
+    box.style.display='block';
+  }
+
+  async function deleteQuestion(id){
+    if(!currentUser) return;
+    if(!confirm(t('fc_del_q_confirm'))) return;
+    try {
+      await db.collection('questions').doc(id).delete();
+      _homeQuestions = null;
+      showToast(t('fc_deleted'));
+      openQuestions(_qBoardMode);
+    } catch(e){ alert(t('err_generic')||'Fehler'); }
+  }
+  async function deleteAnswer(answerId){
+    if(!currentUser || !_currentQuestion) return;
+    try {
+      await db.collection('answers').doc(answerId).delete();
+      try { await db.collection('questions').doc(_currentQuestion.id).update({ answers_count: firebase.firestore.FieldValue.increment(-1) }); } catch(e){}
+      if(_currentQuestion.answers_count) _currentQuestion.answers_count--;
+      loadAnswers(_currentQuestion.id);
+    } catch(e){ alert(t('err_generic')||'Fehler'); }
   }
   function _renderQuestionCard(q){
     var seekers = q.seekers_count||0, answers = q.answers_count||0;
@@ -3103,6 +3212,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         text: text, norm_key: norm(text), created_by: currentUser.uid,
         created_at: new Date(), status: 'open', seekers: [currentUser.uid], seekers_count: 1, answers_count: 0
       });
+      _homeQuestions = null;
       closeAskQuestion();
       if(btn){ btn.disabled=false; btn.textContent=t('fc_ask_send'); }
       showToast(t('fc_asked'));
@@ -3122,6 +3232,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       document.getElementById('qdTitle').textContent = q.text||'';
       document.getElementById('qdMeta').textContent = (q.seekers_count||0)+' '+t('fc_seek_count');
       _renderSeekBtn();
+      var delBtn=document.getElementById('qdDeleteBtn');
+      if(delBtn){ var canDel = currentUser && (currentUser.email===ADMIN_EMAIL || (q.created_by && q.created_by===currentUser.uid)); delBtn.style.display = canDel?'inline-flex':'none'; delBtn.onclick=function(){ deleteQuestion(q.id); }; }
       loadAnswers(id);
     } catch(e){ document.getElementById('qdTitle').textContent = t('err_generic')||'—'; }
   }
@@ -3157,11 +3269,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       c.innerHTML = items.map(function(a){
         var l = allListings.find(function(x){ return x.id===a.listing_id; });
         var col = catColors[(l&&l.category_id)] || '#6B6B6B';
+        var canDelA = currentUser && (currentUser.email===ADMIN_EMAIL || (a.created_by && a.created_by===currentUser.uid));
         return '<div class="answer-card" onclick="showDetail(\''+a.listing_id+'\')">'
           + '<div class="answer-dot" style="background:'+col+'"></div>'
           + '<div style="flex:1;min-width:0"><div class="answer-name">'+esc(a.listing_name||(l&&l.name)||'Eintrag')+'</div>'
           + (a.note ? '<div class="answer-note">'+esc(a.note)+'</div>' : '')+'</div>'
-          + '<svg class="answer-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>'
+          + (canDelA ? '<button class="answer-del" onclick="event.stopPropagation();deleteAnswer(\''+a.id+'\')">✕</button>' : '<svg class="answer-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>')
           + '</div>';
       }).join('');
     } catch(e){ c.innerHTML = '<div style="color:var(--text-3);font-size:13px">'+(t('err_generic')||'Fehler')+'</div>'; }
@@ -3171,6 +3284,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if(!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
     if(!_currentQuestion) return;
     var s=document.getElementById('answerPickSearch'); if(s) s.value='';
+    var no=document.getElementById('answerNote'); if(no) no.value='';
     renderAnswerPick('');
     document.getElementById('answerPickOverlay').classList.add('visible');
     setTimeout(function(){ var s2=document.getElementById('answerPickSearch'); if(s2) s2.focus(); }, 120);
@@ -3191,12 +3305,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if(!currentUser || !_currentQuestion) return;
     var l=allListings.find(function(x){ return x.id===listingId; });
     try {
+      var noteEl=document.getElementById('answerNote'); var note=noteEl?(noteEl.value||'').trim().slice(0,140):'';
       await db.collection('answers').add({
         question_id:_currentQuestion.id, listing_id:listingId, listing_name:l?(l.name||''):'',
-        note:'', created_by:currentUser.uid, created_at:new Date()
+        note:note, created_by:currentUser.uid, created_at:new Date()
       });
       await db.collection('questions').doc(_currentQuestion.id).update({ answers_count: firebase.firestore.FieldValue.increment(1), status:'answered' });
       _currentQuestion.answers_count=(_currentQuestion.answers_count||0)+1; _currentQuestion.status='answered';
+      _homeQuestions=null;
       closeAnswerPick();
       showToast(t('fc_answer_thanks'));
       loadAnswers(_currentQuestion.id);
