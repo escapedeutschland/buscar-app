@@ -66,6 +66,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_note_ph: 'Notiz (optional)',
       fc_del_q_confirm: 'Diese Frage wirklich löschen?',
       fc_deleted: 'Gelöscht',
+      fc_load_err: 'Konnte nicht geladen werden',
+      fc_load_sub: 'Bitte prüfe deine Verbindung und versuch es erneut.',
       maps_import_title: 'Aus Google Maps übernehmen',
       maps_import_hint: 'Spar dir das Tippen: Google-Maps-Link einfügen – Name, Adresse, Telefon, Öffnungszeiten & Standort werden automatisch ausgefüllt. Du ergänzt nur noch deine persönliche Empfehlung.',
       maps_import_btn: 'Laden',
@@ -289,6 +291,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_note_ph: 'Nota (opcional)',
       fc_del_q_confirm: '¿Eliminar esta pregunta?',
       fc_deleted: 'Eliminado',
+      fc_load_err: 'No se pudo cargar',
+      fc_load_sub: 'Revisá tu conexión e intentá de nuevo.',
       maps_import_title: 'Importar desde Google Maps',
       maps_import_hint: 'Ahorrate el tecleo: pegá el enlace de Google Maps y se completan automáticamente nombre, dirección, teléfono, horarios y ubicación. Vos solo agregás tu recomendación personal.',
       maps_import_btn: 'Cargar',
@@ -3137,7 +3141,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         if(!items.length){ list.innerHTML = _qEmpty(t('fc_empty_title'), t('fc_empty_sub')); return; }
       }
       list.innerHTML = items.map(_renderQuestionCard).join('');
-    } catch(e){ list.innerHTML = _qEmpty(t('err_generic')||'Fehler'); }
+    } catch(e){ list.innerHTML = _qEmpty(t('fc_load_err'), t('fc_load_sub')); }
   }
 
   // „Frag die Community" – Badge am schwebenden Button (FAB) auf Home
