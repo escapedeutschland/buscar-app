@@ -732,7 +732,9 @@
 .answer-del { width:30px; height:30px; flex:0 0 auto; border-radius:50%; border:none; background:var(--surface-2,#f4f1ec); color:var(--text-3); font-size:13px; cursor:pointer; }
 .answer-del:hover { color:var(--red,#E5484D); }
 
-/* ===== Frag-die-Community FAB (Home) ===== */
-.community-fab { position:fixed; right:18px; bottom:88px; width:56px; height:56px; border-radius:50%; background:var(--yellow,#F5A623); border:none; box-shadow:0 6px 20px rgba(245,166,35,0.5); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:60; }
-.community-fab:active { transform:scale(0.94); }
-.community-fab-badge { position:absolute; top:-3px; right:-3px; min-width:20px; height:20px; padding:0 5px; border-radius:11px; background:#E5484D; color:#fff; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg,#faf7f2); }
+/* ===== Frag-die-Community FAB (Home) – dezent ===== */
+.community-fab { position:fixed; right:16px; bottom:calc(env(safe-area-inset-bottom, 0px) + 86px); width:46px; height:46px; border-radius:50%; background:rgba(255,255,255,0.97); border:1px solid var(--border,#ece6dc); box-shadow:0 3px 12px rgba(0,0,0,0.12); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:60; }
+.browser-mode .community-fab { bottom:calc(env(safe-area-inset-bottom, 0px) + 150px); }
+.community-fab svg { stroke:var(--yellow-dark,#C9790A); width:21px; height:21px; }
+.community-fab:active { transform:scale(0.93); }
+.community-fab-badge { position:absolute; top:-4px; right:-4px; min-width:17px; height:17px; padding:0 4px; border-radius:9px; background:var(--yellow,#F5A623); color:#3a2a06; font-family:'DM Sans',sans-serif; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg,#faf7f2); }
