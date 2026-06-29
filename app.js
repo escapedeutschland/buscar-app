@@ -26,6 +26,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       share_cta: 'Entdeckt auf Buscar – dem Guide für Paraguay. Lade dir die App auch herunter! 👇',
       tags_title: 'Merkmale & Tags',
       tags_hint: 'Hilf anderen, diesen Ort zu finden. Wähle passende Merkmale oder füge eigene Stichwörter hinzu (z. B. „fluoridfreie Zahnpasta").',
+      tag_suggest: 'Merkmal vorschlagen',
+      tag_suggest_title: 'Merkmal vorschlagen',
+      tag_suggest_hint: 'Was bietet dieser Ort? Dein Vorschlag wird geprüft und dann für alle sichtbar.',
+      tag_suggest_send: 'Vorschlag senden',
+      tag_suggest_thanks: 'Danke! Dein Vorschlag wird geprüft.',
       maps_import_title: 'Aus Google Maps übernehmen',
       maps_import_hint: 'Spar dir das Tippen: Google-Maps-Link einfügen – Name, Adresse, Telefon, Öffnungszeiten & Standort werden automatisch ausgefüllt. Du ergänzt nur noch deine persönliche Empfehlung.',
       maps_import_btn: 'Laden',
@@ -209,6 +214,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       share_cta: 'Descubierto en Buscar – la guía para Paraguay. ¡Descargate la app también! 👇',
       tags_title: 'Características y etiquetas',
       tags_hint: 'Ayudá a otros a encontrar este lugar. Elegí características o agregá tus propias palabras clave (p. ej. „pasta dental sin flúor").',
+      tag_suggest: 'Sugerir característica',
+      tag_suggest_title: 'Sugerir característica',
+      tag_suggest_hint: '¿Qué ofrece este lugar? Tu sugerencia se revisa y luego se muestra a todos.',
+      tag_suggest_send: 'Enviar sugerencia',
+      tag_suggest_thanks: '¡Gracias! Tu sugerencia será revisada.',
       maps_import_title: 'Importar desde Google Maps',
       maps_import_hint: 'Ahorrate el tecleo: pegá el enlace de Google Maps y se completan automáticamente nombre, dirección, teléfono, horarios y ubicación. Vos solo agregás tu recomendación personal.',
       maps_import_btn: 'Cargar',
@@ -2649,7 +2659,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     descEl.dataset.tlang = '';
     (function(){
       var tc=document.getElementById('detailTagsCard'), te=document.getElementById('detailTags');
-      if(tc&&te){ var tags=Array.isArray(l.tags)?l.tags:[]; if(tags.length){ te.innerHTML=tags.map(function(k){return '<span class="detail-tag">'+esc(tagLabel(k))+'</span>';}).join(''); tc.style.display='block'; } else { tc.style.display='none'; } }
+      if(!tc||!te) return;
+      var tags=Array.isArray(l.tags)?l.tags:[];
+      var _adm = currentUser && currentUser.email === ADMIN_EMAIL;
+      var _own = currentUser && ((l.owner_id && l.owner_id===currentUser.uid) || (l.created_by && l.created_by===currentUser.uid));
+      var canSuggest = currentUser && !_adm && !_own;
+      var html = tags.map(function(k){return '<span class="detail-tag">'+esc(tagLabel(k))+'</span>';}).join('');
+      if(canSuggest) html += '<button class="tag-suggest-btn" onclick="openTagSuggest()">＋ '+esc(t('tag_suggest'))+'</button>';
+      if(tags.length || canSuggest){ te.innerHTML=html; tc.style.display='block'; } else { tc.style.display='none'; }
     })();
     const badges = document.getElementById('detailBadges');
     const openStatus = isOpen(l.opening_hours);
@@ -2895,20 +2912,23 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function tagLabel(k){ var e=TAG_LABELS[k]; if(e) return e[currentLang]||e.de||k; return k; }
   function tagSearchStr(tags){ if(!tags||!tags.length) return ''; return tags.map(function(k){var e=TAG_LABELS[k]; return e?(k+' '+(e.de||'')+' '+(e.es||'')):k;}).join(' '); }
 
-  // Tag-Auswahl im Formular (Create + Edit)
-  var formTags = [], editTags = [], _editCatId = '';
-  function _tagState(mode){ return mode==='edit'?editTags:formTags; }
+  // Tag-Auswahl im Formular (Create + Edit + Vorschlag)
+  var formTags = [], editTags = [], suggestTags = [], _editCatId = '', _suggestCatId = '', _suggestListing = null;
+  var _tagModes = {
+    form:    { cat:function(){return (document.getElementById('newCategory')||{}).value;}, presets:'tagPresets',        chips:'tagChips',        input:'tagInput',        state:function(){return formTags;} },
+    edit:    { cat:function(){return _editCatId;},                                          presets:'editTagPresets',    chips:'editTagChips',    input:'editTagInput',    state:function(){return editTags;} },
+    suggest: { cat:function(){return _suggestCatId;},                                       presets:'suggestTagPresets', chips:'suggestTagChips', input:'suggestTagInput',  state:function(){return suggestTags;} }
+  };
+  function _tagState(mode){ return _tagModes[mode].state(); }
   function _renderTagPresets(mode){
-    var catId = mode==='edit' ? _editCatId : (document.getElementById('newCategory')||{}).value;
-    var c = document.getElementById(mode==='edit'?'editTagPresets':'tagPresets'); if(!c) return;
-    var keys = TAG_PRESETS[catId]||[], arr=_tagState(mode);
+    var m=_tagModes[mode], c=document.getElementById(m.presets); if(!c) return;
+    var keys = TAG_PRESETS[m.cat()]||[], arr=m.state();
     c.innerHTML = keys.map(function(k){var on=arr.indexOf(k)>=0;return '<button type="button" class="tag-preset'+(on?' active':'')+'" onclick="toggleTag(\''+mode+'\',\''+k+'\')">'+esc(tagLabel(k))+'</button>';}).join('');
     c.style.display = keys.length ? 'flex' : 'none';
   }
   function _renderTagChips(mode){
-    var c = document.getElementById(mode==='edit'?'editTagChips':'tagChips'); if(!c) return;
-    var catId = mode==='edit' ? _editCatId : (document.getElementById('newCategory')||{}).value;
-    var presetKeys = TAG_PRESETS[catId]||[], arr=_tagState(mode), html='';
+    var m=_tagModes[mode], c=document.getElementById(m.chips); if(!c) return;
+    var presetKeys = TAG_PRESETS[m.cat()]||[], arr=m.state(), html='';
     arr.forEach(function(k,idx){ if(presetKeys.indexOf(k)>=0) return; html+='<span class="tag-chip">'+esc(tagLabel(k))+'<i onclick="removeTagAt(\''+mode+'\','+idx+')">×</i></span>'; });
     c.innerHTML = html;
   }
@@ -2916,11 +2936,80 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function toggleTag(mode,key){ var arr=_tagState(mode), i=arr.indexOf(key); if(i>=0) arr.splice(i,1); else arr.push(key); _refreshTags(mode); }
   function removeTagAt(mode,idx){ _tagState(mode).splice(idx,1); _refreshTags(mode); }
   function addFreeTag(mode){
-    var inp=document.getElementById(mode==='edit'?'editTagInput':'tagInput'); if(!inp) return;
+    var inp=document.getElementById(_tagModes[mode].input); if(!inp) return;
     var v=(inp.value||'').trim(); if(!v) return;
     var arr=_tagState(mode);
     if(!arr.some(function(x){return String(x).toLowerCase()===v.toLowerCase();})) arr.push(v);
     inp.value=''; _refreshTags(mode);
+  }
+
+  // ── Merkmal vorschlagen (tag_suggestions) ──────────────────────────────
+  function openTagSuggest(){
+    if(!currentUser){ showScreen('screenAuth'); return; }
+    var l = allListings.find(function(x){ return x.id === currentListingId; });
+    if(!l) return;
+    _suggestListing = l; _suggestCatId = l.category_id || ''; suggestTags = [];
+    _refreshTags('suggest');
+    var inp=document.getElementById('suggestTagInput'); if(inp) inp.value='';
+    document.getElementById('tagSuggestOverlay').classList.add('visible');
+  }
+  function closeTagSuggest(){ document.getElementById('tagSuggestOverlay').classList.remove('visible'); }
+  async function submitTagSuggestions(){
+    if(!currentUser || !_suggestListing || !suggestTags.length){ closeTagSuggest(); return; }
+    var btn=document.getElementById('tagSuggestSubmitBtn'); if(btn){ btn.disabled=true; btn.textContent=t('saving')||'...'; }
+    try {
+      var l=_suggestListing, existing=(l.tags||[]).map(function(x){return String(x).toLowerCase();});
+      var batch = suggestTags.filter(function(k){ return existing.indexOf(String(k).toLowerCase())<0; });
+      for (var i=0;i<batch.length;i++){
+        await db.collection('tag_suggestions').add({
+          listing_id: l.id, listing_name: l.name||'', tag: batch[i],
+          user_id: currentUser.uid, status:'pending', created_at: new Date()
+        });
+      }
+      closeTagSuggest();
+      showToast(t('tag_suggest_thanks'));
+    } catch(e){ if(btn){ btn.disabled=false; } alert(t('err_generic')||'Fehler'); }
+    if(btn){ btn.disabled=false; btn.textContent=t('tag_suggest_send'); }
+  }
+
+  // ── Admin: Tag-Vorschläge ──────────────────────────────────────────────
+  var _adminTabIds = ['adminTabListings','adminTabClaims','adminTabDeals','adminTabReports','adminTabLocations','adminTabTags','adminTabDuplicates'];
+  async function loadAdminTagSuggestions(){
+    _adminTabIds.forEach(function(t){ var el=document.getElementById(t); if(el){ el.style.color='rgba(255,255,255,0.6)'; el.style.borderBottom='none'; } });
+    var at=document.getElementById('adminTabTags'); if(at){ at.style.color='white'; at.style.borderBottom='2px solid white'; }
+    const body=document.getElementById('adminBody');
+    body.innerHTML='<div style="text-align:center;padding:40px">Wird geladen...</div>';
+    try {
+      const snap=await db.collection('tag_suggestions').where('status','==','pending').get();
+      const items=snap.docs.map(d=>({id:d.id,...d.data()}));
+      items.sort(function(a,b){ return _adminTs(b.created_at)-_adminTs(a.created_at); });
+      if(!items.length){ body.innerHTML='<div class="admin-empty"><div class="admin-empty-icon">✓</div><div class="admin-empty-text">Keine Tag-Vorschläge</div></div>'; return; }
+      body.innerHTML=items.map(function(s){
+        return '<div class="admin-card" id="tagsugCard_'+s.id+'">'
+          +'<div class="admin-card-name">'+esc(s.listing_name||'Eintrag')+'</div>'
+          +'<div class="admin-card-meta">'+formatDate(s.created_at)+'</div>'
+          +'<div style="background:#FFF8EC;border-left:3px solid var(--yellow);padding:8px 10px;border-radius:6px;margin:8px 0;font-size:13px">Vorschlag: <b>'+esc(tagLabel(s.tag))+'</b></div>'
+          +'<div class="admin-actions">'
+            +'<button class="admin-btn approve" onclick="applyTagSuggestion(\''+s.id+'\',\''+s.listing_id+'\','+JSON.stringify(s.tag)+')">Übernehmen</button>'
+            +'<button class="admin-btn reject" onclick="rejectTagSuggestion(\''+s.id+'\')">Verwerfen</button>'
+          +'</div></div>';
+      }).join('');
+    } catch(e){ body.innerHTML='<div class="admin-empty"><div class="admin-empty-text">Fehler beim Laden</div></div>'; }
+  }
+  async function applyTagSuggestion(sugId, listingId, tag){
+    try {
+      await db.collection('listings').doc(listingId).update({ tags: firebase.firestore.FieldValue.arrayUnion(tag) });
+      await db.collection('tag_suggestions').doc(sugId).update({ status:'applied' });
+      var l=allListings.find(function(x){return x.id===listingId;});
+      if(l){ if(!Array.isArray(l.tags)) l.tags=[]; if(l.tags.map(function(x){return String(x).toLowerCase();}).indexOf(String(tag).toLowerCase())<0) l.tags.push(tag); }
+      var c=document.getElementById('tagsugCard_'+sugId); if(c) c.remove();
+      showToast(t('saving')? 'OK':'OK');
+    } catch(e){ alert(t('err_generic')||'Fehler'); }
+  }
+  async function rejectTagSuggestion(sugId){
+    try { await db.collection('tag_suggestions').doc(sugId).update({ status:'rejected' });
+      var c=document.getElementById('tagsugCard_'+sugId); if(c) c.remove();
+    } catch(e){ alert(t('err_generic')||'Fehler'); }
   }
 
   function makeMarkerIcon(color, emoji) {
@@ -3809,6 +3898,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         <span id="adminTabDeals" onclick="loadAdminDeals()" style="cursor:pointer;color:rgba(255,255,255,0.6)">🏷 Deals</span>
         <span id="adminTabReports" onclick="loadAdminReports()" style="cursor:pointer;color:rgba(255,255,255,0.6)">🚩 Meldungen</span>
         <span id="adminTabLocations" onclick="loadAdminLocationSuggestions()" style="cursor:pointer;color:rgba(255,255,255,0.6)">📍 Standorte</span>
+        <span id="adminTabTags" onclick="loadAdminTagSuggestions()" style="cursor:pointer;color:rgba(255,255,255,0.6)">🏷 Tags</span>
         <span id="adminTabDuplicates" onclick="loadAdminDuplicates()" style="cursor:pointer;color:rgba(255,255,255,0.6)">📋 Duplikate</span>
       </div>`;
     loadAdminListings();
@@ -3822,7 +3912,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     return (l.name||'').trim().toLowerCase()+'|'+Number(l.lat).toFixed(5)+'|'+Number(l.lng).toFixed(5);
   }
   async function loadAdminDuplicates() {
-    ['adminTabListings','adminTabClaims','adminTabDeals','adminTabReports','adminTabLocations','adminTabDuplicates'].forEach(function(t){
+    ['adminTabListings','adminTabClaims','adminTabDeals','adminTabReports','adminTabLocations','adminTabTags','adminTabDuplicates'].forEach(function(t){
       var el = document.getElementById(t); if (el){ el.style.color = 'rgba(255,255,255,0.6)'; el.style.borderBottom = 'none'; }
     });
     var dt = document.getElementById('adminTabDuplicates'); if (dt){ dt.style.color = 'white'; dt.style.borderBottom = '2px solid white'; }
@@ -5315,7 +5405,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   // ── STANDORT-VORSCHLÄGE (location_suggestions) ─────────────────────────────
   async function loadAdminLocationSuggestions() {
-    ['adminTabListings','adminTabClaims','adminTabDeals','adminTabReports','adminTabLocations','adminTabDuplicates'].forEach(function(t){
+    ['adminTabListings','adminTabClaims','adminTabDeals','adminTabReports','adminTabLocations','adminTabTags','adminTabDuplicates'].forEach(function(t){
       var el = document.getElementById(t); if (el){ el.style.color = 'rgba(255,255,255,0.6)'; el.style.borderBottom = 'none'; }
     });
     var at = document.getElementById('adminTabLocations'); if (at){ at.style.color = 'white'; at.style.borderBottom = '2px solid white'; }

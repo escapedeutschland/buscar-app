@@ -698,3 +698,6 @@
 .tag-chip i:hover { opacity:1; }
 .detail-tags { display:flex; flex-wrap:wrap; gap:8px; }
 .detail-tag { font-size:12.5px; font-weight:600; padding:7px 12px; border-radius:20px; background:var(--surface-2,#f4f1ec); color:var(--text-2); }
+
+.tag-suggest-btn { font-family:'DM Sans',sans-serif; font-size:12.5px; font-weight:700; padding:7px 13px; border-radius:20px; border:1.5px dashed var(--yellow); background:transparent; color:var(--yellow-dark); cursor:pointer; }
+.tag-suggest-btn:hover { background:var(--yellow-light); }
