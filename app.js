@@ -31,6 +31,29 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       tag_suggest_hint: 'Was bietet dieser Ort? Dein Vorschlag wird geprüft und dann für alle sichtbar.',
       tag_suggest_send: 'Vorschlag senden',
       tag_suggest_thanks: 'Danke! Dein Vorschlag wird geprüft.',
+      loading: 'Wird geladen…',
+      fc_title: 'Frag die Community',
+      fc_sub: 'Wonach suchen die Leute?',
+      fc_ask_btn: 'Frage stellen',
+      fc_ask_title: 'Was suchst du?',
+      fc_ask_hint: 'Stell deine Frage – die Community hilft dir, den richtigen Ort zu finden.',
+      fc_ask_send: 'Frage stellen',
+      fc_asked: 'Deine Frage ist online!',
+      fc_ask_cta: 'Die Community fragen',
+      fc_empty_title: 'Noch keine Fragen',
+      fc_empty_sub: 'Stell die erste Frage an die Community!',
+      fc_seek_count: 'suchen das',
+      fc_answers: 'Antworten',
+      fc_open: 'offen',
+      fc_seek: 'Ich suche das auch',
+      fc_seeking: '✓ Du suchst das auch',
+      fc_no_answers: 'Noch keine Antworten – kennst du einen Ort?',
+      fc_answer_btn: 'Ort vorschlagen',
+      fc_pick_title: 'Welcher Ort bietet das?',
+      fc_pick_hint: 'Wähle einen Eintrag aus Buscar als Antwort.',
+      fc_pick_none: 'Kein passender Eintrag gefunden.',
+      fc_answer_thanks: 'Danke für deine Antwort!',
+      fc_entry_prof: 'Frag die Community',
       maps_import_title: 'Aus Google Maps übernehmen',
       maps_import_hint: 'Spar dir das Tippen: Google-Maps-Link einfügen – Name, Adresse, Telefon, Öffnungszeiten & Standort werden automatisch ausgefüllt. Du ergänzt nur noch deine persönliche Empfehlung.',
       maps_import_btn: 'Laden',
@@ -219,6 +242,29 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       tag_suggest_hint: '¿Qué ofrece este lugar? Tu sugerencia se revisa y luego se muestra a todos.',
       tag_suggest_send: 'Enviar sugerencia',
       tag_suggest_thanks: '¡Gracias! Tu sugerencia será revisada.',
+      loading: 'Cargando…',
+      fc_title: 'Preguntá a la comunidad',
+      fc_sub: '¿Qué está buscando la gente?',
+      fc_ask_btn: 'Hacer una pregunta',
+      fc_ask_title: '¿Qué estás buscando?',
+      fc_ask_hint: 'Hacé tu pregunta: la comunidad te ayuda a encontrar el lugar indicado.',
+      fc_ask_send: 'Publicar pregunta',
+      fc_asked: '¡Tu pregunta está publicada!',
+      fc_ask_cta: 'Preguntar a la comunidad',
+      fc_empty_title: 'Todavía no hay preguntas',
+      fc_empty_sub: '¡Hacé la primera pregunta!',
+      fc_seek_count: 'buscan esto',
+      fc_answers: 'respuestas',
+      fc_open: 'abierta',
+      fc_seek: 'Yo también busco esto',
+      fc_seeking: '✓ Vos también buscás esto',
+      fc_no_answers: 'Aún sin respuestas: ¿conocés un lugar?',
+      fc_answer_btn: 'Sugerir un lugar',
+      fc_pick_title: '¿Qué lugar lo ofrece?',
+      fc_pick_hint: 'Elegí un lugar de Buscar como respuesta.',
+      fc_pick_none: 'No se encontró ningún lugar.',
+      fc_answer_thanks: '¡Gracias por tu respuesta!',
+      fc_entry_prof: 'Preguntá a la comunidad',
       maps_import_title: 'Importar desde Google Maps',
       maps_import_hint: 'Ahorrate el tecleo: pegá el enlace de Google Maps y se completan automáticamente nombre, dirección, teléfono, horarios y ubicación. Vos solo agregás tu recomendación personal.',
       maps_import_btn: 'Cargar',
@@ -761,7 +807,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // damit der nächste Zurück-Druck wieder bei uns landet.
   var _lastHomeBack = 0;
   function _closeAnyOverlay(){
-    var sheets = ['filterSheetOverlay','citySheetOverlay','mapCitySheetOverlay','mapFilterSheetOverlay','reportOverlay','photoLightbox'];
+    var sheets = ['filterSheetOverlay','citySheetOverlay','mapCitySheetOverlay','mapFilterSheetOverlay','reportOverlay','photoLightbox','tagSuggestOverlay','askQuestionOverlay','answerPickOverlay'];
     for (var i=0;i<sheets.length;i++){
       var el = document.getElementById(sheets[i]);
       if (el && el.classList.contains('visible')){ el.classList.remove('visible'); return true; }
@@ -787,6 +833,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       case 'screenDatenschutz':
       case 'screenAGB': return 'screenProfil';
       case 'screenFavorites': return 'screenProfil';
+      case 'screenQuestions': return 'screenHome';
+      case 'screenQuestionDetail': return 'screenQuestions';
       case 'screenCoordEditor': return 'screenDetail';
       case 'screenImmobilien':
       case 'screenMap':
@@ -2409,7 +2457,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     });
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
-    if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div></div>'; return; }
+    if (!filtered.length) { var _askCta = searchQuery ? '<button class="form-submit" style="margin:18px auto 0;max-width:280px" onclick="openAskQuestion(' + JSON.stringify(searchQuery) + ')">📣 '+t('fc_ask_cta')+'</button>' : ''; container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div>'+_askCta+'</div>'; return; }
     container.innerHTML = filtered.map(l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.name)}</div><div style="display:flex;gap:3px;align-items:center;flex-shrink:0">${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${isNew(l.created_at)?`<span class='badge-neu'>${t('badge_new')}</span>`:''}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div></div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(prettyCity(l.city))}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${esc(l.description)}">${esc(l.description)}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`).join('');
     if (currentLang !== 'de') translateVisibleContent();
   }
@@ -3009,6 +3057,149 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   async function rejectTagSuggestion(sugId){
     try { await db.collection('tag_suggestions').doc(sugId).update({ status:'rejected' });
       var c=document.getElementById('tagsugCard_'+sugId); if(c) c.remove();
+    } catch(e){ alert(t('err_generic')||'Fehler'); }
+  }
+
+  // ══════════ FRAG DIE COMMUNITY (Phase 2) ══════════
+  var _currentQuestion = null;
+
+  function openQuestions(){ setNav('navHome'); showScreen('screenQuestions'); loadQuestions(); }
+
+  async function loadQuestions(){
+    var list = document.getElementById('questionsList'); if(!list) return;
+    list.innerHTML = '<div style="text-align:center;padding:34px;color:var(--text-3)">'+(t('loading')||'…')+'</div>';
+    try {
+      var snap = await db.collection('questions').orderBy('created_at','desc').limit(100).get();
+      var items = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      if(!items.length){ list.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="empty-title">'+t('fc_empty_title')+'</div><div class="empty-sub">'+t('fc_empty_sub')+'</div></div>'; return; }
+      list.innerHTML = items.map(_renderQuestionCard).join('');
+    } catch(e){ list.innerHTML = '<div class="empty-state"><div class="empty-title">'+(t('err_generic')||'Fehler')+'</div></div>'; }
+  }
+  function _renderQuestionCard(q){
+    var seekers = q.seekers_count||0, answers = q.answers_count||0;
+    var answered = (q.status==='answered' || answers>0);
+    return '<div class="q-card" onclick="openQuestionDetail(\''+q.id+'\')">'
+      + '<div class="q-card-text">'+esc(q.text||'')+'</div>'
+      + '<div class="q-card-meta">'
+        + '<span class="q-chip hot">👀 '+seekers+' '+t('fc_seek_count')+'</span>'
+        + (answered ? '<span class="q-chip ok">✓ '+answers+' '+t('fc_answers')+'</span>' : '<span class="q-chip">💬 '+t('fc_open')+'</span>')
+      + '</div></div>';
+  }
+
+  function openAskQuestion(prefill){
+    if(!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
+    var ta = document.getElementById('askQuestionText'); if(ta) ta.value = prefill || '';
+    document.getElementById('askQuestionOverlay').classList.add('visible');
+    setTimeout(function(){ var t2=document.getElementById('askQuestionText'); if(t2) t2.focus(); }, 120);
+  }
+  function closeAskQuestion(){ document.getElementById('askQuestionOverlay').classList.remove('visible'); }
+  async function submitQuestion(){
+    if(!currentUser) return;
+    var text = (document.getElementById('askQuestionText').value||'').trim();
+    if(text.length < 3){ var ta=document.getElementById('askQuestionText'); if(ta) ta.focus(); return; }
+    var btn = document.getElementById('askSubmitBtn'); if(btn){ btn.disabled=true; btn.textContent=t('saving')||'…'; }
+    try {
+      var ref = await db.collection('questions').add({
+        text: text, norm_key: norm(text), created_by: currentUser.uid,
+        created_at: new Date(), status: 'open', seekers: [currentUser.uid], seekers_count: 1, answers_count: 0
+      });
+      closeAskQuestion();
+      if(btn){ btn.disabled=false; btn.textContent=t('fc_ask_send'); }
+      showToast(t('fc_asked'));
+      openQuestionDetail(ref.id);
+    } catch(e){ if(btn){ btn.disabled=false; btn.textContent=t('fc_ask_send'); } alert(t('err_generic')||'Fehler'); }
+  }
+
+  async function openQuestionDetail(id){
+    showScreen('screenQuestionDetail');
+    document.getElementById('qdTitle').textContent = '…';
+    document.getElementById('qdMeta').textContent = '';
+    document.getElementById('answerList').innerHTML = '';
+    try {
+      var doc = await db.collection('questions').doc(id).get();
+      if(!doc.exists){ document.getElementById('qdTitle').textContent = t('err_generic')||'—'; return; }
+      var q = Object.assign({id:doc.id}, doc.data()); _currentQuestion = q;
+      document.getElementById('qdTitle').textContent = q.text||'';
+      document.getElementById('qdMeta').textContent = (q.seekers_count||0)+' '+t('fc_seek_count');
+      _renderSeekBtn();
+      loadAnswers(id);
+    } catch(e){ document.getElementById('qdTitle').textContent = t('err_generic')||'—'; }
+  }
+  function _renderSeekBtn(){
+    var q=_currentQuestion, btn=document.getElementById('qdSeekBtn'); if(!q||!btn) return;
+    var seeking = currentUser && Array.isArray(q.seekers) && q.seekers.indexOf(currentUser.uid)>=0;
+    document.getElementById('qdSeekLabel').textContent = seeking ? t('fc_seeking') : t('fc_seek');
+    btn.classList.toggle('active-seek', !!seeking);
+  }
+  async function toggleSeek(){
+    if(!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
+    var q=_currentQuestion; if(!q) return;
+    var seeking = Array.isArray(q.seekers) && q.seekers.indexOf(currentUser.uid)>=0;
+    try {
+      if(seeking){
+        await db.collection('questions').doc(q.id).update({ seekers: firebase.firestore.FieldValue.arrayRemove(currentUser.uid), seekers_count: firebase.firestore.FieldValue.increment(-1) });
+        q.seekers = q.seekers.filter(function(u){ return u!==currentUser.uid; }); q.seekers_count = Math.max(0,(q.seekers_count||1)-1);
+      } else {
+        await db.collection('questions').doc(q.id).update({ seekers: firebase.firestore.FieldValue.arrayUnion(currentUser.uid), seekers_count: firebase.firestore.FieldValue.increment(1) });
+        if(!Array.isArray(q.seekers)) q.seekers=[]; q.seekers.push(currentUser.uid); q.seekers_count=(q.seekers_count||0)+1;
+      }
+      document.getElementById('qdMeta').textContent = (q.seekers_count||0)+' '+t('fc_seek_count');
+      _renderSeekBtn();
+    } catch(e){ alert(t('err_generic')||'Fehler'); }
+  }
+  async function loadAnswers(qid){
+    var c=document.getElementById('answerList'); if(!c) return;
+    try {
+      var snap = await db.collection('answers').where('question_id','==',qid).get();
+      var items = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      items.sort(function(a,b){ return _adminTs(b.created_at)-_adminTs(a.created_at); });
+      if(!items.length){ c.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:8px 2px">'+t('fc_no_answers')+'</div>'; return; }
+      c.innerHTML = items.map(function(a){
+        var l = allListings.find(function(x){ return x.id===a.listing_id; });
+        var col = catColors[(l&&l.category_id)] || '#6B6B6B';
+        return '<div class="answer-card" onclick="showDetail(\''+a.listing_id+'\')">'
+          + '<div class="answer-dot" style="background:'+col+'"></div>'
+          + '<div style="flex:1;min-width:0"><div class="answer-name">'+esc(a.listing_name||(l&&l.name)||'Eintrag')+'</div>'
+          + (a.note ? '<div class="answer-note">'+esc(a.note)+'</div>' : '')+'</div>'
+          + '<svg class="answer-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>'
+          + '</div>';
+      }).join('');
+    } catch(e){ c.innerHTML = '<div style="color:var(--text-3);font-size:13px">'+(t('err_generic')||'Fehler')+'</div>'; }
+  }
+
+  function openAnswerPick(){
+    if(!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
+    if(!_currentQuestion) return;
+    var s=document.getElementById('answerPickSearch'); if(s) s.value='';
+    renderAnswerPick('');
+    document.getElementById('answerPickOverlay').classList.add('visible');
+    setTimeout(function(){ var s2=document.getElementById('answerPickSearch'); if(s2) s2.focus(); }, 120);
+  }
+  function closeAnswerPick(){ document.getElementById('answerPickOverlay').classList.remove('visible'); }
+  function renderAnswerPick(query){
+    var q=norm(query||''), c=document.getElementById('answerPickResults'); if(!c) return;
+    var pool=(allListings||[]).filter(function(l){ return l.category_id!=='kat-immobilien'; });
+    var res = q ? pool.filter(function(l){ return norm(l.name||'').includes(q) || norm(l.city||'').includes(q); }) : pool.slice(0,25);
+    res = res.slice(0,40);
+    if(!res.length){ c.innerHTML='<div style="color:var(--text-3);font-size:13px;padding:8px 2px">'+t('fc_pick_none')+'</div>'; return; }
+    c.innerHTML = res.map(function(l){
+      var col=catColors[l.category_id]||'#6B6B6B';
+      return '<div class="answer-pick-item" onclick="selectAnswerListing(\''+l.id+'\')"><div class="answer-dot" style="background:'+col+'"></div><div style="flex:1;min-width:0"><div class="answer-name">'+esc(l.name||'')+'</div>'+(l.city?'<div class="answer-note">'+esc(prettyCity(l.city))+'</div>':'')+'</div></div>';
+    }).join('');
+  }
+  async function selectAnswerListing(listingId){
+    if(!currentUser || !_currentQuestion) return;
+    var l=allListings.find(function(x){ return x.id===listingId; });
+    try {
+      await db.collection('answers').add({
+        question_id:_currentQuestion.id, listing_id:listingId, listing_name:l?(l.name||''):'',
+        note:'', created_by:currentUser.uid, created_at:new Date()
+      });
+      await db.collection('questions').doc(_currentQuestion.id).update({ answers_count: firebase.firestore.FieldValue.increment(1), status:'answered' });
+      _currentQuestion.answers_count=(_currentQuestion.answers_count||0)+1; _currentQuestion.status='answered';
+      closeAnswerPick();
+      showToast(t('fc_answer_thanks'));
+      loadAnswers(_currentQuestion.id);
     } catch(e){ alert(t('err_generic')||'Fehler'); }
   }
 
