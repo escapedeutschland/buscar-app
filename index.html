@@ -35,17 +35,17 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Buscar – Der Guide für Paraguay</title>
-  <link rel="preload" href="styles.css?v=188" as="style">
-  <link rel="preload" href="app.js?v=188" as="script">
+  <link rel="preload" href="styles.css?v=189" as="style">
+  <link rel="preload" href="app.js?v=189" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-  <link href="styles.css?v=188" rel="stylesheet">
+  <link href="styles.css?v=189" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  <script defer src="app.js?v=188"></script>
+  <script defer src="app.js?v=189"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -1256,20 +1256,22 @@
     </div>
   </div>
 
-  <!-- ANSWER: ORT WÄHLEN SHEET -->
+  <!-- ANSWER SHEET (Text + optional Ort) -->
   <div class="filter-sheet-overlay" id="answerPickOverlay" onclick="if(event.target.id==='answerPickOverlay')closeAnswerPick()">
     <div class="filter-sheet">
       <div class="filter-sheet-handle"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:0 20px 6px">
-        <div class="filter-sheet-title" data-i18n="fc_pick_title" style="padding:0">Welcher Ort bietet das?</div>
+        <div class="filter-sheet-title" data-i18n="fc_answer_sheet_title" style="padding:0">Antworten</div>
         <button onclick="closeAnswerPick()" style="width:32px;height:32px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-2)">✕</button>
       </div>
-      <div style="padding:0 20px 16px">
-        <div style="font-size:12px;color:var(--text-3);margin-bottom:10px" data-i18n="fc_pick_hint">Wähle einen Eintrag aus Buscar als Antwort.</div>
-        <input class="field-input" type="text" id="answerNote" placeholder="Notiz (optional)" maxlength="140" style="margin-bottom:10px" data-i18n-ph="fc_note_ph">
+      <div style="padding:0 20px 14px">
+        <textarea class="field-textarea" id="answerText" maxlength="400" placeholder="Deine Antwort… (Tipp, Name, Gruppe …)" data-i18n-ph="fc_answer_text_ph" style="min-height:80px"></textarea>
+        <div id="answerSelectedBox" style="display:none;margin-top:10px"></div>
+        <div style="font-size:12px;color:var(--text-3);margin:14px 0 8px" data-i18n="fc_answer_link_label">Optional: einen Buscar-Ort verlinken</div>
         <input class="field-input" type="text" id="answerPickSearch" placeholder="Ort suchen…" oninput="renderAnswerPick(this.value)">
-        <div id="answerPickResults" style="max-height:42vh;overflow-y:auto;margin-top:10px"></div>
+        <div id="answerPickResults" style="max-height:32vh;overflow-y:auto;margin-top:10px"></div>
       </div>
+      <button class="filter-apply-btn" id="answerSubmitBtn" onclick="submitAnswer()" data-i18n="fc_answer_send_btn">Antwort senden</button>
     </div>
   </div>
 

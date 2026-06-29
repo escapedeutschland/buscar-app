@@ -48,7 +48,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_seek: 'Ich suche das auch',
       fc_seeking: '✓ Du suchst das auch',
       fc_no_answers: 'Noch keine Antworten – kennst du einen Ort?',
-      fc_answer_btn: 'Ort vorschlagen',
+      fc_answer_btn: 'Antworten',
+      fc_answer_sheet_title: 'Antworten',
+      fc_answer_text_ph: 'Deine Antwort… (Tipp, Name, Gruppe …)',
+      fc_answer_link_label: 'Optional: einen Buscar-Ort verlinken',
+      fc_answer_send_btn: 'Antwort senden',
+      fc_linked: 'wird verlinkt',
       fc_pick_title: 'Welcher Ort bietet das?',
       fc_pick_hint: 'Tippe oben zum Suchen und wähle den passenden Eintrag.',
       fc_pick_none: 'Kein passender Eintrag gefunden.',
@@ -274,7 +279,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_seek: 'Yo también busco esto',
       fc_seeking: '✓ Vos también buscás esto',
       fc_no_answers: 'Aún sin respuestas: ¿conocés un lugar?',
-      fc_answer_btn: 'Sugerir un lugar',
+      fc_answer_btn: 'Responder',
+      fc_answer_sheet_title: 'Responder',
+      fc_answer_text_ph: 'Tu respuesta… (consejo, nombre, grupo …)',
+      fc_answer_link_label: 'Opcional: vincular un lugar de Buscar',
+      fc_answer_send_btn: 'Enviar respuesta',
+      fc_linked: 'se vinculará',
       fc_pick_title: '¿Qué lugar lo ofrece?',
       fc_pick_hint: 'Tocá arriba para buscar y elegí el lugar correcto.',
       fc_pick_none: 'No se encontró ningún lugar.',
@@ -3274,29 +3284,55 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       items.sort(function(a,b){ return _adminTs(b.created_at)-_adminTs(a.created_at); });
       if(!items.length){ c.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:8px 2px">'+t('fc_no_answers')+'</div>'; return; }
       c.innerHTML = items.map(function(a){
-        var l = allListings.find(function(x){ return x.id===a.listing_id; });
-        var col = catColors[(l&&l.category_id)] || '#6B6B6B';
         var canDelA = currentUser && (currentUser.email===ADMIN_EMAIL || (a.created_by && a.created_by===currentUser.uid));
-        return '<div class="answer-card" onclick="showDetail(\''+a.listing_id+'\')">'
-          + '<div class="answer-dot" style="background:'+col+'"></div>'
-          + '<div style="flex:1;min-width:0"><div class="answer-name">'+esc(a.listing_name||(l&&l.name)||'Eintrag')+'</div>'
-          + (a.note ? '<div class="answer-note">'+esc(a.note)+'</div>' : '')+'</div>'
-          + (canDelA ? '<button class="answer-del" onclick="event.stopPropagation();deleteAnswer(\''+a.id+'\')">✕</button>' : '<svg class="answer-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>')
-          + '</div>';
+        var delBtn = canDelA ? '<button class="answer-del" onclick="event.stopPropagation();deleteAnswer(\''+a.id+'\')">✕</button>' : '';
+        var by = a.author_name ? '<div class="answer-by">– '+esc(a.author_name)+'</div>' : '';
+        var txt = a.text || a.note || '';
+        if(a.listing_id){
+          var l = allListings.find(function(x){ return x.id===a.listing_id; });
+          var col = catColors[(l&&l.category_id)] || '#6B6B6B';
+          return '<div class="answer-card" onclick="showDetail(\''+a.listing_id+'\')">'
+            + '<div class="answer-dot" style="background:'+col+'"></div>'
+            + '<div style="flex:1;min-width:0"><div class="answer-name">'+esc(a.listing_name||(l&&l.name)||'Eintrag')+'</div>'
+            + (txt ? '<div class="answer-note">'+esc(txt)+'</div>' : '') + by + '</div>'
+            + (canDelA ? delBtn : '<svg class="answer-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>')
+            + '</div>';
+        }
+        // Reine Text-Antwort
+        return '<div class="answer-card answer-text-card">'
+          + '<div class="answer-dot answer-dot-text"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
+          + '<div style="flex:1;min-width:0"><div class="answer-text">'+esc(txt)+'</div>'+by+'</div>'
+          + delBtn + '</div>';
       }).join('');
     } catch(e){ c.innerHTML = '<div style="color:var(--text-3);font-size:13px">'+(t('err_generic')||'Fehler')+'</div>'; }
   }
 
+  var _selectedAnswerListing = null;
+  function _currentUserName(){
+    try { var n=document.getElementById('profilName'); if(n && n.textContent && n.textContent.trim() && n.textContent.trim()!=='-') return n.textContent.trim(); } catch(e){}
+    return currentUser ? ((currentUser.email||'').split('@')[0] || '') : '';
+  }
   function openAnswerPick(){
     if(!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
     if(!_currentQuestion) return;
+    _selectedAnswerListing = null;
+    var at=document.getElementById('answerText'); if(at) at.value='';
     var s=document.getElementById('answerPickSearch'); if(s) s.value='';
-    var no=document.getElementById('answerNote'); if(no) no.value='';
+    _renderSelectedAnswer();
     renderAnswerPick('');
     document.getElementById('answerPickOverlay').classList.add('visible');
-    setTimeout(function(){ var s2=document.getElementById('answerPickSearch'); if(s2) s2.focus(); }, 120);
+    setTimeout(function(){ var a=document.getElementById('answerText'); if(a) a.focus(); }, 120);
   }
   function closeAnswerPick(){ document.getElementById('answerPickOverlay').classList.remove('visible'); }
+  function _renderSelectedAnswer(){
+    var box=document.getElementById('answerSelectedBox'); if(!box) return;
+    if(_selectedAnswerListing){
+      var col=catColors[_selectedAnswerListing.category_id]||'#6B6B6B';
+      box.innerHTML='<div class="answer-card" style="margin:0;cursor:default"><div class="answer-dot" style="background:'+col+'"></div><div style="flex:1;min-width:0"><div class="answer-name">'+esc(_selectedAnswerListing.name||'')+'</div><div class="answer-note">'+t('fc_linked')+'</div></div><button class="answer-del" onclick="clearSelectedAnswer()">✕</button></div>';
+      box.style.display='block';
+    } else { box.innerHTML=''; box.style.display='none'; }
+  }
+  function clearSelectedAnswer(){ _selectedAnswerListing=null; _renderSelectedAnswer(); }
   function renderAnswerPick(query){
     var q=norm(query||''), c=document.getElementById('answerPickResults'); if(!c) return;
     var pool=(allListings||[]).filter(function(l){ return l.category_id!=='kat-immobilien'; });
@@ -3310,14 +3346,27 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       return '<div class="answer-pick-item" onclick="selectAnswerListing(\''+l.id+'\')"><div class="answer-dot" style="background:'+col+'"></div><div style="flex:1;min-width:0"><div class="answer-name">'+esc(l.name||'')+'</div>'+(l.city?'<div class="answer-note">'+esc(prettyCity(l.city))+'</div>':'')+'</div></div>';
     }).join('');
   }
-  async function selectAnswerListing(listingId){
+  function selectAnswerListing(listingId){
+    var l=allListings.find(function(x){ return x.id===listingId; }); if(!l) return;
+    _selectedAnswerListing = l;
+    var s=document.getElementById('answerPickSearch'); if(s) s.value='';
+    renderAnswerPick('');
+    _renderSelectedAnswer();
+  }
+  async function submitAnswer(){
     if(!currentUser || !_currentQuestion) return;
-    var l=allListings.find(function(x){ return x.id===listingId; });
+    var at=document.getElementById('answerText'); var text=at?(at.value||'').trim().slice(0,400):'';
+    if(!text && !_selectedAnswerListing){ if(at) at.focus(); return; }
+    var btn=document.getElementById('answerSubmitBtn'); if(btn){ btn.disabled=true; btn.textContent=t('saving')||'…'; }
     try {
-      var noteEl=document.getElementById('answerNote'); var note=noteEl?(noteEl.value||'').trim().slice(0,140):'';
+      var l=_selectedAnswerListing;
       await db.collection('answers').add({
-        question_id:_currentQuestion.id, listing_id:listingId, listing_name:l?(l.name||''):'',
-        note:note, created_by:currentUser.uid, created_at:new Date()
+        question_id:_currentQuestion.id,
+        listing_id: l?l.id:null,
+        listing_name: l?(l.name||''):'',
+        text: text||'',
+        author_name: _currentUserName(),
+        created_by:currentUser.uid, created_at:new Date()
       });
       await db.collection('questions').doc(_currentQuestion.id).update({ answers_count: firebase.firestore.FieldValue.increment(1), status:'answered' });
       _currentQuestion.answers_count=(_currentQuestion.answers_count||0)+1; _currentQuestion.status='answered';
@@ -3327,6 +3376,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       showToast(t('fc_answer_thanks'));
       loadAnswers(_currentQuestion.id);
     } catch(e){ alert(t('err_generic')||'Fehler'); }
+    if(btn){ btn.disabled=false; btn.textContent=t('fc_answer_send_btn'); }
   }
 
   function makeMarkerIcon(color, emoji) {
