@@ -35,17 +35,17 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Buscar – Der Guide für Paraguay</title>
-  <link rel="preload" href="styles.css?v=179" as="style">
-  <link rel="preload" href="app.js?v=179" as="script">
+  <link rel="preload" href="styles.css?v=180" as="style">
+  <link rel="preload" href="app.js?v=180" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-  <link href="styles.css?v=179" rel="stylesheet">
+  <link href="styles.css?v=180" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  <script defer src="app.js?v=179"></script>
+  <script defer src="app.js?v=180"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -352,6 +352,10 @@
       <button class="filter-btn" id="filterDealBtn" onclick="toggleDealFilter()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.78 0l-8-4a2 2 0 0 1-1.11-1.79V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z"/><polyline points="2.32 6.16 12 11 21.68 6.16"/><line x1="12" y1="22.76" x2="12" y2="11"/></svg>
         <span id="filterDealLabel">Deals</span>
+      </button>
+      <button class="filter-btn" id="filterTagsBtn" onclick="openFilterSheet('tags')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        <span id="filterTagsLabel">Merkmale</span>
       </button>
     </div>
     </div>

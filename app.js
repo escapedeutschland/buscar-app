@@ -2176,6 +2176,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   let activeOpenNow = false;
   let activeDeal = false;
   let filterMode = 'sub';
+  let activeTags = [];
+  let _tagFilterTemp = [];
 
   const subcats = {
     'kat-restaurants': ['Alle', 'Restaurant', 'Café', 'Bar', 'Parrilla', 'Fast Food', 'Bäckerei', 'Sonstiges'],
@@ -2194,8 +2196,23 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const overlay = document.getElementById('filterSheetOverlay');
     const content = document.getElementById('filterSheetContent');
     overlay.classList.add('visible');
+    _tagFilterTemp = activeTags.slice();
 
-    if (mode === 'sub') {
+    if (mode === 'tags') {
+      document.getElementById('filterSheetTitle').textContent = (currentLang === 'es' ? 'Características' : 'Merkmale');
+      var seen = {};
+      (allListings || []).forEach(function(l){ (l.tags || []).forEach(function(k){ var key = String(k); seen[key] = (seen[key]||0) + 1; }); });
+      var keys = Object.keys(seen).sort(function(a,b){ return seen[b] - seen[a]; });
+      window._tagFilterKeys = keys;
+      if (!keys.length) {
+        content.innerHTML = '<div class="filter-section" style="color:var(--text-3);font-size:13px;padding:6px 2px">' + (currentLang === 'es' ? 'Todavía no hay características. Agregá etiquetas a los lugares.' : 'Noch keine Merkmale vorhanden. Tagge zuerst ein paar Orte.') + '</div>';
+      } else {
+        content.innerHTML = '<div class="filter-section"><div class="filter-chips">' + keys.map(function(k, idx){
+          var on = _tagFilterTemp.some(function(x){ return String(x).toLowerCase() === k.toLowerCase(); });
+          return '<div class="filter-chip' + (on ? ' active' : '') + '" onclick="toggleTagFilter(this,' + idx + ')">' + esc(tagLabel(k)) + '</div>';
+        }).join('') + '</div></div>';
+      }
+    } else if (mode === 'sub') {
       document.getElementById('filterSheetTitle').textContent = 'Unterkategorie';
       const cats = subcats[activeCategory] || [];
       content.innerHTML = `<div class="filter-section"><div class="filter-chips">${
@@ -2237,6 +2254,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.querySelectorAll('#filterSheetContent .filter-chip').forEach(c => c.classList.toggle('active', c.textContent === val));
   }
 
+  function toggleTagFilter(el, idx) {
+    var key = (window._tagFilterKeys || [])[idx]; if (key == null) return;
+    var pos = -1;
+    for (var j = 0; j < _tagFilterTemp.length; j++) { if (String(_tagFilterTemp[j]).toLowerCase() === String(key).toLowerCase()) { pos = j; break; } }
+    if (pos >= 0) _tagFilterTemp.splice(pos, 1); else _tagFilterTemp.push(key);
+    if (el) el.classList.toggle('active');
+  }
+
   function selectStarFilter(val) {
     activeMinStars = val;
     document.querySelectorAll('.filter-star-btn').forEach(b => b.classList.remove('active'));
@@ -2268,6 +2293,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } else {
       starBtn.classList.remove('active');
       starLabel.textContent = 'Bewertung';
+    }
+    activeTags = _tagFilterTemp.slice();
+    var tagsBtn = document.getElementById('filterTagsBtn'), tagsLabel = document.getElementById('filterTagsLabel');
+    if (tagsBtn) {
+      var baseLbl = (currentLang === 'es' ? 'Características' : 'Merkmale');
+      if (activeTags.length) { tagsBtn.classList.add('active'); tagsLabel.textContent = baseLbl + ' (' + activeTags.length + ')'; }
+      else { tagsBtn.classList.remove('active'); tagsLabel.textContent = baseLbl; }
     }
     renderListings();
   }
@@ -2360,6 +2392,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (activeMinStars > 0) filtered = filtered.filter(l => { const avg = getAvgRating(l.id); return avg && avg >= activeMinStars; });
     if (activeOpenNow) filtered = filtered.filter(l => isOpen(l.opening_hours) === true);
     if (activeDeal) filtered = filtered.filter(l => l.deal_text && l.deal_text.trim() !== '');
+    if (activeTags.length) filtered = filtered.filter(l => { const lt = (l.tags||[]).map(x => String(x).toLowerCase()); return activeTags.every(k => lt.indexOf(String(k).toLowerCase()) >= 0); });
     if (searchQuery) { const q = norm(searchQuery); filtered = filtered.filter(l => norm(l.name||'').includes(q)||norm(l.description||'').includes(q)||norm(l.city||'').includes(q)||norm(l.subcategory||'').includes(q)||norm(tagSearchStr(l.tags)).includes(q)); }
     filtered = filtered.slice().sort(function(a, b) {
       return scoreEntry(b) - scoreEntry(a);
@@ -5170,6 +5203,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.querySelectorAll('#catsScroll .cat-chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     activeCategory = chip.dataset.cat;
+    // Merkmal-Filter bei Kategoriewechsel zurücksetzen (Tags sind kategorie-spezifisch)
+    activeTags = []; _tagFilterTemp = [];
+    var _tb = document.getElementById('filterTagsBtn');
+    if (_tb) { _tb.classList.remove('active'); var _tl = document.getElementById('filterTagsLabel'); if (_tl) _tl.textContent = (currentLang === 'es' ? 'Características' : 'Merkmale'); }
     // Show/hide filter bar based on category selection
     const filterBar = document.getElementById('filterBar');
     if (activeCategory === 'Alle') {
