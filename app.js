@@ -967,7 +967,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   var _prevScreenId = null;
 
   function showScreen(id) {
-    if (id === 'screenDetail' && activeScreen && activeScreen !== 'screenDetail') { window._detailFrom = activeScreen; }
+    if (id === 'screenDetail' && activeScreen && activeScreen !== 'screenDetail' && activeScreen !== 'screenEditListing' && activeScreen !== 'screenCoordEditor') { window._detailFrom = activeScreen; }
     activeScreen = id;
     // Build cache on first call
     if (!_screens) {
