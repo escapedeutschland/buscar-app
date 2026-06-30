@@ -61,7 +61,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_open: 'offen',
       fc_seek: 'Ich suche das auch',
       fc_seeking: '✓ Du suchst das auch',
-      fc_no_answers: 'Noch keine Antworten – kennst du einen Ort?',
+      fc_no_answers: 'Noch keine Antworten – kennst du einen Tipp?',
+      fc_asked_by: 'Gefragt von',
       fc_answer_btn: 'Antworten',
       fc_answer_sheet_title: 'Antworten',
       fc_answer_text_ph: 'Deine Antwort… (Tipp, Name, Gruppe …)',
@@ -306,7 +307,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_open: 'abierta',
       fc_seek: 'Yo también busco esto',
       fc_seeking: '✓ Vos también buscás esto',
-      fc_no_answers: 'Aún sin respuestas: ¿conocés un lugar?',
+      fc_no_answers: 'Aún sin respuestas: ¿tenés un dato?',
+      fc_asked_by: 'Preguntado por',
       fc_answer_btn: 'Responder',
       fc_answer_sheet_title: 'Responder',
       fc_answer_text_ph: 'Tu respuesta… (consejo, nombre, grupo …)',
@@ -3205,6 +3207,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     c.innerHTML = QCATS.map(function(x){ return '<button class="q-cat-chip'+(_qCat===x[0]?' active':'')+'" onclick="selectQCat(\''+x[0]+'\')">'+esc(t(x[1]))+'</button>'; }).join('');
   }
   function selectQCat(cat){ _qCat=cat; renderQCats(); renderQuestionList(); }
+  function _qCatLabel(catId){ if(!catId) return ''; for(var i=0;i<QCATS.length;i++){ if(QCATS[i][0]===catId) return t(QCATS[i][1]); } return ''; }
   function filterQuestions(){ var i=document.getElementById('qSearchInput'); _qSearch = i ? i.value : ''; renderQuestionList(); }
   function renderQuestionList(){
     var list=document.getElementById('questionsList'); if(!list) return;
@@ -3309,8 +3312,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var catSel = document.getElementById('askQuestionCat'); var catId = catSel ? (catSel.value||'') : '';
     try {
       var ref = await db.collection('questions').add({
-        text: text, norm_key: norm(text), category_id: catId || null, created_by: currentUser.uid,
-        created_at: new Date(), status: 'open', seekers: [currentUser.uid], seekers_count: 1, answers_count: 0
+        text: text, norm_key: norm(text), category_id: catId || null, author_name: _currentUserName(),
+        created_by: currentUser.uid, created_at: new Date(), status: 'open', seekers: [currentUser.uid], seekers_count: 1, answers_count: 0
       });
       _homeQuestions = null;
       closeAskQuestion();
@@ -3332,6 +3335,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       document.getElementById('qdTitle').textContent = q.text||'';
       document.getElementById('qdMeta').textContent = (q.seekers_count||0)+' '+t('fc_seek_count');
       _renderSeekBtn();
+      (function(){
+        var mr=document.getElementById('qdMetaRow'); if(!mr) return;
+        var cl=_qCatLabel(q.category_id);
+        var info=[];
+        if(q.author_name) info.push(esc(t('fc_asked_by'))+' '+esc(q.author_name));
+        if(q.created_at) info.push(esc(formatDate(q.created_at)));
+        var infoStr=info.join(' · ');
+        mr.innerHTML = (cl?'<span class="qd-cat-chip">'+esc(cl)+'</span>':'') + (infoStr?'<div class="qd-info">'+infoStr+'</div>':'');
+        mr.style.display=(cl||infoStr)?'block':'none';
+      })();
       var delBtn=document.getElementById('qdDeleteBtn');
       if(delBtn){ var canDel = currentUser && (currentUser.email===ADMIN_EMAIL || (q.created_by && q.created_by===currentUser.uid)); delBtn.style.display = canDel?'inline-flex':'none'; delBtn.onclick=function(){ deleteQuestion(q.id); }; }
       _markQuestionSeen(q.id, q.answers_count||0);
@@ -3367,7 +3380,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var snap = await db.collection('answers').where('question_id','==',qid).get();
       var items = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
       items.sort(function(a,b){ return _adminTs(b.created_at)-_adminTs(a.created_at); });
-      if(!items.length){ c.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:8px 2px">'+t('fc_no_answers')+'</div>'; return; }
+      var at=document.getElementById('qdAnswersTitle'); if(at) at.textContent=t('fc_answers')+(items.length?' ('+items.length+')':'');
+      if(!items.length){ c.innerHTML = '<div class="q-empty-answers"><div class="q-empty-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="34" height="34"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="q-empty-answers-txt">'+t('fc_no_answers')+'</div></div>'; return; }
       c.innerHTML = items.map(function(a){
         var canDelA = currentUser && (currentUser.email===ADMIN_EMAIL || (a.created_by && a.created_by===currentUser.uid));
         var delBtn = canDelA ? '<button class="answer-del" onclick="event.stopPropagation();deleteAnswer(\''+a.id+'\')">✕</button>' : '';
