@@ -1,11 +1,11 @@
-const VERSION = 'v194';
+const VERSION = 'v195';
 const STATIC_CACHE = 'buscar-static-' + VERSION;
 const RUNTIME_CACHE = 'buscar-runtime-' + VERSION;
 const STATIC_ASSETS = [
   './',
   './index.html',
-  './styles.css?v=194',
-  './app.js?v=194',
+  './styles.css?v=195',
+  './app.js?v=195',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',

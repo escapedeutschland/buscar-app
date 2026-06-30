@@ -63,6 +63,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_seeking: '✓ Du suchst das auch',
       fc_no_answers: 'Noch keine Antworten – kennst du einen Tipp?',
       fc_asked_by: 'Gefragt von',
+      rt_now: 'gerade eben', rt_min: 'Min.', rt_h: 'Std.', rt_d: 'Tg.',
+      fc_hint: '💡 Tippe auf das 👁-Symbol einer Frage, wenn du dasselbe suchst – so sieht die Community, was gefragt ist. Antworten kannst du mit einem Tipp oder einem Buscar-Ort.',
       fc_answer_btn: 'Antworten',
       fc_answer_sheet_title: 'Antworten',
       fc_answer_text_ph: 'Deine Antwort… (Tipp, Name, Gruppe …)',
@@ -309,6 +311,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_seeking: '✓ Vos también buscás esto',
       fc_no_answers: 'Aún sin respuestas: ¿tenés un dato?',
       fc_asked_by: 'Preguntado por',
+      rt_now: 'recién', rt_min: 'min', rt_h: 'h', rt_d: 'd',
+      fc_hint: '💡 Tocá el ícono 👁 de una pregunta si buscás lo mismo – así la comunidad ve qué se busca. Podés responder con un dato o un lugar de Buscar.',
       fc_answer_btn: 'Responder',
       fc_answer_sheet_title: 'Responder',
       fc_answer_text_ph: 'Tu respuesta… (consejo, nombre, grupo …)',
@@ -1014,6 +1018,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         'screenProfil':      { ind: 'ptrProfil',      fn: function(){ if(currentUser) loadBadges(currentUser.uid); } },
         'screenFavorites':   { ind: 'ptrFavorites',   fn: function(){ loadFavorites(); } },
         'screenEventDetail': { ind: 'ptrEventDetail', fn: function(){ if(_currentEventId) showEventDetail(_currentEventId, _evDetailSource); } },
+        'screenQuestions':   { ind: 'ptrQuestions',   fn: function(){ loadQuestions(); } },
       };
     }
     var ptr = showScreen._ptr[id];
@@ -1023,7 +1028,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         : document.getElementById({
             'screenEvents': 'eventsList',
             'screenFavorites': 'favoritesBody',
-            'screenEventDetail': 'evDetailBody'
+            'screenEventDetail': 'evDetailBody',
+            'screenQuestions': 'qScroll'
           }[id]);
       if (el) { setupPTR(el, ptr.ind, ptr.fn); ptr._done = true; }
     }
@@ -3152,8 +3158,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if(_qBoardMode === 'all') setNav('navHome');
     showScreen('screenQuestions');
     _updateBoardHeader();
+    _maybeShowFcHint();
     loadQuestions();
   }
+  function _maybeShowFcHint(){
+    var el=document.getElementById('fcHint'); if(!el) return;
+    var seen=false; try{ seen = localStorage.getItem('buscar_fc_hint')==='1'; }catch(e){}
+    el.style.display = seen ? 'none' : 'block';
+  }
+  function dismissFcHint(){ try{ localStorage.setItem('buscar_fc_hint','1'); }catch(e){} var el=document.getElementById('fcHint'); if(el) el.style.display='none'; }
   function _updateBoardHeader(){
     var title = document.querySelector('#screenQuestions .form-title');
     var sub = document.querySelector('#screenQuestions .form-sub');
@@ -3271,14 +3284,30 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>'
       + '<span>'+(q.seekers_count||0)+'</span></button>';
   }
+  var QCAT_COLORS = { 'q-produkte':'#E5484D','q-essen':'#F5A623','q-dienst':'#3B82F6','q-gesundheit':'#22A06B','q-familie':'#EC4899','q-behoerden':'#8B5CF6','q-wohnen':'#0EA5E9','q-freizeit':'#F97316','q-sonstiges':'#6B7280' };
+  function _qCatColor(catId){ return QCAT_COLORS[catId] || '#D8D2C6'; }
+  function _hexA(hex,a){ hex=String(hex).replace('#',''); if(hex.length!==6) return 'rgba(0,0,0,'+a+')'; var r=parseInt(hex.substr(0,2),16),g=parseInt(hex.substr(2,2),16),b=parseInt(hex.substr(4,2),16); return 'rgba('+r+','+g+','+b+','+a+')'; }
+  function _relTime(ts){
+    var ms = _adminTs(ts)*1000; if(!ms) return '';
+    var diff = Date.now() - ms; if(diff < 0) diff = 0;
+    var min = Math.floor(diff/60000);
+    if(min < 1) return t('rt_now');
+    if(min < 60) return min + ' ' + t('rt_min');
+    var h = Math.floor(min/60); if(h < 24) return h + ' ' + t('rt_h');
+    var days = Math.floor(h/24); if(days < 7) return days + ' ' + t('rt_d');
+    var d = new Date(ms); return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.';
+  }
   function _renderQuestionCard(q){
     var answers = q.answers_count||0;
     var answered = (q.status==='answered' || answers>0);
-    return '<div class="q-card" onclick="openQuestionDetail(\''+q.id+'\')">'
+    var col = _qCatColor(q.category_id), catLbl = _qCatLabel(q.category_id), date = _relTime(q.created_at);
+    return '<div class="q-card" style="border-left:4px solid '+col+'" onclick="openQuestionDetail(\''+q.id+'\')">'
+      + (catLbl ? '<div class="q-card-cat" style="color:'+col+';background:'+_hexA(col,0.12)+'">'+esc(catLbl)+'</div>' : '')
       + '<div class="q-card-text">'+esc(q.text||'')+'</div>'
       + '<div class="q-card-meta">'
         + _voteBtnHtml(q)
         + (answered ? '<span class="q-chip ok">✓ '+answers+' '+t('fc_answers')+'</span>' : '<span class="q-chip">💬 '+t('fc_open')+'</span>')
+        + (date ? '<span class="q-card-date">'+esc(date)+'</span>' : '')
       + '</div></div>';
   }
   async function toggleSeekById(qid){
