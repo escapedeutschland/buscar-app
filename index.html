@@ -35,17 +35,17 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>Buscar – Der Guide für Paraguay</title>
-  <link rel="preload" href="styles.css?v=191" as="style">
-  <link rel="preload" href="app.js?v=191" as="script">
+  <link rel="preload" href="styles.css?v=192" as="style">
+  <link rel="preload" href="app.js?v=192" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-  <link href="styles.css?v=191" rel="stylesheet">
+  <link href="styles.css?v=192" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  <script defer src="app.js?v=191"></script>
+  <script defer src="app.js?v=192"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -1259,15 +1259,15 @@
         <textarea class="field-textarea" id="askQuestionText" maxlength="120" placeholder="z. B. Wo gibt es fluoridfreie Zahnpasta?" style="min-height:90px"></textarea>
         <select class="field-select" id="askQuestionCat" style="margin-top:10px">
           <option value="" data-i18n="fc_q_cat_any">Kategorie (optional)</option>
-          <option value="kat-restaurants" data-i18n="cat_restaurants">Restaurants</option>
-          <option value="kat-dienstleistung" data-i18n="cat_services">Dienstleistungen</option>
-          <option value="kat-geschaefte" data-i18n="cat_shops">Geschäfte</option>
-          <option value="kat-orte" data-i18n="cat_places">Orte</option>
-          <option value="kat-unterkunft" data-i18n="cat_accommodation">Unterkünfte</option>
-          <option value="kat-beauty" data-i18n="cat_beauty">Beauty & Wellness</option>
-          <option value="kat-sport" data-i18n="cat_sport">Sport & Fitness</option>
-          <option value="kat-tankstelle" data-i18n="cat_tankstelle">Tankstellen</option>
-          <option value="kat-wechselstube" data-i18n="cat_wechselstube">Wechselstuben</option>
+          <option value="q-produkte" data-i18n="qc_produkte">🛒 Produkte & Einkaufen</option>
+          <option value="q-essen" data-i18n="qc_essen">🍽️ Essen & Trinken</option>
+          <option value="q-dienst" data-i18n="qc_dienst">🔧 Dienstleistungen & Handwerk</option>
+          <option value="q-gesundheit" data-i18n="qc_gesundheit">🏥 Gesundheit</option>
+          <option value="q-familie" data-i18n="qc_familie">👨‍👩‍👧 Familie & Kinder</option>
+          <option value="q-behoerden" data-i18n="qc_behoerden">📋 Behörden & Papiere</option>
+          <option value="q-wohnen" data-i18n="qc_wohnen">🏠 Wohnen</option>
+          <option value="q-freizeit" data-i18n="qc_freizeit">🎉 Freizeit & Sport</option>
+          <option value="q-sonstiges" data-i18n="qc_sonstiges">💬 Sonstiges</option>
         </select>
       </div>
       <button class="filter-apply-btn" id="askSubmitBtn" onclick="submitQuestion()" data-i18n="fc_ask_send">Frage stellen</button>

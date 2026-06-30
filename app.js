@@ -39,6 +39,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_no_match: 'Keine passende Frage',
       fc_no_match_sub: 'Ändere Suche oder Kategorie – oder stell die Frage selbst.',
       fc_q_cat_any: 'Kategorie (optional)',
+      qc_produkte: '🛒 Produkte & Einkaufen',
+      qc_essen: '🍽️ Essen & Trinken',
+      qc_dienst: '🔧 Dienstleistungen & Handwerk',
+      qc_gesundheit: '🏥 Gesundheit',
+      qc_familie: '👨‍👩‍👧 Familie & Kinder',
+      qc_behoerden: '📋 Behörden & Papiere',
+      qc_wohnen: '🏠 Wohnen',
+      qc_freizeit: '🎉 Freizeit & Sport',
+      qc_sonstiges: '💬 Sonstiges',
       fc_ask_btn: 'Frage stellen',
       fc_ask_title: 'Was suchst du?',
       fc_ask_hint: 'Stell deine Frage – die Community hilft dir, den richtigen Ort zu finden.',
@@ -275,6 +284,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_no_match: 'Ninguna pregunta coincide',
       fc_no_match_sub: 'Cambiá la búsqueda o categoría, o hacé la pregunta vos.',
       fc_q_cat_any: 'Categoría (opcional)',
+      qc_produkte: '🛒 Productos & Compras',
+      qc_essen: '🍽️ Comer & Beber',
+      qc_dienst: '🔧 Servicios & Oficios',
+      qc_gesundheit: '🏥 Salud',
+      qc_familie: '👨‍👩‍👧 Familia & Niños',
+      qc_behoerden: '📋 Trámites & Papeles',
+      qc_wohnen: '🏠 Vivienda',
+      qc_freizeit: '🎉 Ocio & Deporte',
+      qc_sonstiges: '💬 Otros',
       fc_ask_btn: 'Hacer una pregunta',
       fc_ask_title: '¿Qué estás buscando?',
       fc_ask_hint: 'Hacé tu pregunta: la comunidad te ayuda a encontrar el lugar indicado.',
@@ -3181,7 +3199,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       renderQuestionList();
     } catch(e){ list.innerHTML = _qEmpty(t('fc_load_err'), t('fc_load_sub')); }
   }
-  var QCATS = [['Alle','cat_all'],['kat-restaurants','cat_restaurants'],['kat-dienstleistung','cat_services'],['kat-geschaefte','cat_shops'],['kat-orte','cat_places'],['kat-unterkunft','cat_accommodation'],['kat-beauty','cat_beauty'],['kat-sport','cat_sport'],['kat-tankstelle','cat_tankstelle'],['kat-wechselstube','cat_wechselstube']];
+  var QCATS = [['Alle','cat_all'],['q-produkte','qc_produkte'],['q-essen','qc_essen'],['q-dienst','qc_dienst'],['q-gesundheit','qc_gesundheit'],['q-familie','qc_familie'],['q-behoerden','qc_behoerden'],['q-wohnen','qc_wohnen'],['q-freizeit','qc_freizeit'],['q-sonstiges','qc_sonstiges']];
   function renderQCats(){
     var c=document.getElementById('qCatScroll'); if(!c) return;
     c.innerHTML = QCATS.map(function(x){ return '<button class="q-cat-chip'+(_qCat===x[0]?' active':'')+'" onclick="selectQCat(\''+x[0]+'\')">'+esc(t(x[1]))+'</button>'; }).join('');
