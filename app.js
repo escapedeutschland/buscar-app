@@ -563,9 +563,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ...document.querySelectorAll('.reply-item-text[data-original]'),
       ...document.querySelectorAll('.event-card-title[data-original]'),
       ...document.querySelectorAll('.event-card-desc[data-original]'),
+      ...document.querySelectorAll('.q-card-text[data-original]'),
+      ...document.querySelectorAll('.answer-text[data-original]'),
+      ...document.querySelectorAll('.answer-note[data-original]'),
     ];
     const detailDesc = document.getElementById('detailDesc');
     if (detailDesc && detailDesc.dataset.original) allEls.unshift(detailDesc);
+    const qdTitleEl = document.getElementById('qdTitle');
+    if (qdTitleEl && qdTitleEl.dataset.original) allEls.unshift(qdTitleEl);
 
     // Only those not already shown in the target language
     const todo = allEls.filter(el =>
@@ -3233,6 +3238,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     });
     if(!filtered.length){ list.innerHTML = _qEmpty(t('fc_no_match'), t('fc_no_match_sub')); return; }
     list.innerHTML = filtered.map(_renderQuestionCard).join('');
+    if (currentLang !== 'de') translateVisibleContent();
   }
 
   // „Frag die Community" – FAB-Badge = eigene Fragen mit NEUEN (ungesehenen) Antworten
@@ -3303,7 +3309,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var col = _qCatColor(q.category_id), catLbl = _qCatLabel(q.category_id), date = _relTime(q.created_at);
     return '<div class="q-card" style="border-left:4px solid '+col+'" onclick="openQuestionDetail(\''+q.id+'\')">'
       + (catLbl ? '<div class="q-card-cat" style="color:'+col+';background:'+_hexA(col,0.12)+'">'+esc(catLbl)+'</div>' : '')
-      + '<div class="q-card-text">'+esc(q.text||'')+'</div>'
+      + '<div class="q-card-text" data-original="'+esc(q.text||'')+'">'+esc(q.text||'')+'</div>'
       + '<div class="q-card-meta">'
         + _voteBtnHtml(q)
         + (answered ? '<span class="q-chip ok">✓ '+answers+' '+t('fc_answers')+'</span>' : '<span class="q-chip">💬 '+t('fc_open')+'</span>')
@@ -3361,7 +3367,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var doc = await db.collection('questions').doc(id).get();
       if(!doc.exists){ document.getElementById('qdTitle').textContent = t('err_generic')||'—'; return; }
       var q = Object.assign({id:doc.id}, doc.data()); _currentQuestion = q; _qCache[q.id] = q;
-      document.getElementById('qdTitle').textContent = q.text||'';
+      var _qt=document.getElementById('qdTitle'); _qt.textContent = q.text||''; _qt.dataset.original = q.text||''; _qt.dataset.tlang = '';
+      if (currentLang !== 'de') translateVisibleContent();
       document.getElementById('qdMeta').textContent = (q.seekers_count||0)+' '+t('fc_seek_count');
       _renderSeekBtn();
       (function(){
@@ -3422,16 +3429,17 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           return '<div class="answer-card" onclick="showDetail(\''+a.listing_id+'\')">'
             + '<div class="answer-dot" style="background:'+col+'"></div>'
             + '<div style="flex:1;min-width:0"><div class="answer-name">'+esc(a.listing_name||(l&&l.name)||'Eintrag')+'</div>'
-            + (txt ? '<div class="answer-note">'+esc(txt)+'</div>' : '') + by + '</div>'
+            + (txt ? '<div class="answer-note" data-original="'+esc(txt)+'">'+esc(txt)+'</div>' : '') + by + '</div>'
             + (canDelA ? delBtn : '<svg class="answer-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>')
             + '</div>';
         }
-        // Reine Text-Antwort
+        // Reine Text-Antwort  (Übersetzung greift via .answer-text[data-original])
         return '<div class="answer-card answer-text-card">'
           + '<div class="answer-dot answer-dot-text"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
-          + '<div style="flex:1;min-width:0"><div class="answer-text">'+esc(txt)+'</div>'+by+'</div>'
+          + '<div style="flex:1;min-width:0"><div class="answer-text" data-original="'+esc(txt)+'">'+esc(txt)+'</div>'+by+'</div>'
           + delBtn + '</div>';
       }).join('');
+      if (currentLang !== 'de') translateVisibleContent();
     } catch(e){ c.innerHTML = '<div style="color:var(--text-3);font-size:13px">'+(t('err_generic')||'Fehler')+'</div>'; }
   }
 
