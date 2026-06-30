@@ -26,6 +26,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       share_cta: 'Entdeckt auf Buscar – dem Guide für Paraguay. Lade dir die App auch herunter! 👇',
       tags_title: 'Merkmale & Tags',
       tags_hint: 'Hilf anderen, diesen Ort zu finden. Wähle passende Merkmale oder füge eigene Stichwörter hinzu (z. B. „fluoridfreie Zahnpasta").',
+      tags_empty_hint: 'Noch keine Merkmale hinterlegt. Kennst du welche?',
       tag_suggest: 'Merkmal vorschlagen',
       tag_suggest_title: 'Merkmal vorschlagen',
       tag_suggest_hint: 'Was bietet dieser Ort? Dein Vorschlag wird geprüft und dann für alle sichtbar.',
@@ -33,7 +34,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       tag_suggest_thanks: 'Danke! Dein Vorschlag wird geprüft.',
       loading: 'Wird geladen…',
       fc_title: 'Frag die Community',
-      fc_sub: 'Wonach suchen die Leute?',
+      fc_sub: 'Stell eine Frage oder hilf mit einer Antwort',
+      fc_search_ph: 'Fragen durchsuchen…',
+      fc_no_match: 'Keine passende Frage',
+      fc_no_match_sub: 'Ändere Suche oder Kategorie – oder stell die Frage selbst.',
+      fc_q_cat_any: 'Kategorie (optional)',
       fc_ask_btn: 'Frage stellen',
       fc_ask_title: 'Was suchst du?',
       fc_ask_hint: 'Stell deine Frage – die Community hilft dir, den richtigen Ort zu finden.',
@@ -257,6 +262,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       share_cta: 'Descubierto en Buscar – la guía para Paraguay. ¡Descargate la app también! 👇',
       tags_title: 'Características y etiquetas',
       tags_hint: 'Ayudá a otros a encontrar este lugar. Elegí características o agregá tus propias palabras clave (p. ej. „pasta dental sin flúor").',
+      tags_empty_hint: 'Todavía no hay características. ¿Conocés alguna?',
       tag_suggest: 'Sugerir característica',
       tag_suggest_title: 'Sugerir característica',
       tag_suggest_hint: '¿Qué ofrece este lugar? Tu sugerencia se revisa y luego se muestra a todos.',
@@ -264,7 +270,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       tag_suggest_thanks: '¡Gracias! Tu sugerencia será revisada.',
       loading: 'Cargando…',
       fc_title: 'Preguntá a la comunidad',
-      fc_sub: '¿Qué está buscando la gente?',
+      fc_sub: 'Hacé una pregunta o ayudá con una respuesta',
+      fc_search_ph: 'Buscar preguntas…',
+      fc_no_match: 'Ninguna pregunta coincide',
+      fc_no_match_sub: 'Cambiá la búsqueda o categoría, o hacé la pregunta vos.',
+      fc_q_cat_any: 'Categoría (opcional)',
       fc_ask_btn: 'Hacer una pregunta',
       fc_ask_title: '¿Qué estás buscando?',
       fc_ask_hint: 'Hacé tu pregunta: la comunidad te ayuda a encontrar el lugar indicado.',
@@ -2754,9 +2764,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var _adm = currentUser && currentUser.email === ADMIN_EMAIL;
       var _own = currentUser && ((l.owner_id && l.owner_id===currentUser.uid) || (l.created_by && l.created_by===currentUser.uid));
       var canSuggest = currentUser && !_adm && !_own;
-      var html = tags.map(function(k){return '<span class="detail-tag">'+esc(tagLabel(k))+'</span>';}).join('');
-      if(canSuggest) html += '<button class="tag-suggest-btn" onclick="openTagSuggest()">＋ '+esc(t('tag_suggest'))+'</button>';
-      if(tags.length || canSuggest){ te.innerHTML=html; tc.style.display='block'; } else { tc.style.display='none'; }
+      var chips = tags.map(function(k){return '<span class="detail-tag">'+esc(tagLabel(k))+'</span>';}).join('');
+      var suggestRow = '';
+      if(canSuggest){
+        suggestRow = '<div class="tag-suggest-row">'
+          + (tags.length ? '' : '<div class="tag-empty-hint">'+esc(t('tags_empty_hint'))+'</div>')
+          + '<button class="tag-suggest-btn" onclick="openTagSuggest()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'+esc(t('tag_suggest'))+'</button>'
+          + '</div>';
+      }
+      if(tags.length || canSuggest){
+        te.innerHTML = (chips ? '<div class="detail-tags-chips">'+chips+'</div>' : '') + suggestRow;
+        tc.style.display='block';
+      } else { tc.style.display='none'; }
     })();
     const badges = document.getElementById('detailBadges');
     const openStatus = isOpen(l.opening_hours);
@@ -3105,9 +3124,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // ══════════ FRAG DIE COMMUNITY (Phase 2) ══════════
   var _currentQuestion = null;
 
-  var _qBoardMode = 'all';
+  var _qBoardMode = 'all', _qLoaded = [], _qSearch = '', _qCat = 'Alle';
   function openQuestions(mode){
     _qBoardMode = mode || 'all';
+    _qSearch = ''; _qCat = 'Alle';
+    var si=document.getElementById('qSearchInput'); if(si) si.value='';
     if(_qBoardMode === 'all') setNav('navHome');
     showScreen('screenQuestions');
     _updateBoardHeader();
@@ -3117,8 +3138,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var title = document.querySelector('#screenQuestions .form-title');
     var sub = document.querySelector('#screenQuestions .form-sub');
     var askBtn = document.getElementById('qBoardAskBtn');
+    var fbar = document.getElementById('qFilterBar');
+    var isAnswers = (_qBoardMode === 'answers');
+    if(fbar) fbar.style.display = isAnswers ? 'none' : 'block';
     if(_qBoardMode === 'mine'){ if(title) title.textContent = t('fc_mine'); if(sub) sub.textContent = ''; if(askBtn) askBtn.style.display='block'; }
-    else if(_qBoardMode === 'answers'){ if(title) title.textContent = t('fc_my_answers'); if(sub) sub.textContent = ''; if(askBtn) askBtn.style.display='none'; }
+    else if(isAnswers){ if(title) title.textContent = t('fc_my_answers'); if(sub) sub.textContent = ''; if(askBtn) askBtn.style.display='none'; }
     else { if(title) title.textContent = t('fc_title'); if(sub) sub.textContent = t('fc_sub'); if(askBtn) askBtn.style.display='block'; }
   }
   function _qEmpty(title, sub){
@@ -3143,19 +3167,38 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       }
       var items;
       if(_qBoardMode === 'mine'){
-        if(!currentUser){ list.innerHTML = _qEmpty(t('fc_empty_title'), t('fc_empty_sub')); return; }
+        if(!currentUser){ list.innerHTML = _qEmpty(t('fc_no_my_questions'), t('fc_empty_sub')); return; }
         var snapM = await db.collection('questions').where('created_by','==',currentUser.uid).get();
         items = snapM.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
         items.sort(function(a,b){ return _adminTs(b.created_at)-_adminTs(a.created_at); });
-        if(!items.length){ list.innerHTML = _qEmpty(t('fc_no_my_questions'), t('fc_empty_sub')); return; }
       } else {
         var snap = await db.collection('questions').orderBy('created_at','desc').limit(100).get();
         items = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
-        if(!items.length){ list.innerHTML = _qEmpty(t('fc_empty_title'), t('fc_empty_sub')); return; }
       }
       items.forEach(function(q){ _qCache[q.id]=q; });
-      list.innerHTML = items.map(_renderQuestionCard).join('');
+      _qLoaded = items;
+      renderQCats();
+      renderQuestionList();
     } catch(e){ list.innerHTML = _qEmpty(t('fc_load_err'), t('fc_load_sub')); }
+  }
+  var QCATS = [['Alle','cat_all'],['kat-restaurants','cat_restaurants'],['kat-dienstleistung','cat_services'],['kat-geschaefte','cat_shops'],['kat-orte','cat_places'],['kat-unterkunft','cat_accommodation'],['kat-beauty','cat_beauty'],['kat-sport','cat_sport'],['kat-tankstelle','cat_tankstelle'],['kat-wechselstube','cat_wechselstube']];
+  function renderQCats(){
+    var c=document.getElementById('qCatScroll'); if(!c) return;
+    c.innerHTML = QCATS.map(function(x){ return '<button class="q-cat-chip'+(_qCat===x[0]?' active':'')+'" onclick="selectQCat(\''+x[0]+'\')">'+esc(t(x[1]))+'</button>'; }).join('');
+  }
+  function selectQCat(cat){ _qCat=cat; renderQCats(); renderQuestionList(); }
+  function filterQuestions(){ var i=document.getElementById('qSearchInput'); _qSearch = i ? i.value : ''; renderQuestionList(); }
+  function renderQuestionList(){
+    var list=document.getElementById('questionsList'); if(!list) return;
+    if(!_qLoaded.length){ list.innerHTML = (_qBoardMode==='mine') ? _qEmpty(t('fc_no_my_questions'), t('fc_empty_sub')) : _qEmpty(t('fc_empty_title'), t('fc_empty_sub')); return; }
+    var s=norm(_qSearch||'');
+    var filtered=_qLoaded.filter(function(q){
+      if(_qCat!=='Alle' && (q.category_id||'')!==_qCat) return false;
+      if(s && norm(q.text||'').indexOf(s)<0) return false;
+      return true;
+    });
+    if(!filtered.length){ list.innerHTML = _qEmpty(t('fc_no_match'), t('fc_no_match_sub')); return; }
+    list.innerHTML = filtered.map(_renderQuestionCard).join('');
   }
 
   // „Frag die Community" – FAB-Badge = eigene Fragen mit NEUEN (ungesehenen) Antworten
@@ -3235,6 +3278,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function openAskQuestion(prefill){
     if(!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
     var ta = document.getElementById('askQuestionText'); if(ta) ta.value = prefill || '';
+    var cs = document.getElementById('askQuestionCat'); if(cs) cs.value = '';
     document.getElementById('askQuestionOverlay').classList.add('visible');
     setTimeout(function(){ var t2=document.getElementById('askQuestionText'); if(t2) t2.focus(); }, 120);
   }
@@ -3244,9 +3288,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var text = (document.getElementById('askQuestionText').value||'').trim();
     if(text.length < 3){ var ta=document.getElementById('askQuestionText'); if(ta) ta.focus(); return; }
     var btn = document.getElementById('askSubmitBtn'); if(btn){ btn.disabled=true; btn.textContent=t('saving')||'…'; }
+    var catSel = document.getElementById('askQuestionCat'); var catId = catSel ? (catSel.value||'') : '';
     try {
       var ref = await db.collection('questions').add({
-        text: text, norm_key: norm(text), created_by: currentUser.uid,
+        text: text, norm_key: norm(text), category_id: catId || null, created_by: currentUser.uid,
         created_at: new Date(), status: 'open', seekers: [currentUser.uid], seekers_count: 1, answers_count: 0
       });
       _homeQuestions = null;
