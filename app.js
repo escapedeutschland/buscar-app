@@ -934,19 +934,19 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       showScreen(t);
       return true;
     }
-    // Auf Home/Auth: zweimal "Zurück" zum Beenden
-    var now = Date.now();
-    if (_lastHomeBack && (now - _lastHomeBack) < 2000) return false;
-    _lastHomeBack = now;
-    try { showToast(currentLang === 'es' ? 'Pulsa atrás de nuevo para salir' : 'Nochmal „Zurück" zum Beenden'); } catch(e){}
+    // Auf Home/Auth: NICHT per Zurück/Wisch-Geste verlassen.
+    // (Verhindert auf iOS, dass die Rand-Wischgeste die App "ins Schwarze" schiebt/schließt.)
     return true;
   }
   (function(){
     try { history.pushState({ buscarNav: 1 }, ''); } catch(e){}
+    // Nach JEDEM popstate den Sentinel sofort wieder setzen -> es liegt immer ein
+    // gleichseitiger Verlaufseintrag "unter" der aktuellen Position. Dadurch zeigt die
+    // interaktive iOS-Wischgeste immer die App (nicht eine leere/schwarze Vorseite) und
+    // die App wird nie versehentlich verlassen.
     window.addEventListener('popstate', function(){
-      var handled = false;
-      try { handled = _handleSystemBack(); } catch(e){ handled = false; }
-      if (handled){ try { history.pushState({ buscarNav: 1 }, ''); } catch(e){} }
+      try { _handleSystemBack(); } catch(e){}
+      try { history.pushState({ buscarNav: 1 }, ''); } catch(e){}
     });
   })();
 
