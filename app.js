@@ -184,7 +184,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       create_account: 'Konto erstellen', logging_in: 'Einloggen...',
       forgot_pw: 'Passwort vergessen?', no_account: 'Noch kein Konto?',
       has_account: 'Schon ein Konto?',
-      tagline: 'Der Guide für Paraguay', guest_name: 'Gast', guest_login_cta: 'Einloggen / Registrieren', login_required: 'Bitte melde dich an oder registriere dich', open_now: 'Geöffnet', closed_now: 'Geschlossen', badge_new: 'Neu',
+      tagline: 'Der Guide für Paraguay', guest_name: 'Gast', guest_login_cta: 'Einloggen / Registrieren', continue_guest: 'Als Gast fortfahren →', login_required: 'Bitte melde dich an oder registriere dich', open_now: 'Geöffnet', closed_now: 'Geschlossen', badge_new: 'Neu',
       // Profile
       to_home: 'Zur Startseite', suggest_entry_prof: 'Eintrag vorschlagen',
       admin_panel: 'Admin Panel', change_username: 'Benutzername ändern',
@@ -432,7 +432,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       create_account: 'Crear cuenta', logging_in: 'Iniciando...',
       forgot_pw: '¿Olvidaste tu contraseña?', no_account: '¿No tienes cuenta?',
       has_account: '¿Ya tienes cuenta?',
-      tagline: 'La guía para Paraguay', guest_name: 'Invitado', guest_login_cta: 'Iniciar sesión / Registrarse', login_required: 'Iniciá sesión o registrate', open_now: 'Abierto', closed_now: 'Cerrado', badge_new: 'Nuevo',
+      tagline: 'La guía para Paraguay', guest_name: 'Invitado', guest_login_cta: 'Iniciar sesión / Registrarse', continue_guest: 'Continuar como invitado →', login_required: 'Iniciá sesión o registrate', open_now: 'Abierto', closed_now: 'Cerrado', badge_new: 'Nuevo',
       // Perfil
       to_home: 'Ir al inicio', suggest_entry_prof: 'Sugerir lugar',
       admin_panel: 'Panel admin', change_username: 'Cambiar usuario',
@@ -2169,6 +2169,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       updateGreeting();
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
       var _grOn=document.getElementById('guestLoginSection'); if(_grOn) _grOn.style.display='none';
+      document.querySelectorAll('.auth-only').forEach(function(el){ el.style.display=''; });
       updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
       setTimeout(function(){ try { updateMyAnswerBadge(true); } catch(e){} }, 1500);
       if (!window._evPreloaded) { window._evPreloaded = true; setTimeout(function(){ loadEvents(); }, 1200); }
@@ -2178,9 +2179,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Gäste-Modus: ohne Konto nutzbar (nur Lesen). Aktionen (posten, favorisieren, fragen …) fordern Login an.
       var pn=document.getElementById('profilName'); if(pn) pn.textContent=t('guest_name');
       var pe=document.getElementById('profilEmail'); if(pe) pe.textContent='';
-      try { setAvatarDisplay(null, '👤'); } catch(e){}
+      try { setAvatarDisplay(null, GUEST_AVATAR_SVG); } catch(e){}
       var _gr=document.getElementById('guestLoginSection'); if(_gr) _gr.style.display='block';
       var _ar=document.getElementById('adminRow'); if(_ar) _ar.style.display='none';
+      document.querySelectorAll('.auth-only').forEach(function(el){ el.style.display='none'; });
       updateGreeting();
       setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
       if (!window._evPreloaded) { window._evPreloaded = true; setTimeout(function(){ loadEvents(); }, 1200); }
@@ -2212,12 +2214,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       headerAvatar.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
       profilAvatar.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
       if (deleteBtn) deleteBtn.style.display = 'flex';
+    } else if (initial && String(initial).indexOf('<svg') === 0) {
+      headerAvatar.innerHTML = initial;
+      profilAvatar.innerHTML = initial;
+      if (deleteBtn) deleteBtn.style.display = 'none';
     } else {
       headerAvatar.textContent = initial;
       profilAvatar.textContent = initial;
       if (deleteBtn) deleteBtn.style.display = 'none';
     }
   }
+  var GUEST_AVATAR_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:58%;height:58%;color:#fff"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+  function continueAsGuest(){ setNav('navHome'); showScreen('screenHome'); }
 
   // Blendet versehentliche Doppel-Eintraege aus: immer per ID (sicher) und – wenn
   // Koordinaten vorhanden sind – per Name + exakter Position (gleicher Name an exakt
