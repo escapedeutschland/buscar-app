@@ -869,9 +869,44 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   function getAvgRating(listingId) {
+    // Bevorzugt das Aggregat am Eintrag (rating_sum/rating_count) -> keine Reviews-Lesung nötig
+    var l = allListings.find(function(x){ return x.id === listingId; });
+    if (l && typeof l.rating_count === 'number' && l.rating_count > 0 && typeof l.rating_sum === 'number') {
+      return l.rating_sum / l.rating_count;
+    }
+    // Fallback: alter ratingsCache (Übergangsphase / falls Aggregat fehlt)
     const ratings = ratingsCache[listingId];
     if (!ratings || !ratings.length) return null;
     return (ratings.reduce((s,r) => s+r, 0) / ratings.length);
+  }
+  // Aggregat eines Eintrags aus SEINEN Reviews neu berechnen + am Eintrag speichern
+  // (kleiner Per-Listing-Read statt der kompletten reviews-Sammlung; robust für add/edit/delete)
+  async function _recalcListingRating(listingId) {
+    try {
+      var snap = await db.collection('reviews').where('listing_id','==',listingId).get();
+      var sum = 0, count = 0;
+      snap.docs.forEach(function(d){ var r = d.data().rating; if (typeof r === 'number') { sum += r; count++; } });
+      await db.collection('listings').doc(listingId).update({ rating_sum: sum, rating_count: count });
+      var l = allListings.find(function(x){ return x.id === listingId; });
+      if (l) { l.rating_sum = sum; l.rating_count = count; }
+    } catch(e) {}
+  }
+  // Einmaliges Backfill (nur Admin, im Browser-Console: migrateRatings())
+  async function migrateRatings() {
+    if (!currentUser || currentUser.email !== ADMIN_EMAIL) { alert('Nur als Admin'); return; }
+    if (!confirm('Rating-Backfill starten? Schreibt rating_sum/rating_count auf alle bewerteten Einträge.')) return;
+    try {
+      var snap = await db.collection('reviews').get();
+      var agg = {};
+      snap.docs.forEach(function(d){ var r = d.data(); if (!agg[r.listing_id]) agg[r.listing_id] = { sum:0, count:0 }; if (typeof r.rating === 'number') { agg[r.listing_id].sum += r.rating; agg[r.listing_id].count++; } });
+      var ids = Object.keys(agg), done = 0, failed = 0;
+      for (var i=0;i<ids.length;i++) {
+        try { await db.collection('listings').doc(ids[i]).update({ rating_sum: agg[ids[i]].sum, rating_count: agg[ids[i]].count }); done++; }
+        catch(e){ failed++; }
+      }
+      alert('Backfill fertig: ' + done + ' Einträge aktualisiert' + (failed? (', ' + failed + ' fehlgeschlagen') : '') + '.');
+      loadListings(true);
+    } catch(e){ alert('Fehler: ' + e); }
   }
 
   function starsSmall(avg) {
@@ -4952,7 +4987,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         rating: currentUserRating, comment: document.getElementById('reviewText').value.trim(),
         created_at: new Date()
       });
-      await loadAllRatings(true);
+      await _recalcListingRating(listingId);
       loadReviews(listingId);
       renderListings();
     } catch (err) { alert(t('err_generic')); btn.disabled=false; btn.textContent='Bewertung abschicken'; }
@@ -5005,7 +5040,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function deleteReview(reviewId, listingId) {
     if (!confirm(t('del_review_confirm'))) return;
-    try { await db.collection('reviews').doc(reviewId).delete(); await loadAllRatings(); loadReviews(listingId); renderListings(); } catch(e) { alert(t('err_generic')); }
+    try { await db.collection('reviews').doc(reviewId).delete(); await _recalcListingRating(listingId); loadReviews(listingId); renderListings(); } catch(e) { alert(t('err_generic')); }
   }
 
   function editReview(reviewId, listingId, oldRating) {
@@ -5025,7 +5060,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('reviews').doc(reviewId).update({
         rating: currentUserRating, comment: document.getElementById('reviewText').value.trim(), updated_at: new Date()
       });
-      await loadAllRatings(); loadReviews(listingId); renderListings();
+      await _recalcListingRating(listingId); loadReviews(listingId); renderListings();
     } catch(e) { alert(t('err_generic')); }
   }
 
