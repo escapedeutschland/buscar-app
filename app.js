@@ -2319,8 +2319,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Zeige gecachte Daten sofort waehrend frische Daten geladen werden
       var _cached = null, _ts = 0;
       try {
-        _cached = localStorage.getItem('buscar_listings');
-        _ts = parseInt(localStorage.getItem('buscar_listings_ts') || '0', 10);
+        _cached = localStorage.getItem('buscar_listings2');
+        _ts = parseInt(localStorage.getItem('buscar_listings2_ts') || '0', 10);
         if (_cached && allListings.length === 0) {
           allListings = JSON.parse(_cached);
           buildCityChips();
@@ -2333,28 +2333,25 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         return;
       }
       // Listings + Ratings PARALLEL laden (statt nacheinander)
-      const [snap] = await Promise.all([
-        db.collection('listings').where('verified', '==', true).get(),
-        loadAllRatings(force)
-      ]);
+      // Nur noch die Einträge laden – Bewertungen kommen aus dem Aggregat (rating_sum/rating_count)
+      // am Eintrag; die komplette reviews-Sammlung wird NICHT mehr beim Start gelesen.
+      const snap = await db.collection('listings').where('verified', '==', true).get();
       var _rawListings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       allListings = DEDUPE_HIDE_DUPLICATES ? _dedupeListings(_rawListings) : _rawListings;
       // Cache aktualisieren
-      try { localStorage.setItem('buscar_listings', JSON.stringify(allListings)); localStorage.setItem('buscar_listings_ts', Date.now()); } catch(e) {}
+      try { localStorage.setItem('buscar_listings2', JSON.stringify(allListings)); localStorage.setItem('buscar_listings2_ts', Date.now()); } catch(e) {}
       buildCityChips();
       if (activeScreen === 'screenHome') renderListings();
       document.getElementById('offlineBanner').classList.remove('visible');
     } catch (err) {
       // Try loading from cache
       try {
-        const cached = localStorage.getItem('buscar_listings');
-        const ts = localStorage.getItem('buscar_listings_ts');
+        const cached = localStorage.getItem('buscar_listings2');
+        const ts = localStorage.getItem('buscar_listings2_ts');
         if (cached) {
           allListings = JSON.parse(cached);
           const mins = Math.round((Date.now() - parseInt(ts)) / 60000);
           buildCityChips();
-          renderListings();
-          await loadAllRatings();
           renderListings();
           document.getElementById('offlineBanner').textContent = '📡 Offline – letzte Aktualisierung vor ' + (mins < 60 ? mins + ' Min.' : Math.round(mins/60) + ' Std.');
           document.getElementById('offlineBanner').classList.add('visible');
