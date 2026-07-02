@@ -782,3 +782,9 @@
 .fc-hint { display:flex; align-items:flex-start; gap:10px; margin:8px 16px 0; padding:11px 13px; background:#FFF8EC; border:1px solid #F3D9A8; border-radius:13px; }
 .fc-hint-txt { flex:1; font-size:12px; line-height:1.5; color:#7a5e22; }
 .fc-hint-x { flex:0 0 auto; width:24px; height:24px; border-radius:50%; border:none; background:rgba(0,0,0,0.06); color:#7a5e22; font-size:13px; cursor:pointer; line-height:1; }
+
+/* ===== Öffnungszeiten – saubere Tag/Zeit-Liste ===== */
+.hours-list { display:flex; flex-direction:column; gap:5px; margin-top:2px; }
+.hours-row { display:flex; justify-content:space-between; align-items:baseline; gap:14px; }
+.hours-day { color:var(--text-2); flex:0 0 auto; }
+.hours-time { color:var(--text-1); font-weight:600; text-align:right; }

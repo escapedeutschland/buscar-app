@@ -513,6 +513,31 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
+  // Öffnungszeiten immer schön darstellen – egal wie eingegeben/aus Google Maps eingefügt.
+  // Erkennt Wochentag-Segmente (DE/ES/EN) und rendert je Tag eine Zeile (Tag | Zeit).
+  function formatHours(raw) {
+    var s = String(raw == null ? '' : raw).trim();
+    if (!s) return '';
+    var days = 'Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag|' +
+               'Lunes|Martes|Miércoles|Miercoles|Jueves|Viernes|Sábado|Sabado|Domingo|' +
+               'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday';
+    var splitRe = new RegExp('(?=(?:' + days + ')\\s*[:：])', 'gi');
+    var dayRe = new RegExp('^(?:' + days + ')\\s*[:：]', 'i');
+    var parts = s.split(splitRe).map(function(p){ return p.trim(); }).filter(Boolean);
+    var dayParts = parts.filter(function(p){ return dayRe.test(p); });
+    if (dayParts.length >= 2) {
+      var rows = dayParts.map(function(p){
+        var idx = p.search(/[:：]/);
+        var day = p.slice(0, idx).trim();
+        var time = p.slice(idx + 1).trim().replace(/\s+/g, ' ');
+        return '<div class="hours-row"><span class="hours-day">' + esc(day) + '</span><span class="hours-time">' + esc(time) + '</span></div>';
+      }).join('');
+      return '<div class="hours-list">' + rows + '</div>';
+    }
+    // Fallback: unbekanntes Format -> wenigstens Zeilenumbrüche erhalten
+    return '<span style="white-space:pre-line">' + esc(s) + '</span>';
+  }
+
   let contentTranslated = false;
 
   function toggleLangAuth() {
@@ -2845,7 +2870,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     let infoHTML = '';
     if (l.phone) infoHTML += `<a class="detail-row" href="tel:${esc(l.phone)}"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Telefon</div><div class="detail-row-value">${esc(l.phone)}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
     if (l.website) { var _wHref = /^https?:\/\//i.test(String(l.website).trim()) ? String(l.website).trim() : 'https://' + String(l.website).trim(); infoHTML += `<a class="detail-row" href="${esc(_wHref)}" target="_blank" rel="noopener noreferrer"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Website</div><div class="detail-row-value">${esc(l.website)}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`; }
-    if (l.opening_hours) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Öffnungszeiten</div><div class="detail-row-value">${esc(l.opening_hours)}</div></div></div></div>`;
+    if (l.opening_hours) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Öffnungszeiten</div><div class="detail-row-value">${formatHours(l.opening_hours)}</div></div></div></div>`;
     if (l.address) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Adresse</div><div class="detail-row-value">${esc(l.address)}</div></div></div></div>`;
     const infoCard = document.getElementById('detailInfoCard');
     infoCard.innerHTML = infoHTML; infoCard.style.display = infoHTML?'block':'none';
