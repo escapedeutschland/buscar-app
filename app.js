@@ -1,6 +1,7 @@
 const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
-  let currentLang = localStorage.getItem('buscar_lang') || 'de';
+  // Sprache: gespeicherte Wahl gewinnt; sonst nach Gerätesprache (Deutsch -> de, sonst Spanisch für Paraguay/Einheimische)
+  let currentLang = localStorage.getItem('buscar_lang') || (((navigator.language || navigator.userLanguage || 'de').toLowerCase().indexOf('de') === 0) ? 'de' : 'es');
 
   const translations = {
     de: {
@@ -183,7 +184,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       create_account: 'Konto erstellen', logging_in: 'Einloggen...',
       forgot_pw: 'Passwort vergessen?', no_account: 'Noch kein Konto?',
       has_account: 'Schon ein Konto?',
-      tagline: 'Dein Guide in Paraguay', open_now: 'Geöffnet', closed_now: 'Geschlossen', badge_new: 'Neu',
+      tagline: 'Der Guide für Paraguay', guest_name: 'Gast', guest_login_cta: 'Einloggen / Registrieren', open_now: 'Geöffnet', closed_now: 'Geschlossen', badge_new: 'Neu',
       // Profile
       to_home: 'Zur Startseite', suggest_entry_prof: 'Eintrag vorschlagen',
       admin_panel: 'Admin Panel', change_username: 'Benutzername ändern',
@@ -431,7 +432,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       create_account: 'Crear cuenta', logging_in: 'Iniciando...',
       forgot_pw: '¿Olvidaste tu contraseña?', no_account: '¿No tienes cuenta?',
       has_account: '¿Ya tienes cuenta?',
-      tagline: 'Tu guía en Paraguay', open_now: 'Abierto', closed_now: 'Cerrado', badge_new: 'Nuevo',
+      tagline: 'La guía para Paraguay', guest_name: 'Invitado', guest_login_cta: 'Iniciar sesión / Registrarse', open_now: 'Abierto', closed_now: 'Cerrado', badge_new: 'Nuevo',
       // Perfil
       to_home: 'Ir al inicio', suggest_entry_prof: 'Sugerir lugar',
       admin_panel: 'Panel admin', change_username: 'Cambiar usuario',
@@ -978,6 +979,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   var _prevScreenId = null;
 
   function showScreen(id) {
+    // Gäste-Modus: Aktions-Screens erfordern Login -> Gäste zur Anmeldung leiten
+    if (!currentUser && ['screenForm','screenEventForm','screenFavorites','screenEditListing','screenEditEmail','screenEditPassword','screenEditUsername','screenAdmin','screenCoordEditor'].indexOf(id) >= 0) {
+      id = 'screenAuth';
+    }
     if (id === 'screenDetail' && activeScreen && activeScreen !== 'screenDetail' && activeScreen !== 'screenEditListing' && activeScreen !== 'screenCoordEditor') { window._detailFrom = activeScreen; }
     activeScreen = id;
     // Build cache on first call
@@ -2163,12 +2168,25 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       document.getElementById('profilEmail').textContent = user.email;
       updateGreeting();
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
+      var _grOn=document.getElementById('guestLoginSection'); if(_grOn) _grOn.style.display='none';
       updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
       setTimeout(function(){ try { updateMyAnswerBadge(true); } catch(e){} }, 1500);
       if (!window._evPreloaded) { window._evPreloaded = true; setTimeout(function(){ loadEvents(); }, 1200); }
       var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden');
       handleDeepLink();
-    } else { showScreen('screenAuth'); var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden'); }
+    } else {
+      // Gäste-Modus: ohne Konto nutzbar (nur Lesen). Aktionen (posten, favorisieren, fragen …) fordern Login an.
+      var pn=document.getElementById('profilName'); if(pn) pn.textContent=t('guest_name');
+      var pe=document.getElementById('profilEmail'); if(pe) pe.textContent='';
+      try { setAvatarDisplay(null, '👤'); } catch(e){}
+      var _gr=document.getElementById('guestLoginSection'); if(_gr) _gr.style.display='block';
+      var _ar=document.getElementById('adminRow'); if(_ar) _ar.style.display='none';
+      updateGreeting();
+      setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
+      if (!window._evPreloaded) { window._evPreloaded = true; setTimeout(function(){ loadEvents(); }, 1200); }
+      var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden');
+      handleDeepLink();
+    }
   });
 
   function updateGreeting() {
