@@ -1465,7 +1465,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (ev.rules) {
       bodyHtml += '<div style="background:var(--card);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px">'
         + '<div style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Regeln</div>'
-        + '<p style="font-size:14px;color:var(--text-1);margin:0;line-height:1.5">' + ev.rules + '</p>'
+        + '<p style="font-size:14px;color:var(--text-1);margin:0;line-height:1.5">' + esc(ev.rules) + '</p>'
         + '</div>';
     }
 
@@ -2817,27 +2817,27 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('detailBadgeRow').innerHTML = featBadge + maklerBadge + (l.verified?'<span class="detail-badge green">'+t('verified')+'</span>':'') + (isNew(l.created_at)?'<span class="detail-badge blue">'+t('badge_new')+'</span>':'') + openBadge;
     badges.style.display = (featBadge || maklerBadge || l.verified || isNew(l.created_at) || openStatus!==null) ? 'block' : 'none';
     let infoHTML = '';
-    if (l.phone) infoHTML += `<a class="detail-row" href="tel:${l.phone}"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Telefon</div><div class="detail-row-value">${l.phone}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
-    if (l.website) infoHTML += `<a class="detail-row" href="https://${l.website}" target="_blank"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Website</div><div class="detail-row-value">${l.website}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
-    if (l.opening_hours) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Öffnungszeiten</div><div class="detail-row-value">${l.opening_hours}</div></div></div></div>`;
-    if (l.address) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Adresse</div><div class="detail-row-value">${l.address}</div></div></div></div>`;
+    if (l.phone) infoHTML += `<a class="detail-row" href="tel:${esc(l.phone)}"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Telefon</div><div class="detail-row-value">${esc(l.phone)}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
+    if (l.website) { var _wHref = /^https?:\/\//i.test(String(l.website).trim()) ? String(l.website).trim() : 'https://' + String(l.website).trim(); infoHTML += `<a class="detail-row" href="${esc(_wHref)}" target="_blank" rel="noopener noreferrer"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Website</div><div class="detail-row-value">${esc(l.website)}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`; }
+    if (l.opening_hours) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Öffnungszeiten</div><div class="detail-row-value">${esc(l.opening_hours)}</div></div></div></div>`;
+    if (l.address) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Adresse</div><div class="detail-row-value">${esc(l.address)}</div></div></div></div>`;
     const infoCard = document.getElementById('detailInfoCard');
     infoCard.innerHTML = infoHTML; infoCard.style.display = infoHTML?'block':'none';
     let ctaHTML = '';
-    if (l.phone) ctaHTML += `<a class="detail-cta-btn primary" href="tel:${l.phone}"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${t('call')}</a>`;
+    if (l.phone) ctaHTML += `<a class="detail-cta-btn primary" href="tel:${esc(l.phone)}"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${t('call')}</a>`;
     if (l.lat && l.lng) ctaHTML += `<a class="detail-cta-btn secondary" href="https://maps.google.com/?q=${l.lat},${l.lng}" target="_blank"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>${t('route')}</a>`;
     document.getElementById('detailCta').innerHTML = ctaHTML;
     // Render deal
     const dealCard = document.getElementById('detailDealCard');
     if (l.deal_text) {
-      const expiry = l.deal_expiry ? `<div class="deal-expiry"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Gültig bis: ${l.deal_expiry}</div>` : '';
-      const codeSection = l.deal_code ? `<div class="deal-code-wrap"><span class="deal-code">${l.deal_code}</span><button class="deal-copy-btn" onclick="copyDealCode('${l.deal_code}')">Kopieren</button></div>` : '';
+      const expiry = l.deal_expiry ? `<div class="deal-expiry"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Gültig bis: ${esc(l.deal_expiry)}</div>` : '';
+      const codeSection = l.deal_code ? `<div class="deal-code-wrap"><span class="deal-code">${esc(l.deal_code)}</span><button class="deal-copy-btn" onclick="copyDealCode('${esc(l.deal_code)}')">Kopieren</button></div>` : '';
       dealCard.innerHTML = `<div class="deal-card">
         <div class="deal-card-header">
           <div class="deal-card-icon"><svg viewBox="0 0 24 24"><path d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z"/></svg></div>
           <div><div class="deal-card-title">Exklusiver Buscar-Deal</div><div class="deal-card-sub">Nur für App-Nutzer</div></div>
         </div>
-        <div class="deal-text">${l.deal_text}</div>
+        <div class="deal-text">${esc(l.deal_text)}</div>
         ${codeSection}
         ${expiry}
       </div>`;
@@ -3652,9 +3652,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
     document.getElementById('mapList').innerHTML = withCoords.map(l => `
       <div class="map-card" onclick="showDetail('${l.id}')">
-        <div class="map-card-name">${l.name||''}</div>
-        <div class="map-card-city">${l.city||''}</div>
-        <div class="map-card-cat">${catLabels[l.category_id]||''}</div>
+        <div class="map-card-name">${esc(l.name||'')}</div>
+        <div class="map-card-city">${esc(l.city||'')}</div>
+        <div class="map-card-cat">${esc(catLabels[l.category_id]||'')}</div>
       </div>`).join('');
   }
 
@@ -3754,9 +3754,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
             new maplibregl.Popup({ closeButton:false, maxWidth:'220px' })
               .setLngLat(coords)
               .setHTML(`<div class="map-popup" onclick="showDetail('${p.id}')">
-                <div class="map-popup-name">${p.name}${p.deal?'<span style="margin-left:5px;font-size:11px">⚡</span>':''}</div>
-                <div class="map-popup-city">${prettyCity(p.city)}</div>
-                <div class="map-popup-cat">${p.catLabel}</div>
+                <div class="map-popup-name">${esc(p.name)}${p.deal?'<span style="margin-left:5px;font-size:11px">⚡</span>':''}</div>
+                <div class="map-popup-city">${esc(prettyCity(p.city))}</div>
+                <div class="map-popup-cat">${esc(p.catLabel)}</div>
               </div>`)
               .addTo(maplibreMap);
           });
@@ -4493,10 +4493,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           ex.city === l.city
         ).slice(0, 2);
         const similarHTML = similar.length ? `<div class="admin-similar">
-          <div class="admin-similar-title">⚠️ Ähnliche Einträge in ${l.city}:</div>
-          ${similar.map(s => `<div style="font-size:12px;color:var(--text-1);padding:2px 0">${s.name}</div>`).join('')}
+          <div class="admin-similar-title">⚠️ Ähnliche Einträge in ${esc(l.city)}:</div>
+          ${similar.map(s => `<div style="font-size:12px;color:var(--text-1);padding:2px 0">${esc(s.name)}</div>`).join('')}
         </div>` : '';
-        return `<div class="admin-card" id="adminCard_${l.id}"><div class="admin-card-name">${l.name||'Ohne Name'}</div><div class="admin-card-meta">${catNames[l.category_id]||''} &middot; ${l.city||'Unbekannt'}</div>${photoHTML}<div class="admin-card-desc">${l.description||'Keine Beschreibung'}</div>${similarHTML}<div class="admin-card-info">${l.phone?`<div class="admin-info-pill">${l.phone}</div>`:''}${l.website?`<div class="admin-info-pill">${l.website}</div>`:''}${l.opening_hours?`<div class="admin-info-pill">${l.opening_hours}</div>`:''}</div><div class="admin-actions"><button class="admin-btn approve" onclick="approveEntry('${l.id}')">${t('approve')||'Genehmigen'}</button><button class="admin-btn reject" onclick="rejectEntry('${l.id}')">${t('reject')||'Ablehnen'}</button></div></div>`;
+        return `<div class="admin-card" id="adminCard_${l.id}"><div class="admin-card-name">${esc(l.name||'Ohne Name')}</div><div class="admin-card-meta">${esc(catNames[l.category_id]||'')} &middot; ${esc(l.city||'Unbekannt')}</div>${photoHTML}<div class="admin-card-desc">${esc(l.description||'Keine Beschreibung')}</div>${similarHTML}<div class="admin-card-info">${l.phone?`<div class="admin-info-pill">${esc(l.phone)}</div>`:''}${l.website?`<div class="admin-info-pill">${esc(l.website)}</div>`:''}${l.opening_hours?`<div class="admin-info-pill">${esc(l.opening_hours)}</div>`:''}</div><div class="admin-actions"><button class="admin-btn approve" onclick="approveEntry('${l.id}')">${t('approve')||'Genehmigen'}</button><button class="admin-btn reject" onclick="rejectEntry('${l.id}')">${t('reject')||'Ablehnen'}</button></div></div>`;
       }).join('');
     } catch (err) { body.innerHTML = '<div class="admin-empty"><div class="admin-empty-text">Fehler beim Laden</div></div>'; }
   }
@@ -4520,8 +4520,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         const l = listingsMap[c.listing_id];
         return `<div class="admin-claim-card" id="claimCard_${c.id}">
           <div class="admin-claim-name">${l ? l.name : 'Unbekannter Eintrag'}</div>
-          <div class="admin-claim-meta">${c.user_name} · ${c.user_email}</div>
-          <div class="admin-claim-reason">"${c.reason}"</div>
+          <div class="admin-claim-meta">${esc(c.user_name)} · ${esc(c.user_email)}</div>
+          <div class="admin-claim-reason">"${esc(c.reason)}"</div>
           <div class="admin-actions">
             <button class="admin-btn approve" onclick="approveClaim('${c.id}','${c.listing_id}','${c.user_id}')">Genehmigen</button>
             <button class="admin-btn reject" onclick="rejectClaim('${c.id}')">Ablehnen</button>
@@ -4597,13 +4597,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       const listings = snap.docs.map(d => ({id:d.id,...d.data()}));
       body.innerHTML = `<div style="padding:12px 0 4px;font-size:12px;color:rgba(255,255,255,0.6);text-align:center">Deals für verifizierte Einträge verwalten</div>` +
         listings.map(l => `<div class="admin-card" id="dealCard_${l.id}">
-          <div class="admin-card-name">${l.name}</div>
-          <div class="admin-card-meta">${l.city||''}</div>
-          ${l.deal_text ? `<div class="admin-deal-section"><div class="admin-deal-title">🏷 Aktiver Deal</div><div style="font-size:13px;color:var(--text-2);margin-bottom:6px">${l.deal_text}</div>${l.deal_code?`<div style="font-size:12px;font-weight:700;color:#C2410C">Code: ${l.deal_code}</div>`:''}</div>` : ''}
+          <div class="admin-card-name">${esc(l.name)}</div>
+          <div class="admin-card-meta">${esc(l.city||'')}</div>
+          ${l.deal_text ? `<div class="admin-deal-section"><div class="admin-deal-title">🏷 Aktiver Deal</div><div style="font-size:13px;color:var(--text-2);margin-bottom:6px">${esc(l.deal_text)}</div>${l.deal_code?`<div style="font-size:12px;font-weight:700;color:#C2410C">Code: ${esc(l.deal_code)}</div>`:''}</div>` : ''}
           <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
-            <input class="field-input" type="text" id="dealText_${l.id}" placeholder="Deal-Beschreibung (z.B. 10% Rabatt für Buscar-Nutzer)" value="${l.deal_text||''}" style="font-size:13px;padding:10px 12px">
-            <input class="field-input" type="text" id="dealCode_${l.id}" placeholder="Gutscheincode (optional)" value="${l.deal_code||''}" style="font-size:13px;padding:10px 12px">
-            <input class="field-input" type="text" id="dealExpiry_${l.id}" placeholder="Gültig bis (z.B. 31.12.2025)" value="${l.deal_expiry||''}" style="font-size:13px;padding:10px 12px">
+            <input class="field-input" type="text" id="dealText_${l.id}" placeholder="Deal-Beschreibung (z.B. 10% Rabatt für Buscar-Nutzer)" value="${esc(l.deal_text||'')}" style="font-size:13px;padding:10px 12px">
+            <input class="field-input" type="text" id="dealCode_${l.id}" placeholder="Gutscheincode (optional)" value="${esc(l.deal_code||'')}" style="font-size:13px;padding:10px 12px">
+            <input class="field-input" type="text" id="dealExpiry_${l.id}" placeholder="Gültig bis (z.B. 31.12.2025)" value="${esc(l.deal_expiry||'')}" style="font-size:13px;padding:10px 12px">
             <div style="display:flex;gap:8px">
               <button class="admin-btn approve" style="flex:2" onclick="saveDeal('${l.id}')">Deal speichern</button>
               ${l.deal_text ? `<button class="admin-btn reject" style="flex:1" onclick="removeDeal('${l.id}')">Entfernen</button>` : ''}
@@ -5784,7 +5784,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         return nameSim;
       }).slice(0, 3);
       if (found.length) {
-        list.innerHTML = found.map(l => `<div class="dupe-item" onclick="showDetail('${l.id}')">${l.name} <span style="color:var(--text-3)">${l.city||''}</span></div>`).join('');
+        list.innerHTML = found.map(l => `<div class="dupe-item" onclick="showDetail('${l.id}')">${esc(l.name)} <span style="color:var(--text-3)">${esc(l.city||'')}</span></div>`).join('');
         warning.classList.add('visible');
       } else { warning.classList.remove('visible'); }
     }, 600);
@@ -5887,9 +5887,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       body.innerHTML = reports.map(r => {
         const l = allListings.find(x => x.id === r.listing_id);
         return `<div class="admin-card" id="reportCard_${r.id}">
-          <div class="admin-card-name">${l ? l.name : 'Eintrag gelöscht'}</div>
-          <div class="admin-card-meta">${l ? l.city : ''} · ${formatDate(r.created_at)}</div>
-          <div style="background:#FFF8EC;border-left:3px solid var(--yellow);padding:8px 10px;border-radius:6px;margin:8px 0;font-size:13px"><strong>${reasonLabels[r.reason]||r.reason}</strong>${r.detail?`<div style="margin-top:5px;font-weight:400;color:var(--text-2);white-space:pre-wrap">„${esc(r.detail)}"</div>`:''}</div>
+          <div class="admin-card-name">${l ? esc(l.name) : 'Eintrag gelöscht'}</div>
+          <div class="admin-card-meta">${l ? esc(l.city) : ''} · ${formatDate(r.created_at)}</div>
+          <div style="background:#FFF8EC;border-left:3px solid var(--yellow);padding:8px 10px;border-radius:6px;margin:8px 0;font-size:13px"><strong>${reasonLabels[r.reason]||esc(r.reason)}</strong>${r.detail?`<div style="margin-top:5px;font-weight:400;color:var(--text-2);white-space:pre-wrap">„${esc(r.detail)}"</div>`:''}</div>
           <div class="admin-actions">
             ${l ? `<button class="admin-btn approve" onclick="showDetail('${r.listing_id}')">Anschauen</button>` : ''}
             <button class="admin-btn reject" onclick="resolveReport('${r.id}')">Erledigt</button>
