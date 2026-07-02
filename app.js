@@ -849,7 +849,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   let pendingFormPhotos = [];
   let ratingsCache = (function(){ try { return JSON.parse(localStorage.getItem('buscar_ratings')) || {}; } catch(e) { return {}; } })();
 
-  async function loadAllRatings() {
+  var RATINGS_TTL = 10 * 60 * 1000; // 10 Min
+  async function loadAllRatings(force) {
+    // Frischer Cache -> komplette reviews-Sammlung NICHT erneut lesen (großer Read-Sparer)
+    try {
+      var rts = parseInt(localStorage.getItem('buscar_ratings_ts') || '0', 10);
+      if (!force && rts && (Date.now() - rts) < RATINGS_TTL && ratingsCache && Object.keys(ratingsCache).length) return;
+    } catch(e) {}
     try {
       const snap = await db.collection('reviews').get();
       ratingsCache = {};
@@ -858,7 +864,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         if (!ratingsCache[r.listing_id]) ratingsCache[r.listing_id] = [];
         ratingsCache[r.listing_id].push(r.rating);
       });
-      try { localStorage.setItem('buscar_ratings', JSON.stringify(ratingsCache)); } catch(e) {}
+      try { localStorage.setItem('buscar_ratings', JSON.stringify(ratingsCache)); localStorage.setItem('buscar_ratings_ts', String(Date.now())); } catch(e) {}
     } catch(e) {}
   }
 
@@ -2272,21 +2278,29 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // Schalter: exakte Doppel in der App ausblenden? Aktuell AUS (Übergangslösung, damit die
   // Eintrags-Zahl wieder ~767 zeigt). Auf true setzen, sobald 750+ einzigartige echte Einträge da sind.
   var DEDUPE_HIDE_DUPLICATES = false;
-  async function loadListings() {
+  var LISTINGS_TTL = 10 * 60 * 1000; // 10 Min – innerhalb dieser Zeit aus Cache, keine Firestore-Reads
+  async function loadListings(force) {
     try {
       // Zeige gecachte Daten sofort waehrend frische Daten geladen werden
+      var _cached = null, _ts = 0;
       try {
-        const cached = localStorage.getItem('buscar_listings');
-        if (cached && allListings.length === 0) {
-          allListings = JSON.parse(cached);
+        _cached = localStorage.getItem('buscar_listings');
+        _ts = parseInt(localStorage.getItem('buscar_listings_ts') || '0', 10);
+        if (_cached && allListings.length === 0) {
+          allListings = JSON.parse(_cached);
           buildCityChips();
           renderListings();
         }
       } catch(e) {}
+      // Frischer Cache -> gar nicht erst Firestore abfragen (spart Reads/Kosten, v.a. bei Gästen)
+      if (!force && _cached && _ts && (Date.now() - _ts) < LISTINGS_TTL) {
+        var _ob = document.getElementById('offlineBanner'); if (_ob) _ob.classList.remove('visible');
+        return;
+      }
       // Listings + Ratings PARALLEL laden (statt nacheinander)
       const [snap] = await Promise.all([
         db.collection('listings').where('verified', '==', true).get(),
-        loadAllRatings()
+        loadAllRatings(force)
       ]);
       var _rawListings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       allListings = DEDUPE_HIDE_DUPLICATES ? _dedupeListings(_rawListings) : _rawListings;
@@ -2317,7 +2331,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   // Listen for online/offline events
-  window.addEventListener('online', () => { loadListings(); });
+  window.addEventListener('online', () => { loadListings(true); });
   window.addEventListener('offline', () => {
     document.getElementById('offlineBanner').textContent = '📡 Kein Internet – zeige gespeicherte Daten';
     document.getElementById('offlineBanner').classList.add('visible');
@@ -4774,7 +4788,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     let startY = 0, pulling = false, triggered = false;
     const el = document.querySelector('.listings');
     if (!el) return;
-    setupPTR(el, 'pullIndicator', function(){ loadListings(); });
+    setupPTR(el, 'pullIndicator', function(){ loadListings(true); });
       })(); });
 
   function setupPTR(el, indicatorId, onRefresh) {
@@ -4938,7 +4952,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         rating: currentUserRating, comment: document.getElementById('reviewText').value.trim(),
         created_at: new Date()
       });
-      await loadAllRatings();
+      await loadAllRatings(true);
       loadReviews(listingId);
       renderListings();
     } catch (err) { alert(t('err_generic')); btn.disabled=false; btn.textContent='Bewertung abschicken'; }
