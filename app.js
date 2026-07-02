@@ -184,7 +184,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       create_account: 'Konto erstellen', logging_in: 'Einloggen...',
       forgot_pw: 'Passwort vergessen?', no_account: 'Noch kein Konto?',
       has_account: 'Schon ein Konto?',
-      tagline: 'Der Guide für Paraguay', guest_name: 'Gast', guest_login_cta: 'Einloggen / Registrieren', open_now: 'Geöffnet', closed_now: 'Geschlossen', badge_new: 'Neu',
+      tagline: 'Der Guide für Paraguay', guest_name: 'Gast', guest_login_cta: 'Einloggen / Registrieren', login_required: 'Bitte melde dich an oder registriere dich', open_now: 'Geöffnet', closed_now: 'Geschlossen', badge_new: 'Neu',
       // Profile
       to_home: 'Zur Startseite', suggest_entry_prof: 'Eintrag vorschlagen',
       admin_panel: 'Admin Panel', change_username: 'Benutzername ändern',
@@ -432,7 +432,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       create_account: 'Crear cuenta', logging_in: 'Iniciando...',
       forgot_pw: '¿Olvidaste tu contraseña?', no_account: '¿No tienes cuenta?',
       has_account: '¿Ya tienes cuenta?',
-      tagline: 'La guía para Paraguay', guest_name: 'Invitado', guest_login_cta: 'Iniciar sesión / Registrarse', open_now: 'Abierto', closed_now: 'Cerrado', badge_new: 'Nuevo',
+      tagline: 'La guía para Paraguay', guest_name: 'Invitado', guest_login_cta: 'Iniciar sesión / Registrarse', login_required: 'Iniciá sesión o registrate', open_now: 'Abierto', closed_now: 'Cerrado', badge_new: 'Nuevo',
       // Perfil
       to_home: 'Ir al inicio', suggest_entry_prof: 'Sugerir lugar',
       admin_panel: 'Panel admin', change_username: 'Cambiar usuario',
@@ -4876,7 +4876,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch(e) { return null; }
   }
 
+  // Gäste zur Anmeldung leiten (mit Hinweis) statt still zu scheitern
+  function requireLogin() {
+    if (currentUser) return false;
+    try { showToast(t('login_required')); } catch(e){}
+    setNav('navProfil'); showScreen('screenAuth');
+    return true;
+  }
+
   function setRating(val) {
+    if (requireLogin()) return;
     currentUserRating = val;
     document.querySelectorAll('#reviewStars .star').forEach(s => {
       s.classList.toggle('active', parseInt(s.dataset.val) <= val);
@@ -4884,7 +4893,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function submitReview(listingId) {
-    if (!currentUser || currentUserRating === 0) return;
+    if (requireLogin()) return;
+    if (currentUserRating === 0) return;
     const btn = document.getElementById('reviewSubmitBtn');
     btn.disabled = true; btn.textContent = 'Wird gesendet...';
     try {
@@ -4984,8 +4994,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function submitReply(listingId, parentId) {
+    if (requireLogin()) return;
     const txt = document.getElementById('replyInput_'+parentId).value.trim();
-    if (!currentUser || !txt) return;
+    if (!txt) return;
     try {
       const userName = await getUsername();
       await db.collection('comments').add({
@@ -5099,8 +5110,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function submitComment() {
+    if (requireLogin()) return;
     const txt = document.getElementById('commentInput').value.trim();
-    if (!currentUser || !txt || !currentListingId) return;
+    if (!txt || !currentListingId) return;
     try {
       const userName = await getUsername();
       await db.collection('comments').add({
@@ -5620,7 +5632,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function toggleFavorite() {
-    if (!currentUser || !currentListingId) return;
+    if (requireLogin()) return;
+    if (!currentListingId) return;
     const btn = document.getElementById('favBtn');
     if (currentFavorites.has(currentListingId)) {
       currentFavorites.delete(currentListingId);
