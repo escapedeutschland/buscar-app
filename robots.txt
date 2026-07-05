@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Haupt-App (statische Hülle)
+Sitemap: https://escapedeutschland.github.io/buscar-app/sitemap.xml
+# Einzel-Orte (server-gerendert über den Share-Worker)
+Sitemap: https://buscar-share.maximechristalle.workers.dev/sitemap.xml
