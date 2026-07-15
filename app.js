@@ -1086,6 +1086,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (id === 'screenForm') {
       checkLocationPermissionForForm();
     }
+    if (id === 'screenForm' || id === 'screenEventForm') {
+      try { populateCityDatalist(); } catch(e){}
+    }
     // === Ende NEU ===
     // PTR setup – cached, runs only once per screen (not on every tap)
     if (!showScreen._ptr) {
@@ -2437,6 +2440,27 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try { collect(typeof allEvents   !== 'undefined' ? allEvents   : null); } catch(e){}
     var ex = Object.keys(extras).sort(function(a,b){ return a.localeCompare(b); });
     return base.concat(ex);
+  }
+
+  // Füllt die <datalist> für die Stadt-Eingabe mit allen bekannten + real
+  // vorkommenden Städten -> Nutzer sieht Vorschläge und tippt nicht denselben
+  // Ort in 5 Schreibweisen (verhindert Doppelungen an der Wurzel).
+  function populateCityDatalist() {
+    var dl = document.getElementById('cityOptions');
+    if (!dl) return;
+    var cities = filterCities().filter(function(c){ return c && c !== 'Alle'; });
+    dl.innerHTML = cities.map(function(c){ return '<option value="' + esc(c) + '"></option>'; }).join('');
+  }
+
+  // Beim Verlassen des Feldes: wenn die Eingabe (accent/case-insensitiv) einer
+  // bekannten/vorhandenen Stadt entspricht, auf deren EXAKTE Schreibweise setzen.
+  function canonicalizeCityInput(el) {
+    if (!el || !el.value) return;
+    var v = el.value.trim();
+    if (!v) { el.value = ''; return; }
+    var nv = norm(v);
+    var match = filterCities().find(function(c){ return c !== 'Alle' && norm(c) === nv; });
+    el.value = match || v;
   }
 
   // Filter state

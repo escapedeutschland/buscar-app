@@ -50,17 +50,17 @@
   <meta name="twitter:title" content="Buscar – Der Guide für Paraguay">
   <meta name="twitter:description" content="Der Guide für Paraguay: geprüfte Orte, Dienstleistungen und Events – für Auswanderer und Einheimische.">
   <meta name="twitter:image" content="https://escapedeutschland.github.io/buscar-app/og-default.jpg">
-  <link rel="preload" href="styles.css?v=208" as="style">
-  <link rel="preload" href="app.js?v=208" as="script">
+  <link rel="preload" href="styles.css?v=209" as="style">
+  <link rel="preload" href="app.js?v=209" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-  <link href="styles.css?v=208" rel="stylesheet">
+  <link href="styles.css?v=209" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  <script defer src="app.js?v=208"></script>
+  <script defer src="app.js?v=209"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -207,7 +207,7 @@
           <div class="form-card-title" data-i18n="ev_location">Ort</div>
           <div class="form-field">
             <label class="field-label">Stadt *</label>
-            <input class="field-input" id="evFormCity" placeholder="z.B. Asunción">
+            <input class="field-input" id="evFormCity" list="cityOptions" autocomplete="off" onblur="canonicalizeCityInput(this)" placeholder="z.B. Asunción">
           </div>
           <div class="form-field">
             <label class="field-label">Adresse / Veranstaltungsort</label>
@@ -660,7 +660,8 @@
         </div>
         <div class="form-field">
           <label class="field-label">Stadt *</label>
-          <input class="field-input" type="text" id="newCity" placeholder="z.B. Asunción, Encarnación">
+          <input class="field-input" type="text" id="newCity" list="cityOptions" autocomplete="off" onblur="canonicalizeCityInput(this)" placeholder="z.B. Asunción, Encarnación">
+          <datalist id="cityOptions"></datalist>
         </div>
       </div>
       <div class="form-card" id="immobilienFields" style="display:none">
