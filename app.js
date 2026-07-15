@@ -1459,7 +1459,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
                        spotsLeft ? '<span class="event-spots">' + spotsLeft + '</span>' : '';
 
       var _cover = (ev.photos && ev.photos[0]) ? ev.photos[0] : '';
-      return '<div class="event-card" onclick="showEventDetail(\'' + ev.id + '\')">'
+      return '<div class="event-card" onclick="showEventDetail(\'' + ev.id + '\', \'events\')">'
         + '<div class="event-card-banner ' + typeClass + '"' + (_cover ? ' style="background-image:url(&quot;' + esc(_cover) + '&quot;);background-size:cover;background-position:center"' : '') + '></div>'
         + '<div class="event-card-body">'
         + '<div class="event-card-top">'
@@ -1933,6 +1933,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   function evDetailBack() {
     if (_evDetailSource === 'map') {
+      // Zoom/Ausschnitt der Karte beibehalten (wie bei den Orts-Pins) statt neu zu fitten
+      window._skipMapFit = true; _mapFitOnUpdate = false;
       setNav('navMap');
       showScreen('screenMap');
       setTimeout(function(){ if (maplibreMap) maplibreMap.resize(); }, 100);
@@ -4031,7 +4033,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var dateStr = st ? st.toLocaleDateString(es?'es-PY':'de-DE', {weekday:'short', day:'numeric', month:'short'}) : '';
       var emoji = (typeof EVENT_TYPE_EMOJIS!=='undefined' && EVENT_TYPE_EMOJIS[e.type]) ? EVENT_TYPE_EMOJIS[e.type] : '🎪';
       var esub = [dateStr, e.city].filter(Boolean).join(' · ');
-      return '<div class="radar-row" onclick="showEventDetail(\''+e.id+'\')">'
+      return '<div class="radar-row" onclick="showEventDetail(\''+e.id+'\', \'map\')">'
         + '<div class="radar-row-dot" style="background:'+RADAR_EVENT_COLOR+'"></div>'
         + '<div class="radar-row-main"><div class="radar-row-name">'+emoji+' '+(e.title||'')+'</div><div class="radar-row-sub">'+esub+'</div></div>'
         + '<div class="radar-row-dist">'+_fmtDist(km)+'</div></div>';
@@ -4068,7 +4070,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if (x.ev){
         var emoji = (typeof EVENT_TYPE_EMOJIS!=='undefined' && EVENT_TYPE_EMOJIS[x.e.type]) ? EVENT_TYPE_EMOJIS[x.e.type] : '🎪';
         var ttlE = (x.e.title||'').replace(/[<>"]/g,'') + ' · ' + _fmtDist(x.km);
-        return '<g style="cursor:pointer" onclick="'+fn+'(\''+id+'\')"><title>'+ttlE+'</title>'
+        return '<g style="cursor:pointer" onclick="showEventDetail(\''+id+'\', \'map\')"><title>'+ttlE+'</title>'
           + '<circle cx="'+px+'" cy="'+py+'" r="8" fill="#fff" stroke="'+RADAR_EVENT_COLOR+'" stroke-width="1.6"/>'
           + '<text x="'+px+'" y="'+(py+0.4)+'" font-size="9" text-anchor="middle" dominant-baseline="central">'+emoji+'</text></g>';
       }
