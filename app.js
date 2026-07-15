@@ -1367,7 +1367,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function renderEventCitySheet(query) {
     var list = document.getElementById('evCitySheetList');
     var q = norm(query || '');
-    var filtered = ALL_PY_CITIES.filter(function(c){ return !q || norm(c).includes(q); });
+    var filtered = filterCities().filter(function(c){ return !q || norm(c).includes(q); });
     if (!filtered.length) { list.innerHTML = '<div class="city-sheet-empty">Keine Stadt gefunden</div>'; return; }
     list.innerHTML = filtered.map(function(c){
       return '<div class="city-sheet-item' + (evCityFilter === c ? ' selected' : '') + '" onclick="selectEventCity(\'' + String(c).replace(/'/g, "\\'") + '\')">'
@@ -1455,8 +1455,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
                        isFull ? '<span class=\"event-status-full\">'+t('ev_full')+'</span>' :
                        spotsLeft ? '<span class="event-spots">' + spotsLeft + '</span>' : '';
 
+      var _cover = (ev.photos && ev.photos[0]) ? ev.photos[0] : '';
       return '<div class="event-card" onclick="showEventDetail(\'' + ev.id + '\')">'
-        + '<div class="event-card-banner ' + typeClass + '"></div>'
+        + '<div class="event-card-banner ' + typeClass + '"' + (_cover ? ' style="background-image:url(&quot;' + esc(_cover) + '&quot;);background-size:cover;background-position:center"' : '') + '></div>'
         + '<div class="event-card-body">'
         + '<div class="event-card-top">'
         + '<div class="event-card-title" data-original="' + esc(ev.title) + '">' + esc(ev.title) + '</div>'
@@ -1510,7 +1511,17 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var isCancelled = ev.status === 'cancelled';
     var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' Guaraní' : t('ev_paid_label')) : t('ev_free');
 
-    var bodyHtml = '<div style="background:var(--card);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px">'
+    var photoHtml = '';
+    if (ev.photos && ev.photos.length) {
+      photoHtml = '<div class="ev-photo-gallery">'
+        + ev.photos.map(function(u){
+            return '<img loading="lazy" decoding="async" src="' + esc(u) + '" class="ev-photo" alt="' + esc(ev.title||'') + '">';
+          }).join('')
+        + '</div>';
+    }
+
+    var bodyHtml = photoHtml
+      + '<div style="background:var(--card);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px">'
       + '<p style="font-size:15px;line-height:1.6;color:var(--text-1);margin:0">' + esc(ev.description) + '</p>'
       + '</div>';
 
@@ -2383,7 +2394,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     'Encarnación','Hohenau','Obligado','Bella Vista Sur','Fram','Trinidad',
     'Coronel Bogado','Natalio','Capitán Miranda',
     // Caaguazú / Guairá / Paraguarí
-    'Coronel Oviedo','Caaguazú','Villarrica','Paraguarí','Caazapá',
+    'Coronel Oviedo','Caaguazú','Villarrica','Independencia','Mbocayaty','Paraguarí','Caazapá',
     // Concepción / Norte
     'Concepción','Pedro Juan Caballero','Horqueta','Bella Vista Norte',
     // Misiones / Ñeembucú
@@ -2405,6 +2416,27 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!c) return c || '';
     if (!_cityCanon){ _cityCanon = {}; ALL_PY_CITIES.forEach(function(x){ if (x !== 'Alle') _cityCanon[norm(x)] = x; }); }
     return _cityCanon[norm(c)] || c;
+  }
+
+  // Filterbare Städte = kuratierte Liste + JEDE Stadt, die real in den Daten vorkommt.
+  // So taucht ein selbst eingetippter Ort (z.B. eine kleine Kolonie) automatisch als
+  // Filter-Option auf, ohne dass wir ihn fest hinterlegen müssen.
+  function filterCities() {
+    var base = ALL_PY_CITIES.slice();
+    var known = {}; base.forEach(function(c){ known[norm(c)] = 1; });
+    var extras = {};
+    function collect(arr){
+      if (!arr) return;
+      arr.forEach(function(o){
+        if (!o || !o.city) return;
+        var p = prettyCity(String(o.city).trim());
+        if (p && !known[norm(p)]) extras[p] = 1;
+      });
+    }
+    try { collect(typeof allListings !== 'undefined' ? allListings : null); } catch(e){}
+    try { collect(typeof allEvents   !== 'undefined' ? allEvents   : null); } catch(e){}
+    var ex = Object.keys(extras).sort(function(a,b){ return a.localeCompare(b); });
+    return base.concat(ex);
   }
 
   // Filter state
@@ -2559,7 +2591,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function renderCitySheet(query) {
     const list = document.getElementById('citySheetList');
     const q = norm(query);
-    const filtered = ALL_PY_CITIES.filter(c => !q || norm(c).includes(q));
+    const filtered = filterCities().filter(c => !q || norm(c).includes(q));
     if (!filtered.length) {
       list.innerHTML = '<div class="city-sheet-empty">Keine Stadt gefunden</div>';
       return;
@@ -5769,7 +5801,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function renderMapCitySheet(query) {
     const list = document.getElementById('mapCitySheetList');
     const q = norm(query);
-    const filtered = ALL_PY_CITIES.filter(c => !q || norm(c).includes(q));
+    const filtered = filterCities().filter(c => !q || norm(c).includes(q));
     list.innerHTML = filtered.map(c => `
       <div class="city-sheet-item${mapCityFilter===c?' selected':''}" onclick="selectMapCity('${c}')">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>

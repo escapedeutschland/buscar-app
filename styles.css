@@ -788,3 +788,10 @@
 .hours-row { display:flex; justify-content:space-between; align-items:baseline; gap:14px; }
 .hours-day { color:var(--text-2); flex:0 0 auto; }
 .hours-time { color:var(--text-1); font-weight:600; text-align:right; }
+
+/* Event-Foto-Galerie (Detailansicht) */
+.ev-photo-gallery{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;margin-bottom:14px;padding-bottom:2px}
+.ev-photo-gallery::-webkit-scrollbar{display:none}
+.ev-photo-gallery{scrollbar-width:none}
+.ev-photo{height:210px;min-width:82%;object-fit:cover;border-radius:var(--radius-lg);scroll-snap-align:start;background:var(--surface-2)}
+.ev-photo-gallery .ev-photo:only-child{min-width:100%}
