@@ -910,6 +910,28 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if (l) { l.rating_sum = sum; l.rating_count = count; }
     } catch(e) {}
   }
+  // Einmaliges Backfill der usernames-Reservierungen (nur Admin, Browser-Console: migrateUsernames())
+  async function migrateUsernames() {
+    if (!currentUser || currentUser.email !== ADMIN_EMAIL) { showToast('Nur als Admin'); return; }
+    if (!await confirmSheet('Usernames-Backfill starten? Reserviert alle bestehenden Benutzernamen (usernames-Collection).')) return;
+    try {
+      var snap = await db.collection('users').get();
+      var done = 0, skip = 0, conflict = 0, fail = 0;
+      for (var i = 0; i < snap.docs.length; i++) {
+        var u = snap.docs[i]; var d = u.data();
+        var key = _usernameKey(d.username);
+        if (!key) { skip++; continue; }
+        try {
+          var ref = db.collection('usernames').doc(key);
+          var ex = await ref.get();
+          if (ex.exists) { if (ex.data().uid !== u.id) conflict++; else skip++; continue; }
+          await ref.set({ uid: u.id, created_at: d.created_at || new Date() });
+          done++;
+        } catch(e) { fail++; }
+      }
+      showToast(done + ' reserviert · ' + skip + ' übersprungen · ' + conflict + ' Konflikte · ' + fail + ' Fehler');
+    } catch(e) { showToast('Fehler: ' + e); }
+  }
   // Einmaliges Backfill (nur Admin, im Browser-Console: migrateRatings())
   async function migrateRatings() {
     if (!currentUser || currentUser.email !== ADMIN_EMAIL) { showToast('Nur als Admin'); return; }
@@ -1166,6 +1188,22 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
   }
 
+  // ── Benutzername-Reservierung (öffentliche usernames-Collection) ───────────
+  // doc-id = kleingeschriebener Name, Inhalt {uid, created_at}. KEINE persönlichen Daten
+  // -> öffentlich lesbar, damit Verfügbarkeit schon VOR dem Login geprüft werden kann.
+  function _usernameKey(name){ return String(name || '').trim().toLowerCase(); }
+  async function _usernameOwner(key){
+    // uid = vergeben | null = frei | undefined = nicht prüfbar (Regeln noch nicht aktiv/offline) -> best-effort
+    if (!key) return undefined;
+    try { var d = await db.collection('usernames').doc(key).get(); return d.exists ? (d.data().uid || 'unknown') : null; }
+    catch(e){ return undefined; }
+  }
+  async function _reserveUsername(key, uid){
+    if (!key || !uid) return false;
+    try { await db.collection('usernames').doc(key).set({ uid: uid, created_at: new Date() }); return true; }
+    catch(e){ return false; }
+  }
+
   async function handleRegister(e) {
     e.preventDefault();
     const btn = document.getElementById('registerBtn');
@@ -1178,23 +1216,21 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       usernameErr.style.display = 'block'; return;
     }
 
+    const uKey = _usernameKey(username);
     btn.disabled = true; btn.textContent = 'Wird erstellt...';
     document.getElementById('authError').classList.remove('visible');
     try {
-      // Uniqueness-Vorabprüfung ist BEST-EFFORT: die gehärteten Firestore-Regeln verbieten
-      // einem nicht eingeloggten Gast die users-Abfrage (permission-denied). Diesen Fehler
-      // abfangen und die Prüfung überspringen, statt die gesamte Registrierung zu blockieren.
-      try {
-        const taken = await db.collection('users').where('username', '==', username).get();
-        if (!taken.empty) {
-          usernameErr.textContent = 'Dieser Benutzername ist bereits vergeben.';
-          usernameErr.style.display = 'block';
-          btn.disabled = false; btn.textContent = 'Konto erstellen';
-          return;
-        }
-      } catch (preErr) { /* Gast darf users nicht lesen -> Vorabprüfung überspringen */ }
-
+      // Verfügbarkeit über die öffentliche usernames-Collection prüfen (funktioniert auch als Gast).
+      // Best-effort: ohne veröffentlichte Regeln liefert _usernameOwner undefined -> Prüfung übersprungen.
+      const owner = await _usernameOwner(uKey);
+      if (owner) {
+        usernameErr.textContent = 'Dieser Benutzername ist bereits vergeben.';
+        usernameErr.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Konto erstellen';
+        return;
+      }
       const cred = await auth.createUserWithEmailAndPassword(document.getElementById('regEmail').value, document.getElementById('regPassword').value);
+      await _reserveUsername(uKey, cred.user.uid); // Name reservieren (best-effort; atomar via Regel)
       await db.collection('users').doc(cred.user.uid).set({
         name: document.getElementById('regName').value,
         username: username,
@@ -5304,12 +5340,21 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!/^[a-zA-Z0-9_]{3,30}$/.test(newName)) {
       err.textContent = 'Min. 3 Zeichen, nur Buchstaben, Zahlen und _.'; err.style.display = 'block'; return;
     }
-    const taken = await db.collection('users').where('username','==',newName).get();
-    if (!taken.empty && taken.docs[0].id !== currentUser.uid) {
-      err.textContent = 'Bereits vergeben.'; err.style.display = 'block'; return;
-    }
+    const newKey = _usernameKey(newName);
+    // Alten Namen aus dem eigenen user-doc holen (self-read ist erlaubt), um die alte Reservierung freizugeben.
+    let oldName = '';
+    try { const ud = await db.collection('users').doc(currentUser.uid).get(); oldName = (ud.exists && ud.data().username) || ''; } catch(e){}
+    const oldKey = _usernameKey(oldName);
     try {
+      if (newKey !== oldKey) {
+        const owner = await _usernameOwner(newKey);
+        if (owner && owner !== currentUser.uid) {
+          err.textContent = 'Bereits vergeben.'; err.style.display = 'block'; return;
+        }
+        await _reserveUsername(newKey, currentUser.uid);
+      }
       await db.collection('users').doc(currentUser.uid).set({ username: newName }, { merge: true });
+      if (oldKey && oldKey !== newKey) { try { await db.collection('usernames').doc(oldKey).delete(); } catch(e){} }
       document.getElementById('profilName').textContent = newName;
       succ.textContent = '✓ Gespeichert!'; succ.style.display = 'block';
       setTimeout(() => showScreen('screenProfil'), 1200);
