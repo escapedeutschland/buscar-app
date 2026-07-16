@@ -1882,12 +1882,29 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     _eventsMapMarkers = [];
   }
 
-  function buildEvPopup(evId, title, city, type) {
-    return '<div class="map-popup" data-evid="' + evId + '" onclick="evMarkerClick(this.getAttribute(\'data-evid\'))" style="cursor:pointer">'
-      + '<div class="map-popup-name">' + title + '</div>'
-      + '<div class="map-popup-city">' + city + ' &middot; ' + type + '</div>'
-      + '<div class="map-popup-cat" style="color:var(--yellow);margin-top:2px">Zum Event →</div>'
-      + '</div>';
+  // Popup für einen Karten-Punkt: 1 Event -> direkte Vorschau, mehrere Events
+  // am selben Ort -> Liste (sonst würden sich die Pins gegenseitig verdecken).
+  function buildEvGroupPopup(list) {
+    if (list.length === 1) {
+      var ev = list[0];
+      return '<div class="map-popup" data-evid="' + ev.id + '" onclick="evMarkerClick(this.getAttribute(\'data-evid\'))" style="cursor:pointer">'
+        + '<div class="map-popup-name">' + esc(ev.title || '') + '</div>'
+        + '<div class="map-popup-city">' + esc(ev.city || '') + ' &middot; ' + esc(ev.type || '') + '</div>'
+        + '<div class="map-popup-cat" style="color:var(--yellow);margin-top:2px">Zum Event →</div>'
+        + '</div>';
+    }
+    var rows = list.map(function(ev) {
+      var em = EVENT_TYPE_EMOJIS[ev.type] || '📅';
+      var st = (ev.date_start && ev.date_start.toDate) ? ev.date_start.toDate() : null;
+      var ds = st ? st.toLocaleDateString(currentLang === 'es' ? 'es-PY' : 'de-DE', { day: 'numeric', month: 'short' }) : '';
+      return '<div data-evid="' + ev.id + '" onclick="evMarkerClick(this.getAttribute(\'data-evid\'))" style="cursor:pointer;padding:7px 0;border-top:1px solid var(--border)">'
+        + '<div class="map-popup-name">' + em + ' ' + esc(ev.title || '') + '</div>'
+        + '<div class="map-popup-city">' + (ds ? ds + ' &middot; ' : '') + esc(ev.city || '') + '</div>'
+        + '</div>';
+    }).join('');
+    return '<div class="map-popup" style="max-width:230px;max-height:240px;overflow-y:auto">'
+      + '<div class="map-popup-cat" style="color:var(--yellow);font-weight:700">' + list.length + ' Events an diesem Ort</div>'
+      + rows + '</div>';
   }
 
   async function renderEventsOnMap() {
@@ -1902,24 +1919,44 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         allEvents = events;
       } catch(e) { return; }
     }
+    // Events nach exakter Koordinate gruppieren – mehrere Events am selben
+    // Veranstaltungsort liegen sonst als Pins übereinander und verdecken sich.
+    var groups = {};
     events.forEach(function(ev) {
       if (!ev.lat || !ev.lng) return;
-      var color = EVENT_TYPE_COLORS[ev.type] || '#F5A623';
-      var emoji = EVENT_TYPE_EMOJIS[ev.type] || '📅';
-      var evId = ev.id;
+      var key = Number(ev.lat).toFixed(5) + ',' + Number(ev.lng).toFixed(5);
+      if (!groups[key]) groups[key] = { lat: ev.lat, lng: ev.lng, list: [] };
+      groups[key].list.push(ev);
+    });
 
-      // Circle marker
+    Object.keys(groups).forEach(function(key) {
+      var g = groups[key];
+      var first = g.list[0];
+      var many = g.list.length > 1;
+      var color = many ? '#F5A623' : (EVENT_TYPE_COLORS[first.type] || '#F5A623');
+      var emoji = many ? '🎉' : (EVENT_TYPE_EMOJIS[first.type] || '📅');
+
+      // WICHTIG: KEIN position/transform am Marker-Element setzen – MapLibre
+      // positioniert es selbst (position:absolute + transform). Ein eigenes
+      // position würde das überschreiben und alle Pins aus der Karte "fallen"
+      // lassen. Das Badge ist ein absolut positioniertes Kind und hängt sich
+      // dadurch automatisch an das (von MapLibre absolut gesetzte) Marker-Element.
       var el = document.createElement('div');
       el.style.cssText = 'width:38px;height:38px;border-radius:50%;background:'+color+';border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;';
       el.textContent = emoji;
+      if (many) {
+        var badge = document.createElement('div');
+        badge.textContent = g.list.length;
+        badge.style.cssText = 'position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;padding:0 4px;box-sizing:border-box;border-radius:10px;background:#EF4444;color:#fff;font-size:11px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;border:2px solid #fff;pointer-events:none;';
+        el.appendChild(badge);
+      }
 
       var marker = new maplibregl.Marker({ element: el, anchor: 'center' })
-        .setLngLat([ev.lng, ev.lat])
+        .setLngLat([g.lng, g.lat])
         .addTo(maplibreMap);
 
-      // Popup like listings - click popup → detail
-      var popup = new maplibregl.Popup({ closeButton: false, maxWidth: '220px', offset: 20 })
-        .setHTML(buildEvPopup(evId, ev.title||'', ev.city||'', ev.type||''));
+      var popup = new maplibregl.Popup({ closeButton: false, maxWidth: '240px', offset: 20 })
+        .setHTML(buildEvGroupPopup(g.list));
       marker.setPopup(popup);
 
       el.addEventListener('click', function(e) {
