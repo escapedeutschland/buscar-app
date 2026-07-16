@@ -1085,6 +1085,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     // === NEU: Beim Öffnen des Formulars Standort-Berechtigung pruefen
     if (id === 'screenForm') {
       checkLocationPermissionForForm();
+      // Kategorie-Feld ausblenden, wenn aus dem Immobilien-Reiter geöffnet (Einmal-Flag)
+      var _immoLocked = !!window._immoFormPending; window._immoFormPending = false;
+      var _cf = document.getElementById('categoryField');
+      if (_cf) _cf.style.display = _immoLocked ? 'none' : '';
+      // Feld-Sichtbarkeit (Tags/Öffnungszeiten/Maps-Import/Immo-Details) an aktuelle Kategorie angleichen
+      try { updateSubcatOptions(); } catch(e){}
     }
     if (id === 'screenForm' || id === 'screenEventForm') {
       try { populateCityDatalist(); } catch(e){}
@@ -2864,6 +2870,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function openImmobilien(){ renderImmoFilters(); updateMaklerCta(); showScreen('screenImmobilien'); loadImmobilien(); }
   function openImmobilienForm(){
     if (!currentUser){ showScreen('screenAuth'); return; }
+    // Kennzeichnet: Formular wurde aus dem Immobilien-Reiter geöffnet -> Kategorie ist
+    // implizit Immobilien und soll NICHT wählbar sein (wird in showScreen ausgeblendet).
+    window._immoFormPending = true;
     setNav('navForm'); showScreen('screenForm');
     var cat = document.getElementById('newCategory');
     if (cat){ cat.value = 'kat-immobilien'; if (typeof updateSubcatOptions === 'function') updateSubcatOptions(); }
@@ -4353,6 +4362,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       grid2.innerHTML = `<label style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px" for="formPhotoInput"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="24" height="24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">${t('photo_add_label')}</span></label><input type="file" id="formPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFormPhotos(event)">`;
       ['newName','newCity','newDesc','newPhone','newWebsite','newAddress','newHours'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('newCategory').value = '';
+      var _cfReset = document.getElementById('categoryField'); if (_cfReset) _cfReset.style.display = '';
+      try { updateSubcatOptions(); } catch(e){}
       formTags = []; _refreshTags('form');
       document.getElementById('nameCounter').textContent = '0 / 60';
       document.getElementById('descCounter').textContent = '0 / 500';
@@ -5853,8 +5864,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       sel.innerHTML = '<option value="">Bitte wählen...</option>' + opts.map(s => `<option value="${s}">${s}</option>`).join('');
       field.style.display = 'block';
     } else { field.style.display = 'none'; }
+    var isImmo = (cat === 'kat-immobilien');
     var imo = document.getElementById('immobilienFields');
-    if (imo) imo.style.display = (cat === 'kat-immobilien') ? 'block' : 'none';
+    if (imo) imo.style.display = isImmo ? 'block' : 'none';
+    // Bei Immobilien unpassend -> ausblenden: Merkmale/Tags, Öffnungszeiten, Maps-Import
+    var _tc = document.getElementById('tagsCard');       if (_tc) _tc.style.display = isImmo ? 'none' : '';
+    var _hf = document.getElementById('hoursField');     if (_hf) _hf.style.display = isImmo ? 'none' : '';
+    var _mi = document.getElementById('mapsImportCard'); if (_mi) _mi.style.display = isImmo ? 'none' : '';
     _refreshTags('form');
   }
 

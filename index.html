@@ -50,17 +50,17 @@
   <meta name="twitter:title" content="Buscar – Der Guide für Paraguay">
   <meta name="twitter:description" content="Der Guide für Paraguay: geprüfte Orte, Dienstleistungen und Events – für Auswanderer und Einheimische.">
   <meta name="twitter:image" content="https://escapedeutschland.github.io/buscar-app/og-default.jpg">
-  <link rel="preload" href="styles.css?v=214" as="style">
-  <link rel="preload" href="app.js?v=214" as="script">
+  <link rel="preload" href="styles.css?v=215" as="style">
+  <link rel="preload" href="app.js?v=215" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-  <link href="styles.css?v=214" rel="stylesheet">
+  <link href="styles.css?v=215" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  <script defer src="app.js?v=214"></script>
+  <script defer src="app.js?v=215"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -636,7 +636,7 @@
           <div class="dupe-warning" id="dupeWarning"><div class="dupe-warning-title">⚠️ Ähnliche Einträge gefunden – bitte prüfen:</div><div id="dupeList"></div></div>
           <div class="field-error" id="nameError">Name darf keine Emojis enthalten.</div>
         </div>
-        <div class="form-field">
+        <div class="form-field" id="categoryField">
           <label class="field-label">Kategorie *</label>
           <select class="field-select" id="newCategory" onchange="updateSubcatOptions()">
             <option value="">Bitte wählen...</option>
@@ -754,7 +754,7 @@
           <label class="field-label">Adresse</label>
           <input class="field-input" type="text" id="newAddress" placeholder="Straße, Stadtviertel">
         </div>
-        <div class="form-field">
+        <div class="form-field" id="hoursField">
           <label class="field-label">Öffnungszeiten</label>
           <div style="display:flex;flex-direction:column;gap:10px">
             <select id="hoursDay" class="field-input" style="padding:10px 12px">
@@ -794,7 +794,7 @@
           <div id="importedHoursDisplay" style="display:none;white-space:pre-line;margin-top:10px;padding:10px 12px;background:var(--green-light);border:1px solid var(--green);border-radius:10px;font-size:12px;color:var(--text-2);line-height:1.5"></div>
         </div>
       </div>
-      <div class="form-card">
+      <div class="form-card" id="tagsCard">
         <div class="form-card-title" data-i18n="tags_title">Merkmale & Tags</div>
         <div style="font-size:12px;color:var(--text-3);margin-bottom:10px" data-i18n="tags_hint">Hilf anderen, diesen Ort zu finden. Wähle passende Merkmale oder füge eigene Stichwörter hinzu (z. B. „fluoridfreie Zahnpasta").</div>
         <div id="tagPresets" class="tag-presets" style="display:none"></div>
