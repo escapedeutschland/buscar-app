@@ -3173,6 +3173,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   let maplibreMap = null;
   let mapLoaded = false;
+  let _geoLocateCtrl = null;
   let pendingData = null;
   let _mapFitOnUpdate = true;
   let mapCityFilter = 'Alle';
@@ -3875,6 +3876,17 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
       maplibreMap.addControl(new maplibregl.NavigationControl({ showCompass:false }), 'top-right');
       maplibreMap.addControl(new maplibregl.AttributionControl({ compact:true }), 'bottom-right');
+
+      // Eigener Live-Standort: kleiner blauer Punkt, folgt der Bewegung.
+      // Tippen zeigt den Standort; erneutes Tippen folgt/zentriert. Datenschutz-
+      // freundlich: Ortung wird erst nach dem Tippen (Nutzergeste) abgefragt.
+      _geoLocateCtrl = new maplibregl.GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        trackUserLocation: true,
+        showUserLocation: true,
+        showAccuracyCircle: true
+      });
+      maplibreMap.addControl(_geoLocateCtrl, 'top-right');
 
       maplibreMap.on('load', () => {
         mapLoaded = true;
