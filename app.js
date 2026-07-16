@@ -894,7 +894,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // Einmaliges Backfill (nur Admin, im Browser-Console: migrateRatings())
   async function migrateRatings() {
     if (!currentUser || currentUser.email !== ADMIN_EMAIL) { alert('Nur als Admin'); return; }
-    if (!confirm('Rating-Backfill starten? Schreibt rating_sum/rating_count auf alle bewerteten Einträge.')) return;
+    if (!await confirmSheet('Rating-Backfill starten? Schreibt rating_sum/rating_count auf alle bewerteten Einträge.')) return;
     try {
       var snap = await db.collection('reviews').get();
       var agg = {};
@@ -1306,6 +1306,40 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     toast.style.opacity = '1';
     clearTimeout(toast._t);
     toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 3500);
+  }
+
+  // Gebrandetes, Promise-basiertes Bestätigungs-Sheet als Ersatz für natives confirm().
+  // Auflösung: true = bestätigt, false = abgebrochen. Text wird XSS-sicher per textContent gesetzt.
+  function confirmSheet(message, opts) {
+    opts = opts || {};
+    var es = (currentLang === 'es');
+    return new Promise(function(resolve) {
+      var ov = document.createElement('div');
+      ov.className = 'confirm-overlay';
+      ov.innerHTML =
+        '<div class="confirm-sheet" role="dialog" aria-modal="true">'
+        + '<div class="confirm-msg"></div>'
+        + '<div class="confirm-actions">'
+        + '<button type="button" class="confirm-cancel"></button>'
+        + '<button type="button" class="confirm-ok' + (opts.danger === false ? '' : ' danger') + '"></button>'
+        + '</div></div>';
+      ov.querySelector('.confirm-msg').textContent = message || '';
+      ov.querySelector('.confirm-cancel').textContent = opts.cancelText || (es ? 'Cancelar' : 'Abbrechen');
+      ov.querySelector('.confirm-ok').textContent = opts.confirmText || (es ? 'Confirmar' : 'Bestätigen');
+      var done = false;
+      function close(val) {
+        if (done) return; done = true;
+        if (ov.parentNode) ov.parentNode.removeChild(ov);
+        document.removeEventListener('keydown', onKey);
+        resolve(val);
+      }
+      function onKey(e) { if (e.key === 'Escape') close(false); }
+      ov.querySelector('.confirm-cancel').addEventListener('click', function() { close(false); });
+      ov.querySelector('.confirm-ok').addEventListener('click', function() { close(true); });
+      ov.addEventListener('click', function(e) { if (e.target === ov) close(false); });
+      document.addEventListener('keydown', onKey);
+      document.body.appendChild(ov);
+    });
   }
 
   // ══ EVENTS SYSTEM ═════════════════════════════════════════════════════════
@@ -1853,7 +1887,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function deleteEvent(id) {
-    if (!confirm(t('ev_delete_confirm'))) return;
+    if (!await confirmSheet(t('ev_delete_confirm'))) return;
     try {
       await db.collection('events').doc(id).delete();
       allEvents = allEvents.filter(function(e){ return e.id !== id; });
@@ -1870,7 +1904,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function cancelEvent(id) {
-    if (!confirm(t('cancel_event_confirm'))) return;
+    if (!await confirmSheet(t('cancel_event_confirm'))) return;
     try {
       await db.collection('events').doc(id).update({ status: 'cancelled' });
       var ev = allEvents.find(function(e){ return e.id === id; });
@@ -2151,7 +2185,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function unsignupEvent(id) {
     if (!currentUser) return;
-    if (!confirm(t('ev_unsignup_confirm'))) return;
+    if (!await confirmSheet(t('ev_unsignup_confirm'))) return;
     try {
       var ref = db.collection('events').doc(id);
       await db.runTransaction(async function(tx) {
@@ -3484,7 +3518,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function deleteQuestion(id){
     if(!currentUser) return;
-    if(!confirm(t('fc_del_q_confirm'))) return;
+    if(!await confirmSheet(t('fc_del_q_confirm'))) return;
     try {
       await db.collection('questions').doc(id).delete();
       _homeQuestions = null;
@@ -4690,7 +4724,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch(e){ body.innerHTML = '<div class="admin-empty"><div class="admin-empty-text">Fehler beim Laden</div></div>'; }
   }
   async function deleteDuplicate(id){
-    if (!confirm('Dieses Duplikat wirklich aus der Datenbank löschen?')) return;
+    if (!await confirmSheet('Dieses Duplikat wirklich aus der Datenbank löschen?')) return;
     try {
       await db.collection('listings').doc(id).delete();
       showToast('✓ Duplikat gelöscht');
@@ -4771,7 +4805,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function rejectClaim(claimId) {
-    if (!confirm('Anfrage ablehnen?')) return;
+    if (!await confirmSheet('Anfrage ablehnen?')) return;
     try {
       await db.collection('claims').doc(claimId).update({ status: 'rejected' });
       document.getElementById('claimCard_' + claimId).remove();
@@ -4860,7 +4894,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function removeDeal(listingId) {
-    if (!confirm(t('del_deal_confirm'))) return;
+    if (!await confirmSheet(t('del_deal_confirm'))) return;
     try {
       await db.collection('listings').doc(listingId).update({ deal_text: null, deal_code: null, deal_expiry: null });
       await loadListings();
@@ -4869,7 +4903,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function rejectEntry(id) {
-    if (!confirm(t('del_entry_confirm'))) return;
+    if (!await confirmSheet(t('del_entry_confirm'))) return;
     try {
       await db.collection('listings').doc(id).delete();
       var card = document.getElementById('adminCard_' + id);
@@ -5171,7 +5205,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function deleteReview(reviewId, listingId) {
-    if (!confirm(t('del_review_confirm'))) return;
+    if (!await confirmSheet(t('del_review_confirm'))) return;
     try { await db.collection('reviews').doc(reviewId).delete(); await _recalcListingRating(listingId); loadReviews(listingId); renderListings(); } catch(e) { alert(t('err_generic')); }
   }
 
@@ -5200,7 +5234,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function deleteComment(commentId, listingId) {
-    if (!confirm(t('del_comment_confirm'))) return;
+    if (!await confirmSheet(t('del_comment_confirm'))) return;
     try { await db.collection('comments').doc(commentId).delete(); loadComments(listingId); } catch(e) { alert(t('err_generic')); }
   }
 
@@ -5378,7 +5412,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function deletePhoto(photoId, path, event) {
     event.stopPropagation();
-    if (!confirm(t('del_photo_confirm'))) return;
+    if (!await confirmSheet(t('del_photo_confirm'))) return;
     try {
       if (path) await storage.ref(path).delete().catch(()=>{});
       await db.collection('listing_photos').doc(photoId).delete();
@@ -5588,7 +5622,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function deleteAvatar() {
     if (!currentUser) return;
-    if (!confirm(t('del_photo_confirm'))) return;
+    if (!await confirmSheet(t('del_photo_confirm'))) return;
     try {
       const userDoc = await db.collection('users').doc(currentUser.uid).get();
       if (userDoc.exists && userDoc.data().avatar_path) {
@@ -5689,7 +5723,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function deleteOwnListing(id){
     var es=(currentLang==='es');
-    if(!confirm(es?'¿Eliminar este anuncio definitivamente?':'Diesen Eintrag wirklich endgültig löschen?')) return;
+    if(!await confirmSheet(es?'¿Eliminar este anuncio definitivamente?':'Diesen Eintrag wirklich endgültig löschen?')) return;
     try{
       await db.collection('listings').doc(id).delete();
       try{ await loadListings(); }catch(e){}
@@ -5999,7 +6033,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function removeOwnerDeal(listingId) {
-    if (!confirm(t('del_deal_confirm'))) return;
+    if (!await confirmSheet(t('del_deal_confirm'))) return;
     try {
       await db.collection('listings').doc(listingId).update({ deal_text: null, deal_code: null, deal_expiry: null });
       await loadListings();
@@ -6082,7 +6116,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   applyLang();
 
   async function deleteCoverImage(listingId){
-    if(!confirm('Titelbild entfernen?')) return;
+    if(!await confirmSheet('Titelbild entfernen?')) return;
     try {
       const l = allListings.find(x => x.id === listingId);
       if (l && l.cover_url) {

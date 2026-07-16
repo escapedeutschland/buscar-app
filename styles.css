@@ -796,3 +796,16 @@
 .ev-photo-gallery{scrollbar-width:none}
 .ev-photo{height:210px;min-width:82%;object-fit:cover;border-radius:var(--radius-lg);scroll-snap-align:start;background:var(--surface-2)}
 .ev-photo-gallery .ev-photo:only-child{min-width:100%}
+
+/* Gebrandetes Bestätigungs-Sheet (Ersatz für natives confirm()) */
+.confirm-overlay{position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.45);display:flex;align-items:flex-end;justify-content:center;padding:0 12px calc(env(safe-area-inset-bottom,0px) + 14px);animation:confirmFade .18s ease}
+@keyframes confirmFade{from{opacity:0}to{opacity:1}}
+.confirm-sheet{background:var(--card);border-radius:var(--radius-lg);width:100%;max-width:400px;padding:22px 20px 16px;box-shadow:var(--shadow-lg);animation:confirmUp .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes confirmUp{from{transform:translateY(22px);opacity:.5}to{transform:none;opacity:1}}
+.confirm-msg{font-size:15px;line-height:1.5;color:var(--text-1);margin-bottom:18px}
+.confirm-actions{display:flex;gap:10px}
+.confirm-actions button{flex:1;padding:13px;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.confirm-actions button:active{opacity:.7}
+.confirm-cancel{background:var(--surface-2);color:var(--text-2)}
+.confirm-ok{background:var(--yellow);color:#fff}
+.confirm-ok.danger{background:var(--red);color:#fff}
