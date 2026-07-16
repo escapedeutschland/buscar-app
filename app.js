@@ -1178,15 +1178,22 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       usernameErr.style.display = 'block'; return;
     }
 
-    const taken = await db.collection('users').where('username', '==', username).get();
-    if (!taken.empty) {
-      usernameErr.textContent = 'Dieser Benutzername ist bereits vergeben.';
-      usernameErr.style.display = 'block'; return;
-    }
-
     btn.disabled = true; btn.textContent = 'Wird erstellt...';
     document.getElementById('authError').classList.remove('visible');
     try {
+      // Uniqueness-Vorabprüfung ist BEST-EFFORT: die gehärteten Firestore-Regeln verbieten
+      // einem nicht eingeloggten Gast die users-Abfrage (permission-denied). Diesen Fehler
+      // abfangen und die Prüfung überspringen, statt die gesamte Registrierung zu blockieren.
+      try {
+        const taken = await db.collection('users').where('username', '==', username).get();
+        if (!taken.empty) {
+          usernameErr.textContent = 'Dieser Benutzername ist bereits vergeben.';
+          usernameErr.style.display = 'block';
+          btn.disabled = false; btn.textContent = 'Konto erstellen';
+          return;
+        }
+      } catch (preErr) { /* Gast darf users nicht lesen -> Vorabprüfung überspringen */ }
+
       const cred = await auth.createUserWithEmailAndPassword(document.getElementById('regEmail').value, document.getElementById('regPassword').value);
       await db.collection('users').doc(cred.user.uid).set({
         name: document.getElementById('regName').value,
@@ -1195,7 +1202,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         created_at: new Date(), verified: false
       });
     } catch (err) {
-      const msgs = { 'auth/email-already-in-use': 'E-Mail bereits registriert.', 'auth/weak-password': 'Passwort zu schwach.' };
+      const msgs = { 'auth/email-already-in-use': 'E-Mail bereits registriert.', 'auth/weak-password': 'Passwort zu schwach.', 'auth/invalid-email': 'Ungültige E-Mail-Adresse.' };
       showAuthError(msgs[err.code] || 'Fehler bei der Registrierung.');
       btn.disabled = false; btn.textContent = 'Konto erstellen';
     }
