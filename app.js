@@ -1412,6 +1412,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     renderEvents();
   }
 
+  // Aktuelle Anzeige-Locale (Datum/Zahlen) passend zur App-Sprache.
+  function dateLoc(){ return currentLang === 'es' ? 'es-PY' : 'de-DE'; }
+
   // Robust: liefert ein Date egal ob Firestore-Timestamp, Date, {seconds} oder String; sonst null.
   function _evDate(v){
     if (!v) return null;
@@ -1462,13 +1465,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
     document.getElementById('eventsList').innerHTML = filtered.map(function(ev) {
       var start = _evDate(ev.date_start);
-      var dateStr = start ? start.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'}) : '';
-      var timeStr = start ? start.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) : '';
+      var dateStr = start ? start.toLocaleDateString(dateLoc(),{weekday:'short',day:'numeric',month:'short'}) : '';
+      var timeStr = start ? start.toLocaleTimeString(dateLoc(),{hour:'2-digit',minute:'2-digit'}) : '';
       var emoji = EVENT_TYPE_EMOJIS[ev.type] || '📌';
       var typeClass = 'type-' + (ev.type||'').toLowerCase();
       var isFull = ev.has_signup && ev.capacity > 0 && (ev.signups_count||0) >= ev.capacity;
       var isCancelled = ev.status === 'cancelled';
-      var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' ₲' : t('ev_paid_label')) : t('ev_free');
+      var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString(dateLoc()) + ' ₲' : t('ev_paid_label')) : t('ev_free');
       var spotsLeft = ev.has_signup && ev.capacity > 0 ? (ev.capacity - (ev.signups_count||0)) + ' ' + t('ev_spots') : '';
       var statusHtml = isCancelled ? '<span class=\"event-status-cancelled\">'+t('ev_cancelled')+'</span>' :
                        isFull ? '<span class=\"event-status-full\">'+t('ev_full')+'</span>' :
@@ -1514,9 +1517,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('evDetailTypeBadge').textContent = emoji + ' ' + (ev.type||'');
     document.getElementById('evDetailTitle').textContent = ev.title||'';
 
-    var dateStr    = start ? start.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '';
-    var timeStr    = start ? start.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) : '';
-    var timeEndStr = end   ? end.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})   : '';
+    var dateStr    = start ? start.toLocaleDateString(dateLoc(),{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '';
+    var timeStr    = start ? start.toLocaleTimeString(dateLoc(),{hour:'2-digit',minute:'2-digit'}) : '';
+    var timeEndStr = end   ? end.toLocaleTimeString(dateLoc(),{hour:'2-digit',minute:'2-digit'})   : '';
 
     var evRouteUrl = (ev.lat && ev.lng) ? 'https://maps.google.com/?q=' + ev.lat + ',' + ev.lng
       : ((ev.address || ev.city) ? 'https://maps.google.com/?q=' + encodeURIComponent([ev.address, ev.city].filter(Boolean).join(', ')) : '');
@@ -1528,7 +1531,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
     var isFull = ev.has_signup && ev.capacity > 0 && (ev.signups_count||0) >= ev.capacity;
     var isCancelled = ev.status === 'cancelled';
-    var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString('de-DE') + ' Guaraní' : t('ev_paid_label')) : t('ev_free');
+    var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString(dateLoc()) + ' Guaraní' : t('ev_paid_label')) : t('ev_free');
 
     var photoHtml = '';
     if (ev.photos && ev.photos.length) {
@@ -2060,7 +2063,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       }
       list.innerHTML = events.map(function(ev) {
         var start = _evDate(ev.date_start);
-        var dateStr = start ? start.toLocaleDateString('de-DE',{day:'numeric',month:'short',year:'numeric'}) : '';
+        var dateStr = start ? start.toLocaleDateString(dateLoc(),{day:'numeric',month:'short',year:'numeric'}) : '';
         var isCancelled = ev.status === 'cancelled';
         var _now = new Date();
         var _endD = _evDate(ev.date_end) || _evDate(ev.date_start);
@@ -2110,8 +2113,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       }
       list.innerHTML = events.map(function(ev) {
         var start = _evDate(ev.date_start);
-        var dateStr = start ? start.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'}) : '';
-        var timeStr = start ? start.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) : '';
+        var dateStr = start ? start.toLocaleDateString(dateLoc(),{weekday:'short',day:'numeric',month:'short'}) : '';
+        var timeStr = start ? start.toLocaleTimeString(dateLoc(),{hour:'2-digit',minute:'2-digit'}) : '';
         var isCancelled = ev.status === 'cancelled';
         var isPast = start && start < new Date();
         var emoji = EVENT_TYPE_EMOJIS[ev.type] || '📅';
@@ -3090,7 +3093,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           const pyg = rates.PYG || 0;
           const eur = rates.EUR || 0;
           const brl = rates.BRL || 0;
-          const now = new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+          const now = new Date().toLocaleTimeString(dateLoc(),{hour:'2-digit',minute:'2-digit'});
           const lang = currentLang;
           const note = lang === 'de'
             ? '* Interbanken-Referenzkurs. Der Kurs vor Ort kann leicht abweichen.'
@@ -3106,17 +3109,17 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
             <div class="exchange-row">
               <span class="exchange-from">1 USD 🇺🇸</span>
               <span class="exchange-arrow">→</span>
-              <span class="exchange-to">${pyg ? Math.round(pyg).toLocaleString('de-DE') + ' PYG' : '—'}</span>
+              <span class="exchange-to">${pyg ? Math.round(pyg).toLocaleString(dateLoc()) + ' PYG' : '—'}</span>
             </div>
             <div class="exchange-row">
               <span class="exchange-from">1 EUR 🇪🇺</span>
               <span class="exchange-arrow">→</span>
-              <span class="exchange-to">${(pyg && eur) ? Math.round(pyg/eur).toLocaleString('de-DE') + ' PYG' : '—'}</span>
+              <span class="exchange-to">${(pyg && eur) ? Math.round(pyg/eur).toLocaleString(dateLoc()) + ' PYG' : '—'}</span>
             </div>
             <div class="exchange-row">
               <span class="exchange-from">1 BRL 🇧🇷</span>
               <span class="exchange-arrow">→</span>
-              <span class="exchange-to">${(pyg && brl) ? Math.round(pyg/brl).toLocaleString('de-DE') + ' PYG' : '—'}</span>
+              <span class="exchange-to">${(pyg && brl) ? Math.round(pyg/brl).toLocaleString(dateLoc()) + ' PYG' : '—'}</span>
             </div>
             <div class="exchange-note">${note}</div>
           </div>`;
@@ -4885,7 +4888,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function formatDate(ts) {
     if (!ts) return '';
     const d = ts.toDate ? ts.toDate() : new Date(ts);
-    return d.toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric' });
+    return d.toLocaleDateString(dateLoc(), { day:'2-digit', month:'2-digit', year:'numeric' });
   }
 
   function starsHTML(rating, size) {
@@ -6066,8 +6069,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   const searchInput = document.getElementById('searchInput');
   const searchClear = document.getElementById('searchClear');
-  searchInput.addEventListener('input', e => { searchQuery = e.target.value; searchClear.classList.toggle('visible', !!searchQuery); renderListings(); });
-  searchClear.addEventListener('click', () => { searchQuery = ''; searchInput.value = ''; searchClear.classList.remove('visible'); renderListings(); });
+  let _searchDebounce = null;
+  searchInput.addEventListener('input', e => {
+    searchQuery = e.target.value;
+    searchClear.classList.toggle('visible', !!searchQuery);
+    clearTimeout(_searchDebounce);
+    _searchDebounce = setTimeout(renderListings, 160);
+  });
+  searchClear.addEventListener('click', () => { clearTimeout(_searchDebounce); searchQuery = ''; searchInput.value = ''; searchClear.classList.remove('visible'); renderListings(); });
 
   // Apply language on load
   applyLang();
