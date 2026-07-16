@@ -868,9 +868,28 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch(e) {}
   }
 
+  // Schneller id->listing-Index: verhindert lineare .find()-Scans in heißen Pfaden
+  // (getAvgRating pro Karte + pro Sortier-Vergleich). Wird pro Render einmal neu gebaut.
+  let _listingIndex = new Map();
+  function _rebuildListingIndex(){
+    _listingIndex = new Map();
+    for (var i = 0; i < allListings.length; i++){ var l = allListings[i]; if (l && l.id) _listingIndex.set(l.id, l); }
+  }
+  // Normalisiertes Such-Blob je Eintrag, einmal berechnet. WeakMap (nach Objekt-Identität)
+  // -> landet NICHT im localStorage und wird für frische Objekte nach Reload automatisch neu berechnet.
+  var _searchCache = new WeakMap();
+  function _searchBlob(l){
+    var c = _searchCache.get(l);
+    if (c === undefined){
+      c = norm([l.name||'', l.description||'', l.city||'', l.subcategory||'', tagSearchStr(l.tags)].join(' '));
+      _searchCache.set(l, c);
+    }
+    return c;
+  }
+
   function getAvgRating(listingId) {
     // Bevorzugt das Aggregat am Eintrag (rating_sum/rating_count) -> keine Reviews-Lesung nötig
-    var l = allListings.find(function(x){ return x.id === listingId; });
+    var l = _listingIndex.get(listingId) || allListings.find(function(x){ return x.id === listingId; });
     if (l && typeof l.rating_count === 'number' && l.rating_count > 0 && typeof l.rating_sum === 'number') {
       return l.rating_sum / l.rating_count;
     }
@@ -2773,6 +2792,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function _doRenderListings() {
     if (activeScreen !== 'screenHome') return;
     try { updateMyAnswerBadge(); } catch(e){}
+    _rebuildListingIndex();
     let filtered = allListings;
     filtered = filtered.filter(l => l.category_id !== 'kat-immobilien'); // Immobilien haben eine eigene Seite
     if (activeCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === activeCategory);
@@ -2782,10 +2802,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (activeOpenNow) filtered = filtered.filter(l => isOpen(l.opening_hours) === true);
     if (activeDeal) filtered = filtered.filter(l => l.deal_text && l.deal_text.trim() !== '');
     if (activeTags.length) filtered = filtered.filter(l => { const lt = (l.tags||[]).map(x => String(x).toLowerCase()); return activeTags.every(k => lt.indexOf(String(k).toLowerCase()) >= 0); });
-    if (searchQuery) { const q = norm(searchQuery); filtered = filtered.filter(l => norm(l.name||'').includes(q)||norm(l.description||'').includes(q)||norm(l.city||'').includes(q)||norm(l.subcategory||'').includes(q)||norm(tagSearchStr(l.tags)).includes(q)); }
-    filtered = filtered.slice().sort(function(a, b) {
-      return scoreEntry(b) - scoreEntry(a);
-    });
+    if (searchQuery) { const q = norm(searchQuery); filtered = filtered.filter(l => _searchBlob(l).includes(q)); }
+    // Score EINMAL pro Eintrag berechnen (nicht bei jedem Sortier-Vergleich) -> O(n log n) statt O(n²)
+    filtered = filtered.map(function(l){ return { l: l, s: scoreEntry(l) }; })
+      .sort(function(a, b){ return b.s - a.s; })
+      .map(function(x){ return x.l; });
     const container = document.getElementById('listingsInner');
     document.getElementById('sectionTitle').textContent = filtered.length + ' ' + (activeCategory === 'Alle' ? t('entries_all') : t('results'));
     if (!filtered.length) { var _askCta = searchQuery ? '<button class="form-submit" style="margin:18px auto 0;max-width:280px" onclick="openAskQuestion(' + JSON.stringify(searchQuery) + ')">📣 '+t('fc_ask_cta')+'</button>' : ''; container.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="empty-title">'+t('nothing_found')+'</div><div class="empty-sub">'+t('nothing_found_sub')+'</div>'+_askCta+'</div>'; return; }
@@ -3393,7 +3414,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('listings').doc(listingId).update({ tags: firebase.firestore.FieldValue.arrayUnion(tag) });
       await db.collection('tag_suggestions').doc(sugId).update({ status:'applied' });
       var l=allListings.find(function(x){return x.id===listingId;});
-      if(l){ if(!Array.isArray(l.tags)) l.tags=[]; if(l.tags.map(function(x){return String(x).toLowerCase();}).indexOf(String(tag).toLowerCase())<0) l.tags.push(tag); }
+      if(l){ if(!Array.isArray(l.tags)) l.tags=[]; if(l.tags.map(function(x){return String(x).toLowerCase();}).indexOf(String(tag).toLowerCase())<0) l.tags.push(tag); _searchCache.delete(l); }
       var c=document.getElementById('tagsugCard_'+sugId); if(c) c.remove();
       showToast(currentLang==='es' ? '✓ Etiqueta aplicada' : '✓ Tag übernommen');
     } catch(e){ showToast(t('err_generic')||'Fehler'); }
