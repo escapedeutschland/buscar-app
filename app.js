@@ -893,7 +893,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
   // Einmaliges Backfill (nur Admin, im Browser-Console: migrateRatings())
   async function migrateRatings() {
-    if (!currentUser || currentUser.email !== ADMIN_EMAIL) { alert('Nur als Admin'); return; }
+    if (!currentUser || currentUser.email !== ADMIN_EMAIL) { showToast('Nur als Admin'); return; }
     if (!await confirmSheet('Rating-Backfill starten? Schreibt rating_sum/rating_count auf alle bewerteten Einträge.')) return;
     try {
       var snap = await db.collection('reviews').get();
@@ -904,9 +904,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         try { await db.collection('listings').doc(ids[i]).update({ rating_sum: agg[ids[i]].sum, rating_count: agg[ids[i]].count }); done++; }
         catch(e){ failed++; }
       }
-      alert('Backfill fertig: ' + done + ' Einträge aktualisiert' + (failed? (', ' + failed + ' fehlgeschlagen') : '') + '.');
+      showToast('Backfill fertig: ' + done + ' Einträge aktualisiert' + (failed? (', ' + failed + ' fehlgeschlagen') : '') + '.');
       loadListings(true);
-    } catch(e){ alert('Fehler: ' + e); }
+    } catch(e){ showToast('Fehler: ' + e); }
   }
 
   function starsSmall(avg) {
@@ -1642,9 +1642,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!currentUser){ showScreen('screenAuth'); return; }
     var ev = (typeof allEvents!=='undefined' && allEvents) ? allEvents.find(function(e){ return e.id===id; }) : null;
     if (!ev){
-      try { var d = await db.collection('events').doc(id).get(); if (!d.exists) return; ev = Object.assign({id:d.id}, d.data()); } catch(e){ alert(t('err_event_load')); return; }
+      try { var d = await db.collection('events').doc(id).get(); if (!d.exists) return; ev = Object.assign({id:d.id}, d.data()); } catch(e){ showToast(t('err_event_load')); return; }
     }
-    if (ev.created_by !== currentUser.uid && currentUser.email !== ADMIN_EMAIL){ alert('Nur der Ersteller kann das Event bearbeiten.'); return; }
+    if (ev.created_by !== currentUser.uid && currentUser.email !== ADMIN_EMAIL){ showToast('Nur der Ersteller kann das Event bearbeiten.'); return; }
     _editingEventId = id;
     document.getElementById('evFormTitle').value = ev.title || '';
     document.getElementById('evFormType').value = ev.type || '';
@@ -1882,7 +1882,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       showToast(t('ev_signup_ok'));
       showEventDetail(id);
     } catch(e) {
-      alert(e.message === 'Ausgebucht' ? t('err_sold_out') : e.message === 'Bereits angemeldet' ? t('err_already_signed') : t('err_prefix') + e.message);
+      showToast(e.message === 'Ausgebucht' ? t('err_sold_out') : e.message === 'Bereits angemeldet' ? t('err_already_signed') : t('err_prefix') + e.message);
     }
   }
 
@@ -1900,7 +1900,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       } else {
         setNav('navEvents'); showScreen('screenEvents'); renderEvents();
       }
-    } catch(e) { alert('Event konnte nicht gelöscht werden: ' + (e && e.message ? e.message : e)); }
+    } catch(e) { showToast('Event konnte nicht gelöscht werden: ' + (e && e.message ? e.message : e)); }
   }
 
   async function cancelEvent(id) {
@@ -1912,7 +1912,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       showToast('Event wurde abgesagt.');
       showScreen('screenEvents');
       renderEvents();
-    } catch(e) { alert(t('err_prefix') + e.message); }
+    } catch(e) { showToast(t('err_prefix') + e.message); }
   }
   // ══ END EVENTS SYSTEM ══════════════════════════════════════════════════════
 
@@ -2202,7 +2202,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       }
       showToast(t('ev_unsignup_ok'));
       loadMySignups();
-    } catch(e) { alert(t('err_prefix') + e.message); }
+    } catch(e) { showToast(t('err_prefix') + e.message); }
   }
   // ── END PROFIL EVENTS ──────────────────────────────────────────────────────
 
@@ -2317,7 +2317,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       closeCoordEditor();
       if (maplibreMap && mapLoaded) renderMap();
     } catch(e) {
-      alert(t('err_prefix') + e.message);
+      showToast(t('err_prefix') + e.message);
       btn.disabled = false;
       btn.textContent = t(_coordMode === 'suggest' ? 'locfix_send' : 'locfix_save');
     }
@@ -2880,7 +2880,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var l=allListings.find(function(x){return x.id===id;}); if(l) Object.assign(l, upd);
       showToast('✅ '+(es?'Guardado':'Gespeichert'));
       showDetail(id);
-    }catch(e){ if(btn){ btn.disabled=false; btn.textContent=(es?'Guardar':'Speichern'); } alert(t('err_prefix')+(e.message||e)); }
+    }catch(e){ if(btn){ btn.disabled=false; btn.textContent=(es?'Guardar':'Speichern'); } showToast(t('err_prefix')+(e.message||e)); }
   }
   function renderImmoCard(l){
     var es=(currentLang==='es');
@@ -2965,7 +2965,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function closeMaklerModal(){ var m=document.getElementById('maklerModal'); if(m) m.style.display='none'; }
   function showOnMap(id){
     var l=(typeof allListings!=='undefined'?allListings:[]).find(function(x){return x.id===id;});
-    if(!l || l.lat==null || l.lng==null){ alert(currentLang==='es'?'Este inmueble no tiene ubicación.':'Für diese Immobilie ist kein Standort hinterlegt.'); return; }
+    if(!l || l.lat==null || l.lng==null){ showToast(currentLang==='es'?'Este inmueble no tiene ubicación.':'Für diese Immobilie ist kein Standort hinterlegt.'); return; }
     // Karte auf Immobilien-Kategorie stellen, damit der Pin sichtbar ist
     mapCategory='kat-immobilien';
     document.querySelectorAll('#mapCats .map-chip').forEach(function(c){ c.classList.remove('active'); });
@@ -3360,7 +3360,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       }
       closeTagSuggest();
       showToast(t('tag_suggest_thanks'));
-    } catch(e){ if(btn){ btn.disabled=false; } alert(t('err_generic')||'Fehler'); }
+    } catch(e){ if(btn){ btn.disabled=false; } showToast(t('err_generic')||'Fehler'); }
     if(btn){ btn.disabled=false; btn.textContent=t('tag_suggest_send'); }
   }
 
@@ -3396,12 +3396,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if(l){ if(!Array.isArray(l.tags)) l.tags=[]; if(l.tags.map(function(x){return String(x).toLowerCase();}).indexOf(String(tag).toLowerCase())<0) l.tags.push(tag); }
       var c=document.getElementById('tagsugCard_'+sugId); if(c) c.remove();
       showToast(currentLang==='es' ? '✓ Etiqueta aplicada' : '✓ Tag übernommen');
-    } catch(e){ alert(t('err_generic')||'Fehler'); }
+    } catch(e){ showToast(t('err_generic')||'Fehler'); }
   }
   async function rejectTagSuggestion(sugId){
     try { await db.collection('tag_suggestions').doc(sugId).update({ status:'rejected' });
       var c=document.getElementById('tagsugCard_'+sugId); if(c) c.remove();
-    } catch(e){ alert(t('err_generic')||'Fehler'); }
+    } catch(e){ showToast(t('err_generic')||'Fehler'); }
   }
 
   // ══════════ FRAG DIE COMMUNITY (Phase 2) ══════════
@@ -3524,7 +3524,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       _homeQuestions = null;
       showToast(t('fc_deleted'));
       openQuestions(_qBoardMode);
-    } catch(e){ alert(t('err_generic')||'Fehler'); }
+    } catch(e){ showToast(t('err_generic')||'Fehler'); }
   }
   async function deleteAnswer(answerId){
     if(!currentUser || !_currentQuestion) return;
@@ -3533,7 +3533,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       try { await db.collection('questions').doc(_currentQuestion.id).update({ answers_count: firebase.firestore.FieldValue.increment(-1) }); } catch(e){}
       if(_currentQuestion.answers_count) _currentQuestion.answers_count--;
       loadAnswers(_currentQuestion.id);
-    } catch(e){ alert(t('err_generic')||'Fehler'); }
+    } catch(e){ showToast(t('err_generic')||'Fehler'); }
   }
   var _qCache = {};
   function _voteBtnHtml(q){
@@ -3607,7 +3607,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if(btn){ btn.disabled=false; btn.textContent=t('fc_ask_send'); }
       showToast(t('fc_asked'));
       openQuestionDetail(ref.id);
-    } catch(e){ if(btn){ btn.disabled=false; btn.textContent=t('fc_ask_send'); } alert(t('err_generic')||'Fehler'); }
+    } catch(e){ if(btn){ btn.disabled=false; btn.textContent=t('fc_ask_send'); } showToast(t('err_generic')||'Fehler'); }
   }
 
   async function openQuestionDetail(id){
@@ -3660,7 +3660,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       }
       document.getElementById('qdMeta').textContent = (q.seekers_count||0)+' '+t('fc_seek_count');
       _renderSeekBtn();
-    } catch(e){ alert(t('err_generic')||'Fehler'); }
+    } catch(e){ showToast(t('err_generic')||'Fehler'); }
   }
   async function loadAnswers(qid){
     var c=document.getElementById('answerList'); if(!c) return;
@@ -3763,7 +3763,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       closeAnswerPick();
       showToast(t('fc_answer_thanks'));
       loadAnswers(_currentQuestion.id);
-    } catch(e){ alert(t('err_generic')||'Fehler'); }
+    } catch(e){ showToast(t('err_generic')||'Fehler'); }
     if(btn){ btn.disabled=false; btn.textContent=t('fc_answer_send_btn'); }
   }
 
@@ -4730,7 +4730,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       showToast('✓ Duplikat gelöscht');
       await loadListings();
       loadAdminDuplicates();
-    } catch(e){ alert(t('err_prefix') + (e.message || e)); }
+    } catch(e){ showToast(t('err_prefix') + (e.message || e)); }
   }
 
   async function loadAdminListings() {
@@ -4801,7 +4801,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('claims').doc(claimId).update({ status: 'approved' });
       await db.collection('listings').doc(listingId).update({ owner_id: userId });
       document.getElementById('claimCard_' + claimId).remove();
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { showToast(t('err_generic')); }
   }
 
   async function rejectClaim(claimId) {
@@ -4809,7 +4809,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       await db.collection('claims').doc(claimId).update({ status: 'rejected' });
       document.getElementById('claimCard_' + claimId).remove();
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { showToast(t('err_generic')); }
   }
 
   async function approveEntry(id) {
@@ -4819,7 +4819,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch (err) {
       console.error('approveEntry: listing update failed', err);
       var msg = (err && err.message) ? err.message : 'Unbekannter Fehler';
-      alert('Eintrag konnte nicht freigegeben werden: ' + msg);
+      showToast('Eintrag konnte nicht freigegeben werden: ' + msg);
       return;
     }
 
@@ -4890,7 +4890,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       const btn = event.target;
       btn.textContent = '✓ Gespeichert!';
       setTimeout(() => { btn.textContent = 'Deal speichern'; }, 2000);
-    } catch(e) { alert(t('err_prefix') + (e.message || e)); }
+    } catch(e) { showToast(t('err_prefix') + (e.message || e)); }
   }
 
   async function removeDeal(listingId) {
@@ -4899,7 +4899,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('listings').doc(listingId).update({ deal_text: null, deal_code: null, deal_expiry: null });
       await loadListings();
       loadAdminDeals();
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { showToast(t('err_generic')); }
   }
 
   async function rejectEntry(id) {
@@ -4912,7 +4912,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch (err) {
       console.error('rejectEntry failed', err);
       var msg = (err && err.message) ? err.message : 'Unbekannter Fehler';
-      alert('Eintrag konnte nicht gelöscht werden: ' + msg);
+      showToast('Eintrag konnte nicht gelöscht werden: ' + msg);
     }
   }
 
@@ -5156,7 +5156,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await _recalcListingRating(listingId);
       loadReviews(listingId);
       renderListings();
-    } catch (err) { alert(t('err_generic')); btn.disabled=false; btn.textContent='Bewertung abschicken'; }
+    } catch (err) { showToast(t('err_generic')); btn.disabled=false; btn.textContent='Bewertung abschicken'; }
   }
 
   async function loadComments(listingId) {
@@ -5206,7 +5206,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function deleteReview(reviewId, listingId) {
     if (!await confirmSheet(t('del_review_confirm'))) return;
-    try { await db.collection('reviews').doc(reviewId).delete(); await _recalcListingRating(listingId); loadReviews(listingId); renderListings(); } catch(e) { alert(t('err_generic')); }
+    try { await db.collection('reviews').doc(reviewId).delete(); await _recalcListingRating(listingId); loadReviews(listingId); renderListings(); } catch(e) { showToast(t('err_generic')); }
   }
 
   function editReview(reviewId, listingId, oldRating) {
@@ -5230,12 +5230,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         rating: currentUserRating, comment: document.getElementById('reviewText').value.trim(), updated_at: new Date()
       });
       await _recalcListingRating(listingId); loadReviews(listingId); renderListings();
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { showToast(t('err_generic')); }
   }
 
   async function deleteComment(commentId, listingId) {
     if (!await confirmSheet(t('del_comment_confirm'))) return;
-    try { await db.collection('comments').doc(commentId).delete(); loadComments(listingId); } catch(e) { alert(t('err_generic')); }
+    try { await db.collection('comments').doc(commentId).delete(); loadComments(listingId); } catch(e) { showToast(t('err_generic')); }
   }
 
   function toggleReplyForm(commentId) {
@@ -5255,7 +5255,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         text: txt, created_at: new Date()
       });
       loadComments(listingId);
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { showToast(t('err_generic')); }
   }
 
   function detailBack(){ var from = window._detailFrom || 'screenHome'; if (from === 'screenMap') window._skipMapFit = true; showScreen(from); }
@@ -5372,7 +5372,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       });
       document.getElementById('commentInput').value = '';
       loadComments(currentListingId);
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { showToast(t('err_generic')); }
   }
 
   async function loadPhotos(listingId) {
@@ -5417,7 +5417,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if (path) await storage.ref(path).delete().catch(()=>{});
       await db.collection('listing_photos').doc(photoId).delete();
       loadPhotos(currentListingId);
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { showToast(t('err_generic')); }
   }
 
   async function uploadPhoto(event) {
@@ -5631,7 +5631,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('users').doc(currentUser.uid).set({ avatar_url: null, avatar_path: null }, { merge: true });
       const name = document.getElementById('profilName').textContent;
       setAvatarDisplay(null, name.charAt(0).toUpperCase());
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { showToast(t('err_generic')); }
   }
 
   async function uploadAvatar(event) {
@@ -5709,7 +5709,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function submitClaim(listingId) {
     const reason = document.getElementById('claimReason').value.trim();
-    if (!reason) { alert(t('err_reason')); return; }
+    if (!reason) { showToast(t('err_reason')); return; }
     try {
       const userDoc = await db.collection('users').doc(currentUser.uid).get();
       await db.collection('claims').add({
@@ -5718,7 +5718,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         reason, status: 'pending', created_at: new Date()
       });
       document.getElementById('claimDiv').innerHTML = `<div style="text-align:center;padding:8px"><div style="font-size:14px;color:var(--green);font-weight:600">✓ Anfrage gesendet!</div></div>`;
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { showToast(t('err_generic')); }
   }
 
   async function deleteOwnListing(id){
@@ -5730,7 +5730,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if(typeof showToast==='function') showToast(es?'✓ Eliminado':'✓ Eintrag gelöscht');
       setNav('navHome'); showScreen('screenHome');
     }catch(e){
-      alert((es?'No se pudo eliminar: ':'Konnte nicht gelöscht werden: ')+((e&&e.message)||'Fehler'));
+      showToast((es?'No se pudo eliminar: ':'Konnte nicht gelöscht werden: ')+((e&&e.message)||'Fehler'));
     }
   }
 
@@ -6029,7 +6029,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await loadListings();
       const l = allListings.find(x => x.id === listingId);
       if (l) showDetail(listingId);
-    } catch(e) { alert(t('err_prefix') + e.message); }
+    } catch(e) { showToast(t('err_prefix') + e.message); }
   }
 
   async function removeOwnerDeal(listingId) {
@@ -6038,7 +6038,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('listings').doc(listingId).update({ deal_text: null, deal_code: null, deal_expiry: null });
       await loadListings();
       showDetail(listingId);
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { showToast(t('err_generic')); }
   }
 
   function copyDealCode(code) {
@@ -6130,7 +6130,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('listings').doc(listingId).update({ cover_url: null });
       await loadListings();
       showDetail(listingId);
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { showToast(t('err_generic')); }
   }
 
   // Cover image file input
@@ -6154,7 +6154,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         await db.collection('listings').doc(currentListingId).update({cover_url:url});
         await loadListings();
         showDetail(currentListingId);
-      }catch(err){alert(t('err_upload'));}
+      }catch(err){showToast(t('err_upload'));}
       hero.style.opacity='1';
     };
     document.body.appendChild(inp);
@@ -6196,7 +6196,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       await db.collection('reports').doc(reportId).update({ status: 'resolved' });
       document.getElementById('reportCard_'+reportId).remove();
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { showToast(t('err_generic')); }
   }
 
   // ── STANDORT-VORSCHLÄGE (location_suggestions) ─────────────────────────────
@@ -6237,13 +6237,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var c = document.getElementById('locsugCard_' + sugId); if (c) c.remove();
       if (maplibreMap && mapLoaded) renderMap();
       showToast(t('toast_coords_saved'));
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { showToast(t('err_generic')); }
   }
   async function rejectLocationSuggestion(sugId) {
     try {
       await db.collection('location_suggestions').doc(sugId).update({ status: 'rejected' });
       var c = document.getElementById('locsugCard_' + sugId); if (c) c.remove();
-    } catch(e) { alert(t('err_generic')); }
+    } catch(e) { showToast(t('err_generic')); }
   }
 
   // ── Teilen + Deep-Link ──────────────────────────────────────────────
@@ -6323,7 +6323,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       });
       closeReport();
       showToast(t('toast_report_sent'));
-    } catch(e) { alert(t('err_generic')); closeReport(); }
+    } catch(e) { showToast(t('err_generic')); closeReport(); }
   }
 
   // Service Worker registrieren fuer Offline-Funktionalitaet
