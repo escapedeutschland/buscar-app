@@ -1412,6 +1412,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     renderEvents();
   }
 
+  // Robust: liefert ein Date egal ob Firestore-Timestamp, Date, {seconds} oder String; sonst null.
+  function _evDate(v){
+    if (!v) return null;
+    if (typeof v.toDate === 'function') return v.toDate();
+    if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
+    if (typeof v.seconds === 'number') return new Date(v.seconds * 1000);
+    var d = new Date(v);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
   function renderEvents() {
     var now = new Date();
     var todayEnd = new Date(); todayEnd.setHours(23,59,59);
@@ -1419,7 +1429,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var monthEnd = new Date(); monthEnd.setDate(monthEnd.getDate()+30);
 
     var filtered = allEvents.filter(function(ev) {
-      var start = ev.date_start ? ev.date_start.toDate() : null;
+      var start = _evDate(ev.date_start);
       if (!start) return false;
       if (evTimeFilter === 'today') return start <= todayEnd;
       if (evTimeFilter === 'week')  return start <= weekEnd;
@@ -1451,7 +1461,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
 
     document.getElementById('eventsList').innerHTML = filtered.map(function(ev) {
-      var start = ev.date_start ? ev.date_start.toDate() : null;
+      var start = _evDate(ev.date_start);
       var dateStr = start ? start.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'}) : '';
       var timeStr = start ? start.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) : '';
       var emoji = EVENT_TYPE_EMOJIS[ev.type] || '📌';
@@ -1494,8 +1504,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (source) _evDetailSource = source;
     var ev = allEvents.find(function(e){ return e.id === id; });
     if (!ev) return;
-    var start = ev.date_start ? ev.date_start.toDate() : null;
-    var end   = ev.date_end   ? ev.date_end.toDate()   : null;
+    var start = _evDate(ev.date_start);
+    var end   = _evDate(ev.date_end);
     var emoji = EVENT_TYPE_EMOJIS[ev.type] || '📌';
     var color = EVENT_TYPE_COLORS[ev.type] || '#F5A623';
 
@@ -1771,6 +1781,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var tEnd   = document.getElementById('evFormTimeEnd').value   || '23:59';
       var dateStart = new Date(date + 'T' + tStart);
       var dateEnd   = new Date(date + 'T' + tEnd);
+      // Endzeit &le; Startzeit bedeutet "geht über Mitternacht" -> Ende auf den Folgetag legen,
+      // sonst läge date_end vor date_start/in der Vergangenheit und das Event verschwände aus allen Listen.
+      if (dateEnd <= dateStart) dateEnd = new Date(dateEnd.getTime() + 24 * 60 * 60 * 1000);
       var isPaid    = document.getElementById('evFormIsPaid').checked;
       var hasSignup = document.getElementById('evFormHasSignup').checked;
 
@@ -2031,12 +2044,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Vergangene Events nicht mehr listen (verschwinden, sobald sie vorbei sind)
       var _nowMy = new Date();
       events = events.filter(function(ev){
-        var endD = ev.date_end ? ev.date_end.toDate() : (ev.date_start ? ev.date_start.toDate() : null);
+        var endD = _evDate(ev.date_end) || _evDate(ev.date_start);
         return !endD || endD >= _nowMy;
       });
       events.sort(function(a,b){
-        var da = a.date_start ? a.date_start.toDate() : new Date(0);
-        var db2 = b.date_start ? b.date_start.toDate() : new Date(0);
+        var da = _evDate(a.date_start) || new Date(0);
+        var db2 = _evDate(b.date_start) || new Date(0);
         return db2 - da;
       });
       countEl.textContent = events.length === 0 ? t('my_events_count_0') :
@@ -2046,11 +2059,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         return;
       }
       list.innerHTML = events.map(function(ev) {
-        var start = ev.date_start ? ev.date_start.toDate() : null;
+        var start = _evDate(ev.date_start);
         var dateStr = start ? start.toLocaleDateString('de-DE',{day:'numeric',month:'short',year:'numeric'}) : '';
         var isCancelled = ev.status === 'cancelled';
         var _now = new Date();
-        var _endD = ev.date_end ? ev.date_end.toDate() : (ev.date_start ? ev.date_start.toDate() : null);
+        var _endD = _evDate(ev.date_end) || _evDate(ev.date_start);
         var isPast = _endD && _endD < _now;
         var signups = ev.signups_count || 0;
         var cap = ev.capacity || 0;
@@ -2085,8 +2098,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var snap = await db.collection('events').where('signups','array-contains',currentUser.uid).get();
       var events = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
       events.sort(function(a,b){
-        var da = a.date_start ? a.date_start.toDate() : new Date(0);
-        var db2 = b.date_start ? b.date_start.toDate() : new Date(0);
+        var da = _evDate(a.date_start) || new Date(0);
+        var db2 = _evDate(b.date_start) || new Date(0);
         return da - db2;
       });
       countEl.textContent = events.length === 0 ? t('my_signups_count_0') :
@@ -2096,7 +2109,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         return;
       }
       list.innerHTML = events.map(function(ev) {
-        var start = ev.date_start ? ev.date_start.toDate() : null;
+        var start = _evDate(ev.date_start);
         var dateStr = start ? start.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'}) : '';
         var timeStr = start ? start.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) : '';
         var isCancelled = ev.status === 'cancelled';
@@ -3345,7 +3358,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var l=allListings.find(function(x){return x.id===listingId;});
       if(l){ if(!Array.isArray(l.tags)) l.tags=[]; if(l.tags.map(function(x){return String(x).toLowerCase();}).indexOf(String(tag).toLowerCase())<0) l.tags.push(tag); }
       var c=document.getElementById('tagsugCard_'+sugId); if(c) c.remove();
-      showToast(t('saving')? 'OK':'OK');
+      showToast(currentLang==='es' ? '✓ Etiqueta aplicada' : '✓ Tag übernommen');
     } catch(e){ alert(t('err_generic')||'Fehler'); }
   }
   async function rejectTagSuggestion(sugId){
@@ -4897,6 +4910,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       </div>` : `<div style='padding:12px 16px;font-size:13px;color:var(--text-3)'>${t('no_ratings')}</div>`;
 
     if (myReview) {
+      window._myReviewComment = myReview.comment || '';
       document.getElementById('reviewForm').innerHTML = `
         <div class="own-review-note">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -4907,7 +4921,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
             </div>
           </div>
           <div>${starsHTML(myReview.rating,18)}</div>
-          ${myReview.comment ? `<div style="font-size:13px;color:var(--text-2);margin-top:6px;font-style:italic">"${myReview.comment}"</div>` : ''}
+          ${myReview.comment ? `<div style="font-size:13px;color:var(--text-2);margin-top:6px;font-style:italic">"${esc(myReview.comment)}"</div>` : ''}
         </div>`;
     } else {
       currentUserRating = 0;
@@ -5168,6 +5182,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         <textarea class="review-textarea" id="reviewText"></textarea>
         <button class="review-submit" onclick="updateReview('${reviewId}','${listingId}')">Aktualisieren</button>
       </div>`;
+    // Alten Kommentar vorbefüllen, damit er beim reinen Stern-Ändern nicht verloren geht
+    var _rt = document.getElementById('reviewText');
+    if (_rt) _rt.value = (typeof window._myReviewComment === 'string' ? window._myReviewComment : '');
   }
 
   async function updateReview(reviewId, listingId) {

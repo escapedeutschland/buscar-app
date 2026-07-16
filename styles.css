@@ -9,6 +9,7 @@
       --bg: #F2EFE9; --card: #FFFFFF; --text-1: #111111; --text-2: #5A5A5A;
       --text-3: #AAAAAA; --green: #22C55E; --green-light: #DCFCE7;
       --red: #EF4444; --red-light: #FEE2E2; --border: #EAEAEA;
+      --surface: #FFFFFF; --surface-2: #F4F1EC;
       --radius-md: 18px; --radius-lg: 24px;
       --shadow-sm: 0 2px 16px rgba(0,0,0,0.07); --shadow-md: 0 8px 32px rgba(0,0,0,0.10);
       --shadow-lg: 0 16px 48px rgba(0,0,0,0.14);
