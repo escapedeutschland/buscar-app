@@ -1,4 +1,4 @@
-const VERSION = 'v222';
+const VERSION = 'v223';
 const STATIC_CACHE = 'buscar-static-' + VERSION;
 const RUNTIME_CACHE = 'buscar-runtime-' + VERSION;
 // Bilder-Cache bewusst NICHT versioniert: Nutzer-Fotos/Cover ändern sich nicht mit
@@ -18,11 +18,12 @@ function trimImageCache() {
 const STATIC_ASSETS = [
   './',
   './index.html',
-  './styles.css?v=222',
-  './app.js?v=222',
+  './styles.css?v=223',
+  './app.js?v=223',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
+  './favicon.svg',
   './paraguay.geojson'
 ];
 self.addEventListener('install', (event) => {
