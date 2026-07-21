@@ -413,10 +413,12 @@
     .city-sheet-empty { text-align: center; padding: 30px; color: var(--text-3); font-size: 13px; }
 
     /* FAVORITEN */
-    .fav-btn { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; top: 52px; right: 20px; z-index: 10; }
+    /* top waechst mit der Safe-Area (Notch/Statusleiste, Edge-to-Edge ab Android 15/16),
+       bleibt aber nie kleiner als die bisherigen 52px -> keine Aenderung auf Geraeten ohne Inset */
+    .fav-btn { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; top: max(env(safe-area-inset-top, 0px) + 14px, 52px); right: 20px; z-index: 10; }
     .share-btn { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; position: absolute; z-index: 10; }
     .share-btn svg { width: 19px; height: 19px; stroke: white; fill: none; }
-    #detailShareBtn { top: 52px; right: 66px; }
+    #detailShareBtn { top: max(env(safe-area-inset-top, 0px) + 14px, 52px); right: 66px; }
     .event-detail-header { position: relative; }
     #evShareBtn { position: absolute; top: max(env(safe-area-inset-top, 0px), 16px); right: 20px; }
     .fav-btn svg { width: 20px; height: 20px; transition: all 0.2s; }
