@@ -563,7 +563,17 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     translateVisibleContent();
   }
 
-  const translationCache = {};
+  // Übersetzungs-Cache aus localStorage laden -> wiederkehrende ES-Nutzer sehen sofort
+  // übersetzte Inhalte, ohne pro Session erneut das Netz zu bemühen.
+  const translationCache = (function(){ try { return JSON.parse(localStorage.getItem('buscar_tcache') || '{}') || {}; } catch(e){ return {}; } })();
+  var _tcacheTimer = null;
+  function _schedulePersistTCache(){
+    if (_tcacheTimer) return; // Schreibvorgänge bündeln (max. 1x pro Burst)
+    _tcacheTimer = setTimeout(function(){
+      _tcacheTimer = null;
+      _idleWrite(function(){ try { var j = JSON.stringify(translationCache); if (j.length < 1200000) localStorage.setItem('buscar_tcache', j); } catch(e){} });
+    }, 1500);
+  }
   async function detectAndTranslate(text, targetLang) {
     const ck = targetLang + '|' + text;
     if (translationCache[ck]) return translationCache[ck];
@@ -573,7 +583,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       const data = await res.json();
       // Google returns [[["translated","original",...],...],...]
       const translated = data?.[0]?.map(item => item?.[0]).filter(Boolean).join('');
-      if (translated && translated !== text) { translationCache[ck] = translated; return translated; }
+      if (translated && translated !== text) { translationCache[ck] = translated; _schedulePersistTCache(); return translated; }
     } catch(e) {}
     return null;
   }
