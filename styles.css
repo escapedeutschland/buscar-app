@@ -811,3 +811,14 @@
 .confirm-cancel{background:var(--surface-2);color:var(--text-2)}
 .confirm-ok{background:var(--yellow);color:#fff}
 .confirm-ok.danger{background:var(--red);color:#fff}
+
+/* Performance: Browser überspringt Layout/Paint für Karten außerhalb des sichtbaren
+   Bereichs. Verhindert, dass eine lange Liste (~680 Einträge) den Haupt-Thread bei
+   der ersten Interaktion sekundenlang blockiert. contain-intrinsic-size = grobe
+   Höhen-Schätzung (nur für die Scrollbalken-Länge, nicht funktional). Ältere
+   Browser ignorieren die Regel gefahrlos. */
+.listing-card{content-visibility:auto;contain-intrinsic-size:0 152px}
+.immo-card{content-visibility:auto;contain-intrinsic-size:0 300px}
+.map-card{content-visibility:auto;contain-intrinsic-size:0 64px}
+.event-card{content-visibility:auto;contain-intrinsic-size:0 150px}
+.q-card{content-visibility:auto;contain-intrinsic-size:0 120px}
