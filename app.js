@@ -2485,6 +2485,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // Eintrags-Zahl wieder ~767 zeigt). Auf true setzen, sobald 750+ einzigartige echte Einträge da sind.
   var DEDUPE_HIDE_DUPLICATES = false;
   var LISTINGS_TTL = 10 * 60 * 1000; // 10 Min – innerhalb dieser Zeit aus Cache, keine Firestore-Reads
+  // Führt eine Aufgabe im Leerlauf aus (blockiert nicht den ersten Render/Interaktionen).
+  // Fallback für Browser ohne requestIdleCallback (z.B. älteres iOS Safari).
+  function _idleWrite(fn){
+    if (typeof requestIdleCallback === 'function') requestIdleCallback(fn, { timeout: 2000 });
+    else setTimeout(fn, 0);
+  }
+
   async function loadListings(force) {
     try {
       // Zeige gecachte Daten sofort waehrend frische Daten geladen werden
@@ -2509,11 +2516,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       const snap = await db.collection('listings').where('verified', '==', true).get();
       var _rawListings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       allListings = DEDUPE_HIDE_DUPLICATES ? _dedupeListings(_rawListings) : _rawListings;
-      // Cache aktualisieren
-      try { localStorage.setItem('buscar_listings2', JSON.stringify(allListings)); localStorage.setItem('buscar_listings2_ts', Date.now()); } catch(e) {}
       buildCityChips();
       if (activeScreen === 'screenHome') renderListings();
       document.getElementById('offlineBanner').classList.remove('visible');
+      // Cache-Schreiben (JSON.stringify von ~400KB) in den Leerlauf verschieben,
+      // damit es den ersten Render / erste Interaktionen nicht blockiert.
+      _idleWrite(function(){
+        try { localStorage.setItem('buscar_listings2', JSON.stringify(allListings)); localStorage.setItem('buscar_listings2_ts', Date.now()); } catch(e) {}
+      });
     } catch (err) {
       // Try loading from cache
       try {
