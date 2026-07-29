@@ -254,6 +254,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_first: 'Erster Eintrag', badge_five: '5 Einträge', badge_ten: '10 Einträge',
       badge_twenty: '20 Einträge', badge_fifty: '50 Einträge', badge_hundred: '100 Einträge',
       badge_explorer: 'Entdecker', badge_chaco: 'Chaco-Kenner',
+      badge_done: 'Schon erreicht ✓', badge_todo: 'Noch offen',
+      bdesc_first: 'Erstelle deinen ersten Eintrag.', bdesc_five: 'Erstelle 5 Einträge.', bdesc_ten: 'Erstelle 10 Einträge.', bdesc_twenty: 'Erstelle 20 Einträge.', bdesc_fifty: 'Erstelle 50 Einträge.', bdesc_hundred: 'Erstelle 100 Einträge.', bdesc_explorer: 'Erstelle Einträge in 3 verschiedenen Städten.', bdesc_chaco: 'Erstelle einen Eintrag im Chaco.',
       badge_count_0: 'Noch keine eigenen Einträge', badge_count_1: '1 eigener Eintrag', badge_count_n: ' eigene Einträge',
     },
     es: {
@@ -506,6 +508,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_first: 'Primer registro', badge_five: '5 registros', badge_ten: '10 registros',
       badge_twenty: '20 registros', badge_fifty: '50 registros', badge_hundred: '100 registros',
       badge_explorer: 'Explorador', badge_chaco: 'Conocedor del Chaco',
+      badge_done: 'Ya conseguido ✓', badge_todo: 'Pendiente',
+      bdesc_first: 'Crea tu primera entrada.', bdesc_five: 'Crea 5 entradas.', bdesc_ten: 'Crea 10 entradas.', bdesc_twenty: 'Crea 20 entradas.', bdesc_fifty: 'Crea 50 entradas.', bdesc_hundred: 'Crea 100 entradas.', bdesc_explorer: 'Crea entradas en 3 ciudades distintas.', bdesc_chaco: 'Crea una entrada en el Chaco.',
       badge_count_0: 'Aún sin registros propios', badge_count_1: '1 registro propio', badge_count_n: ' registros propios',
     },
     en: {
@@ -758,6 +762,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_first: 'First entry', badge_five: '5 entries', badge_ten: '10 entries',
       badge_twenty: '20 entries', badge_fifty: '50 entries', badge_hundred: '100 entries',
       badge_explorer: 'Explorer', badge_chaco: 'Chaco expert',
+      badge_done: 'Earned ✓', badge_todo: 'Not yet',
+      bdesc_first: 'Create your first entry.', bdesc_five: 'Create 5 entries.', bdesc_ten: 'Create 10 entries.', bdesc_twenty: 'Create 20 entries.', bdesc_fifty: 'Create 50 entries.', bdesc_hundred: 'Create 100 entries.', bdesc_explorer: 'Create entries in 3 different cities.', bdesc_chaco: 'Create an entry in the Chaco.',
       badge_count_0: 'No entries of your own yet', badge_count_1: '1 entry of your own', badge_count_n: ' entries of your own',
     }
   };
@@ -1548,14 +1554,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   // ── BADGE SYSTEM ─────────────────────────────────────────────────────────
   function getBadgeDefs() { return [
-    { id: 'first',    emoji: '🌱', name: t('badge_first'),   threshold: 1   },
-    { id: 'five',     emoji: '✋', name: t('badge_five'),        threshold: 5   },
-    { id: 'ten',      emoji: '🔟', name: t('badge_ten'),       threshold: 10  },
-    { id: 'twenty',   emoji: '🚀', name: t('badge_twenty'),       threshold: 20  },
-    { id: 'fifty',    emoji: '⭐', name: t('badge_fifty'),       threshold: 50  },
-    { id: 'hundred',  emoji: '💯', name: t('badge_hundred'),      threshold: 100 },
-    { id: 'explorer', emoji: '🗺️', name: t('badge_explorer'),         threshold: 3,  special: 'cities3' },
-    { id: 'chaco',    emoji: '🌵', name: t('badge_chaco'),      threshold: 1,  special: 'chaco'   },
+    { id: 'first',    emoji: '🌱', name: t('badge_first'),   threshold: 1,  desc: t('bdesc_first')   },
+    { id: 'five',     emoji: '✋', name: t('badge_five'),        threshold: 5,  desc: t('bdesc_five')   },
+    { id: 'ten',      emoji: '🔟', name: t('badge_ten'),       threshold: 10, desc: t('bdesc_ten')  },
+    { id: 'twenty',   emoji: '🚀', name: t('badge_twenty'),       threshold: 20, desc: t('bdesc_twenty')  },
+    { id: 'fifty',    emoji: '⭐', name: t('badge_fifty'),       threshold: 50, desc: t('bdesc_fifty')  },
+    { id: 'hundred',  emoji: '💯', name: t('badge_hundred'),      threshold: 100,desc: t('bdesc_hundred') },
+    { id: 'explorer', emoji: '🗺️', name: t('badge_explorer'),         threshold: 3,  special: 'cities3', desc: t('bdesc_explorer') },
+    { id: 'chaco',    emoji: '🌵', name: t('badge_chaco'),      threshold: 1,  special: 'chaco',   desc: t('bdesc_chaco') },
   ];; }
 
   async function loadBadges(uid) {
@@ -1606,7 +1612,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch(e) { console.error('badge error', e); }
   }
 
+  var _earnedBadges = [];
   function renderBadgeGrid(earned) {
+    _earnedBadges = earned || [];
     const grid = document.getElementById('badgeGrid');
     const section = document.getElementById('badgeSection');
     if (!grid) return;
@@ -1615,7 +1623,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       const checkHtml = isEarned ? '<span class="badge-check">&#10003;</span>' : '';
       const iconClass = 'badge-icon ' + (isEarned ? 'earned' : 'locked');
       const nameClass = 'badge-name ' + (isEarned ? 'earned' : '');
-      return '<div class="badge-item">'
+      return '<div class="badge-item" style="cursor:pointer" onclick="showBadgeInfo(\'' + b.id + '\')">'
         + '<div class="' + iconClass + '">'
         + '<span style="font-size:24px;line-height:1;display:block;">' + b.emoji + '</span>'
         + checkHtml
@@ -1623,6 +1631,29 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         + '<div class="' + nameClass + '">' + b.name + '</div>'
         + '</div>';
     }).join('');
+  }
+
+  // Kurze Info-Karte beim Antippen einer Auszeichnung: Emoji, Name, Bedingung, Status
+  function showBadgeInfo(id) {
+    const def = getBadgeDefs().find(function(b){ return b.id === id; });
+    if (!def) return;
+    const earned = _earnedBadges.indexOf(id) !== -1;
+    const status = earned ? t('badge_done') : t('badge_todo');
+    const statusColor = earned ? 'var(--green)' : 'var(--text-3)';
+    let el = document.getElementById('badgeInfoToast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'badgeInfoToast';
+      el.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--card);color:var(--text-1);padding:16px 18px;border-radius:16px;z-index:10000;box-shadow:var(--shadow-md,0 8px 32px rgba(0,0,0,0.14));transition:opacity .35s;text-align:center;max-width:300px;width:calc(100% - 48px);box-sizing:border-box;';
+      document.body.appendChild(el);
+    }
+    el.innerHTML = '<div style="font-size:26px;line-height:1;margin-bottom:7px">' + def.emoji + '</div>'
+      + '<div style="font-weight:700;font-size:15px;margin-bottom:4px">' + esc(def.name) + '</div>'
+      + '<div style="font-size:13px;color:var(--text-2);line-height:1.4">' + esc(def.desc || '') + '</div>'
+      + '<div style="font-size:12px;font-weight:700;margin-top:8px;color:' + statusColor + '">' + status + '</div>';
+    el.style.opacity = '1';
+    clearTimeout(el._t);
+    el._t = setTimeout(function(){ el.style.opacity = '0'; }, 4000);
   }
 
   function toggleBadgePanel() {
