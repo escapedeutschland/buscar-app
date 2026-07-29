@@ -1,7 +1,7 @@
 const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   // Sprache: gespeicherte Wahl gewinnt; sonst nach Gerätesprache (Deutsch -> de, sonst Spanisch für Paraguay/Einheimische)
-  let currentLang = localStorage.getItem('buscar_lang') || (((navigator.language || navigator.userLanguage || 'de').toLowerCase().indexOf('de') === 0) ? 'de' : 'es');
+  let currentLang = localStorage.getItem('buscar_lang') || (function(){ var l = (navigator.language || navigator.userLanguage || 'de').toLowerCase(); return l.indexOf('de') === 0 ? 'de' : (l.indexOf('en') === 0 ? 'en' : 'es'); })();
 
   const translations = {
     de: {
@@ -198,6 +198,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       filter_title_sub: 'Unterkategorie', filter_title_stars: 'Mindest-Bewertung',
       min_stars: 'Minimum Sterne', stars_all: 'Alle',
       apply_filter: 'Anwenden',
+      filter_features: 'Merkmale', filter_features_empty: 'Noch keine Merkmale vorhanden. Tagge zuerst ein paar Orte.',
+      ph_name: 'z.B. Dr. Müller, Café Central', ph_city: 'z.B. Asunción, Encarnación', ph_addr: 'Straße, Stadtviertel',
       cancel: 'Abbrechen',
       ptr_pull: 'Aktualisieren', ptr_release: 'Loslassen...',
       approve: 'Genehmigen',
@@ -448,6 +450,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       filter_title_sub: 'Subcategoría', filter_title_stars: 'Valoración mínima',
       min_stars: 'Estrellas mínimas', stars_all: 'Todas',
       apply_filter: 'Aplicar',
+      filter_features: 'Características', filter_features_empty: 'Todavía no hay características. Agregá etiquetas a los lugares.',
+      ph_name: 'ej. Dr. Martínez, Café Central', ph_city: 'ej. Asunción, Encarnación', ph_addr: 'Calle, Barrio',
       cancel: 'Cancelar',
       ptr_pull: 'Actualizar', ptr_release: 'Soltar...',
       approve: 'Aprobar',
@@ -503,6 +507,258 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_twenty: '20 registros', badge_fifty: '50 registros', badge_hundred: '100 registros',
       badge_explorer: 'Explorador', badge_chaco: 'Conocedor del Chaco',
       badge_count_0: 'Aún sin registros propios', badge_count_1: '1 registro propio', badge_count_n: ' registros propios',
+    },
+    en: {
+      // Navigation
+      nav_home: 'Home', nav_map: 'Map', nav_entry: 'Add', nav_profile: 'Profile',
+      // Header
+      greet_morning: 'Good morning', greet_day: 'Good afternoon', greet_evening: 'Good evening', greet_night: 'Good night',
+      header_sub: 'What are you looking for today?',
+      location_tip: '💡 Tip: Tap "Use my location" – then you can freely move the pin on the map or tap it to set the exact spot.',
+      timeblock1: '1st time slot', timeblock2: '2nd time slot (optional)',
+      refresh_btn: 'Refresh', map_no_coords: 'Some places don\'t have coordinates yet', remove_photo: 'Remove photo',
+      grundstueck_lbl: 'Plot', flaeche_lbl: 'Area',
+      day_daily: 'Daily', day_mofr: 'Mon – Fri', day_mosa: 'Mon – Sat', day_moso: 'Mon – Sun', day_saso: 'Sat – Sun',
+      pub_visible: 'Publicly visible in the app', owner_only: 'Only for verified owners',
+      email_change_hint: 'Confirmation via link to the new address', send_confirm_link: 'Send confirmation link',
+      save_changes: 'Save changes', changes_saved: 'Changes saved!',
+      pin_hint: 'Move or tap the pin on the map to change the location.',
+      choose_city: 'Choose city',
+      adm_all_entries: 'All entries', adm_review: 'Review entries', adm_all_checked: 'All checked!', adm_none_open: 'No pending entries.', adm_similar: '⚠️ Similar entries found – please check:',
+      err_generic: 'Error.', err_prefix: 'Error: ',
+      report_detail_ph: 'Briefly describe what\'s wrong (optional)',
+      link_copied: '🔗 Link copied',
+      share_cta: 'Discovered on Buscar – the guide for Paraguay. Download the app too! 👇',
+      tags_title: 'Features & tags',
+      tags_hint: 'Help others find this place. Choose matching features or add your own keywords (e.g. "fluoride-free toothpaste").',
+      tags_empty_hint: 'No features yet. Do you know any?',
+      tag_suggest: 'Suggest feature',
+      tag_suggest_title: 'Suggest feature',
+      tag_suggest_hint: 'What does this place offer? Your suggestion will be reviewed and then shown to everyone.',
+      tag_suggest_send: 'Send suggestion',
+      tag_suggest_thanks: 'Thanks! Your suggestion will be reviewed.',
+      loading: 'Loading…',
+      fc_title: 'Ask the community',
+      fc_sub: 'Ask a question or help with an answer',
+      fc_search_ph: 'Search questions…',
+      fc_no_match: 'No matching question',
+      fc_no_match_sub: 'Change your search or category – or ask the question yourself.',
+      fc_q_cat_any: 'Category (optional)',
+      qc_produkte: '🛒 Products & Shopping',
+      qc_essen: '🍽️ Food & Drink',
+      qc_dienst: '🔧 Services & Trades',
+      qc_gesundheit: '🏥 Health',
+      qc_familie: '👨‍👩‍👧 Family & Kids',
+      qc_behoerden: '📋 Admin & Paperwork',
+      qc_wohnen: '🏠 Housing',
+      qc_freizeit: '🎉 Leisure & Sport',
+      qc_sonstiges: '💬 Other',
+      fc_ask_btn: 'Ask a question',
+      fc_ask_title: 'What are you looking for?',
+      fc_ask_hint: 'Ask your question – the community helps you find the right place.',
+      fc_ask_send: 'Post question',
+      fc_asked: 'Your question is live!',
+      fc_ask_cta: 'Ask the community',
+      fc_empty_title: 'No questions yet',
+      fc_empty_sub: 'Ask the community the first question!',
+      fc_seek_count: 'are looking for this',
+      fc_answers: 'answers',
+      fc_open: 'open',
+      fc_seek: 'I\'m looking for this too',
+      fc_seeking: '✓ You\'re looking for this too',
+      fc_no_answers: 'No answers yet – do you have a tip?',
+      fc_asked_by: 'Asked by',
+      rt_now: 'just now', rt_min: 'min', rt_h: 'h', rt_d: 'd',
+      fc_hint: '💡 Tap the 👁 icon on a question if you\'re looking for the same thing – that way the community sees what\'s wanted. You can answer with a tip or a Buscar place.',
+      fc_answer_btn: 'Answer',
+      fc_answer_sheet_title: 'Answer',
+      fc_answer_text_ph: 'Your answer… (tip, name, group …)',
+      fc_answer_link_label: 'Optional: link a Buscar place',
+      fc_answer_send_btn: 'Send answer',
+      fc_linked: 'will be linked',
+      fc_pick_title: 'Which place offers this?',
+      fc_pick_hint: 'Tap above to search and choose the right entry.',
+      fc_pick_none: 'No matching entry found.',
+      fc_pick_more: 'Tap above to search all entries.',
+      fc_answer_thanks: 'Thanks for your answer!',
+      fc_entry_prof: 'Ask the community',
+      fc_entry_mine: 'My questions',
+      fc_entry_answers: 'My answers',
+      fc_mine: 'My questions',
+      fc_my_answers: 'My answers',
+      fc_no_my_questions: 'You haven\'t asked a question yet',
+      fc_no_my_answers: 'You haven\'t answered anything yet',
+      fc_you_recommended: 'Recommended by you',
+      fc_home_sub: 'Find what no listing reveals',
+      fc_all: 'All',
+      fc_note_ph: 'Note (optional)',
+      fc_del_q_confirm: 'Really delete this question?',
+      fc_deleted: 'Deleted',
+      fc_load_err: 'Could not be loaded',
+      fc_load_sub: 'Please check your connection and try again.',
+      maps_import_title: 'Import from Google Maps',
+      maps_import_hint: 'Save yourself the typing: paste a name or Google Maps link – name, address, phone, opening hours & location fill in automatically. You just add your personal recommendation.',
+      maps_import_ph: 'Name or Google Maps link…',
+      maps_pick: 'Several places found – tap the right one:',
+      maps_import_btn: 'Load',
+      maps_loading: 'Fetching data from Google…',
+      maps_success: '✓ Data imported – please check and add your personal recommendation.',
+      maps_error: 'Couldn\'t load the place. Tip: instead of the short "share" link, just type the name (e.g. "Juan Valdez San Bernardino").',
+      saving: 'Saving...',
+      locfix_btn_edit: 'Correct location', locfix_btn_suggest: 'Location wrong?',
+      locfix_edit_title: 'Correct location', locfix_suggest_title: 'Suggest location',
+      locfix_hint_edit: 'Move the pin or tap the map to set the location.',
+      locfix_hint_suggest: 'Drag the pin to the right spot. Your suggestion will be reviewed by the team.',
+      locfix_save: 'Save location', locfix_send: 'Send suggestion',
+      locfix_thanks: '✅ Thanks! Your location suggestion will be reviewed.',
+      del_entry_confirm: 'Really delete this entry?', del_review_confirm: 'Delete review?', del_comment_confirm: 'Delete comment?', del_photo_confirm: 'Delete photo?', del_deal_confirm: 'Really remove deal?', cancel_event_confirm: 'Really cancel event?',
+      toast_coords_saved: '✅ Coordinates saved!', toast_no_entry: 'No entry selected.', toast_photo_uploaded: '✓ Photo uploaded', toast_photo_submitted: '✓ Photo submitted – will be reviewed and visible after approval', toast_report_sent: '✅ Report sent. Thanks!', toast_entry_deleted: '✓ Entry deleted',
+      err_event_load: 'Event could not be loaded.', err_sold_out: 'Sorry, sold out.', err_already_signed: 'You\'re already signed up.', err_reason: 'Please give a reason.', err_upload: 'Upload error',
+      ev_type_party: '🎊 Party', ev_type_festival: '🎪 Festival', ev_type_konzert: '🎵 Concert', ev_type_retreat: '🧘 Retreat', ev_type_workshop: '🛠 Workshop',
+      // Search
+      search_placeholder: 'Doctor, restaurant, lawyer...',
+      // Categories
+      cat_all: 'All', cat_restaurants: 'Restaurants', cat_services: 'Services',
+      cat_immobilien: 'Real estate', immo_tile: 'Real estate', immo_tile_sub: 'Buy & rent in Paraguay', immo_title: 'Real estate',
+      cat_places: 'Places', cat_accommodation: 'Accommodation', cat_shops: 'Shops',
+      cat_sport: 'Sport & Fitness', cat_tankstelle: 'Gas stations', cat_wechselstube: 'Currency exchange', cat_beauty: 'Beauty & Wellness',
+      // City picker
+      city_select: 'Select city...', city_all: '🌍 All cities',
+      // Listings
+      entries_all: 'Entries', results: 'Results',
+      nothing_found: 'Nothing found', nothing_found_sub: 'Try a different search term',
+      verified: 'Verified',
+      // Detail
+      description: 'Description', no_description: 'No description.',
+      phone: 'Phone', website: 'Website', hours: 'Opening hours', address: 'Address',
+      call: 'Call', route: 'Directions',
+      ratings: 'Reviews', discussion: 'Discussion', photos: 'Photos',
+      no_ratings: 'No reviews yet',
+      rate_now: 'Leave a review', rate_submit: 'Submit review',
+      rate_optional: 'Your experience (optional)',
+      your_rating: 'Your review', edit: 'Edit', delete: 'Delete',
+      reply: 'Reply', comment_placeholder: 'Write a comment...',
+      add_photo: 'Add photo', uploading: 'Uploading...', days_select: 'Select days...', from_time: 'From...', to_time: 'To...', photo_add_label: 'Add photo',
+      claim_btn: 'I\'m the owner of this place',
+      claim_info: 'As a verified owner you can manage this listing yourself.',
+      owner_badge: '⭐ Verified owner', pending_claim: '✓ Your claim is being reviewed...',
+      edit_entry: 'Edit entry',
+      // Form
+      suggest_entry: 'Suggest a place', after_review: 'Will be published after review',
+      rules_title: 'Rules for entries',
+      rule1: '• No emojis in the title', rule2: '• Name: max. 60 characters',
+      rule3: '• Description: min. 50, max. 500 characters',
+      rule4: '• Only real places in Paraguay', rule5: '• No advertising or spam',
+      name_label: 'Name of the place *', cat_label: 'Category *', city_label: 'City *',
+      cat_choose: 'Please choose...', cat_rest: 'Restaurants and cafés',
+      cat_serv: 'Services', cat_place: 'Places and attractions',
+      cat_accom: 'Accommodation', cat_shop: 'Shops and markets',
+      desc_label: 'Your experience *',
+      desc_placeholder: 'Describe the place for other users. What makes it special? What should people know?',
+      contact_optional: 'Contact (optional)',
+      tel_label: 'Phone', web_label: 'Website', addr_label: 'Address', hours_label: 'Opening hours',
+      location_btn: 'Use my location', location_saved: 'Location saved',
+      // === NEW: Location-Permission-Fix ===
+      location_card_title: 'Location *',
+      location_required_hint: 'The location is needed so your entry appears on the map.',
+      location_required_error: 'Please provide your location. Tap "Use my location".',
+      loc_banner_text: 'Location permission missing – tap for instructions',
+      loc_modal_title: 'Enable location',
+      loc_modal_text: 'To create an entry we need location permission. Here\'s how to enable it:',
+      loc_modal_step1: 'Open your phone\'s settings',
+      loc_modal_step2: 'Select "Apps" → "Buscar"',
+      loc_modal_step3: 'Tap "Permissions" → "Location"',
+      loc_modal_step4: 'Choose "Allow while using the app"',
+      loc_modal_close: 'Close',
+      loc_modal_retry: 'Try again',
+      loc_unavailable: 'Location currently unavailable. Please try again.',
+      loc_timeout: 'Location search is taking too long. Please try again.',
+      loc_unsupported: 'Location is not supported by this browser.',
+      loc_remove: 'Remove location',
+      loc_locating: 'Determining location...',
+      // === End NEW ===
+      photos_optional: 'Photos (optional, max. 3)',
+      photos_hint: 'Photos help with the review and become visible after approval.',
+      submit_btn: 'Submit entry', submitting: 'Submitting...',
+      submit_success: 'Thanks! Your entry has been submitted and will be reviewed.',
+      fill_all: 'Please fill in all required fields.',
+      // Auth
+      login: 'Log in', register: 'Sign up', logout: 'Log out',
+      email_label: 'Email', password_label: 'Password', name_auth: 'Name',
+      username_label: 'Username *',
+      username_hint: 'Shown publicly. Only letters, numbers and _',
+      create_account: 'Create account', logging_in: 'Logging in...',
+      forgot_pw: 'Forgot password?', no_account: 'No account yet?',
+      has_account: 'Already have an account?',
+      tagline: 'The guide for Paraguay', guest_name: 'Guest', guest_login_cta: 'Log in / Sign up', continue_guest: 'Continue as guest →', login_required: 'Please log in or sign up', open_now: 'Open', closed_now: 'Closed', badge_new: 'New',
+      // Profile
+      to_home: 'To home', suggest_entry_prof: 'Suggest a place',
+      admin_panel: 'Admin panel', change_username: 'Change username',
+      change_password: 'Change password', change_email: 'Change email', my_favorites: 'My favorites',
+      // Map
+      map_title: 'Map', map_sub_all: 'All places in Paraguay',
+      // Filter
+      subcategory: 'Subcategory', rating_filter: 'Rating',
+      filter_title_sub: 'Subcategory', filter_title_stars: 'Minimum rating',
+      min_stars: 'Minimum stars', stars_all: 'All',
+      apply_filter: 'Apply',
+      filter_features: 'Features', filter_features_empty: 'No features yet. Tag a few places first.',
+      ph_name: 'e.g. Dr. Smith, Café Central', ph_city: 'e.g. Asunción, Encarnación', ph_addr: 'Street, neighborhood',
+      cancel: 'Cancel',
+      ptr_pull: 'Refresh', ptr_release: 'Release...',
+      approve: 'Approve',
+      reject: 'Reject',
+      // Events
+      nav_events: 'Events',
+      events_title: 'Events',
+      events_sub: 'Events in Paraguay',
+      events_loading: 'Loading events...',
+      events_none: 'No events found',
+      events_none_filter: 'No events for this filter',
+      ev_time_all: '📅 All', ev_time_today: 'Today', ev_time_week: 'This week', ev_time_month: 'This month',
+      ev_type_all: '🎉 All types',
+      ev_create: 'Create event', ev_publish: 'Publish event', ev_publishing: 'Publishing...',
+      ev_form_sub: 'Your event appears immediately for everyone',
+      ev_basic: 'Basic info', ev_datetime: 'Date & time', ev_location: 'Location', ev_photos: 'Photos',
+      ev_price_cap: 'Price & registration', ev_rules_opt: 'Rules',
+      ev_title_label: 'Event title *', ev_type_label: 'Type *', ev_type_choose: 'Choose type...',
+      ev_desc_label: 'Description *', ev_date_label: 'Date *', ev_time_label: 'Time',
+      ev_city_label: 'City *', ev_addr_label: 'Address / venue',
+      ev_map_btn: 'Use my location',
+      ev_photos_btn: 'Add photos',
+      ev_paid: 'Paid', ev_paid_sub: 'Specify entry fee',
+      ev_price_label: 'Price (Guaraní)',
+      ev_signup: 'Enable registration', ev_signup_sub: 'Users can register',
+      ev_capacity_label: 'Max. participants',
+      ev_rules_placeholder: 'e.g. 18+ only, max. 1 guest...',
+      ev_back: 'Back', ev_to_event: 'To event →',
+      ev_entry: 'Entry', ev_capacity: 'Capacity', ev_rules: 'Rules',
+      ev_website_label: 'Website / tickets (optional)', ev_tickets_info: 'Tickets & info',
+      ev_free: 'Free', ev_paid_label: 'Paid',
+      ev_spots: 'spots left', ev_full: 'Sold out', ev_cancelled: 'Cancelled',
+      ev_none_filter: 'No events for this filter', ev_none_city: 'Currently no events in {city}', ev_show_all_cities: 'Show all cities',
+      ev_signup_btn: 'Sign up', ev_login_signup: 'Log in to sign up',
+      ev_cancel_btn: 'Cancel event', ev_cancel_confirm: 'Really cancel this event?',
+      ev_delete_btn: 'Delete', ev_delete_confirm: 'Permanently delete this event?', ev_delete_ok: 'Event deleted.',
+      // Profile events
+      my_events_title: 'My events', loading: 'Loading...', error_loading: 'Error loading.', ev_cancel_done: 'Event has been cancelled.', my_signups_title: 'Registered events',
+      my_events_none: 'You haven\'t created any events yet.',
+      my_events_count_0: 'No events yet', my_events_count_1: '1 event',
+      my_signups_none: 'You haven\'t signed up for any events yet.',
+      my_signups_count_0: 'No registrations',
+      ev_active: 'Active', ev_details: 'Details →',
+      ev_past: 'Past', ev_cancelled_warning: '⚠️ This event was cancelled',
+      ev_unsignup_confirm: 'Cancel registration for this event?', ev_unsignup_ok: '✅ Registration cancelled.',
+      ev_already_signed_up: '✅ You\'re signed up', ev_unsignup_btn: 'Cancel registration',
+      ev_signups_label: 'Registrations',
+      ev_signup_ok: '✅ Registration successful!', ev_already_signed: 'You\'re already registered.',
+      ev_full_msg: 'Sold out', ev_error_fields: 'Please fill in all required fields (*).',
+      // Badges
+      badge_title: 'My badges',
+      badge_first: 'First entry', badge_five: '5 entries', badge_ten: '10 entries',
+      badge_twenty: '20 entries', badge_fifty: '50 entries', badge_hundred: '100 entries',
+      badge_explorer: 'Explorer', badge_chaco: 'Chaco expert',
+      badge_count_0: 'No entries of your own yet', badge_count_1: '1 entry of your own', badge_count_n: ' entries of your own',
     }
   };
 
@@ -544,19 +800,26 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   let contentTranslated = false;
 
+  // Sprach-Zyklus: de -> es -> en -> de. Der Button zeigt die NÄCHSTE Sprache.
+  function _nextLang(l) { return l === 'de' ? 'es' : (l === 'es' ? 'en' : 'de'); }
+  function _langLabel(l) { return _nextLang(l).toUpperCase(); }
+  // Inline-Übersetzung für Strings, die (noch) nicht im translations-Dict liegen
+  // (v.a. Immobilien/Radar). en fällt auf de zurück, falls nicht angegeben.
+  function L(de, es, en) { return currentLang === 'es' ? es : (currentLang === 'en' ? (en != null ? en : de) : de); }
+
   function toggleLangAuth() {
-    currentLang = currentLang === 'de' ? 'es' : 'de';
+    currentLang = _nextLang(currentLang);
     localStorage.setItem('buscar_lang', currentLang);
     const btn = document.getElementById('langToggleAuth');
-    if (btn) btn.textContent = currentLang === 'de' ? 'ES' : 'DE';
+    if (btn) btn.textContent = _langLabel(currentLang);
     applyLang();
     // Also update main toggle if exists
     const mainBtn = document.getElementById('langToggle');
-    if (mainBtn) mainBtn.textContent = currentLang === 'de' ? 'ES' : 'DE';
+    if (mainBtn) mainBtn.textContent = _langLabel(currentLang);
   }
 
   function toggleLang() {
-    currentLang = currentLang === 'de' ? 'es' : 'de';
+    currentLang = _nextLang(currentLang);
     renderLegalScreens();
     localStorage.setItem('buscar_lang', currentLang);
     contentTranslated = false;
@@ -593,7 +856,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function translateVisibleContent() {
-    const targetLang = currentLang === 'es' ? 'es' : 'de';
+    // de -> Originale wiederherstellen (kein API-Call); es/en -> maschinell übersetzen
+    const targetLang = currentLang;
 
     // Collect all dynamic-content elements (entries, reviews, comments, replies, detail desc)
     const allEls = [
@@ -659,9 +923,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function applyLang() {
     if (!applyLang._wired) { try { autoWireI18n(); } catch(e){} applyLang._wired = true; }
     const btn = document.getElementById('langToggle');
-    if (btn) btn.textContent = currentLang === 'de' ? 'ES' : 'DE';
+    if (btn) btn.textContent = _langLabel(currentLang);
     const btnAuth = document.getElementById('langToggleAuth');
-    if (btnAuth) btnAuth.textContent = currentLang === 'de' ? 'ES' : 'DE';
+    if (btnAuth) btnAuth.textContent = _langLabel(currentLang);
 
     // Update all elements with data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -725,12 +989,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     });
 
     // Form placeholders
+    // name/city/address laufen über data-i18n-ph (robust in allen Sprachen).
+    // Rest hier, weil kein festes Feld-Element / sprachneutral:
     const phMap = {
-      'z.B. Dr. Müller, Café Central': currentLang === 'es' ? 'ej. Dr. Martínez, Café Central' : 'z.B. Dr. Müller, Café Central',
-      'z.B. Asunción, Encarnación': currentLang === 'es' ? 'ej. Asunción, Encarnación' : 'z.B. Asunción, Encarnación',
-      'z.B. Mo-Fr 08:00-18:00': currentLang === 'es' ? 'ej. Lun-Vie 08:00-18:00' : 'z.B. Mo-Fr 08:00-18:00',
-      'Straße, Stadtviertel': currentLang === 'es' ? 'Calle, Barrio' : 'Straße, Stadtviertel',
-      'www.beispiel.com': 'www.ejemplo.com',
+      'z.B. Mo-Fr 08:00-18:00': currentLang === 'es' ? 'ej. Lun-Vie 08:00-18:00' : (currentLang === 'en' ? 'e.g. Mon-Fri 08:00-18:00' : 'z.B. Mo-Fr 08:00-18:00'),
+      'www.beispiel.com': currentLang === 'es' ? 'www.ejemplo.com' : (currentLang === 'en' ? 'www.example.com' : 'www.beispiel.com'),
       '+595 21 ...': '+595 21 ...',
     };
     document.querySelectorAll('.field-input, .field-textarea').forEach(el => {
@@ -755,8 +1018,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if (el.textContent.includes('Fotos') || el.textContent.includes('Foto')) {
         el.textContent = t('photos_optional');
       }
-      if (el.textContent === 'Grundinfos' || el.textContent === 'Información básica') {
-        el.textContent = currentLang === 'es' ? 'Información básica' : 'Grundinfos';
+      if (el.textContent === 'Grundinfos' || el.textContent === 'Información básica' || el.textContent === 'Basic info') {
+        el.textContent = currentLang === 'es' ? 'Información básica' : (currentLang === 'en' ? 'Basic info' : 'Grundinfos');
       }
       if (el.textContent === 'Beschreibung' || el.textContent === 'Descripción') {
         el.textContent = t('description');
@@ -1400,8 +1663,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         + '<button type="button" class="confirm-ok' + (opts.danger === false ? '' : ' danger') + '"></button>'
         + '</div></div>';
       ov.querySelector('.confirm-msg').textContent = message || '';
-      ov.querySelector('.confirm-cancel').textContent = opts.cancelText || (es ? 'Cancelar' : 'Abbrechen');
-      ov.querySelector('.confirm-ok').textContent = opts.confirmText || (es ? 'Confirmar' : 'Bestätigen');
+      ov.querySelector('.confirm-cancel').textContent = opts.cancelText || L('Abbrechen', 'Cancelar', 'Cancel');
+      ov.querySelector('.confirm-ok').textContent = opts.confirmText || L('Bestätigen', 'Confirmar', 'Confirm');
       var done = false;
       function close(val) {
         if (done) return; done = true;
@@ -1434,7 +1697,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     'Workshop':'🛠','Sport':'⚽','Kultur':'🎭','Treffen':'🤝','Markt':'🛒','Sonstiges':'📌'
   };
   const EVENT_TYPE_ES = {'Party':'Fiesta','Festival':'Festival','Konzert':'Concierto','Retreat':'Retiro','Workshop':'Taller','Sport':'Deporte','Kultur':'Cultura','Treffen':'Encuentro','Markt':'Mercado','Sonstiges':'Otro'};
-  function evTypeName(ty){ return (currentLang==='es' && EVENT_TYPE_ES[ty]) ? EVENT_TYPE_ES[ty] : (ty||''); }
+  const EVENT_TYPE_EN = {'Party':'Party','Festival':'Festival','Konzert':'Concert','Retreat':'Retreat','Workshop':'Workshop','Sport':'Sport','Kultur':'Culture','Treffen':'Meetup','Markt':'Market','Sonstiges':'Other'};
+  function evTypeName(ty){ return currentLang==='es' ? (EVENT_TYPE_ES[ty]||ty||'') : (currentLang==='en' ? (EVENT_TYPE_EN[ty]||ty||'') : (ty||'')); }
 
   async function loadEvents() {
     // Instant: render from in-memory cache if we already have events
@@ -1523,7 +1787,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   // Aktuelle Anzeige-Locale (Datum/Zahlen) passend zur App-Sprache.
-  function dateLoc(){ return currentLang === 'es' ? 'es-PY' : 'de-DE'; }
+  function dateLoc(){ return currentLang === 'es' ? 'es-PY' : (currentLang === 'en' ? 'en-GB' : 'de-DE'); }
 
   // Robust: liefert ein Date egal ob Firestore-Timestamp, Date, {seconds} oder String; sonst null.
   function _evDate(v){
@@ -1700,7 +1964,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
 
     if (currentUser && ev.created_by === currentUser.uid) {
-      bodyHtml += '<button onclick="openEditEvent(\'' + id + '\')" style="width:100%;background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;font-size:14px;font-weight:700;color:var(--text-1);cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' + (currentLang==='es'?'Editar evento':'Event bearbeiten') + '</button>'
+      bodyHtml += '<button onclick="openEditEvent(\'' + id + '\')" style="width:100%;background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;font-size:14px;font-weight:700;color:var(--text-1);cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' + L('Event bearbeiten','Editar evento','Edit event') + '</button>'
         + '<div style="display:flex;gap:8px;margin-top:0">'
         + '<button onclick="cancelEvent(\'' + id + '\')" style="flex:1;background:var(--surface-2);border:none;border-radius:var(--radius-lg);padding:14px;font-size:14px;font-weight:600;color:var(--text-2);cursor:pointer">' + t('ev_cancel_btn') + '</button>'
         + '<button onclick="deleteEvent(\'' + id + '\')" style="flex:1;background:#FEE2E2;border:none;border-radius:var(--radius-lg);padding:14px;font-size:14px;font-weight:600;color:#EF4444;cursor:pointer">' + t('ev_delete_btn') + '</button>'
@@ -1746,8 +2010,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     _evLat = (ev.lat != null ? ev.lat : null); _evLng = (ev.lng != null ? ev.lng : null);
     var ls = document.getElementById('evLocationStatus');
     if (ls){ if (_evLat != null){ ls.style.display='block'; ls.textContent = '📍 ' + Number(_evLat).toFixed(4) + ', ' + Number(_evLng).toFixed(4); } else { ls.style.display='none'; } }
-    var ft = document.querySelector('#screenEventForm .form-title'); if (ft) ft.textContent = (currentLang==='es'?'Editar evento':'Event bearbeiten');
-    var sb = document.getElementById('evFormSubmitBtn'); if (sb){ sb.textContent = (currentLang==='es'?'Guardar cambios':'Änderungen speichern'); sb.disabled = false; }
+    var ft = document.querySelector('#screenEventForm .form-title'); if (ft) ft.textContent = L('Event bearbeiten','Editar evento','Edit event');
+    var sb = document.getElementById('evFormSubmitBtn'); if (sb){ sb.textContent = L('Änderungen speichern','Guardar cambios','Save changes'); sb.disabled = false; }
     showScreen('screenEventForm');
     if (_evLat != null && typeof initEvMap === 'function'){ setTimeout(function(){ try { initEvMap(_evLat, _evLng); } catch(e){} }, 200); }
     else if (_evMapPicker) { setTimeout(function(){ _evMapPicker.resize(); }, 200); }
@@ -1756,7 +2020,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function showEventForm() {
     if (!currentUser) { showScreen('screenAuth'); return; }
     _editingEventId = null;
-    var _ft = document.querySelector('#screenEventForm .form-title'); if (_ft) _ft.textContent = (currentLang==='es'?'Crear evento':'Event erstellen');
+    var _ft = document.querySelector('#screenEventForm .form-title'); if (_ft) _ft.textContent = L('Event erstellen','Crear evento','Create event');
     var _sb = document.getElementById('evFormSubmitBtn'); if (_sb){ _sb.textContent = t('ev_publish'); _sb.disabled = false; }
     ['evFormTitle','evFormDesc','evFormCity','evFormAddress','evFormWebsite','evFormPrice','evFormCapacity','evFormRules'].forEach(function(id){
       var el = document.getElementById(id);
@@ -1919,7 +2183,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         if (evPendingPhotos.length) await uploadEvPhotos(editId);
         _editingEventId = null;
         await loadEvents();
-        showToast(currentLang==='es'?'Evento actualizado':'Event aktualisiert');
+        showToast(L('Event aktualisiert','Evento actualizado','Event updated'));
         if (activeScreen === 'screenProfil' || _evDetailSource === 'profil') { setNav('navProfil'); showScreen('screenProfil'); loadMyEvents(); }
         else { setNav('navEvents'); showScreen('screenEvents'); }
         var _sbR = document.getElementById('evFormSubmitBtn'); if (_sbR){ _sbR.disabled = false; _sbR.textContent = t('ev_publish'); }
@@ -2028,7 +2292,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var rows = list.map(function(ev) {
       var em = EVENT_TYPE_EMOJIS[ev.type] || '📅';
       var st = (ev.date_start && ev.date_start.toDate) ? ev.date_start.toDate() : null;
-      var ds = st ? st.toLocaleDateString(currentLang === 'es' ? 'es-PY' : 'de-DE', { day: 'numeric', month: 'short' }) : '';
+      var ds = st ? st.toLocaleDateString(dateLoc(), { day: 'numeric', month: 'short' }) : '';
       return '<div data-evid="' + ev.id + '" onclick="evMarkerClick(this.getAttribute(\'data-evid\'))" style="cursor:pointer;padding:7px 0;border-top:1px solid var(--border)">'
         + '<div class="map-popup-name">' + em + ' ' + esc(ev.title || '') + '</div>'
         + '<div class="map-popup-city">' + (ds ? ds + ' &middot; ' : '') + esc(ev.city || '') + '</div>'
@@ -2673,13 +2937,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     _tagFilterTemp = activeTags.slice();
 
     if (mode === 'tags') {
-      document.getElementById('filterSheetTitle').textContent = (currentLang === 'es' ? 'Características' : 'Merkmale');
+      document.getElementById('filterSheetTitle').textContent = t('filter_features');
       var seen = {};
       (allListings || []).forEach(function(l){ (l.tags || []).forEach(function(k){ var key = String(k); seen[key] = (seen[key]||0) + 1; }); });
       var keys = Object.keys(seen).sort(function(a,b){ return seen[b] - seen[a]; });
       window._tagFilterKeys = keys;
       if (!keys.length) {
-        content.innerHTML = '<div class="filter-section" style="color:var(--text-3);font-size:13px;padding:6px 2px">' + (currentLang === 'es' ? 'Todavía no hay características. Agregá etiquetas a los lugares.' : 'Noch keine Merkmale vorhanden. Tagge zuerst ein paar Orte.') + '</div>';
+        content.innerHTML = '<div class="filter-section" style="color:var(--text-3);font-size:13px;padding:6px 2px">' + t('filter_features_empty') + '</div>';
       } else {
         content.innerHTML = '<div class="filter-section"><div class="filter-chips">' + keys.map(function(k, idx){
           var on = _tagFilterTemp.some(function(x){ return String(x).toLowerCase() === k.toLowerCase(); });
@@ -2771,7 +3035,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     activeTags = _tagFilterTemp.slice();
     var tagsBtn = document.getElementById('filterTagsBtn'), tagsLabel = document.getElementById('filterTagsLabel');
     if (tagsBtn) {
-      var baseLbl = (currentLang === 'es' ? 'Características' : 'Merkmale');
+      var baseLbl = t('filter_features');
       if (activeTags.length) { tagsBtn.classList.add('active'); tagsLabel.textContent = baseLbl + ' (' + activeTags.length + ')'; }
       else { tagsBtn.classList.remove('active'); tagsLabel.textContent = baseLbl; }
     }
@@ -2907,27 +3171,27 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ? {wohnung:'Departamento', haus:'Casa', grundstueck:'Terreno', land:'Campo / Finca', gewerbe:'Comercial'}
       : {wohnung:'Wohnung', haus:'Haus', grundstueck:'Grundstück', land:'Land / Finca', gewerbe:'Gewerbe'};
     var curMap = {USD:'USD', PYG:'₲', EUR:'€'};
-    var locale = es ? 'es-PY' : 'de-DE';
+    var locale = dateLoc();
     var priceStr = '';
     if (l.re_price != null) {
       var cur = curMap[l.re_currency] || (l.re_currency || '');
-      var per = (l.re_period === 'monat') ? (es ? '/mes' : '/Monat') : '';
+      var per = (l.re_period === 'monat') ? L('/Monat','/mes','/mo') : '';
       priceStr = cur + ' ' + Number(l.re_price).toLocaleString(locale) + per;
     }
     var areaStr = (l.re_area != null) ? (Number(l.re_area).toLocaleString(locale) + ' ' + (l.re_area_unit === 'ha' ? 'ha' : 'm²')) : '';
     var head = priceStr ? '<div style="font-family:\'Fraunces\',serif;font-weight:700;font-size:26px;color:#0D9488;margin-bottom:12px;line-height:1.15;word-break:break-word">' + priceStr + '</div>' : '';
     var items = [];
-    if (dealMap[l.re_deal]) items.push([es ? 'Operación' : 'Angebot', dealMap[l.re_deal]]);
-    if (typeMap[l.re_type]) items.push([es ? 'Tipo' : 'Typ', typeMap[l.re_type]]);
-    if (areaStr) items.push([es ? 'Superficie' : 'Fläche', areaStr]);
-    if (l.re_rooms != null) items.push([es ? 'Habitaciones' : 'Zimmer', String(l.re_rooms)]);
+    if (dealMap[l.re_deal]) items.push([L('Angebot','Operación','Offer'), dealMap[l.re_deal]]);
+    if (typeMap[l.re_type]) items.push([L('Typ','Tipo','Type'), typeMap[l.re_type]]);
+    if (areaStr) items.push([L('Fläche','Superficie','Area'), areaStr]);
+    if (l.re_rooms != null) items.push([L('Zimmer','Habitaciones','Rooms'), String(l.re_rooms)]);
     var rows = items.map(function(it, i){
       var border = (i < items.length - 1) ? 'border-bottom:1px solid var(--border);' : '';
       return '<div style="display:flex;justify-content:space-between;gap:14px;padding:9px 0;' + border + 'font-size:14px"><span style="color:var(--text-3)">' + it[0] + '</span><span style="font-weight:600;color:var(--text-1);text-align:right;word-break:break-word">' + it[1] + '</span></div>';
     }).join('');
-    var title = es ? 'Detalles del inmueble' : 'Immobilien-Details';
+    var title = L('Immobilien-Details','Detalles del inmueble','Property details');
     var mapBtn = (l.lat != null && l.lng != null)
-      ? '<button onclick="showOnMap(\'' + l.id + '\')" style="width:100%;margin-top:14px;background:#fff;border:1.5px solid #0D9488;color:#0D9488;font-weight:700;font-size:14px;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#0D9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>' + (es ? 'Ver en el mapa' : 'Auf Karte anzeigen') + '</button>'
+      ? '<button onclick="showOnMap(\'' + l.id + '\')" style="width:100%;margin-top:14px;background:#fff;border:1.5px solid #0D9488;color:#0D9488;font-weight:700;font-size:14px;padding:12px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#0D9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>' + L('Auf Karte anzeigen','Ver en el mapa','View on map') + '</button>'
       : '';
     return '<div class="detail-section-title">' + title + '</div><div style="padding:0 16px 16px">' + head + rows + mapBtn + '</div>';
   }
@@ -2935,16 +3199,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function immoPriceStr(l){
     if(l.re_price==null) return '';
     var es=(currentLang==='es'); var curMap={USD:'USD',PYG:'₲',EUR:'€'};
-    var per=(l.re_period==='monat')?(es?'/mes':'/Monat'):'';
-    return (curMap[l.re_currency]||l.re_currency||'')+' '+Number(l.re_price).toLocaleString(es?'es-PY':'de-DE')+per;
+    var per=(l.re_period==='monat')?L('/Monat','/mes','/mo'):'';
+    return (curMap[l.re_currency]||l.re_currency||'')+' '+Number(l.re_price).toLocaleString(dateLoc())+per;
   }
   function immoMetaStr(l){
     var es=(currentLang==='es');
     var typeMap=es?{wohnung:'Departamento',haus:'Casa',grundstueck:'Terreno',land:'Campo',gewerbe:'Comercial'}:{wohnung:'Wohnung',haus:'Haus',grundstueck:'Grundstück',land:'Land',gewerbe:'Gewerbe'};
     var parts=[];
     if(typeMap[l.re_type]) parts.push(typeMap[l.re_type]);
-    if(l.re_area!=null) parts.push(Number(l.re_area).toLocaleString(es?'es-PY':'de-DE')+' '+(l.re_area_unit==='ha'?'ha':'m²'));
-    if(l.re_rooms!=null) parts.push(l.re_rooms+' '+(es?'hab.':'Zi.'));
+    if(l.re_area!=null) parts.push(Number(l.re_area).toLocaleString(dateLoc())+' '+(l.re_area_unit==='ha'?'ha':'m²'));
+    if(l.re_rooms!=null) parts.push(l.re_rooms+' '+L('Zi.','hab.','rm'));
     return parts.join(' · ');
   }
   // ── Phase 3: Featured / Verifizierter Makler (monetarisierungs-fertig) ──────
@@ -2960,8 +3224,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
   function immoBadgesHTML(l){
     var es=(currentLang==='es'); var h='';
-    if(isFeatured(l)) h+='<span class="immo-badge immo-badge-featured">★ '+(es?'Destacado':'Empfohlen')+'</span>';
-    if(isMaklerVerified(l)) h+='<span class="immo-badge immo-badge-verified">✓ '+(es?'Verificado':'Verifiziert')+'</span>';
+    if(isFeatured(l)) h+='<span class="immo-badge immo-badge-featured">★ '+L('Empfohlen','Destacado','Featured')+'</span>';
+    if(isMaklerVerified(l)) h+='<span class="immo-badge immo-badge-verified">✓ '+L('Verifiziert','Verificado','Verified')+'</span>';
     return h ? '<div class="immo-badges">'+h+'</div>' : '';
   }
   function _dateInputVal(v){
@@ -2985,9 +3249,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try{
       await db.collection('listings').doc(id).update(upd);
       var l=allListings.find(function(x){return x.id===id;}); if(l) Object.assign(l, upd);
-      showToast('✅ '+(es?'Guardado':'Gespeichert'));
+      showToast('✅ '+L('Gespeichert','Guardado','Saved'));
       showDetail(id);
-    }catch(e){ if(btn){ btn.disabled=false; btn.textContent=(es?'Guardar':'Speichern'); } showToast(t('err_prefix')+(e.message||e)); }
+    }catch(e){ if(btn){ btn.disabled=false; btn.textContent=L('Speichern','Guardar','Save'); } showToast(t('err_prefix')+(e.message||e)); }
   }
   function renderImmoCard(l){
     var es=(currentLang==='es');
@@ -3017,8 +3281,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   var immoDeal='Alle', immoType='Alle';
   function renderImmoFilters(){
     var es=(currentLang==='es');
-    var deals=[['Alle',es?'Todos':'Alle'],['kauf',es?'Venta':'Kauf'],['miete',es?'Alquiler':'Miete']];
-    var types=[['Alle',es?'Todos los tipos':'Alle Typen'],['wohnung',es?'Departamento':'Wohnung'],['haus',es?'Casa':'Haus'],['grundstueck',es?'Terreno':'Grundstück'],['land',es?'Campo':'Land'],['gewerbe',es?'Comercial':'Gewerbe']];
+    var deals=[['Alle',L('Alle','Todos','All')],['kauf',L('Kauf','Venta','Buy')],['miete',L('Miete','Alquiler','Rent')]];
+    var types=[['Alle',L('Alle Typen','Todos los tipos','All types')],['wohnung',L('Wohnung','Departamento','Apartment')],['haus',L('Haus','Casa','House')],['grundstueck',L('Grundstück','Terreno','Plot')],['land',L('Land','Campo','Farmland')],['gewerbe',L('Gewerbe','Comercial','Commercial')]];
     var dc=document.getElementById('immoDealChips'); if(dc) dc.innerHTML=deals.map(function(d){return '<div class="immo-fchip'+(immoDeal===d[0]?' active':'')+'" onclick="setImmoDeal(\''+d[0]+'\')">'+d[1]+'</div>';}).join('');
     var tc=document.getElementById('immoTypeChips'); if(tc) tc.innerHTML=types.map(function(t){return '<div class="immo-fchip'+(immoType===t[0]?' active':'')+'" onclick="setImmoType(\''+t[0]+'\')">'+t[1]+'</div>';}).join('');
   }
@@ -3038,7 +3302,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   var MAKLER_WA = '4915222487351';
   function updateMaklerCta(){
     var el=document.getElementById('maklerCtaText'); if(!el) return;
-    el.textContent = (currentLang==='es') ? '¿Agente?' : 'Makler?';
+    el.textContent = L('Makler?','¿Agente?','Agent?');
   }
   function openMaklerModal(listingId){
     var es=(currentLang==='es');
@@ -3051,28 +3315,28 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var box=document.getElementById('maklerModalBox'); if(!box) return;
     box.innerHTML =
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
-        +'<div style="font-family:\'Fraunces\',serif;font-size:21px;font-weight:700;color:var(--text-1)">'+(es?'Hazte visible':'Werde sichtbar')+'</div>'
+        +'<div style="font-family:\'Fraunces\',serif;font-size:21px;font-weight:700;color:var(--text-1)">'+L('Werde sichtbar','Hazte visible','Get seen')+'</div>'
         +'<button onclick="closeMaklerModal()" style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:2px"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'
       +'</div>'
-      +'<div style="font-size:13.5px;color:var(--text-2);line-height:1.5;margin-bottom:16px">'+(es?'Más visibilidad y confianza para tus inmuebles en Buscar.':'Mehr Sichtbarkeit und Vertrauen für deine Immobilien bei Buscar.')+'</div>'
+      +'<div style="font-size:13.5px;color:var(--text-2);line-height:1.5;margin-bottom:16px">'+L('Mehr Sichtbarkeit und Vertrauen für deine Immobilien bei Buscar.','Más visibilidad y confianza para tus inmuebles en Buscar.','More visibility and trust for your properties on Buscar.')+'</div>'
       +'<div class="makler-price-card">'
-        +'<div class="makler-price-head"><span class="makler-price-badge feat">★</span><span>'+(es?'Inmueble destacado':'Inserat hervorheben')+'</span></div>'
-        +'<div class="makler-price-desc">'+(es?'Tu inmueble aparece arriba de todo, con marco y sello dorado.':'Dein Objekt erscheint ganz oben — mit goldenem Rahmen und Badge.')+'</div>'
-        +'<div class="makler-price-val">USD 15 <span>(~14 €)</span> · <span>'+(es?'pago único por 30 días':'einmalig für 30 Tage')+'</span></div>'
+        +'<div class="makler-price-head"><span class="makler-price-badge feat">★</span><span>'+L('Inserat hervorheben','Inmueble destacado','Feature listing')+'</span></div>'
+        +'<div class="makler-price-desc">'+L('Dein Objekt erscheint ganz oben — mit goldenem Rahmen und Badge.','Tu inmueble aparece arriba de todo, con marco y sello dorado.','Your listing appears at the very top — with a gold frame and badge.')+'</div>'
+        +'<div class="makler-price-val">USD 15 <span>(~14 €)</span> · <span>'+L('einmalig für 30 Tage','pago único por 30 días','one-time, 30 days')+'</span></div>'
       +'</div>'
       +'<div class="makler-price-card">'
-        +'<div class="makler-price-head"><span class="makler-price-badge ver">✓</span><span>'+(es?'Agente verificado':'Verifizierter Makler')+'</span></div>'
-        +'<div class="makler-price-desc">'+(es?'Sello de confianza «verificado» en tus inmuebles. Para verificarte registras tu cédula y RUC — así los usuarios ven que eres un proveedor real y registrado.':'Vertrauens-Badge „Verifiziert" an deinen Inseraten. Zur Verifizierung hinterlegst du Cédula und RUC — so sehen Nutzer, dass du ein echter, registrierter Anbieter bist.')+'</div>'
-        +'<div class="makler-price-val">USD 20 <span>(~18 €)</span> · <span>'+(es?'por mes (suscripción)':'pro Monat (Abo)')+'</span></div>'
+        +'<div class="makler-price-head"><span class="makler-price-badge ver">✓</span><span>'+L('Verifizierter Makler','Agente verificado','Verified agent')+'</span></div>'
+        +'<div class="makler-price-desc">'+L('Vertrauens-Badge „Verifiziert" an deinen Inseraten. Zur Verifizierung hinterlegst du Cédula und RUC — so sehen Nutzer, dass du ein echter, registrierter Anbieter bist.','Sello de confianza «verificado» en tus inmuebles. Para verificarte registras tu cédula y RUC — así los usuarios ven que eres un proveedor real y registrado.','A "verified" trust badge on your listings. To get verified, you register your Cédula and RUC — so users can see you are a real, registered provider.')+'</div>'
+        +'<div class="makler-price-val">USD 20 <span>(~18 €)</span> · <span>'+L('pro Monat (Abo)','por mes (suscripción)','per month (subscription)')+'</span></div>'
       +'</div>'
-      +'<a href="'+waHref+'" target="_blank" rel="noopener" onclick="closeMaklerModal()" class="makler-wa-btn"><svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.595zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.71.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.247-.694.247-1.289.173-1.413z"/></svg>'+(es?'Contactar por WhatsApp':'Per WhatsApp anfragen')+'</a>'
-      +'<div style="font-size:11.5px;color:var(--text-3);line-height:1.5;margin-top:12px;text-align:center">'+(es?'Pago por transferencia / Tigo Money. Buscar activa la visibilidad manualmente.':'Zahlung per Überweisung / Tigo Money. Buscar schaltet die Sichtbarkeit manuell frei.')+'</div>';
+      +'<a href="'+waHref+'" target="_blank" rel="noopener" onclick="closeMaklerModal()" class="makler-wa-btn"><svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.595zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.71.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.247-.694.247-1.289.173-1.413z"/></svg>'+L('Per WhatsApp anfragen','Contactar por WhatsApp','Contact via WhatsApp')+'</a>'
+      +'<div style="font-size:11.5px;color:var(--text-3);line-height:1.5;margin-top:12px;text-align:center">'+L('Zahlung per Überweisung / Tigo Money. Buscar schaltet die Sichtbarkeit manuell frei.','Pago por transferencia / Tigo Money. Buscar activa la visibilidad manualmente.','Payment via bank transfer / Tigo Money. Buscar activates visibility manually.')+'</div>';
     var m=document.getElementById('maklerModal'); if(m) m.style.display='flex';
   }
   function closeMaklerModal(){ var m=document.getElementById('maklerModal'); if(m) m.style.display='none'; }
   function showOnMap(id){
     var l=(typeof allListings!=='undefined'?allListings:[]).find(function(x){return x.id===id;});
-    if(!l || l.lat==null || l.lng==null){ showToast(currentLang==='es'?'Este inmueble no tiene ubicación.':'Für diese Immobilie ist kein Standort hinterlegt.'); return; }
+    if(!l || l.lat==null || l.lng==null){ showToast(L('Für diese Immobilie ist kein Standort hinterlegt.','Este inmueble no tiene ubicación.','This property has no location set.')); return; }
     // Karte auf Immobilien-Kategorie stellen, damit der Pin sichtbar ist
     mapCategory='kat-immobilien';
     document.querySelectorAll('#mapCats .map-chip').forEach(function(c){ c.classList.remove('active'); });
@@ -3095,8 +3359,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var cnt=document.getElementById('immobilienCount'); if(cnt) cnt.textContent=list.length+' '+(es?(list.length===1?'inmueble':'inmuebles'):(list.length===1?'Objekt':'Objekte'));
     if(!list.length){
       var noneAtAll=(all.length===0);
-      var t1=noneAtAll?(es?'Aún no hay inmuebles':'Noch keine Immobilien'):(es?'Sin resultados':'Keine Treffer');
-      var t2=noneAtAll?(es?'Sé el primero en publicar uno':'Sei der Erste und inseriere eine'):(es?'Prueba con otro filtro':'Versuch einen anderen Filter');
+      var t1=noneAtAll?L('Noch keine Immobilien','Aún no hay inmuebles','No properties yet'):L('Keine Treffer','Sin resultados','No matches');
+      var t2=noneAtAll?L('Sei der Erste und inseriere eine','Sé el primero en publicar uno','Be the first to post one'):L('Versuch einen anderen Filter','Prueba con otro filtro','Try a different filter');
       body.innerHTML='<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></div><div class="empty-title">'+t1+'</div><div class="empty-sub">'+t2+'</div></div>';
       return;
     }
@@ -3170,8 +3434,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const openStatus = isOpen(l.opening_hours);
     const openBadge = openStatus===true ? '<span class="detail-badge open-status">'+t('open_now')+'</span>' : openStatus===false ? '<span class="detail-badge closed-status">'+t('closed_now')+'</span>' : '';
     var _esb=(currentLang==='es');
-    var featBadge = isFeatured(l) ? '<span class="detail-badge featured">★ '+(_esb?'Destacado':'Empfohlen')+'</span>' : '';
-    var maklerBadge = isMaklerVerified(l) ? '<span class="detail-badge makler">✓ '+(_esb?'Agente verificado':'Verifizierter Makler')+'</span>' : '';
+    var featBadge = isFeatured(l) ? '<span class="detail-badge featured">★ '+L('Empfohlen','Destacado','Featured')+'</span>' : '';
+    var maklerBadge = isMaklerVerified(l) ? '<span class="detail-badge makler">✓ '+L('Verifizierter Makler','Agente verificado','Verified agent')+'</span>' : '';
     document.getElementById('detailBadgeRow').innerHTML = featBadge + maklerBadge + (l.verified?'<span class="detail-badge green">'+t('verified')+'</span>':'') + (isNew(l.created_at)?'<span class="detail-badge blue">'+t('badge_new')+'</span>':'') + openBadge;
     badges.style.display = (featBadge || maklerBadge || l.verified || isNew(l.created_at) || openStatus!==null) ? 'block' : 'none';
     let infoHTML = '';
@@ -3305,11 +3569,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if (currentUser && (currentUser.email === ADMIN_EMAIL || (l.created_by && l.created_by === currentUser.uid))) {
         var _esc = (currentLang === 'es');
         _cre.innerHTML = '<div class="detail-card" style="display:flex;gap:8px;padding:12px">'
-          + '<button onclick="openEditListing(\'' + l.id + '\')" style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:11px;font-family:\'DM Sans\',sans-serif;font-weight:600;font-size:13px;color:var(--text-1);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' + (_esc ? 'Editar' : 'Bearbeiten') + '</button>'
-          + '<button onclick="deleteOwnListing(\'' + l.id + '\')" style="flex:1;background:var(--red-light);border:none;border-radius:12px;padding:11px;font-family:\'DM Sans\',sans-serif;font-weight:600;font-size:13px;color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>' + (_esc ? 'Eliminar' : 'Löschen') + '</button>'
+          + '<button onclick="openEditListing(\'' + l.id + '\')" style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:11px;font-family:\'DM Sans\',sans-serif;font-weight:600;font-size:13px;color:var(--text-1);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' + L('Bearbeiten','Editar','Edit') + '</button>'
+          + '<button onclick="deleteOwnListing(\'' + l.id + '\')" style="flex:1;background:var(--red-light);border:none;border-radius:12px;padding:11px;font-family:\'DM Sans\',sans-serif;font-weight:600;font-size:13px;color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>' + L('Löschen','Eliminar','Delete') + '</button>'
           + '</div>'
           + (l.category_id === 'kat-immobilien'
-              ? '<div class="detail-card makler-promo-card" onclick="openMaklerModal(\'' + l.id + '\')"><div class="makler-promo-icon">★</div><div class="makler-promo-text"><div class="makler-promo-title">' + (_esc ? '¿Destacar este inmueble?' : 'Dieses Objekt hervorheben?') + '</div><div class="makler-promo-sub">' + (_esc ? 'Aparece arriba + sello de verificado' : 'Ganz oben erscheinen + Verifiziert-Badge') + '</div></div><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>'
+              ? '<div class="detail-card makler-promo-card" onclick="openMaklerModal(\'' + l.id + '\')"><div class="makler-promo-icon">★</div><div class="makler-promo-text"><div class="makler-promo-title">' + L('Dieses Objekt hervorheben?','¿Destacar este inmueble?','Feature this property?') + '</div><div class="makler-promo-sub">' + L('Ganz oben erscheinen + Verifiziert-Badge','Aparece arriba + sello de verificado','Appear at the top + verified badge') + '</div></div><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>'
               : '');
         _cre.style.display = 'block';
       } else { _cre.style.display = 'none'; _cre.innerHTML = ''; }
@@ -3320,12 +3584,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if (_isImmo && currentUser && currentUser.email === ADMIN_EMAIL) {
         var _esa = (currentLang === 'es');
         _adm.innerHTML = '<div class="detail-card" style="padding:14px">'
-          + '<div class="detail-section-title" style="padding:0 0 10px">&#128295; ' + (_esa ? 'Admin · Visibilidad' : 'Admin · Sichtbarkeit') + '</div>'
-          + '<label class="adm-imo-row"><input type="checkbox" id="admFeatured"' + (l.re_featured ? ' checked' : '') + '> ' + (_esa ? 'Destacado (Empfohlen)' : 'Empfohlen (Featured)') + '</label>'
-          + '<div class="adm-imo-field"><span>' + (_esa ? 'Válido hasta' : 'Gültig bis') + '</span><input type="date" id="admFeaturedUntil" value="' + _dateInputVal(l.featured_until) + '"></div>'
-          + '<label class="adm-imo-row"><input type="checkbox" id="admVerified"' + (l.makler_verified ? ' checked' : '') + '> ' + (_esa ? 'Agente verificado' : 'Verifizierter Makler') + '</label>'
-          + '<div class="adm-imo-field"><span>' + (_esa ? 'Hasta (opcional)' : 'Bis (optional)') + '</span><input type="date" id="admVerifiedUntil" value="' + _dateInputVal(l.makler_verified_until) + '"></div>'
-          + '<button id="admSaveBtn" class="adm-imo-save" onclick="saveImmoAdmin(\'' + l.id + '\')">' + (_esa ? 'Guardar' : 'Speichern') + '</button>'
+          + '<div class="detail-section-title" style="padding:0 0 10px">&#128295; ' + L('Admin · Sichtbarkeit','Admin · Visibilidad','Admin · Visibility') + '</div>'
+          + '<label class="adm-imo-row"><input type="checkbox" id="admFeatured"' + (l.re_featured ? ' checked' : '') + '> ' + L('Empfohlen (Featured)','Destacado (Empfohlen)','Featured') + '</label>'
+          + '<div class="adm-imo-field"><span>' + L('Gültig bis','Válido hasta','Valid until') + '</span><input type="date" id="admFeaturedUntil" value="' + _dateInputVal(l.featured_until) + '"></div>'
+          + '<label class="adm-imo-row"><input type="checkbox" id="admVerified"' + (l.makler_verified ? ' checked' : '') + '> ' + L('Verifizierter Makler','Agente verificado','Verified agent') + '</label>'
+          + '<div class="adm-imo-field"><span>' + L('Bis (optional)','Hasta (opcional)','Until (optional)') + '</span><input type="date" id="admVerifiedUntil" value="' + _dateInputVal(l.makler_verified_until) + '"></div>'
+          + '<button id="admSaveBtn" class="adm-imo-save" onclick="saveImmoAdmin(\'' + l.id + '\')">' + L('Speichern','Guardar','Save') + '</button>'
           + '</div>';
         _adm.style.display = 'block';
       } else { _adm.style.display = 'none'; _adm.innerHTML = ''; }
@@ -3502,7 +3766,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var l=allListings.find(function(x){return x.id===listingId;});
       if(l){ if(!Array.isArray(l.tags)) l.tags=[]; if(l.tags.map(function(x){return String(x).toLowerCase();}).indexOf(String(tag).toLowerCase())<0) l.tags.push(tag); _searchCache.delete(l); }
       var c=document.getElementById('tagsugCard_'+sugId); if(c) c.remove();
-      showToast(currentLang==='es' ? '✓ Etiqueta aplicada' : '✓ Tag übernommen');
+      showToast(L('✓ Tag übernommen','✓ Etiqueta aplicada','✓ Tag applied'));
     } catch(e){ showToast(t('err_generic')||'Fehler'); }
   }
   async function rejectTagSuggestion(sugId){
@@ -4172,9 +4436,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var cityBtn = document.getElementById('mapCityPickerBtn'); if (cityBtn) cityBtn.style.display = isR ? 'none' : 'flex';
     var evBtn = document.getElementById('eventsMapBtn'); if (evBtn) evBtn.style.display = isR ? 'none' : 'flex';
     if (isR) {
-      var lbl = document.getElementById('radarRefreshLabel'); if (lbl) lbl.textContent = (currentLang==='es'?'Actualizar':'Aktualisieren');
-      var sp = document.getElementById('radarSegPlaces'); if (sp) sp.textContent = (currentLang==='es'?'Lugares':'Orte');
-      var se = document.getElementById('radarSegEvents'); if (se) se.textContent = (currentLang==='es'?'Eventos':'Events');
+      var lbl = document.getElementById('radarRefreshLabel'); if (lbl) lbl.textContent = L('Aktualisieren','Actualizar','Refresh');
+      var sp = document.getElementById('radarSegPlaces'); if (sp) sp.textContent = L('Orte','Lugares','Places');
+      var se = document.getElementById('radarSegEvents'); if (se) se.textContent = L('Events','Eventos','Events');
       if (_radarLat == null) refreshRadarLocation(); else renderRadar();
     } else if (maplibreMap) { try { setTimeout(function(){ maplibreMap.resize(); }, 60); } catch(e){} }
   }
@@ -4191,12 +4455,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
   function refreshRadarLocation(){
     var status = document.getElementById('radarStatus');
-    var es = (currentLang === 'es');
-    if (!navigator.geolocation){ if (status) status.textContent = es?'GPS no disponible':'GPS nicht verfügbar'; return; }
-    if (status) status.textContent = es?'Obteniendo ubicación…':'Standort wird ermittelt…';
+    if (!navigator.geolocation){ if (status) status.textContent = L('GPS nicht verfügbar','GPS no disponible','GPS unavailable'); return; }
+    if (status) status.textContent = L('Standort wird ermittelt…','Obteniendo ubicación…','Getting location…');
     navigator.geolocation.getCurrentPosition(function(pos){
       _radarLat = pos.coords.latitude; _radarLng = pos.coords.longitude; renderRadar();
-    }, function(){ if (status) status.textContent = es?'No se pudo obtener la ubicación':'Standort konnte nicht ermittelt werden'; }, { enableHighAccuracy:true, timeout:10000, maximumAge:60000 });
+    }, function(){ if (status) status.textContent = L('Standort konnte nicht ermittelt werden','No se pudo obtener la ubicación','Could not get location'); }, { enableHighAccuracy:true, timeout:10000, maximumAge:60000 });
   }
   function setRadarRadius(km){ _radarRadiusKm = km; renderRadar(); }
   async function setRadarEvents(on){
@@ -4206,7 +4469,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (se) se.classList.toggle('active', on);
     if (on && (typeof allEvents === 'undefined' || !allEvents || !allEvents.length)){
       var status = document.getElementById('radarStatus');
-      if (status) status.textContent = (currentLang==='es'?'Cargando eventos…':'Events werden geladen…');
+      if (status) status.textContent = L('Events werden geladen…','Cargando eventos…','Loading events…');
       try { await loadEvents(); } catch(e){}
     }
     renderRadar();
@@ -4245,7 +4508,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (x.ev){
       var e = x.e;
       var st = (e.date_start && e.date_start.toDate) ? e.date_start.toDate() : null;
-      var dateStr = st ? st.toLocaleDateString(es?'es-PY':'de-DE', {weekday:'short', day:'numeric', month:'short'}) : '';
+      var dateStr = st ? st.toLocaleDateString(dateLoc(), {weekday:'short', day:'numeric', month:'short'}) : '';
       var emoji = (typeof EVENT_TYPE_EMOJIS!=='undefined' && EVENT_TYPE_EMOJIS[e.type]) ? EVENT_TYPE_EMOJIS[e.type] : '🎪';
       var esub = [dateStr, e.city].filter(Boolean).join(' · ');
       return '<div class="radar-row" onclick="showEventDetail(\''+e.id+'\', \'map\')">'
@@ -4309,15 +4572,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       + '<line x1="100" y1="12" x2="100" y2="188" stroke="var(--border)" stroke-width="0.8"/>'
       + '<line x1="12" y1="100" x2="188" y2="100" stroke="var(--border)" stroke-width="0.8"/>'
       + '<text x="100" y="9" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">N</text>'
-      + '<text x="194" y="103" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">'+(es?'E':'O')+'</text>'
+      + '<text x="194" y="103" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">'+L('O','E','E')+'</text>'
       + '<text x="100" y="199" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">S</text>'
-      + '<text x="6" y="103" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">'+(es?'O':'W')+'</text>'
+      + '<text x="6" y="103" font-size="8" font-weight="700" text-anchor="middle" fill="var(--text-3)">'+L('W','O','W')+'</text>'
       + '<g class="radar-sweep"><path d="M100 100 L100 12 A88 88 0 0 1 162.2 37.8 Z" fill="url(#rgSweep)"/></g>'
       + dots
       + '<circle cx="100" cy="100" r="12" fill="#007AFF" opacity="0.16"/>'
       + '<circle cx="100" cy="100" r="5" fill="#007AFF" stroke="#fff" stroke-width="2"/>'
       + '</svg>'
-      + '<div class="radar-stage-cap">'+(es?'Tú':'Du')+' · '+_radarRadiusKm+' km</div></div>';
+      + '<div class="radar-stage-cap">'+L('Du','Tú','You')+' · '+_radarRadiusKm+' km</div></div>';
   }
   function renderRadar(){
     _renderRadarRadiusChips();
@@ -4326,16 +4589,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var es = (currentLang === 'es');
     if (_radarLat == null){
       list.innerHTML = '';
-      if (status) status.textContent = es?'Activa el GPS para ver lo cercano':'Standort aktivieren, um die Umgebung zu sehen';
+      if (status) status.textContent = L('Standort aktivieren, um die Umgebung zu sehen','Activa el GPS para ver lo cercano','Enable location to see what\'s nearby');
       return;
     }
     var cand = _radarCandidates();
-    var noun = _radarEvents ? 'Events' : (es ? 'lugares' : 'Orte');
+    var noun = _radarEvents ? 'Events' : L('Orte','lugares','places');
     if (status) status.textContent = cand.length + ' ' + noun + ' ' + (es ? ('en '+_radarRadiusKm+' km') : ('im Umkreis von '+_radarRadiusKm+' km'));
     var stage = _radarStageHTML(cand);
     if (!cand.length){
-      var et = _radarEvents ? (es?'Ningún evento cerca':'Keine Events in der Nähe') : (es?'Nada cerca':'Nichts in der Nähe');
-      list.innerHTML = stage + '<div class="empty-state" style="padding:24px 16px"><div class="empty-title">'+et+'</div><div class="empty-sub">'+(es?'Aumenta el radio o cambia el filtro':'Vergrößere den Radius oder ändere den Filter')+'</div></div>';
+      var et = _radarEvents ? L('Keine Events in der Nähe','Ningún evento cerca','No events nearby') : L('Nichts in der Nähe','Nada cerca','Nothing nearby');
+      list.innerHTML = stage + '<div class="empty-state" style="padding:24px 16px"><div class="empty-title">'+et+'</div><div class="empty-sub">'+L('Vergrößere den Radius oder ändere den Filter','Aumenta el radio o cambia el filtro','Increase the radius or change the filter')+'</div></div>';
       return;
     }
     list.innerHTML = stage + cand.slice(0, 60).map(function(x){ return _radarRowHTML(x); }).join('');
@@ -4446,9 +4709,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (typeof d.lat === 'number' && typeof d.lng === 'number') {
       window._newLat = d.lat; window._newLng = d.lng;
       const locStatus = document.getElementById('locationStatus');
-      if (locStatus) { locStatus.style.display = 'block'; locStatus.style.color = 'var(--green)'; locStatus.textContent = 'Standort gespeichert: ' + d.lat.toFixed(5) + ', ' + d.lng.toFixed(5); }
+      if (locStatus) { locStatus.style.display = 'block'; locStatus.style.color = 'var(--green)'; locStatus.textContent = t('location_saved') + ': ' + d.lat.toFixed(5) + ', ' + d.lng.toFixed(5); }
       const locBtn = document.getElementById('locationBtn');
-      if (locBtn) { locBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg> Standort gespeichert'; locBtn.style.background = 'var(--green-light)'; locBtn.style.borderColor = 'var(--green)'; locBtn.style.color = 'var(--green)'; locBtn.dataset.saved = 'true'; }
+      if (locBtn) { locBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg> ' + t('location_saved'); locBtn.style.background = 'var(--green-light)'; locBtn.style.borderColor = 'var(--green)'; locBtn.style.color = 'var(--green)'; locBtn.dataset.saved = 'true'; }
       const removeBtn = document.getElementById('locationRemoveBtn'); if (removeBtn) removeBtn.style.display = 'inline-block';
       const banner = document.getElementById('locationPermissionBanner'); if (banner) banner.style.display = 'none';
       const lh = document.getElementById('locationHint'); if (lh) lh.style.display = 'none';
@@ -4641,10 +4904,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         window._newLng = pos.coords.longitude;
         status.style.color = 'var(--green)';
         status.style.display = 'block';
-        status.textContent = 'Standort gespeichert: '
+        status.textContent = t('location_saved') + ': '
           + pos.coords.latitude.toFixed(5) + ', '
           + pos.coords.longitude.toFixed(5);
-        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg> Standort gespeichert';
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg> ' + t('location_saved');
         btn.style.background = 'var(--green-light)';
         btn.style.borderColor = 'var(--green)';
         btn.style.color = 'var(--green)';
@@ -4733,7 +4996,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         window._newLat = pos.lat;
         window._newLng = pos.lng;
         const status = document.getElementById('locationStatus');
-        if (status) status.textContent = 'Standort gespeichert: ' + pos.lat.toFixed(5) + ', ' + pos.lng.toFixed(5);
+        if (status) status.textContent = t('location_saved') + ': ' + pos.lat.toFixed(5) + ', ' + pos.lng.toFixed(5);
       });
 
       // Bei Tipp auf Karte: Marker dorthin verschieben
@@ -4742,7 +5005,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         window._newLng = e.lngLat.lng;
         _locationMarker.setLngLat([e.lngLat.lng, e.lngLat.lat]);
         const status = document.getElementById('locationStatus');
-        if (status) status.textContent = 'Standort gespeichert: ' + e.lngLat.lat.toFixed(5) + ', ' + e.lngLat.lng.toFixed(5);
+        if (status) status.textContent = t('location_saved') + ': ' + e.lngLat.lat.toFixed(5) + ', ' + e.lngLat.lng.toFixed(5);
       });
 
       setTimeout(function(){ if (_locationMap) _locationMap.resize(); }, 100);
@@ -5194,20 +5457,53 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     'Frisör': 'Peluquería', 'Beauty-Salon': 'Salón de belleza', 'Spa & Wellness': 'Spa & Bienestar',
     'Nagelpflege': 'Manicura', 'Barbershop': 'Barbería', 'Massage': 'Masaje',
   };
-  function tSubcat(s) { return (currentLang==='es' && subcatTranslations[s]) ? subcatTranslations[s] : s; }
+  const subcatTranslationsEN = {
+    'Sonstiges': 'Other', 'Tierarzt': 'Veterinarian', 'Genossenschaft': 'Cooperative', 'Wechselstube': 'Currency exchange',
+    'Alle': 'All', 'Restaurant': 'Restaurant', 'Café': 'Café', 'Bar': 'Bar',
+    'Parrilla': 'Grill house', 'Fast Food': 'Fast food', 'Bäckerei': 'Bakery',
+    'Arzt': 'Doctor', 'Zahnarzt': 'Dentist', 'Anwalt': 'Lawyer', 'Notar': 'Notary',
+    'Bank': 'Bank', 'Handwerker': 'Handyman', 'Schule': 'School',
+    'Übersetzung': 'Translation', 'Behörde': 'Government office',
+    'Strand': 'Beach', 'Park': 'Park', 'Museum': 'Museum', 'Kirche': 'Church',
+    'Aussichtspunkt': 'Viewpoint', 'Natur': 'Nature',
+    'Hotel': 'Hotel', 'Hostel': 'Hostel', 'Ferienwohnung': 'Vacation rental',
+    'B&B': 'B&B', 'Camping': 'Camping',
+    'Supermarkt': 'Supermarket', 'Markt': 'Market', 'Apotheke': 'Pharmacy',
+    'Elektronik': 'Electronics', 'Kleidung': 'Clothing', 'Baumarkt': 'Hardware store',
+    'Fitnessstudio': 'Gym', 'Kampfsport': 'Martial arts',
+    'Yoga & Pilates': 'Yoga & Pilates', 'Schwimmbad': 'Swimming pool',
+    'Fußball': 'Football', 'Tennis': 'Tennis', 'Radfahren': 'Cycling',
+    'Crossfit': 'Crossfit', 'Klettern': 'Climbing',
+    'Tankstelle': 'Gas station', 'Autowaschanlage': 'Car wash', 'Reifenservice': 'Tire service',
+    'Frisör': 'Hair salon', 'Beauty-Salon': 'Beauty salon', 'Spa & Wellness': 'Spa & Wellness',
+    'Nagelpflege': 'Nail care', 'Barbershop': 'Barbershop', 'Massage': 'Massage',
+  };
+  function tSubcat(s) {
+    if (currentLang==='es' && subcatTranslations[s]) return subcatTranslations[s];
+    if (currentLang==='en' && subcatTranslationsEN[s]) return subcatTranslationsEN[s];
+    return s;
+  }
 
   function renderLegalScreens() {
-    var de = currentLang === 'de';
-    var pil=document.getElementById('profilImpressumLabel'); if(pil) pil.textContent=de?'Impressum':'Aviso Legal';
-    var pdl=document.getElementById('profilDatenschutzLabel'); if(pdl) pdl.textContent=de?'Datenschutz':'Privacidad';
-    var pal=document.getElementById('profilAgbLabel'); if(pal) pal.textContent=de?'Nutzungsbedingungen':'Términos de Uso';
+    var pil=document.getElementById('profilImpressumLabel'); if(pil) pil.textContent=L('Impressum','Aviso Legal','Legal Notice');
+    var pdl=document.getElementById('profilDatenschutzLabel'); if(pdl) pdl.textContent=L('Datenschutz','Privacidad','Privacy');
+    var pal=document.getElementById('profilAgbLabel'); if(pal) pal.textContent=L('Nutzungsbedingungen','Términos de Uso','Terms of Use');
     var el = function(id){return document.getElementById(id);};
-    if(el('impressumTitle')) el('impressumTitle').textContent = de?'Impressum':'Aviso Legal';
-    if(el('impressumBody')) el('impressumBody').innerHTML = de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Impressum</p><p><strong>Verantwortlich:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay<br>maximechristalle@gmail.com</p><br><p>Buscar ist ein privates Informationsprojekt ohne kommerziellen Charakter.</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Aviso Legal</p><p><strong>Responsable:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay<br>maximechristalle@gmail.com</p><br><p>Buscar es un proyecto de información privado sin fines comerciales.</p>';
-    if(el('datenschutzTitle')) el('datenschutzTitle').textContent = de?'Datenschutz':'Privacidad';
-    if(el('datenschutzBody')) el('datenschutzBody').innerHTML = de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Datenschutzerklärung</p><p><strong>Verantwortlicher:</strong><br>Maxime Christalle, San Bernardino, Paraguay, maximechristalle@gmail.com</p><br><p><strong>Daten:</strong><br>E-Mail, Benutzername, Fotos. Keine Weitergabe ohne Einwilligung.</p><br><p><strong>Firebase:</strong><br><a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>Rechte:</strong><br>maximechristalle@gmail.com</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Política de Privacidad</p><p><strong>Responsable:</strong><br>Maxime Christalle, San Bernardino, Paraguay, maximechristalle@gmail.com</p><br><p><strong>Datos:</strong><br>Correo, nombre, fotos. Sin cesión a terceros.</p><br><p><strong>Firebase:</strong><br><a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>Derechos:</strong><br>maximechristalle@gmail.com</p>';
-    if(el('agbTitle')) el('agbTitle').textContent = de?'Nutzungsbedingungen':'Términos de Uso';
-    if(el('agbBody')) el('agbBody').innerHTML = de?'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Nutzungsbedingungen</p><p><strong>1. Geltungsbereich</strong><br>Diese Nutzungsbedingungen gelten für die Verwendung der App Buscar, erreichbar unter escapedeutschland.github.io/buscar-app. Mit der Nutzung der App erklärt sich der Nutzer mit diesen Bedingungen einverstanden.</p><br><p><strong>2. Nutzung der App</strong><br>Buscar ist ein kostenloses Informationsverzeichnis für deutschsprachige Personen in Paraguay. Die Nutzung ist für alle registrierten Nutzer kostenlos. Jeder Nutzer verpflichtet sich, keine falschen, irreführenden, beleidigenden oder rechtswidrigen Inhalte einzustellen.</p><br><p><strong>3. Einträge und Inhalte</strong><br>Jeder registrierte Nutzer kann Einträge erstellen und Fotos hochladen. Der Betreiber behält sich vor, Einträge, Fotos oder Kommentare ohne Angabe von Gründen zu entfernen. Spam, unerwünschte Werbung und missbräuchliche Nutzung sind nicht gestattet.</p><br><p><strong>4. Verantwortung der Nutzer</strong><br>Jeder Nutzer ist für die von ihm erstellten Inhalte selbst verantwortlich. Es dürfen keine Bilder von Personen ohne deren Einwilligung hochgeladen werden. Urheberrechtlich geschütztes Material darf nicht ohne Erlaubnis verwendet werden.</p><br><p><strong>5. Haftungsausschluss</strong><br>Buscar übernimmt keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der gelisteten Einträge. Die Nutzung erfolgt auf eigene Verantwortung des Nutzers.</p><br><p><strong>6. Datenschutz</strong><br>Die Verarbeitung personenbezogener Daten erfolgt gemäß unserer Datenschutzerklärung, die in der App einsehbar ist.</p><br><p><strong>7. Änderungen</strong><br>Der Betreiber behält sich vor, diese Nutzungsbedingungen jederzeit zu ändern. Die jeweils aktuelle Version ist in der App einsehbar.</p>':'<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Términos de Uso</p><p><strong>1. Ámbito de aplicación</strong><br>Estos términos de uso aplican al uso de la aplicación Buscar, disponible en escapedeutschland.github.io/buscar-app. Al usar la app, el usuario acepta estos términos.</p><br><p><strong>2. Uso de la aplicación</strong><br>Buscar es un directorio de información gratuito para personas de habla alemana en Paraguay. El uso es gratuito para todos los usuarios registrados. Cada usuario se compromete a no publicar contenido falso, engañoso, ofensivo o ilegal.</p><br><p><strong>3. Entradas y contenido</strong><br>Cualquier usuario registrado puede crear entradas y subir fotos. El administrador se reserva el derecho de eliminar entradas, fotos o comentarios sin justificación. No se permite el spam, publicidad no solicitada ni el uso abusivo.</p><br><p><strong>4. Responsabilidad del usuario</strong><br>Cada usuario es responsable del contenido que publica. No se deben subir imágenes de personas sin su consentimiento. No se puede utilizar material protegido por derechos de autor sin autorización.</p><br><p><strong>5. Limitación de responsabilidad</strong><br>Buscar no garantiza la exactitud, integridad ni actualidad de las entradas listadas. El uso es bajo la propia responsabilidad del usuario.</p><br><p><strong>6. Privacidad</strong><br>El tratamiento de datos personales se realiza conforme a nuestra política de privacidad, disponible en la aplicación.</p><br><p><strong>7. Modificaciones</strong><br>El administrador se reserva el derecho de modificar estos términos en cualquier momento. La versión actualizada estará siempre disponible en la aplicación.</p>';
+    if(el('impressumTitle')) el('impressumTitle').textContent = L('Impressum','Aviso Legal','Legal Notice');
+    if(el('impressumBody')) el('impressumBody').innerHTML = L(
+      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Impressum</p><p><strong>Verantwortlich:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay<br>maximechristalle@gmail.com</p><br><p>Buscar ist ein privates Informationsprojekt ohne kommerziellen Charakter.</p>',
+      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Aviso Legal</p><p><strong>Responsable:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay<br>maximechristalle@gmail.com</p><br><p>Buscar es un proyecto de información privado sin fines comerciales.</p>',
+      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Legal Notice</p><p><strong>Responsible:</strong><br>Maxime Christalle<br>San Bernardino, Cordillera, Paraguay<br>maximechristalle@gmail.com</p><br><p>Buscar is a private, non-commercial information project.</p>');
+    if(el('datenschutzTitle')) el('datenschutzTitle').textContent = L('Datenschutz','Privacidad','Privacy');
+    if(el('datenschutzBody')) el('datenschutzBody').innerHTML = L(
+      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Datenschutzerklärung</p><p><strong>Verantwortlicher:</strong><br>Maxime Christalle, San Bernardino, Paraguay, maximechristalle@gmail.com</p><br><p><strong>Daten:</strong><br>E-Mail, Benutzername, Fotos. Keine Weitergabe ohne Einwilligung.</p><br><p><strong>Firebase:</strong><br><a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>Rechte:</strong><br>maximechristalle@gmail.com</p>',
+      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Política de Privacidad</p><p><strong>Responsable:</strong><br>Maxime Christalle, San Bernardino, Paraguay, maximechristalle@gmail.com</p><br><p><strong>Datos:</strong><br>Correo, nombre, fotos. Sin cesión a terceros.</p><br><p><strong>Firebase:</strong><br><a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>Derechos:</strong><br>maximechristalle@gmail.com</p>',
+      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Privacy Policy</p><p><strong>Controller:</strong><br>Maxime Christalle, San Bernardino, Paraguay, maximechristalle@gmail.com</p><br><p><strong>Data:</strong><br>Email, username, photos. No sharing without consent.</p><br><p><strong>Firebase:</strong><br><a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>Your rights:</strong><br>maximechristalle@gmail.com</p>');
+    if(el('agbTitle')) el('agbTitle').textContent = L('Nutzungsbedingungen','Términos de Uso','Terms of Use');
+    if(el('agbBody')) el('agbBody').innerHTML = L(
+      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Nutzungsbedingungen</p><p><strong>1. Geltungsbereich</strong><br>Diese Nutzungsbedingungen gelten für die Verwendung der App Buscar, erreichbar unter escapedeutschland.github.io/buscar-app. Mit der Nutzung der App erklärt sich der Nutzer mit diesen Bedingungen einverstanden.</p><br><p><strong>2. Nutzung der App</strong><br>Buscar ist ein kostenloses Informationsverzeichnis für deutschsprachige Personen in Paraguay. Die Nutzung ist für alle registrierten Nutzer kostenlos. Jeder Nutzer verpflichtet sich, keine falschen, irreführenden, beleidigenden oder rechtswidrigen Inhalte einzustellen.</p><br><p><strong>3. Einträge und Inhalte</strong><br>Jeder registrierte Nutzer kann Einträge erstellen und Fotos hochladen. Der Betreiber behält sich vor, Einträge, Fotos oder Kommentare ohne Angabe von Gründen zu entfernen. Spam, unerwünschte Werbung und missbräuchliche Nutzung sind nicht gestattet.</p><br><p><strong>4. Verantwortung der Nutzer</strong><br>Jeder Nutzer ist für die von ihm erstellten Inhalte selbst verantwortlich. Es dürfen keine Bilder von Personen ohne deren Einwilligung hochgeladen werden. Urheberrechtlich geschütztes Material darf nicht ohne Erlaubnis verwendet werden.</p><br><p><strong>5. Haftungsausschluss</strong><br>Buscar übernimmt keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der gelisteten Einträge. Die Nutzung erfolgt auf eigene Verantwortung des Nutzers.</p><br><p><strong>6. Datenschutz</strong><br>Die Verarbeitung personenbezogener Daten erfolgt gemäß unserer Datenschutzerklärung, die in der App einsehbar ist.</p><br><p><strong>7. Änderungen</strong><br>Der Betreiber behält sich vor, diese Nutzungsbedingungen jederzeit zu ändern. Die jeweils aktuelle Version ist in der App einsehbar.</p>',
+      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Términos de Uso</p><p><strong>1. Ámbito de aplicación</strong><br>Estos términos de uso aplican al uso de la aplicación Buscar, disponible en escapedeutschland.github.io/buscar-app. Al usar la app, el usuario acepta estos términos.</p><br><p><strong>2. Uso de la aplicación</strong><br>Buscar es un directorio de información gratuito para personas de habla alemana en Paraguay. El uso es gratuito para todos los usuarios registrados. Cada usuario se compromete a no publicar contenido falso, engañoso, ofensivo o ilegal.</p><br><p><strong>3. Entradas y contenido</strong><br>Cualquier usuario registrado puede crear entradas y subir fotos. El administrador se reserva el derecho de eliminar entradas, fotos o comentarios sin justificación. No se permite el spam, publicidad no solicitada ni el uso abusivo.</p><br><p><strong>4. Responsabilidad del usuario</strong><br>Cada usuario es responsable del contenido que publica. No se deben subir imágenes de personas sin su consentimiento. No se puede utilizar material protegido por derechos de autor sin autorización.</p><br><p><strong>5. Limitación de responsabilidad</strong><br>Buscar no garantiza la exactitud, integridad ni actualidad de las entradas listadas. El uso es bajo la propia responsabilidad del usuario.</p><br><p><strong>6. Privacidad</strong><br>El tratamiento de datos personales se realiza conforme a nuestra política de privacidad, disponible en la aplicación.</p><br><p><strong>7. Modificaciones</strong><br>El administrador se reserva el derecho de modificar estos términos en cualquier momento. La versión actualizada estará siempre disponible en la aplicación.</p>',
+      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Terms of Use</p><p><strong>1. Scope</strong><br>These terms of use apply to the use of the Buscar app, available at escapedeutschland.github.io/buscar-app. By using the app, the user agrees to these terms.</p><br><p><strong>2. Use of the app</strong><br>Buscar is a free information directory for people living in Paraguay. Use is free for all registered users. Each user agrees not to post false, misleading, offensive or unlawful content.</p><br><p><strong>3. Listings and content</strong><br>Any registered user can create listings and upload photos. The operator reserves the right to remove listings, photos or comments without stating reasons. Spam, unsolicited advertising and abuse are not permitted.</p><br><p><strong>4. User responsibility</strong><br>Each user is responsible for the content they create. Images of people may not be uploaded without their consent. Copyrighted material may not be used without permission.</p><br><p><strong>5. Disclaimer</strong><br>Buscar makes no warranty as to the accuracy, completeness or timeliness of the listed entries. Use is at the user\'s own risk.</p><br><p><strong>6. Privacy</strong><br>Personal data is processed in accordance with our privacy policy, available in the app.</p><br><p><strong>7. Changes</strong><br>The operator reserves the right to change these terms at any time. The current version is always available in the app.</p>');
   }
 
   function isOpen(hours) {
@@ -5875,14 +6171,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   async function deleteOwnListing(id){
     var es=(currentLang==='es');
-    if(!await confirmSheet(es?'¿Eliminar este anuncio definitivamente?':'Diesen Eintrag wirklich endgültig löschen?')) return;
+    if(!await confirmSheet(L('Diesen Eintrag wirklich endgültig löschen?','¿Eliminar este anuncio definitivamente?','Permanently delete this listing?'))) return;
     try{
       await db.collection('listings').doc(id).delete();
       try{ await loadListings(); }catch(e){}
-      if(typeof showToast==='function') showToast(es?'✓ Eliminado':'✓ Eintrag gelöscht');
+      if(typeof showToast==='function') showToast(L('✓ Eintrag gelöscht','✓ Eliminado','✓ Listing deleted'));
       setNav('navHome'); showScreen('screenHome');
     }catch(e){
-      showToast((es?'No se pudo eliminar: ':'Konnte nicht gelöscht werden: ')+((e&&e.message)||'Fehler'));
+      showToast(L('Konnte nicht gelöscht werden: ','No se pudo eliminar: ','Could not delete: ')+((e&&e.message)||'Fehler'));
     }
   }
 
@@ -5896,11 +6192,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var clat = hasLoc ? lat : -25.2867, clng = hasLoc ? lng : -57.6470;
     var status = document.getElementById('editLocationStatus');
     if (status) status.textContent = hasLoc
-      ? ((es ? 'Ubicación: ' : 'Standort: ') + clat.toFixed(5) + ', ' + clng.toFixed(5))
-      : (es ? 'Aún sin ubicación – toca el mapa.' : 'Noch kein Standort gesetzt – tippe auf die Karte.');
+      ? (L('Standort: ','Ubicación: ','Location: ') + clat.toFixed(5) + ', ' + clng.toFixed(5))
+      : L('Noch kein Standort gesetzt – tippe auf die Karte.','Aún sin ubicación – toca el mapa.','No location set yet – tap the map.');
     var setStatus = function(la, ln) {
       var s = document.getElementById('editLocationStatus');
-      if (s) s.textContent = (es ? 'Ubicación: ' : 'Standort: ') + la.toFixed(5) + ', ' + ln.toFixed(5);
+      if (s) s.textContent = L('Standort: ','Ubicación: ','Location: ') + la.toFixed(5) + ', ' + ln.toFixed(5);
     };
     setTimeout(function() {
       try {
@@ -5932,16 +6228,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!navigator.geolocation) return;
     var btn = document.getElementById('editLocationBtn');
     var orig = btn ? btn.innerHTML : '';
-    if (btn) { btn.disabled = true; btn.textContent = es ? 'Obteniendo ubicación…' : 'Standort wird ermittelt…'; }
+    if (btn) { btn.disabled = true; btn.textContent = L('Standort wird ermittelt…','Obteniendo ubicación…','Getting location…'); }
     navigator.geolocation.getCurrentPosition(function(pos) {
       var la = pos.coords.latitude, ln = pos.coords.longitude;
       window._editLat = la; window._editLng = ln;
       if (_editLocMap && _editLocMarker) { _editLocMap.flyTo({ center:[ln, la], zoom:15 }); _editLocMarker.setLngLat([ln, la]); }
-      var s = document.getElementById('editLocationStatus'); if (s) s.textContent = (es ? 'Ubicación: ' : 'Standort: ') + la.toFixed(5) + ', ' + ln.toFixed(5);
+      var s = document.getElementById('editLocationStatus'); if (s) s.textContent = L('Standort: ','Ubicación: ','Location: ') + la.toFixed(5) + ', ' + ln.toFixed(5);
       if (btn) { btn.disabled = false; btn.innerHTML = orig; }
     }, function() {
       if (btn) { btn.disabled = false; btn.innerHTML = orig; }
-      var s = document.getElementById('editLocationStatus'); if (s) s.textContent = es ? 'No se pudo obtener la ubicación.' : 'Standort konnte nicht ermittelt werden.';
+      var s = document.getElementById('editLocationStatus'); if (s) s.textContent = L('Standort konnte nicht ermittelt werden.','No se pudo obtener la ubicación.','Could not get location.');
     });
   }
 
@@ -6238,7 +6534,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     // Merkmal-Filter bei Kategoriewechsel zurücksetzen (Tags sind kategorie-spezifisch)
     activeTags = []; _tagFilterTemp = [];
     var _tb = document.getElementById('filterTagsBtn');
-    if (_tb) { _tb.classList.remove('active'); var _tl = document.getElementById('filterTagsLabel'); if (_tl) _tl.textContent = (currentLang === 'es' ? 'Características' : 'Merkmale'); }
+    if (_tb) { _tb.classList.remove('active'); var _tl = document.getElementById('filterTagsLabel'); if (_tl) _tl.textContent = t('filter_features'); }
     // Show/hide filter bar based on category selection
     const filterBar = document.getElementById('filterBar');
     if (activeCategory === 'Alle') {
