@@ -3160,6 +3160,31 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   var _renderToken = 0; // bricht ein laufendes progressives Nachladen ab, wenn neu gerendert wird
+  // Fensterung der Home-Liste: nur Sichtbares rendern, Rest beim Scrollen nachladen
+  var _homeFiltered = [], _homeRendered = 0, _homeCardHtml = null, _homeScrollBound = false, _homeBatch = 40;
+  function _appendHomeBatch() {
+    if (!_homeCardHtml || _homeRendered >= _homeFiltered.length) return;
+    var container = document.getElementById('listingsInner'); if (!container) return;
+    container.insertAdjacentHTML('beforeend', _homeFiltered.slice(_homeRendered, _homeRendered + _homeBatch).map(_homeCardHtml).join(''));
+    _homeRendered += _homeBatch;
+    if (currentLang !== 'de') translateVisibleContent();
+  }
+  function _bindHomeScroll() {
+    if (_homeScrollBound) return;
+    var li = document.getElementById('listingsInner'); if (!li) return;
+    var sc = li.parentElement;
+    while (sc && sc !== document.body) { var oy = getComputedStyle(sc).overflowY; if (oy === 'auto' || oy === 'scroll') break; sc = sc.parentElement; }
+    _homeScrollBound = true;
+    var check = function (el) {
+      if (activeScreen !== 'screenHome') return;
+      var top = el === window ? (window.scrollY || 0) : el.scrollTop;
+      var ch = el === window ? window.innerHeight : el.clientHeight;
+      var sh = el === window ? document.documentElement.scrollHeight : el.scrollHeight;
+      if (top + ch >= sh - 900) _appendHomeBatch();
+    };
+    if (sc && sc !== document.body) sc.addEventListener('scroll', function () { check(sc); }, { passive: true });
+    window.addEventListener('scroll', function () { check(window); }, { passive: true }); // Fallback, falls das Fenster scrollt
+  }
   function renderListings() {
     if (activeScreen !== 'screenHome') return;
     requestAnimationFrame(function() { _doRenderListings(); });
@@ -3188,23 +3213,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const _cardHtml = l => `<div class="listing-card" style="--cat-color:${catColors[l.category_id]||'#6B6B6B'}" onclick="showDetail('${l.id}')"><div class="listing-icon-wrap">${catIcons[l.category_id]||catIcons['default']}</div><div class="listing-body"><div class="listing-top"><div class="listing-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.name)}</div><div style="display:flex;gap:3px;align-items:center;flex-shrink:0">${(l.deal_text ? `<span class='deal-badge'><svg viewBox='0 0 24 24'><path d='M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4A2 2 0 0 1 2 16.77V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z'/></svg>Deal</span>` : '')}${isNew(l.created_at)?`<span class='badge-neu'>${t('badge_new')}</span>`:''}${l.verified?`<span class='badge-geprüft'>${t('verified')}</span>`:''}</div></div>${l.city?`<div class="listing-city"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(prettyCity(l.city))}${(()=>{const o=isOpen(l.opening_hours);return o===true?'<span class="open-badge open">● '+t('open_now')+'</span>':o===false?'<span class="open-badge closed">● '+t('closed_now')+'</span>':''})()}</div>`:''}<div class="listing-desc" data-original="${esc(l.description)}">${esc(l.description)}</div>${starsSmall(getAvgRating(l.id))}${l.phone?`<div class="listing-phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${l.phone}</div>`:''}</div><div class="listing-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>`;
     // Progressives Rendern: erste Charge sofort, Rest im Hintergrund (rAF) nachfüllen.
     // _tok bricht ab, falls zwischenzeitlich neu gerendert oder der Screen verlassen wird.
-    const CHUNK = 40, _tok = ++_renderToken;
-    container.innerHTML = filtered.slice(0, CHUNK).map(_cardHtml).join('');
+    // Nur die sichtbaren Karten rendern; weitere beim Scrollen des Listen-Containers nachladen.
+    // -> gerenderte Karten sind IMMER sofort gemalt (keine leeren Boxen), DOM bleibt klein.
+    ++_renderToken;
+    _homeFiltered = filtered;
+    _homeCardHtml = _cardHtml;
+    container.innerHTML = filtered.slice(0, _homeBatch).map(_cardHtml).join('');
+    _homeRendered = Math.min(_homeBatch, filtered.length);
     if (currentLang !== 'de') translateVisibleContent();
-    if (filtered.length > CHUNK) {
-      let _idx = CHUNK;
-      // setTimeout statt rAF: feuert zuverlässig (auch wenn Tab kurz inaktiv) und
-      // yieldet zwischen den Chargen an den Event-Loop -> Taps bleiben responsiv.
-      const _sched = function(f){ return setTimeout(f, 0); };
-      const _step = function(){
-        if (_tok !== _renderToken || activeScreen !== 'screenHome') return;
-        container.insertAdjacentHTML('beforeend', filtered.slice(_idx, _idx + CHUNK).map(_cardHtml).join(''));
-        _idx += CHUNK;
-        if (currentLang !== 'de') translateVisibleContent();
-        if (_idx < filtered.length) _sched(_step);
-      };
-      _sched(_step);
-    }
+    _bindHomeScroll();
   }
 
   function renderReFacts(l) {
