@@ -1567,7 +1567,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     { id: 'chaco',    emoji: '🌵', name: t('badge_chaco'),      threshold: 1,  special: 'chaco',   desc: t('bdesc_chaco') },
   ];; }
 
+  var _badgesCache = null; // { uid, badges, count, ts } – vermeidet Netz-Warten beim erneuten Profil-Öffnen
   async function loadBadges(uid) {
+    // Sofort aus Session-Cache rendern -> Profil reagiert ohne Verzögerung
+    if (_badgesCache && _badgesCache.uid === uid) {
+      renderBadgeGrid(_badgesCache.badges);
+      var _cc = _badgesCache.count, _cel = document.getElementById('profilListingsCount');
+      if (_cel) _cel.textContent = _cc === 0 ? t('badge_count_0') : _cc === 1 ? t('badge_count_1') : _cc + t('badge_count_n');
+      if (Date.now() - _badgesCache.ts < 90000) return; // frisch -> kein erneuter Netz-Read
+    }
     try {
       // Step 1: Show cached badges immediately from user doc (fast)
       const userDoc = await db.collection('users').doc(uid).get();
@@ -1612,6 +1620,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           renderBadgeGrid(earned); // update grid with new badges
         } catch(e) {}
       }
+      _badgesCache = { uid: uid, badges: earned, count: count, ts: Date.now() }; // Session-Cache aktualisieren
     } catch(e) { console.error('badge error', e); }
   }
 
@@ -4846,6 +4855,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         var _rci = document.getElementById('reCoverInput'); if (_rci) _rci.value = '';
       }
       document.getElementById('formSuccess').textContent = t('submit_success'); document.getElementById('formSuccess').classList.add('visible');
+      _badgesCache = null; // Zählung/Badges neu laden lassen
       showToast(t('submit_success'));
       var _lhReset = document.getElementById('locationHint'); if (_lhReset) _lhReset.style.display = '';
       pendingFormPhotos = [];
@@ -6209,6 +6219,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if(!await confirmSheet(L('Diesen Eintrag wirklich endgültig löschen?','¿Eliminar este anuncio definitivamente?','Permanently delete this listing?'))) return;
     try{
       await db.collection('listings').doc(id).delete();
+      _badgesCache = null; // Zählung/Badges neu laden lassen
       try{ await loadListings(); }catch(e){}
       if(typeof showToast==='function') showToast(L('✓ Eintrag gelöscht','✓ Eliminado','✓ Listing deleted'));
       setNav('navHome'); showScreen('screenHome');
