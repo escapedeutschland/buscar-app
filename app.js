@@ -3390,7 +3390,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var list=all.filter(function(l){ return (immoDeal==='Alle'||l.re_deal===immoDeal) && (immoType==='Alle'||l.re_type===immoType); });
     list=list.slice().sort(function(a,b){ var fa=isFeatured(a)?1:0, fb=isFeatured(b)?1:0; if(fb!==fa) return fb-fa; return _ts(b.created_at)-_ts(a.created_at); });
     var body=document.getElementById('immobilienBody'); if(!body) return;
-    var cnt=document.getElementById('immobilienCount'); if(cnt) cnt.textContent=list.length+' '+(es?(list.length===1?'inmueble':'inmuebles'):(list.length===1?'Objekt':'Objekte'));
+    var cnt=document.getElementById('immobilienCount'); if(cnt) cnt.textContent=list.length+' '+(list.length===1?L('Objekt','inmueble','property'):L('Objekte','inmuebles','properties'));
     if(!list.length){
       var noneAtAll=(all.length===0);
       var t1=noneAtAll?L('Noch keine Immobilien','Aún no hay inmuebles','No properties yet'):L('Keine Treffer','Sin resultados','No matches');
@@ -4629,7 +4629,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
     var cand = _radarCandidates();
     var noun = _radarEvents ? 'Events' : L('Orte','lugares','places');
-    if (status) status.textContent = cand.length + ' ' + noun + ' ' + (es ? ('en '+_radarRadiusKm+' km') : ('im Umkreis von '+_radarRadiusKm+' km'));
+    if (status) status.textContent = cand.length + ' ' + noun + ' ' + L('im Umkreis von '+_radarRadiusKm+' km', 'en '+_radarRadiusKm+' km', 'within '+_radarRadiusKm+' km');
     var stage = _radarStageHTML(cand);
     if (!cand.length){
       var et = _radarEvents ? L('Keine Events in der Nähe','Ningún evento cerca','No events nearby') : L('Nichts in der Nähe','Nada cerca','Nothing nearby');

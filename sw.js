@@ -1,4 +1,4 @@
-const VERSION = 'v235';
+const VERSION = 'v236';
 const STATIC_CACHE = 'buscar-static-' + VERSION;
 const RUNTIME_CACHE = 'buscar-runtime-' + VERSION;
 // Bilder-Cache bewusst NICHT versioniert: Nutzer-Fotos/Cover ändern sich nicht mit
@@ -18,8 +18,8 @@ function trimImageCache() {
 const STATIC_ASSETS = [
   './',
   './index.html',
-  './styles.css?v=235',
-  './app.js?v=235',
+  './styles.css?v=236',
+  './app.js?v=236',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
