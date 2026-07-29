@@ -95,6 +95,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       maps_import_title: 'Aus Google Maps übernehmen',
       maps_import_hint: 'Spar dir das Tippen: Namen oder Google-Maps-Link einfügen – Name, Adresse, Telefon, Öffnungszeiten & Standort werden automatisch ausgefüllt. Du ergänzt nur noch deine persönliche Empfehlung.',
       maps_import_ph: 'Name oder Google-Maps-Link…',
+      maps_pick: 'Mehrere Orte gefunden – tippe den richtigen an:',
       maps_import_btn: 'Laden',
       maps_loading: 'Hole Daten von Google…',
       maps_success: '✓ Daten übernommen – bitte prüfen und deine persönliche Empfehlung ergänzen.',
@@ -344,6 +345,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       maps_import_title: 'Importar desde Google Maps',
       maps_import_hint: 'Ahorrate el tecleo: pegá el nombre o el enlace de Google Maps y se completan automáticamente nombre, dirección, teléfono, horarios y ubicación. Vos solo agregás tu recomendación personal.',
       maps_import_ph: 'Nombre o enlace de Google Maps…',
+      maps_pick: 'Se encontraron varios lugares – tocá el correcto:',
       maps_import_btn: 'Cargar',
       maps_loading: 'Obteniendo datos de Google…',
       maps_success: '✓ Datos cargados – revisalos y agregá tu recomendación personal.',
@@ -4387,6 +4389,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!raw) { input.focus(); return; }
     status.style.display = 'block'; status.style.color = 'var(--text-2)';
     status.textContent = t('maps_loading');
+    const _pk0 = document.getElementById('mapsImportPicker'); if (_pk0) { _pk0.style.display = 'none'; _pk0.innerHTML = ''; }
     const oldBtn = btn.textContent; btn.disabled = true; btn.textContent = '…';
     try {
       const param = /https?:\/\//i.test(raw) ? ('url=' + encodeURIComponent(raw)) : ('q=' + encodeURIComponent(raw));
@@ -4398,37 +4401,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         btn.disabled = false; btn.textContent = oldBtn;
         return;
       }
-      // Felder füllen (überschreibt vorhandene Eingaben)
-      if (d.name) { const nmEl = document.getElementById('newName'); nmEl.value = d.name; const nc = document.getElementById('nameCounter'); if (nc) nc.textContent = Math.min(d.name.length, 60) + ' / 60'; }
-      const cat = _mapsCatFromTypes(d.types, d.primary_type);
-      if (cat) { document.getElementById('newCategory').value = cat; if (typeof updateSubcatOptions === 'function') updateSubcatOptions(); }
-      const city = _mapsCityFromAddress(d.address);
-      if (city) document.getElementById('newCity').value = city;
-      if (d.address) document.getElementById('newAddress').value = d.address;
-      if (d.phone) document.getElementById('newPhone').value = d.phone;
-      if (d.website) document.getElementById('newWebsite').value = d.website;
-      // Öffnungszeiten (komplette Wochenübersicht von Google)
-      const hoursDisplay = document.getElementById('importedHoursDisplay');
-      if (Array.isArray(d.hours) && d.hours.length) {
-        const htxt = d.hours.join('\n');
-        document.getElementById('newHours').value = htxt;
-        if (hoursDisplay) { hoursDisplay.style.display = 'block'; hoursDisplay.textContent = htxt; }
-      } else {
-        document.getElementById('newHours').value = '';
-        if (hoursDisplay) { hoursDisplay.style.display = 'none'; hoursDisplay.textContent = ''; }
+      // Mehrere Treffer (namensbasierte Suche ohne Koordinaten) -> Auswahl zeigen statt raten
+      if (d.candidates && d.candidates.length > 1) {
+        _renderMapsPicker(d.candidates);
+        status.style.color = 'var(--text-2)';
+        status.textContent = t('maps_pick');
+        btn.disabled = false; btn.textContent = oldBtn;
+        return;
       }
-      // Standort exakt setzen + Mini-Karte
-      if (typeof d.lat === 'number' && typeof d.lng === 'number') {
-        window._newLat = d.lat; window._newLng = d.lng;
-        const locStatus = document.getElementById('locationStatus');
-        if (locStatus) { locStatus.style.display = 'block'; locStatus.style.color = 'var(--green)'; locStatus.textContent = 'Standort gespeichert: ' + d.lat.toFixed(5) + ', ' + d.lng.toFixed(5); }
-        const locBtn = document.getElementById('locationBtn');
-        if (locBtn) { locBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg> Standort gespeichert'; locBtn.style.background = 'var(--green-light)'; locBtn.style.borderColor = 'var(--green)'; locBtn.style.color = 'var(--green)'; locBtn.dataset.saved = 'true'; }
-        const removeBtn = document.getElementById('locationRemoveBtn'); if (removeBtn) removeBtn.style.display = 'inline-block';
-        const banner = document.getElementById('locationPermissionBanner'); if (banner) banner.style.display = 'none';
-        const lh = document.getElementById('locationHint'); if (lh) lh.style.display = 'none';
-        if (typeof initLocationMapPreview === 'function') initLocationMapPreview(d.lat, d.lng);
-      }
+      _fillFormFromPlace(d);
       status.style.color = 'var(--green)';
       status.textContent = t('maps_success');
       input.value = '';
@@ -4440,6 +4421,63 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       status.textContent = t('maps_error');
       btn.disabled = false; btn.textContent = oldBtn;
     }
+  }
+
+  // Füllt das Eintrags-Formular aus einem Orts-Objekt (vom Maps-Import oder aus der Auswahl-Liste)
+  function _fillFormFromPlace(d) {
+    var pk = document.getElementById('mapsImportPicker'); if (pk) { pk.style.display = 'none'; pk.innerHTML = ''; }
+    if (d.name) { const nmEl = document.getElementById('newName'); nmEl.value = d.name; const nc = document.getElementById('nameCounter'); if (nc) nc.textContent = Math.min(d.name.length, 60) + ' / 60'; }
+    const cat = _mapsCatFromTypes(d.types, d.primary_type);
+    if (cat) { document.getElementById('newCategory').value = cat; if (typeof updateSubcatOptions === 'function') updateSubcatOptions(); }
+    const city = _mapsCityFromAddress(d.address);
+    if (city) document.getElementById('newCity').value = city;
+    if (d.address) document.getElementById('newAddress').value = d.address;
+    if (d.phone) document.getElementById('newPhone').value = d.phone;
+    if (d.website) document.getElementById('newWebsite').value = d.website;
+    const hoursDisplay = document.getElementById('importedHoursDisplay');
+    if (Array.isArray(d.hours) && d.hours.length) {
+      const htxt = d.hours.join('\n');
+      document.getElementById('newHours').value = htxt;
+      if (hoursDisplay) { hoursDisplay.style.display = 'block'; hoursDisplay.textContent = htxt; }
+    } else {
+      document.getElementById('newHours').value = '';
+      if (hoursDisplay) { hoursDisplay.style.display = 'none'; hoursDisplay.textContent = ''; }
+    }
+    if (typeof d.lat === 'number' && typeof d.lng === 'number') {
+      window._newLat = d.lat; window._newLng = d.lng;
+      const locStatus = document.getElementById('locationStatus');
+      if (locStatus) { locStatus.style.display = 'block'; locStatus.style.color = 'var(--green)'; locStatus.textContent = 'Standort gespeichert: ' + d.lat.toFixed(5) + ', ' + d.lng.toFixed(5); }
+      const locBtn = document.getElementById('locationBtn');
+      if (locBtn) { locBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg> Standort gespeichert'; locBtn.style.background = 'var(--green-light)'; locBtn.style.borderColor = 'var(--green)'; locBtn.style.color = 'var(--green)'; locBtn.dataset.saved = 'true'; }
+      const removeBtn = document.getElementById('locationRemoveBtn'); if (removeBtn) removeBtn.style.display = 'inline-block';
+      const banner = document.getElementById('locationPermissionBanner'); if (banner) banner.style.display = 'none';
+      const lh = document.getElementById('locationHint'); if (lh) lh.style.display = 'none';
+      if (typeof initLocationMapPreview === 'function') initLocationMapPreview(d.lat, d.lng);
+    }
+  }
+
+  // Auswahl-Liste bei mehrdeutigen (namensbasierten) Treffern
+  var _mapsCandidates = [];
+  function _renderMapsPicker(cands) {
+    _mapsCandidates = cands || [];
+    const pk = document.getElementById('mapsImportPicker');
+    if (!pk) return;
+    pk.innerHTML = _mapsCandidates.map(function(c, i) {
+      const sub = c.address ? esc(c.address) : (c.type_label ? esc(c.type_label) : '');
+      return '<div class="maps-pick-item" onclick="_pickMapsCandidate(' + i + ')">'
+        + '<div class="maps-pick-name">' + esc(c.name || '—') + '</div>'
+        + (sub ? '<div class="maps-pick-addr">' + sub + '</div>' : '')
+        + '</div>';
+    }).join('');
+    pk.style.display = 'block';
+  }
+  function _pickMapsCandidate(i) {
+    const d = _mapsCandidates[i]; if (!d) return;
+    _fillFormFromPlace(d);
+    const status = document.getElementById('mapsImportStatus');
+    if (status) { status.style.display = 'block'; status.style.color = 'var(--green)'; status.textContent = t('maps_success'); }
+    const input = document.getElementById('mapsImportLink'); if (input) input.value = '';
+    const nm = document.getElementById('newName'); if (nm) nm.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   async function submitListing() {
