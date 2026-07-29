@@ -200,6 +200,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       apply_filter: 'Anwenden',
       filter_features: 'Merkmale', filter_features_empty: 'Noch keine Merkmale vorhanden. Tagge zuerst ein paar Orte.',
       ph_name: 'z.B. Dr. Müller, Café Central', ph_city: 'z.B. Asunción, Encarnación', ph_addr: 'Straße, Stadtviertel',
+      map_type: 'Typ', mcat_restaurant: 'Restaurant', mcat_service: 'Dienstleistung', mcat_place: 'Ort', mcat_accom: 'Unterkunft', mcat_shop: 'Geschäft', mcat_sport: 'Sport', mcat_exchange: 'Wechselstube', mcat_immo: 'Immobilie',
       cancel: 'Abbrechen',
       ptr_pull: 'Aktualisieren', ptr_release: 'Loslassen...',
       approve: 'Genehmigen',
@@ -454,6 +455,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       apply_filter: 'Aplicar',
       filter_features: 'Características', filter_features_empty: 'Todavía no hay características. Agregá etiquetas a los lugares.',
       ph_name: 'ej. Dr. Martínez, Café Central', ph_city: 'ej. Asunción, Encarnación', ph_addr: 'Calle, Barrio',
+      map_type: 'Tipo', mcat_restaurant: 'Restaurante', mcat_service: 'Servicio', mcat_place: 'Lugar', mcat_accom: 'Alojamiento', mcat_shop: 'Tienda', mcat_sport: 'Deporte', mcat_exchange: 'Casa de cambio', mcat_immo: 'Inmueble',
       cancel: 'Cancelar',
       ptr_pull: 'Actualizar', ptr_release: 'Soltar...',
       approve: 'Aprobar',
@@ -708,6 +710,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       apply_filter: 'Apply',
       filter_features: 'Features', filter_features_empty: 'No features yet. Tag a few places first.',
       ph_name: 'e.g. Dr. Smith, Café Central', ph_city: 'e.g. Asunción, Encarnación', ph_addr: 'Street, neighborhood',
+      map_type: 'Type', mcat_restaurant: 'Restaurant', mcat_service: 'Service', mcat_place: 'Place', mcat_accom: 'Accommodation', mcat_shop: 'Shop', mcat_sport: 'Sport', mcat_exchange: 'Exchange', mcat_immo: 'Property',
       cancel: 'Cancel',
       ptr_pull: 'Refresh', ptr_release: 'Release...',
       approve: 'Approve',
@@ -3653,17 +3656,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     'default': '#6B6B6B'
   };
 
-  const catLabels = {
-    'kat-restaurants': 'Restaurant',
-    'kat-dienstleistung': 'Dienstleistung',
-    'kat-orte': 'Ort',
-    'kat-unterkunft': 'Unterkunft',
-    'kat-geschaefte': 'Geschäft',
-    'kat-sport': 'Sport',
-    'kat-wechselstube': 'Wechselstube',
-    'kat-immobilien': 'Immobilie',
-    'default': 'Ort'
+  // Kurzer, sprachabhängiger Kategorie-Name (Singular) für Karten-Cards/Popups
+  const _catKeyMap = {
+    'kat-restaurants': 'mcat_restaurant',
+    'kat-dienstleistung': 'mcat_service',
+    'kat-orte': 'mcat_place',
+    'kat-unterkunft': 'mcat_accom',
+    'kat-geschaefte': 'mcat_shop',
+    'kat-sport': 'mcat_sport',
+    'kat-wechselstube': 'mcat_exchange',
+    'kat-immobilien': 'mcat_immo'
   };
+  function _catLabel(id) { return t(_catKeyMap[id] || 'mcat_place'); }
 
   // ===== Tags / Merkmale (Phase 1) =====
   // Bekannte Merkmal-Keys mit lokalisierten Labels (de/es). Freitext-Tags werden so wie eingegeben gespeichert.
@@ -4250,7 +4254,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
             city: l.city || '',
             cat: l.category_id || '',
             deal: l.deal_text || '',
-            catLabel: catLabels[l.category_id] || ''
+            catLabel: _catLabel(l.category_id)
           }
         }))
     };
@@ -4308,7 +4312,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       <div class="map-card" onclick="showDetail('${l.id}')">
         <div class="map-card-name">${esc(l.name||'')}</div>
         <div class="map-card-city">${esc(l.city||'')}</div>
-        <div class="map-card-cat">${esc(catLabels[l.category_id]||'')}</div>
+        <div class="map-card-cat">${esc(_catLabel(l.category_id))}</div>
       </div>`).join('');
   }
 
@@ -4549,7 +4553,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
     var l = x.l;
     var col = catColors[l.category_id] || catColors.default;
-    var sub = (catLabels[l.category_id] || catLabels.default) + (l.city ? ' · ' + esc(l.city) : '');
+    var sub = _catLabel(l.category_id) + (l.city ? ' · ' + esc(l.city) : '');
     return '<div class="radar-row" onclick="showDetail(\''+l.id+'\')">'
       + '<div class="radar-row-dot" style="background:'+col+'"></div>'
       + '<div class="radar-row-main"><div class="radar-row-name">'+esc(l.name)+'</div><div class="radar-row-sub">'+sub+'</div></div>'
@@ -6490,7 +6494,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const subBtn = document.getElementById('mapFilterSubBtn');
     const starBtn = document.getElementById('mapFilterStarBtn');
     if (mapSubcatFilter !== 'Alle') { subBtn.classList.add('active'); document.getElementById('mapFilterSubLabel').textContent = tSubcat(mapSubcatFilter); }
-    else { subBtn.classList.remove('active'); document.getElementById('mapFilterSubLabel').textContent = 'Typ'; }
+    else { subBtn.classList.remove('active'); document.getElementById('mapFilterSubLabel').textContent = t('map_type'); }
     if (mapMinStars > 0) { starBtn.classList.add('active'); document.getElementById('mapFilterStarLabel').textContent = mapMinStars + '+ ★'; }
     else { starBtn.classList.remove('active'); document.getElementById('mapFilterStarLabel').textContent = '★'; }
     renderMap();
