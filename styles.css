@@ -817,11 +817,13 @@
    der ersten Interaktion sekundenlang blockiert. contain-intrinsic-size = grobe
    Höhen-Schätzung (nur für die Scrollbalken-Länge, nicht funktional). Ältere
    Browser ignorieren die Regel gefahrlos. */
-.listing-card{content-visibility:auto;contain-intrinsic-size:0 152px}
-.immo-card{content-visibility:auto;contain-intrinsic-size:0 300px}
-.map-card{content-visibility:auto;contain-intrinsic-size:0 64px}
-.event-card{content-visibility:auto;contain-intrinsic-size:0 150px}
-.q-card{content-visibility:auto;contain-intrinsic-size:0 120px}
+/* Fallback (feste Höhe) + Override mit auto: alte Browser behalten die feste Höhe,
+   moderne merken sich die echte Höhe -> ruhigeres Zurückscrollen, kein Flackern. */
+.listing-card{content-visibility:auto;contain-intrinsic-size:0 152px;contain-intrinsic-size:auto 152px}
+.immo-card{content-visibility:auto;contain-intrinsic-size:0 300px;contain-intrinsic-size:auto 300px}
+.map-card{content-visibility:auto;contain-intrinsic-size:0 64px;contain-intrinsic-size:auto 64px}
+.event-card{content-visibility:auto;contain-intrinsic-size:0 150px;contain-intrinsic-size:auto 150px}
+.q-card{content-visibility:auto;contain-intrinsic-size:0 120px;contain-intrinsic-size:auto 120px}
 .maps-pick-item{background:var(--surface,#fff);border:1.5px solid var(--border);border-radius:12px;padding:10px 12px;margin-top:8px;cursor:pointer;transition:border-color .15s,background .15s}
 .maps-pick-item:hover,.maps-pick-item:active{border-color:var(--yellow);background:var(--surface-2,#F4F1EC)}
 .maps-pick-name{font-size:14px;font-weight:600;color:var(--text-1)}
