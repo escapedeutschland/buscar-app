@@ -6889,36 +6889,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     log('DEBUG ON');
   })();
 
-  (function() {
-    var touchMoved = false, touchTarget = null, touchStartTime = 0, lastSyntheticAt = 0;
-    document.addEventListener('touchstart', function(e) {
-      touchMoved = false;
-      touchTarget = e.target;
-      touchStartTime = Date.now();
-    }, { passive: true, capture: true });
-    document.addEventListener('touchmove', function() {
-      touchMoved = true;
-    }, { passive: true, capture: true });
-    document.addEventListener('touchend', function(e) {
-      if (touchMoved) return;
-      if (Date.now() - touchStartTime > 700) return;
-      var t = touchTarget;
-      while (t && t !== document.body) {
-        if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable) return;
-        var clickable = t.onclick || t.hasAttribute('onclick') || t.tagName === 'BUTTON' || t.tagName === 'A' || t.getAttribute('role') === 'button';
-        if (clickable) {
-          try { e.preventDefault(); } catch (_) {}
-          lastSyntheticAt = Date.now();
-          t.click();
-          return;
-        }
-        t = t.parentElement;
-      }
-    }, { passive: false, capture: true });
-    document.addEventListener('click', function(e) {
-      if (Date.now() - lastSyntheticAt < 350 && e.isTrusted) {
-        e.stopPropagation();
-        e.preventDefault();
-      }
-    }, true);
-  })();
+  // Hinweis: Der frühere selbstgebaute "FastClick"-Handler (synthetischer Klick +
+  // 350ms-Klick-Unterdrückung) wurde entfernt. Auf modernen WebViews gibt es dank
+  // responsivem Viewport + `touch-action: manipulation` KEINE 300ms-Tap-Verzögerung;
+  // der Handler war überflüssig und ließ schnelle Folge-Taps "verschluckt" wirken.
+  // Native Klicks feuern jetzt sofort und 1:1.
