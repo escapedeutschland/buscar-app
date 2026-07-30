@@ -2986,6 +2986,17 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if(!s.sel){ _ctRender(s, null); return; } // Station ohne Ziel (Begrüßung) -> zentriert, nicht überspringen
     var el=await _ctWaitFor(s.sel, s.screen==='screenMap'?2800:1400);
     if(!el && _ctIdx<_ctSteps.length-1){ _ctIdx++; return _ctGo(); } // Ziel fehlt -> überspringen (bricht nie)
+    // Ziel bei Bedarf in den sichtbaren Bereich scrollen, BEVOR das Spotlight
+    // gemessen wird. Sonst steht das Loch falsch (z.B. eingeloggt ist das Profil
+    // laenger -> Ziel oberhalb des Sichtfensters -> r.top negativ -> ans obere
+    // Rand geklemmt). scrollIntoView ist synchron, unabhaengig von rAF.
+    if(el){
+      var _rr=el.getBoundingClientRect();
+      if(_rr.top < 8 || _rr.bottom > window.innerHeight-8){
+        try{ el.scrollIntoView({block:'center', inline:'nearest'}); }catch(e){ try{ el.scrollIntoView(); }catch(_){} }
+        await new Promise(function(r){ setTimeout(r,220); });
+      }
+    }
     _ctRender(s, el);
   }
   function _ctRender(s, el){
