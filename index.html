@@ -34,7 +34,7 @@
   <meta name="apple-touch-fullscreen" content="yes">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=244">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=245">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <title>Buscar – Der Guide für Paraguay</title>
   <meta name="description" content="Buscar ist der Guide für Paraguay: Geschäfte, Dienstleistungen, Restaurants, Ärzte, Behörden und Events – für Auswanderer und Einheimische. Finde geprüfte Orte in Asunción, Encarnación, Ciudad del Este und ganz Paraguay.">
@@ -52,17 +52,17 @@
   <meta name="twitter:title" content="Buscar – Der Guide für Paraguay">
   <meta name="twitter:description" content="Der Guide für Paraguay: geprüfte Orte, Dienstleistungen und Events – für Auswanderer und Einheimische.">
   <meta name="twitter:image" content="https://escapedeutschland.github.io/buscar-app/og-default.jpg">
-  <link rel="preload" href="styles.css?v=244" as="style">
-  <link rel="preload" href="app.js?v=244" as="script">
+  <link rel="preload" href="styles.css?v=245" as="style">
+  <link rel="preload" href="app.js?v=245" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-  <link href="styles.css?v=244" rel="stylesheet">
+  <link href="styles.css?v=245" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  <script defer src="app.js?v=244"></script>
+  <script defer src="app.js?v=245"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -909,6 +909,10 @@
           <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span class="profil-row-label" data-i18n="fc_entry_prof">Frag die Community</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
+        <div class="profil-row" onclick="openWissen('profil')">
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><span class="profil-row-label" data-i18n="wissen_entry">Ankommen in Paraguay</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
         <div class="profil-row auth-only" onclick="openQuestions('mine')">
           <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div><span class="profil-row-label" data-i18n="fc_entry_mine">Meine Fragen</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
@@ -1270,6 +1274,9 @@
     <div style="padding:14px 16px 4px">
       <button class="form-submit" id="qBoardAskBtn" style="margin:0" onclick="openAskQuestion('')" data-i18n="fc_ask_btn">Frage stellen</button>
     </div>
+    <div style="padding:10px 16px 0">
+      <button onclick="openWissen('forum')" style="width:100%;background:var(--surface-2,#f4f1ec);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;color:var(--text-1);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span data-i18n="wissen_entry">Ankommen in Paraguay</span></button>
+    </div>
     <div id="fcHint" class="fc-hint" style="display:none">
       <span class="fc-hint-txt" data-i18n="fc_hint">💡 Tippe auf das 👁-Symbol einer Frage, wenn du dasselbe suchst.</span>
       <button class="fc-hint-x" onclick="dismissFcHint()" aria-label="OK">✕</button>
@@ -1283,6 +1290,18 @@
     <div id="qScroll" style="overflow-y:auto;flex:1;min-height:0">
       <div id="ptrQuestions" style="text-align:center;height:0;overflow:hidden;transition:height 0.2s;color:var(--text-3);font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16" class="ptr-arrow" style="transition:transform 0.2s"><path d="M12 5v14M5 12l7 7 7-7"/></svg><span class="ptr-text" data-i18n="ptr_pull">Aktualisieren</span></div>
       <div id="questionsList" style="padding:6px 16px 110px"></div>
+    </div>
+  </div>
+
+  <!-- WISSEN / ANKOMMEN IN PARAGUAY -->
+  <div class="screen" id="screenWissen">
+    <div class="form-header">
+      <button class="form-back" onclick="wissenBack()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="form-title" data-i18n="wissen_title">Ankommen in Paraguay</div>
+      <div class="form-sub" data-i18n="wissen_sub">Praktische Guides fürs Leben in Paraguay</div>
+    </div>
+    <div id="wissenScroll" style="overflow-y:auto;flex:1;min-height:0">
+      <div id="wissenBody" style="padding:14px 16px 110px"></div>
     </div>
   </div>
 
