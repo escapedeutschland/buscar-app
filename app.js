@@ -1776,7 +1776,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     ov.className = 'badge-celebrate-overlay';
     ov.innerHTML = confetti
       + '<div class="badge-celebrate-card" role="dialog" aria-live="polite">'
-      + '<div class="bc-sub">🎉 ' + esc(t('badge_unlocked_title')) + '</div>'
+      + '<div class="bc-sub">' + esc(def.sub || ('🎉 ' + t('badge_unlocked_title'))) + '</div>'
       + '<div class="bc-emoji">' + (def.emoji || '🏆') + '</div>'
       + '<div class="bc-name">' + esc(def.name || '') + '</div>'
       + (def.desc ? '<div class="bc-desc">' + esc(def.desc) + '</div>' : '')
@@ -2940,11 +2940,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   // ── Erst-Tour beim ersten Öffnen (einmalig, überspringbar, rein additiv) ──
   function maybeShowWelcomeTour(){
-    try{ if(localStorage.getItem('buscar_tour_done')==='1') return; }catch(e){}
+    try{ if(localStorage.getItem('buscar_tour_done_v2')==='1') return; }catch(e){}
     if(document.querySelector('.ct-root')) return;
     var sp=document.getElementById('splash'); if(sp && !sp.classList.contains('hidden')) return;
     if(typeof activeScreen!=='undefined' && activeScreen!=='screenHome') return;
-    try{ localStorage.setItem('buscar_tour_done','1'); }catch(e){} // sofort als gesehen markieren -> auto-Start nur EINMAL, egal wie geschlossen
+    try{ localStorage.setItem('buscar_tour_done_v2','1'); }catch(e){} // sofort als gesehen markieren -> auto-Start nur EINMAL, egal wie geschlossen
     showWelcomeTour();
   }
   // Spotlight-Coach-Mark-Tour: dunkelt den Screen ab, leuchtet einzelne Elemente an,
@@ -3022,13 +3022,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('ctSkip').onclick=function(){ _ctFinish(false); };
   }
   function _ctFinish(completed){
-    try{ localStorage.setItem('buscar_tour_done','1'); }catch(e){}
+    try{ localStorage.setItem('buscar_tour_done_v2','1'); }catch(e){}
     var root=_ctRoot; _ctRoot=null;
     if(root){ root.style.opacity='0'; setTimeout(function(){ if(root.parentNode) root.parentNode.removeChild(root); },300); }
     try{ setNav('navHome'); showScreen('screenHome'); }catch(e){}
     // Nur bei echtem Abschluss (nicht bei „Überspringen") eine dezente Erfolgs-Feier
     if(completed && typeof showBadgeCelebration==='function'){
-      setTimeout(function(){ showBadgeCelebration([{ emoji:'🎉', name:L('Startklar!','¡Listo!','All set!'), desc:L('Du kennst jetzt die wichtigsten Funktionen. Viel Spaß mit Buscar!','Ya conocés las funciones principales. ¡Que disfrutes Buscar!','You know the key features now. Enjoy Buscar!') }]); }, 420);
+      setTimeout(function(){ showBadgeCelebration([{ emoji:'🎉', sub:L('Tour abgeschlossen!','¡Tour completado!','Tour complete!'), name:L('Startklar!','¡Listo!','All set!'), desc:L('Du kennst jetzt die wichtigsten Funktionen. Viel Spaß mit Buscar!','Ya conocés las funciones principales. ¡Que disfrutes Buscar!','You know the key features now. Enjoy Buscar!') }]); }, 420);
     }
   }
   function showWelcomeTour(){ _ctSteps=_ctBuildSteps(); _ctIdx=0; _ctEnsureRoot(); setTimeout(function(){ if(_ctRoot) _ctRoot.style.opacity='1'; }, 20); _ctGo(); }
@@ -4250,7 +4250,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if(done===steps.length){
       var celebrated=false; try{ celebrated=localStorage.getItem('buscar_cl_done')==='1'; }catch(e){}
       if(!celebrated){ try{ localStorage.setItem('buscar_cl_done','1'); }catch(e){}
-        if(typeof showBadgeCelebration==='function') showBadgeCelebration([{ emoji:'🎉', name:L('Angekommen in Paraguay!','¡Llegaste a Paraguay!','You have arrived in Paraguay!'), desc:L('Du hast alle ersten Schritte erledigt.','Completaste todos los primeros pasos.','You completed all the first steps.') }]);
+        if(typeof showBadgeCelebration==='function') showBadgeCelebration([{ emoji:'🎉', sub:L('Geschafft!','¡Completado!','Done!'), name:L('Angekommen in Paraguay!','¡Llegaste a Paraguay!','You have arrived in Paraguay!'), desc:L('Du hast alle ersten Schritte erledigt.','Completaste todos los primeros pasos.','You completed all the first steps.') }]);
       }
     } else { try{ localStorage.removeItem('buscar_cl_done'); }catch(e){} }
   }
