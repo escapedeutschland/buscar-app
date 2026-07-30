@@ -1243,6 +1243,39 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
     return out;
   }
+  // ── Tippfehler-Toleranz (Fuzzy) ──────────────────────────────────────────
+  // Kleines Vokabular aus Synonymen + Unterkategorien + Tags. Getippte, UNBEKANNTE Wörter
+  // werden per Levenshtein gegen dieses Vokabular korrigiert (nicht gegen alle Texte -> billig).
+  var _fuzzyVocab = null, _fuzzyVocabN = -1;
+  function _buildFuzzyVocab(){
+    var n = (window.allListings ? allListings.length : 0);
+    if (_fuzzyVocab && _fuzzyVocabN === n) return _fuzzyVocab;
+    var set = {};
+    SEARCH_SYN.forEach(function(g){ g.forEach(function(t){ if(t.indexOf(' ')<0 && t.length>=4) set[t]=1; }); });
+    (window.allListings||[]).forEach(function(l){
+      if(l.subcategory){ var s=norm(l.subcategory); if(s.length>=4 && s.indexOf(' ')<0) set[s]=1; }
+      (l.tags||[]).forEach(function(t){ var x=norm(String(t)); if(x && x.indexOf(' ')<0 && x.length>=4) set[x]=1; });
+    });
+    _fuzzyVocab = Object.keys(set); _fuzzyVocabN = n;
+    return _fuzzyVocab;
+  }
+  function _lev(a,b){
+    var m=a.length,n=b.length; if(Math.abs(m-n)>2) return 3;
+    var prev=[],cur=[],i,j; for(j=0;j<=n;j++) prev[j]=j;
+    for(i=1;i<=m;i++){ cur[0]=i;
+      for(j=1;j<=n;j++){ var c=a.charCodeAt(i-1)===b.charCodeAt(j-1)?0:1; cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+c); }
+      for(j=0;j<=n;j++) prev[j]=cur[j];
+    }
+    return prev[n];
+  }
+  function _fuzzyMatches(w){
+    if(w.length<4) return [];
+    var vocab=_buildFuzzyVocab();
+    for(var e=0;e<vocab.length;e++){ if(vocab[e]===w) return []; } // korrekt geschrieben -> kein Fuzzy nötig
+    var maxD = w.length<=5 ? 1 : 2, out=[];
+    for(var i=0;i<vocab.length;i++){ var t=vocab[i]; if(Math.abs(t.length-w.length)>maxD) continue; if(_lev(w,t)<=maxD) out.push(t); }
+    return out;
+  }
 
   function getAvgRating(listingId) {
     // Bevorzugt das Aggregat am Eintrag (rating_sum/rating_count) -> keine Reviews-Lesung nötig
@@ -3345,7 +3378,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Mehrwörtige Synonym-Phrasen (z. B. "sin gluten" -> glutenfrei) als OR-Shortcut
       const phraseTerms = _phraseSynonyms(q);
       // Pro Wort: das Wort selbst + seine Synonyme (OR innerhalb; AND über alle Wörter)
-      const wordGroups = words.map(function(w){ return [w].concat(_expandQuery(w).filter(function(t){ return t !== w; })); });
+      const wordGroups = words.map(function(w){
+        var g = [w].concat(_expandQuery(w).filter(function(t){ return t !== w; }));
+        _fuzzyMatches(w).forEach(function(t){ if(g.indexOf(t) < 0) g.push(t); }); // Tippfehler-Korrektur
+        return g;
+      });
       filtered = filtered.filter(function(l){
         var b = _searchBlob(l);
         if (b.indexOf(q) >= 0) return true;                                  // exakte Phrase
