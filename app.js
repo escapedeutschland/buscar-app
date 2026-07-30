@@ -3567,7 +3567,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if(tags.length || canSuggest){
         te.innerHTML = (chips ? '<div class="detail-tags-chips">'+chips+'</div>' : '') + suggestRow;
         tc.style.display='block';
-      } else { tc.style.display='none'; }
+      } else { te.innerHTML=''; tc.style.display='none'; }
+      var _verOwner = currentUser && l.owner_id && l.owner_id===currentUser.uid;
+      if(_verOwner){ te.insertAdjacentHTML('beforeend','<div id="ownerTagSug"></div>'); _loadOwnerTagSuggestions(l.id); }
     })();
     const badges = document.getElementById('detailBadges');
     const openStatus = isOpen(l.opening_hours);
@@ -3919,6 +3921,40 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   async function rejectTagSuggestion(sugId){
     try { await db.collection('tag_suggestions').doc(sugId).update({ status:'rejected' });
       var c=document.getElementById('tagsugCard_'+sugId); if(c) c.remove();
+    } catch(e){ showToast(t('err_generic')||'Fehler'); }
+  }
+
+  // ── Selbstheilende Suche 2b: Inhaber bestätigt Merkmal-Vorschläge am eigenen Eintrag ──
+  async function _loadOwnerTagSuggestions(listingId){
+    var cont=document.getElementById('ownerTagSug'); if(!cont) return;
+    try {
+      var snap=await db.collection('tag_suggestions').where('listing_id','==',listingId).where('status','==','pending').get();
+      if(snap.empty){ cont.innerHTML=''; return; }
+      var tc=document.getElementById('detailTagsCard'); if(tc) tc.style.display='block';
+      cont.innerHTML='<div style="margin-top:12px;border-top:1px solid var(--border);padding-top:11px"><div style="font-size:12.5px;font-weight:700;color:var(--text-1);margin-bottom:8px">💡 '+esc(L('Vorgeschlagene Merkmale','Etiquetas propuestas','Suggested features'))+'</div>'
+        + snap.docs.map(function(d){ var s=d.data();
+            return '<div id="ots_'+d.id+'" style="display:flex;align-items:center;gap:8px;padding:6px 0">'
+              + '<span style="flex:1;min-width:0;font-size:13.5px;color:var(--text-1)">'+esc(tagLabel(s.tag))+'</span>'
+              + '<button onclick="ownerApplyTag(\''+d.id+'\',\''+listingId+'\','+JSON.stringify(s.tag)+')" style="border:none;background:var(--yellow);color:#1a1400;font-weight:800;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer">'+esc(L('Übernehmen','Aplicar','Apply'))+'</button>'
+              + '<button onclick="ownerRejectTag(\''+d.id+'\')" style="border:1px solid var(--border);background:transparent;color:var(--text-2);font-size:12px;padding:6px 10px;border-radius:8px;cursor:pointer">'+esc(L('Ablehnen','Rechazar','Dismiss'))+'</button>'
+              + '</div>';
+          }).join('') + '</div>';
+    } catch(e){ cont.innerHTML=''; } // Regeln evtl. noch nicht veröffentlicht
+  }
+  async function ownerApplyTag(sugId, listingId, tag){
+    try {
+      await db.collection('listings').doc(listingId).update({ tags: firebase.firestore.FieldValue.arrayUnion(tag) });
+      await db.collection('tag_suggestions').doc(sugId).update({ status:'applied' });
+      var l=allListings.find(function(x){return x.id===listingId;});
+      if(l){ if(!Array.isArray(l.tags)) l.tags=[]; if(l.tags.map(function(x){return String(x).toLowerCase();}).indexOf(String(tag).toLowerCase())<0) l.tags.push(tag); try{ _searchCache.delete(l); }catch(e){} }
+      var row=document.getElementById('ots_'+sugId); if(row) row.remove();
+      showToast(L('✓ Merkmal übernommen','✓ Etiqueta aplicada','✓ Feature applied'));
+      showDetail(listingId);
+    } catch(e){ showToast(t('err_generic')||'Fehler'); }
+  }
+  async function ownerRejectTag(sugId){
+    try { await db.collection('tag_suggestions').doc(sugId).update({ status:'rejected' });
+      var row=document.getElementById('ots_'+sugId); if(row) row.remove();
     } catch(e){ showToast(t('err_generic')||'Fehler'); }
   }
 
