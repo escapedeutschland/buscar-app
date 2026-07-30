@@ -167,12 +167,13 @@
     .detail-row-icon svg { width: 18px; height: 18px; stroke: var(--yellow); }
     .detail-row-label { font-size: 11px; color: var(--text-3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
     .detail-row-value { font-size: 14px; color: var(--text-1); font-weight: 500; margin-top: 1px; }
-    .detail-badge-row { padding: 12px 16px; display: flex; gap: 8px; }
+    .detail-badge-row { padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 8px; }
     .detail-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
     .detail-badge.green { background: var(--green-light); color: var(--green); }
     .detail-badge.blue { background:#DBEAFE;color:#2563EB; }
     .detail-badge.open-status { background:#DCFCE7;color:#15803D; }
     .detail-badge.closed-status { background:#F1F5F9;color:#94A3B8; }
+    .detail-badge.owner { background:#FFF8EC; color:#D4841A; border:1px solid #F5A623; }
     .detail-cta { display: flex; gap: 10px; margin-top: 6px; margin-bottom: 14px; }
     .detail-cta-btn { flex: 1; padding: 15px; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
     .detail-cta-btn.primary { background: var(--yellow); color: white; }

@@ -3577,8 +3577,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var _esb=(currentLang==='es');
     var featBadge = isFeatured(l) ? '<span class="detail-badge featured">★ '+L('Empfohlen','Destacado','Featured')+'</span>' : '';
     var maklerBadge = isMaklerVerified(l) ? '<span class="detail-badge makler">✓ '+L('Verifizierter Makler','Agente verificado','Verified agent')+'</span>' : '';
-    document.getElementById('detailBadgeRow').innerHTML = featBadge + maklerBadge + (l.verified?'<span class="detail-badge green">'+t('verified')+'</span>':'') + (isNew(l.created_at)?'<span class="detail-badge blue">'+t('badge_new')+'</span>':'') + openBadge;
-    badges.style.display = (featBadge || maklerBadge || l.verified || isNew(l.created_at) || openStatus!==null) ? 'block' : 'none';
+    var ownerBadge = l.owner_id ? '<span class="detail-badge owner">'+t('owner_badge')+'</span>' : '';
+    document.getElementById('detailBadgeRow').innerHTML = ownerBadge + featBadge + maklerBadge + (l.verified?'<span class="detail-badge green">'+t('verified')+'</span>':'') + (isNew(l.created_at)?'<span class="detail-badge blue">'+t('badge_new')+'</span>':'') + openBadge;
+    badges.style.display = (ownerBadge || featBadge || maklerBadge || l.verified || isNew(l.created_at) || openStatus!==null) ? 'block' : 'none';
     let infoHTML = '';
     if (l.phone) infoHTML += `<a class="detail-row" href="tel:${esc(l.phone)}"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Telefon</div><div class="detail-row-value">${esc(l.phone)}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
     if (l.website) { var _wHref = /^https?:\/\//i.test(String(l.website).trim()) ? String(l.website).trim() : 'https://' + String(l.website).trim(); infoHTML += `<a class="detail-row" href="${esc(_wHref)}" target="_blank" rel="noopener noreferrer"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Website</div><div class="detail-row-value">${esc(l.website)}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`; }
@@ -6505,11 +6506,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       </div>` : '';
       // "Eintrag bearbeiten" nur zeigen, wenn nicht ohnehin die Bearbeiten/Löschen-Karte erscheint (Admin/Ersteller)
       var _hasCreatorControls = (currentUser.email === ADMIN_EMAIL) || (listing.created_by && listing.created_by === currentUser.uid);
-      // Mit Edit-Button (echter Inhaber ohne weitere Controls): Karte. Sonst: nur der Chip, zentriert, ohne Container.
-      var _ownerHtml = _hasCreatorControls
-        ? `<div style="text-align:center;margin:2px 0 8px"><span class="owner-badge">⭐ Verifizierter Inhaber</span></div>`
-        : `<div class="detail-card owner-section verified" style="display:flex;flex-direction:column;align-items:flex-start;gap:12px"><div class="owner-badge">⭐ Verifizierter Inhaber</div><button class="owner-edit-btn" onclick="openEditListing('${listing.id}')">Eintrag bearbeiten</button></div>`;
-      section.innerHTML = _ownerHtml + _dealCard;
+      // "Verifizierter Inhaber" ist jetzt Badge oben in der Statusleiste. Hier nur noch Edit-Button (nur echte Inhaber ohne Admin/Ersteller-Controls) + Deal.
+      var _editCard = _hasCreatorControls ? '' : `<div class="detail-card owner-section verified"><button class="owner-edit-btn" onclick="openEditListing('${listing.id}')">Eintrag bearbeiten</button></div>`;
+      section.innerHTML = _editCard + _dealCard;
       return;
     }
     // Eintrag hat bereits einen verifizierten Inhaber -> kein Claim-Button fuer andere Nutzer
