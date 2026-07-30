@@ -258,6 +258,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_twenty: '20 Einträge', badge_fifty: '50 Einträge', badge_hundred: '100 Einträge',
       badge_explorer: 'Entdecker', badge_chaco: 'Chaco-Kenner',
       badge_done: 'Schon erreicht ✓', badge_todo: 'Noch offen',
+      badge_unlocked_title: 'Auszeichnung freigeschaltet!', badge_unlocked_cta: 'Super!',
       bdesc_first: 'Erstelle deinen ersten Eintrag.', bdesc_five: 'Erstelle 5 Einträge.', bdesc_ten: 'Erstelle 10 Einträge.', bdesc_twenty: 'Erstelle 20 Einträge.', bdesc_fifty: 'Erstelle 50 Einträge.', bdesc_hundred: 'Erstelle 100 Einträge.', bdesc_explorer: 'Erstelle Einträge in 3 verschiedenen Städten.', bdesc_chaco: 'Erstelle einen Eintrag im Chaco.',
       badge_count_0: 'Noch keine eigenen Einträge', badge_count_1: '1 eigener Eintrag', badge_count_n: ' eigene Einträge',
     },
@@ -515,6 +516,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_twenty: '20 registros', badge_fifty: '50 registros', badge_hundred: '100 registros',
       badge_explorer: 'Explorador', badge_chaco: 'Conocedor del Chaco',
       badge_done: 'Ya conseguido ✓', badge_todo: 'Pendiente',
+      badge_unlocked_title: '¡Insignia desbloqueada!', badge_unlocked_cta: '¡Genial!',
       bdesc_first: 'Crea tu primera entrada.', bdesc_five: 'Crea 5 entradas.', bdesc_ten: 'Crea 10 entradas.', bdesc_twenty: 'Crea 20 entradas.', bdesc_fifty: 'Crea 50 entradas.', bdesc_hundred: 'Crea 100 entradas.', bdesc_explorer: 'Crea entradas en 3 ciudades distintas.', bdesc_chaco: 'Crea una entrada en el Chaco.',
       badge_count_0: 'Aún sin registros propios', badge_count_1: '1 registro propio', badge_count_n: ' registros propios',
     },
@@ -772,6 +774,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_twenty: '20 entries', badge_fifty: '50 entries', badge_hundred: '100 entries',
       badge_explorer: 'Explorer', badge_chaco: 'Chaco expert',
       badge_done: 'Earned ✓', badge_todo: 'Not yet',
+      badge_unlocked_title: 'Badge unlocked!', badge_unlocked_cta: 'Awesome!',
       bdesc_first: 'Create your first entry.', bdesc_five: 'Create 5 entries.', bdesc_ten: 'Create 10 entries.', bdesc_twenty: 'Create 20 entries.', bdesc_fifty: 'Create 50 entries.', bdesc_hundred: 'Create 100 entries.', bdesc_explorer: 'Create entries in 3 different cities.', bdesc_chaco: 'Create an entry in the Chaco.',
       badge_count_0: 'No entries of your own yet', badge_count_1: '1 entry of your own', badge_count_n: ' entries of your own',
     }
@@ -1619,11 +1622,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if (newlyEarned.length > 0) {
         try {
           await db.collection('users').doc(uid).set({ badges: earned }, { merge: true });
-          newlyEarned.forEach(id => {
-            const def = getBadgeDefs().find(b => b.id === id);
-            if (def) showToast('🏆 ' + def.name + ' ' + def.emoji);
-          });
           renderBadgeGrid(earned); // update grid with new badges
+          // Erst-Backfill (Cache war leer + mehrere auf einmal) NICHT zelebrieren -> keine Flut an Overlays
+          if (cached.length === 0 && newlyEarned.length >= 3) {
+            newlyEarned.forEach(function(id){ var def = getBadgeDefs().find(function(b){ return b.id === id; }); if (def) showToast('🏆 ' + def.name + ' ' + def.emoji); });
+          } else {
+            showBadgeCelebration(newlyEarned.map(function(id){ return getBadgeDefs().find(function(b){ return b.id === id; }); }));
+          }
         } catch(e) {}
       }
       _badgesCache = { uid: uid, badges: earned, count: count, ts: Date.now() }; // Session-Cache aktualisieren
@@ -1649,6 +1654,51 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         + '<div class="' + nameClass + '">' + b.name + '</div>'
         + '</div>';
     }).join('');
+  }
+
+  // Zelebriert neu freigeschaltete Auszeichnungen mit Overlay + Konfetti (nacheinander, falls mehrere)
+  var _bcQueue = [], _bcActive = false;
+  function showBadgeCelebration(defs) {
+    if (!defs || !defs.length) return;
+    defs.forEach(function(d){ if (d) _bcQueue.push(d); });
+    if (!_bcActive) _nextBadgeCelebration();
+  }
+  function _nextBadgeCelebration() {
+    var def = _bcQueue.shift();
+    if (!def) { _bcActive = false; return; }
+    _bcActive = true;
+    try { if (navigator.vibrate) navigator.vibrate([20, 40, 20]); } catch(e){}
+    var colors = ['#F5C518','#EC4899','#3B82F6','#22C55E','#F97316','#8B5CF6','#EF4444'];
+    var confetti = '';
+    for (var i = 0; i < 30; i++) {
+      var c = colors[i % colors.length];
+      var left = Math.round((i * 53 + 7) % 100);
+      var delay = ((i % 12) * 0.11).toFixed(2);
+      var dur = (2.2 + (i % 6) * 0.28).toFixed(2);
+      confetti += '<span class="bc-confetti" style="left:' + left + '%;background:' + c + ';animation-delay:' + delay + 's;animation-duration:' + dur + 's"></span>';
+    }
+    var ov = document.createElement('div');
+    ov.className = 'badge-celebrate-overlay';
+    ov.innerHTML = confetti
+      + '<div class="badge-celebrate-card" role="dialog" aria-live="polite">'
+      + '<div class="bc-sub">🎉 ' + esc(t('badge_unlocked_title')) + '</div>'
+      + '<div class="bc-emoji">' + (def.emoji || '🏆') + '</div>'
+      + '<div class="bc-name">' + esc(def.name || '') + '</div>'
+      + (def.desc ? '<div class="bc-desc">' + esc(def.desc) + '</div>' : '')
+      + '<button class="bc-btn" type="button">' + esc(t('badge_unlocked_cta')) + '</button>'
+      + '</div>';
+    document.body.appendChild(ov);
+    requestAnimationFrame(function(){ ov.classList.add('visible'); });
+    var closed = false, auto = null;
+    function close() {
+      if (closed) return; closed = true;
+      if (auto) clearTimeout(auto);
+      ov.classList.remove('visible');
+      setTimeout(function(){ if (ov.parentNode) ov.parentNode.removeChild(ov); _nextBadgeCelebration(); }, 320);
+    }
+    ov.querySelector('.bc-btn').addEventListener('click', close);
+    ov.addEventListener('click', function(e){ if (e.target === ov) close(); });
+    auto = setTimeout(close, 6000);
   }
 
   // Kurze Info-Karte beim Antippen einer Auszeichnung: Emoji, Name, Bedingung, Status
@@ -5031,6 +5081,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       document.getElementById('formSuccess').textContent = t('submit_success'); document.getElementById('formSuccess').classList.add('visible');
       _badgesCache = null; // Zählung/Badges neu laden lassen
       showToast(t('submit_success'));
+      if (currentUser) { try { loadBadges(currentUser.uid); } catch(e){} } // ggf. neue Auszeichnung sofort zelebrieren
       var _lhReset = document.getElementById('locationHint'); if (_lhReset) _lhReset.style.display = '';
       pendingFormPhotos = [];
       const grid2 = document.getElementById('formPhotoGrid');

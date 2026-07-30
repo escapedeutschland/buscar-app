@@ -524,6 +524,19 @@
     .badge-icon .badge-check { position: absolute; bottom: -2px; right: -2px; width: 18px; height: 18px; background: #22C55E; border-radius: 50%; border: 2px solid var(--bg); display: flex; align-items: center; justify-content: center; font-size: 9px; }
     .badge-name { font-size: 10px; font-weight: 600; color: var(--text-2); text-align: center; line-height: 1.2; }
     .badge-name.earned { color: var(--text-1); }
+    /* Auszeichnungs-Zelebration (Freischalt-Overlay + Konfetti) */
+    .badge-celebrate-overlay { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.55); opacity: 0; transition: opacity 0.3s; overflow: hidden; padding: 24px; }
+    .badge-celebrate-overlay.visible { opacity: 1; }
+    .badge-celebrate-card { position: relative; z-index: 2; background: var(--card); border-radius: 20px; padding: 26px 26px 22px; max-width: 320px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.35); transform: scale(0.8); opacity: 0; transition: transform 0.35s cubic-bezier(0.2,1.2,0.3,1), opacity 0.3s; }
+    .badge-celebrate-overlay.visible .badge-celebrate-card { transform: scale(1); opacity: 1; }
+    .badge-celebrate-card .bc-sub { font-size: 12.5px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: var(--yellow-dark); }
+    .badge-celebrate-card .bc-emoji { font-size: 72px; line-height: 1; margin: 12px 0 4px; animation: bc-pop 0.6s cubic-bezier(0.2,1.4,0.3,1) 0.15s both; }
+    .badge-celebrate-card .bc-name { font-size: 20px; font-weight: 800; color: var(--text-1); }
+    .badge-celebrate-card .bc-desc { font-size: 13.5px; color: var(--text-2); margin-top: 6px; line-height: 1.45; }
+    .badge-celebrate-card .bc-btn { margin-top: 18px; border: none; background: var(--yellow); color: #1a1400; font-weight: 800; font-size: 15px; padding: 12px 30px; border-radius: 12px; cursor: pointer; }
+    @keyframes bc-pop { 0% { transform: scale(0) rotate(-25deg); } 70% { transform: scale(1.15) rotate(8deg); } 100% { transform: scale(1) rotate(0); } }
+    .bc-confetti { position: absolute; top: -14px; width: 9px; height: 14px; border-radius: 2px; opacity: 0.9; z-index: 1; animation-name: bc-fall; animation-timing-function: linear; animation-iteration-count: 1; animation-fill-mode: both; }
+    @keyframes bc-fall { 0% { transform: translateY(-20px) rotate(0); opacity: 1; } 100% { transform: translateY(105vh) rotate(720deg); opacity: 0.9; } }
     .profil-listings-count { font-size: 13px; color: var(--text-2); text-align: center; margin-top: 4px; margin-bottom: 8px; }
     .profil-name { font-size: 18px; font-weight: 700; color: white; }
         .profil-email { font-size: 12px; color: rgba(255,255,255,0.75); }
