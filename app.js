@@ -2884,6 +2884,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if (!window._evPreloaded) { window._evPreloaded = true; setTimeout(function(){ loadEvents(); }, 1200); }
       var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden');
       handleDeepLink();
+      setTimeout(maybeShowWelcomeTour, 1000);
     } else {
       // Gäste-Modus: ohne Konto nutzbar (nur Lesen). Aktionen (posten, favorisieren, fragen …) fordern Login an.
       var pn=document.getElementById('profilName'); if(pn) pn.textContent=t('guest_name');
@@ -2897,6 +2898,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if (!window._evPreloaded) { window._evPreloaded = true; setTimeout(function(){ loadEvents(); }, 1200); }
       var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden');
       handleDeepLink();
+      setTimeout(maybeShowWelcomeTour, 1000);
     }
   });
 
@@ -2934,7 +2936,50 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
   }
   var GUEST_AVATAR_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:58%;height:58%;color:#fff"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-  function continueAsGuest(){ setNav('navHome'); showScreen('screenHome'); }
+  function continueAsGuest(){ setNav('navHome'); showScreen('screenHome'); setTimeout(maybeShowWelcomeTour, 700); }
+
+  // ── Erst-Tour beim ersten Öffnen (einmalig, überspringbar, rein additiv) ──
+  function maybeShowWelcomeTour(){
+    try{ if(localStorage.getItem('buscar_tour_done')==='1') return; }catch(e){}
+    if(document.querySelector('.tour-overlay')) return;
+    var sp=document.getElementById('splash'); if(sp && !sp.classList.contains('hidden')) return;
+    if(typeof activeScreen!=='undefined' && activeScreen!=='screenHome') return;
+    showWelcomeTour();
+  }
+  function showWelcomeTour(){
+    var slides=[
+      { ic:'👋', t:L('Willkommen bei Buscar','Bienvenido a Buscar','Welcome to Buscar'), d:L('Dein Guide für Paraguay: echte Orte, Events und Community-Wissen – auf Deutsch, Español und English.','Tu guía para Paraguay: lugares reales, eventos y conocimiento de la comunidad – en alemán, español e inglés.','Your guide to Paraguay: real places, events and community knowledge – in German, Spanish and English.') },
+      { ic:'🔎', t:L('Finden & Filtern','Buscar y filtrar','Find & filter'), d:L('Suche Restaurants, Ärzte, Geschäfte und mehr. Filtere nach Kategorie, Stadt und sogar nach „spricht deine Sprache".','Buscá restaurantes, médicos, comercios y más. Filtrá por categoría, ciudad e incluso por „habla tu idioma".','Search restaurants, doctors, shops and more. Filter by category, city and even by "speaks your language".') },
+      { ic:'🧭', t:L('Ankommen & Community','Llegar y comunidad','Arrive & community'), d:L('Praktische Guides unter „Ankommen in Paraguay" – und stell Fragen bei „Frag die Community".','Guías prácticas en „Llegar a Paraguay" – y hacé preguntas en „Preguntá a la comunidad".','Practical guides under "Arriving in Paraguay" – and ask questions in "Ask the community".') },
+      { ic:'📅', t:L('Events & Karte','Eventos y mapa','Events & map'), d:L('Entdecke Veranstaltungen und finde alles auf Karte oder Radar in deiner Nähe.','Descubrí eventos y encontrá todo en el mapa o el radar cerca tuyo.','Discover events and find everything on the map or radar near you.') }
+    ];
+    var idx=0;
+    var ov=document.createElement('div');
+    ov.className='tour-overlay';
+    ov.style.cssText='position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity 0.3s';
+    function close(){ try{localStorage.setItem('buscar_tour_done','1');}catch(e){} ov.style.opacity='0'; setTimeout(function(){ if(ov.parentNode) ov.parentNode.removeChild(ov); },300); }
+    function render(){
+      var s=slides[idx], last=(idx===slides.length-1);
+      var dots=slides.map(function(_,i){ return '<span style="width:7px;height:7px;border-radius:50%;background:'+(i===idx?'var(--yellow-dark)':'var(--border)')+'"></span>'; }).join('');
+      ov.innerHTML='<div style="background:var(--card);border-radius:20px;max-width:340px;width:100%;padding:26px 24px 18px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.35)">'
+        + '<div style="font-size:56px;line-height:1">'+s.ic+'</div>'
+        + '<div style="font-size:20px;font-weight:800;color:var(--text-1);margin-top:10px">'+esc(s.t)+'</div>'
+        + '<div style="font-size:14px;color:var(--text-2);line-height:1.5;margin-top:8px">'+esc(s.d)+'</div>'
+        + '<div style="display:flex;gap:6px;justify-content:center;margin:18px 0 16px">'+dots+'</div>'
+        + '<div style="display:flex;gap:8px">'
+        +   (idx>0?'<button id="tourBack" style="flex:1;border:1px solid var(--border);background:transparent;color:var(--text-2);font-weight:700;font-size:14px;padding:12px;border-radius:12px;cursor:pointer">'+esc(L('Zurück','Atrás','Back'))+'</button>':'')
+        +   '<button id="tourNext" style="flex:2;border:none;background:var(--yellow);color:#1a1400;font-weight:800;font-size:14.5px;padding:12px;border-radius:12px;cursor:pointer">'+esc(last?L('Los geht\'s','¡Empezar!','Let\'s go'):L('Weiter','Siguiente','Next'))+'</button>'
+        + '</div>'
+        + '<div id="tourSkip" style="font-size:12px;color:var(--text-3);margin-top:12px;cursor:pointer">'+esc(L('Überspringen','Saltar','Skip'))+'</div>'
+        + '</div>';
+      ov.querySelector('#tourNext').onclick=function(){ if(last) close(); else { idx++; render(); } };
+      var bb=ov.querySelector('#tourBack'); if(bb) bb.onclick=function(){ idx--; render(); };
+      ov.querySelector('#tourSkip').onclick=close;
+    }
+    document.body.appendChild(ov);
+    render();
+    requestAnimationFrame(function(){ ov.style.opacity='1'; });
+  }
 
   // Blendet versehentliche Doppel-Eintraege aus: immer per ID (sicher) und – wenn
   // Koordinaten vorhanden sind – per Name + exakter Position (gleicher Name an exakt
