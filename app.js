@@ -3086,7 +3086,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var _rawListings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       allListings = DEDUPE_HIDE_DUPLICATES ? _dedupeListings(_rawListings) : _rawListings;
       buildCityChips();
-      if (activeScreen === 'screenHome') renderListings();
+      renderListings(); // self-guarded auf Home
+      if (activeScreen === 'screenMap' && maplibreMap) updateMapData(); // Karte offen -> Pins nachziehen
       document.getElementById('offlineBanner').classList.remove('visible');
       // Cache-Schreiben (JSON.stringify von ~400KB) in den Leerlauf verschieben,
       // damit es den ersten Render / erste Interaktionen nicht blockiert.
@@ -3451,9 +3452,22 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (sc && sc !== document.body) sc.addEventListener('scroll', function () { check(sc); }, { passive: true });
     window.addEventListener('scroll', function () { check(window); }, { passive: true }); // Fallback, falls das Fenster scrollt
   }
+  var _rlScheduled = false;
   function renderListings() {
     if (activeScreen !== 'screenHome') return;
-    requestAnimationFrame(function() { _doRenderListings(); });
+    // Mehrfach-Aufrufe im selben Tick koaleszieren (Debounce) …
+    if (_rlScheduled) return;
+    _rlScheduled = true;
+    var run = function() {
+      if (!_rlScheduled) return; // schon gezeichnet
+      _rlScheduled = false;
+      _doRenderListings();
+    };
+    // … aber GARANTIERT zeichnen: rAF ist beim Kaltstart / Resume aus dem
+    // Hintergrund im WebView pausiert/gedrosselt und feuert dann evtl. nie.
+    // Der setTimeout-Fallback malt in dem Fall trotzdem (was zuerst kommt, gewinnt).
+    requestAnimationFrame(run);
+    setTimeout(run, 120);
   }
   function _doRenderListings() {
     if (activeScreen !== 'screenHome') return;
@@ -4913,6 +4927,22 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         showAccuracyCircle: true
       });
       maplibreMap.addControl(_geoLocateCtrl, 'top-right');
+      // Standort außerhalb des Karten-Bereichs (z. B. Nutzer in Europa): MapLibre
+      // zentriert wegen maxBounds NICHT und zeigt keinen Punkt -> sonst passiert
+      // sichtbar "nichts". Deshalb ein kurzer, klarer Hinweis.
+      _geoLocateCtrl.on('outofmaxbounds', function() {
+        showToast(L('Du bist gerade außerhalb von Paraguay – dein Standort wird auf dieser Karte nicht angezeigt.',
+                    'Estás fuera de Paraguay – tu ubicación no se muestra en este mapa.',
+                    "You're currently outside Paraguay – your location isn't shown on this map."));
+      });
+      _geoLocateCtrl.on('error', function(e) {
+        // Häufigster Fall: Nutzer hat die Standort-Freigabe verweigert.
+        if (e && e.code === 1) {
+          showToast(L('Standort-Zugriff ist deaktiviert. Du kannst ihn in den Einstellungen erlauben.',
+                      'El acceso a la ubicación está desactivado. Podés permitirlo en los ajustes.',
+                      'Location access is off. You can enable it in your settings.'));
+        }
+      });
 
       maplibreMap.on('load', () => {
         mapLoaded = true;
