@@ -3997,10 +3997,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       }
     } else { try{ localStorage.removeItem('buscar_cl_done'); }catch(e){} }
   }
+  function _clOpen(){ try { return localStorage.getItem('buscar_cl_open')==='1'; } catch(e){ return false; } }
+  function toggleChecklistOpen(){
+    var open=!_clOpen(); try{ localStorage.setItem('buscar_cl_open', open?'1':'0'); }catch(e){}
+    var card=document.getElementById('clCard'); if(card){ card.outerHTML=_renderChecklistCard(); }
+  }
   function _renderChecklistCard(){
     var steps=_clSteps(), m=_clGet();
     var done=steps.filter(function(s){return m[s.id];}).length;
-    var pct=Math.round(done/steps.length*100), allDone=(done===steps.length);
+    var pct=Math.round(done/steps.length*100), allDone=(done===steps.length), open=_clOpen();
     var rows=steps.map(function(s){
       var on=!!m[s.id], gid=_clGuideId(s.match);
       var box='<span onclick="event.stopPropagation();toggleChecklistStep(\''+s.id+'\')" style="flex-shrink:0;width:22px;height:22px;border-radius:6px;border:2px solid '+(on?'var(--yellow-dark)':'var(--border)')+';background:'+(on?'var(--yellow)':'transparent')+';display:flex;align-items:center;justify-content:center;cursor:pointer">'+(on?'<svg viewBox="0 0 24 24" fill="none" stroke="#1a1400" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</span>';
@@ -4010,13 +4015,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       return '<div'+attr+'display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--border)">'+box+lbl+chev+'</div>';
     }).join('');
     return '<div id="clCard" class="detail-card" style="padding:15px 16px;margin-bottom:14px">'
-      + '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">'
-      +   '<div style="font-weight:800;font-size:15px;color:var(--text-1)">🧳 '+esc(L('Deine ersten Schritte','Tus primeros pasos','Your first steps'))+'</div>'
+      + '<div onclick="toggleChecklistOpen()" style="display:flex;align-items:center;gap:10px;cursor:pointer">'
+      +   '<div style="flex:1;min-width:0;font-weight:800;font-size:15px;color:var(--text-1)">🧳 '+esc(L('Deine ersten Schritte','Tus primeros pasos','Your first steps'))+'</div>'
       +   '<div style="font-size:12px;font-weight:800;color:var(--yellow-dark);flex-shrink:0">'+done+'/'+steps.length+'</div>'
+      +   '<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="16" height="16" style="flex-shrink:0;transition:transform .2s;transform:rotate('+(open?'90':'0')+'deg)"><polyline points="9 18 15 12 9 6"/></svg>'
       + '</div>'
-      + '<div style="font-size:12.5px;color:var(--text-2);margin-top:3px;line-height:1.4">'+esc(allDone?L('Geschafft – willkommen in Paraguay! 🎉','¡Listo, bienvenido a Paraguay! 🎉','All done – welcome to Paraguay! 🎉'):L('Hak ab, was erledigt ist – jeder Punkt führt zum passenden Guide.','Marcá lo que ya hiciste – cada punto lleva a su guía.','Check off what you have done – each item links to its guide.'))+'</div>'
-      + '<div style="height:7px;border-radius:4px;background:var(--surface-2);margin:11px 0 3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--yellow);border-radius:4px;transition:width .3s"></div></div>'
-      + rows
+      + '<div style="height:7px;border-radius:4px;background:var(--surface-2);margin:11px 0 0;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--yellow);border-radius:4px;transition:width .3s"></div></div>'
+      + '<div id="clBody" style="display:'+(open?'block':'none')+'">'
+      +   '<div style="font-size:12.5px;color:var(--text-2);margin-top:9px;line-height:1.4">'+esc(allDone?L('Geschafft – willkommen in Paraguay! 🎉','¡Listo, bienvenido a Paraguay! 🎉','All done – welcome to Paraguay! 🎉'):L('Hak ab, was erledigt ist – jeder Punkt führt zum passenden Guide.','Marcá lo que ya hiciste – cada punto lleva a su guía.','Check off what you have done – each item links to its guide.'))+'</div>'
+      +   rows
+      + '</div>'
       + '</div>';
   }
   function renderWissenList(){
