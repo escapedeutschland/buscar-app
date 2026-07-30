@@ -1234,6 +1234,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
     return out;
   }
+  // Synonyme NUR für mehrwörtige Phrasen, die als Ganzes in der Anfrage stehen (z. B. „sin gluten" -> glutenfrei).
+  function _phraseSynonyms(q){
+    var out=[];
+    for(var i=0;i<SEARCH_SYN.length;i++){ var g=SEARCH_SYN[i], hit=false;
+      for(var j=0;j<g.length;j++){ var t=g[j]; if(t.indexOf(' ')>=0 && q.indexOf(t)>=0){ hit=true; break; } }
+      if(hit){ for(var k=0;k<g.length;k++){ if(g[k].length>=3 && out.indexOf(g[k])<0) out.push(g[k]); } }
+    }
+    return out;
+  }
 
   function getAvgRating(listingId) {
     // Bevorzugt das Aggregat am Eintrag (rating_sum/rating_count) -> keine Reviews-Lesung nötig
@@ -3332,8 +3341,23 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (activeTags.length) filtered = filtered.filter(l => { const lt = (l.tags||[]).map(x => String(x).toLowerCase()); return activeTags.every(k => lt.indexOf(String(k).toLowerCase()) >= 0); });
     if (searchQuery) {
       const q = norm(searchQuery);
-      const terms = [q].concat(_expandQuery(q).filter(function(t){ return t !== q; }));
-      filtered = filtered.filter(function(l){ var b = _searchBlob(l); for (var i=0;i<terms.length;i++){ if (b.indexOf(terms[i]) >= 0) return true; } return false; });
+      const words = q.split(' ').filter(function(w){ return w.length >= 2; });
+      // Mehrwörtige Synonym-Phrasen (z. B. "sin gluten" -> glutenfrei) als OR-Shortcut
+      const phraseTerms = _phraseSynonyms(q);
+      // Pro Wort: das Wort selbst + seine Synonyme (OR innerhalb; AND über alle Wörter)
+      const wordGroups = words.map(function(w){ return [w].concat(_expandQuery(w).filter(function(t){ return t !== w; })); });
+      filtered = filtered.filter(function(l){
+        var b = _searchBlob(l);
+        if (b.indexOf(q) >= 0) return true;                                  // exakte Phrase
+        for (var p=0;p<phraseTerms.length;p++){ if (b.indexOf(phraseTerms[p]) >= 0) return true; }
+        if (!wordGroups.length) return false;
+        for (var i=0;i<wordGroups.length;i++){                               // jedes Wort muss vorkommen
+          var g = wordGroups[i], ok = false;
+          for (var j=0;j<g.length;j++){ if (b.indexOf(g[j]) >= 0){ ok = true; break; } }
+          if (!ok) return false;
+        }
+        return true;
+      });
     }
     // Score EINMAL pro Eintrag berechnen (nicht bei jedem Sortier-Vergleich) -> O(n log n) statt O(n²)
     filtered = filtered.map(function(l){ return { l: l, s: scoreEntry(l) }; })
