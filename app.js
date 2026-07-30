@@ -3898,6 +3898,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           +'<div class="admin-card-name">'+esc(s.listing_name||'Eintrag')+'</div>'
           +'<div class="admin-card-meta">'+formatDate(s.created_at)+'</div>'
           +'<div style="background:#FFF8EC;border-left:3px solid var(--yellow);padding:8px 10px;border-radius:6px;margin:8px 0;font-size:13px">Vorschlag: <b>'+esc(tagLabel(s.tag))+'</b></div>'
+          +(s.source==='answer'?'<div style="font-size:11px;color:var(--text-3);margin:-2px 0 8px">↳ '+esc(L('aus einer Community-Antwort','de una respuesta de la comunidad','from a community answer'))+'</div>':'')
           +'<div class="admin-actions">'
             +'<button class="admin-btn approve" onclick="applyTagSuggestion(\''+s.id+'\',\''+s.listing_id+'\','+JSON.stringify(s.tag)+')">Übernehmen</button>'
             +'<button class="admin-btn reject" onclick="rejectTagSuggestion(\''+s.id+'\')">Verwerfen</button>'
@@ -4404,11 +4405,21 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     setTimeout(function(){ var a=document.getElementById('answerText'); if(a) a.focus(); }, 120);
   }
   function closeAnswerPick(){ document.getElementById('answerPickOverlay').classList.remove('visible'); }
+  // Schlägt aus dem Fragetext ein kurzes Merkmal-Wort vor (nur Vorbefüllung, editierbar)
+  function _suggestTagFromQuestion(){
+    var q=_currentQuestion; if(!q||!q.text) return '';
+    var stop=/^(wo|wer|was|wie|wann|warum|wieso|gibt|es|der|die|das|den|dem|ein|eine|einen|ich|man|kann|koennt|finde|finden|suche|gesucht|nach|in|im|bei|einer|einem|und|oder|fuer|für|mit|zum|zur|hier|nahe|umgebung|donde|dónde|que|qué|hay|un|una|el|la|los|las|busco|para|con|en|de|del|puedo|encontrar|como|cómo|se|algun|algún|alguna|cerca)$/i;
+    var words=String(q.text).replace(/[?.!,;:¿¡]/g,' ').split(/\s+/).filter(function(w){ return w.length>2 && !stop.test(w); });
+    return words.slice(0,3).join(' ').slice(0,30);
+  }
   function _renderSelectedAnswer(){
     var box=document.getElementById('answerSelectedBox'); if(!box) return;
     if(_selectedAnswerListing){
       var col=catColors[_selectedAnswerListing.category_id]||'#6B6B6B';
-      box.innerHTML='<div class="answer-card" style="margin:0;cursor:default"><div class="answer-dot" style="background:'+col+'"></div><div style="flex:1;min-width:0"><div class="answer-name">'+esc(_selectedAnswerListing.name||'')+'</div><div class="answer-note">'+t('fc_linked')+'</div></div><button class="answer-del" onclick="clearSelectedAnswer()">✕</button></div>';
+      box.innerHTML='<div class="answer-card" style="margin:0;cursor:default"><div class="answer-dot" style="background:'+col+'"></div><div style="flex:1;min-width:0"><div class="answer-name">'+esc(_selectedAnswerListing.name||'')+'</div><div class="answer-note">'+t('fc_linked')+'</div></div><button class="answer-del" onclick="clearSelectedAnswer()">✕</button></div>'
+        + '<div style="margin-top:10px"><div style="font-size:12px;color:var(--text-3);margin-bottom:5px">'+esc(L('Passendes Merkmal (optional)','Etiqueta relevante (opcional)','Relevant feature (optional)'))+'</div>'
+        + '<input class="field-input" type="text" id="answerTagInput" maxlength="30" value="'+esc(_suggestTagFromQuestion())+'" placeholder="'+esc(L('z. B. glutenfrei, deutschsprachig','p. ej. sin gluten, habla alemán','e.g. gluten-free, speaks German'))+'">'
+        + '<div style="font-size:11px;color:var(--text-3);margin-top:5px;line-height:1.35">'+esc(L('Wird als Merkmal vorgeschlagen – hilft anderen, diesen Ort über die Suche zu finden.','Se propone como etiqueta – ayuda a otros a encontrar este lugar en la búsqueda.','Suggested as a feature – helps others find this place via search.'))+'</div></div>';
       box.style.display='block';
     } else { box.innerHTML=''; box.style.display='none'; }
   }
@@ -4448,6 +4459,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         author_name: _currentUserName(),
         created_by:currentUser.uid, created_at:new Date()
       });
+      // Selbstheilende Suche: verlinkter Eintrag + Merkmal -> Tag-Vorschlag (bestehende Freigabe/Owner-Weg)
+      if(l){ var _tagEl=document.getElementById('answerTagInput'); var _tag=_tagEl?(_tagEl.value||'').trim():'';
+        if(_tag){ var _ex=(l.tags||[]).map(function(x){return String(x).toLowerCase();});
+          if(_ex.indexOf(_tag.toLowerCase())<0){ try{ await db.collection('tag_suggestions').add({ listing_id:l.id, listing_name:l.name||'', tag:_tag, user_id:currentUser.uid, status:'pending', source:'answer', question_id:_currentQuestion.id, created_at:new Date() }); }catch(e){} } } }
       await db.collection('questions').doc(_currentQuestion.id).update({ answers_count: firebase.firestore.FieldValue.increment(1), status:'answered' });
       _currentQuestion.answers_count=(_currentQuestion.answers_count||0)+1; _currentQuestion.status='answered';
       _markQuestionSeen(_currentQuestion.id, _currentQuestion.answers_count);
