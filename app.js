@@ -2969,7 +2969,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.body.appendChild(_ctRoot);
   }
   function _ctWaitFor(sel, ms){
-    return new Promise(function(res){ var t0=Date.now(); (function p(){ var el=document.querySelector(sel); if(el){ var r=el.getBoundingClientRect(); if(r.width>0 && r.height>0) return res(el); } if(Date.now()-t0>ms) return res(null); setTimeout(p,120); })(); });
+    // Nimmt das erste SICHTBARE Element (die App hat pro Screen eine eigene Bottom-Nav mit gleichen IDs).
+    return new Promise(function(res){ var t0=Date.now(); (function p(){
+      var els=document.querySelectorAll(sel);
+      for(var i=0;i<els.length;i++){ var r=els[i].getBoundingClientRect(); if(r.width>0 && r.height>0) return res(els[i]); }
+      if(Date.now()-t0>ms) return res(null);
+      setTimeout(p,120);
+    })(); });
   }
   async function _ctGo(){
     var s=_ctSteps[_ctIdx]; if(!s){ _ctFinish(); return; }
