@@ -3910,16 +3910,31 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if (_wissenView === 'list' && activeScreen === 'screenWissen') renderWissenList();
     } catch(e) { /* Rules/Offline -> Liste bleibt */ }
   }
+  // Lokalisierte Ansicht eines Guides (i18n.es/en mit Fallback auf Deutsch)
+  function _gL(g){
+    var loc = (g && g.i18n && g.i18n[currentLang]) || null;
+    return {
+      title: (loc && loc.title) || g.title || '',
+      intro: (loc && loc.intro) || g.intro || '',
+      body:  (loc && loc.body)  || g.body  || '',
+      ctaLabel: (g.cta ? ((loc && loc.cta_label) || g.cta.label || t('wissen_cta')) : ''),
+      contacts: (g.contacts||[]).map(function(c,i){
+        var lc = (loc && Array.isArray(loc.contacts) && loc.contacts[i]) || null;
+        return { icon:c.icon, number:c.number, label:(lc&&lc.label)||c.label, note:(lc&&lc.note)||c.note };
+      })
+    };
+  }
   function renderWissenList(){
     _wissenView = 'list';
     var body = document.getElementById('wissenBody'); if (!body) return;
     var guides = _guidesCache || [];
     if (!guides.length) { body.innerHTML = '<div class="empty-state" style="padding:44px 16px"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><div class="empty-title">'+esc(t('wissen_empty'))+'</div></div>'; return; }
     body.innerHTML = guides.map(function(g){
+      var gl = _gL(g);
       return '<div class="detail-card" style="cursor:pointer;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:10px" onclick="openGuide(\''+g.id+'\')">'
         + '<div style="font-size:26px;line-height:1;flex-shrink:0">' + (g.icon || '📘') + '</div>'
-        + '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:15px;color:var(--text-1)">' + esc(g.title||'') + '</div>'
-        + (g.intro ? '<div style="font-size:13px;color:var(--text-2);margin-top:2px;line-height:1.4">' + esc(g.intro) + '</div>' : '') + '</div>'
+        + '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:15px;color:var(--text-1)">' + esc(gl.title) + '</div>'
+        + (gl.intro ? '<div style="font-size:13px;color:var(--text-2);margin-top:2px;line-height:1.4">' + esc(gl.intro) + '</div>' : '') + '</div>'
         + '<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="16" height="16" style="flex-shrink:0"><polyline points="9 18 15 12 9 6"/></svg>'
         + '</div>';
     }).join('');
@@ -3928,11 +3943,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var g = (_guidesCache||[]).find(function(x){ return x.id === id; }); if (!g) return;
     _wissenView = 'detail';
     var body = document.getElementById('wissenBody'); if (!body) return;
-    var bodyHtml = esc(g.body||'').replace(/\n/g,'<br>');
+    var gl = _gL(g);
+    var bodyHtml = esc(gl.body).replace(/\n/g,'<br>');
     var updated = g.updated_at ? (' · ' + t('wissen_updated') + ': ' + formatDate(g.updated_at)) : '';
     var contactsHtml = '';
-    if (Array.isArray(g.contacts) && g.contacts.length) {
-      contactsHtml = '<div style="margin-top:16px;display:flex;flex-direction:column;gap:9px">' + g.contacts.map(function(cc){
+    if (gl.contacts && gl.contacts.length) {
+      contactsHtml = '<div style="margin-top:16px;display:flex;flex-direction:column;gap:9px">' + gl.contacts.map(function(cc){
         var num = String(cc.number||'');
         var tel = num.replace(/[^0-9+]/g,'');
         return '<a href="tel:'+esc(tel)+'" style="display:flex;align-items:center;gap:12px;text-decoration:none;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 14px">'
@@ -3947,14 +3963,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var ctaHtml = '';
     if (g.cta && g.cta.category) {
       var _c = g.cta;
-      var _cLbl = esc(_c.label || t('wissen_cta'));
+      var _cLbl = esc(gl.ctaLabel || t('wissen_cta'));
       var _cArgs = "'"+esc(_c.category)+"','"+esc(_c.subcat||'Alle')+"','"+esc(_c.lang||'Alle')+"'";
       ctaHtml = '<button onclick="applyGuideCta('+_cArgs+')" style="margin-top:16px;width:100%;border:none;background:var(--yellow);color:#1a1400;font-weight:800;font-size:14.5px;padding:13px 16px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">'
         + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>'
         + _cLbl + '</button>';
     }
     body.innerHTML = '<div onclick="renderWissenList()" style="cursor:pointer;color:var(--yellow-dark);font-weight:700;font-size:13px;margin-bottom:12px;display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="15" height="15"><polyline points="15 18 9 12 15 6"/></svg>' + esc(t('wissen_back')) + '</div>'
-      + '<div class="detail-card" style="padding:16px 18px"><div style="font-size:21px;font-weight:800;color:var(--text-1);line-height:1.25">' + (g.icon ? g.icon + ' ' : '') + esc(g.title||'') + '</div>'
+      + '<div class="detail-card" style="padding:16px 18px"><div style="font-size:21px;font-weight:800;color:var(--text-1);line-height:1.25">' + (g.icon ? g.icon + ' ' : '') + esc(gl.title) + '</div>'
       + '<div style="font-size:14.5px;line-height:1.6;color:var(--text-1);margin-top:12px">' + bodyHtml + '</div>'
       + contactsHtml
       + ctaHtml
