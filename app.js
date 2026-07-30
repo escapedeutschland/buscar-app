@@ -3849,6 +3849,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     _updateBoardHeader();
     _maybeShowFcHint();
     loadQuestions();
+    _markAllMyQuestionsSeen(); // Board geöffnet -> eigene Fragen als gesehen markieren, Bubble-Badge leeren
   }
   function _maybeShowFcHint(){
     var el=document.getElementById('fcHint'); if(!el) return;
@@ -3929,6 +3930,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   var _homeQuestions = null;
   function _getSeenMap(){ try { return JSON.parse(localStorage.getItem('buscar_q_seen')||'{}') || {}; } catch(e){ return {}; } }
   function _markQuestionSeen(qid, answersCount){ try { var m=_getSeenMap(); m[qid]=answersCount||0; localStorage.setItem('buscar_q_seen', JSON.stringify(m)); } catch(e){} }
+  // Alle eigenen Fragen als gesehen markieren + Bubble-Badge leeren (beim Öffnen des Boards).
+  async function _markAllMyQuestionsSeen(){
+    if(!currentUser) return;
+    try {
+      var snap = await db.collection('questions').where('created_by','==',currentUser.uid).get();
+      var m=_getSeenMap();
+      snap.docs.forEach(function(d){ m[d.id]=(d.data().answers_count)||0; });
+      localStorage.setItem('buscar_q_seen', JSON.stringify(m));
+      _ansBadgeTs = Date.now();
+      var badge=document.getElementById('communityFabBadge'); if(badge) badge.style.display='none';
+    } catch(e){}
+  }
   var _ansBadgeTs = 0, _ansBadgeBusy = false;
   async function updateMyAnswerBadge(force){
     var badge = document.getElementById('communityFabBadge'); if(!badge) return;
@@ -5195,6 +5208,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!await confirmSheet('Dieses Duplikat wirklich aus der Datenbank löschen?')) return;
     try {
       await db.collection('listings').doc(id).delete();
+      _resolveReportsForListing(id);
       showToast('✓ Duplikat gelöscht');
       await loadListings();
       loadAdminDuplicates();
@@ -5374,6 +5388,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!await confirmSheet(t('del_entry_confirm'))) return;
     try {
       await db.collection('listings').doc(id).delete();
+      _resolveReportsForListing(id);
       var card = document.getElementById('adminCard_' + id);
       if (card) card.remove();
       showToast(t('toast_entry_deleted'));
@@ -6236,6 +6251,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if(!await confirmSheet(L('Diesen Eintrag wirklich endgültig löschen?','¿Eliminar este anuncio definitivamente?','Permanently delete this listing?'))) return;
     try{
       await db.collection('listings').doc(id).delete();
+      _resolveReportsForListing(id);
       _badgesCache = null; // Zählung/Badges neu laden lassen
       try{ await loadListings(); }catch(e){}
       if(typeof showToast==='function') showToast(L('✓ Eintrag gelöscht','✓ Eliminado','✓ Listing deleted'));
@@ -6708,6 +6724,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('reports').doc(reportId).update({ status: 'resolved' });
       document.getElementById('reportCard_'+reportId).remove();
     } catch(e) { showToast(t('err_generic')); }
+  }
+
+  // Offene Meldungen eines Eintrags automatisch als erledigt markieren, wenn der
+  // Eintrag gelöscht wird (verhindert "Eintrag gelöscht"-Meldungen, die ins Leere zeigen).
+  // Best-effort: kein Composite-Index nötig, Fehler blockieren das Löschen nicht.
+  async function _resolveReportsForListing(listingId) {
+    try {
+      var snap = await db.collection('reports').where('listing_id','==',listingId).get();
+      var batch = db.batch(); var n = 0;
+      snap.forEach(function(d){ if ((d.data().status||'pending') === 'pending') { batch.update(d.ref, { status: 'resolved' }); n++; } });
+      if (n) await batch.commit();
+    } catch(e) { /* best-effort, ignorieren */ }
   }
 
   // ── STANDORT-VORSCHLÄGE (location_suggestions) ─────────────────────────────
