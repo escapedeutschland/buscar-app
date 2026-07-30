@@ -3916,7 +3916,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if(l){ if(!Array.isArray(l.tags)) l.tags=[]; if(l.tags.map(function(x){return String(x).toLowerCase();}).indexOf(String(tag).toLowerCase())<0) l.tags.push(tag); _searchCache.delete(l); }
       var c=document.getElementById('tagsugCard_'+sugId); if(c) c.remove();
       showToast(L('✓ Tag übernommen','✓ Etiqueta aplicada','✓ Tag applied'));
-    } catch(e){ showToast(t('err_generic')||'Fehler'); }
+    } catch(e){ showToast('Fehler: '+((e&&e.code)||(e&&e.message)||'?')); }
   }
   async function rejectTagSuggestion(sugId){
     try { await db.collection('tag_suggestions').doc(sugId).update({ status:'rejected' });
@@ -3928,18 +3928,20 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   async function _loadOwnerTagSuggestions(listingId){
     var cont=document.getElementById('ownerTagSug'); if(!cont) return;
     try {
-      var snap=await db.collection('tag_suggestions').where('listing_id','==',listingId).where('status','==','pending').get();
-      if(snap.empty){ cont.innerHTML=''; return; }
+      // Nur EIN where (kein zusammengesetzter Index nötig), Status im Code filtern
+      var snap=await db.collection('tag_suggestions').where('listing_id','==',listingId).get();
+      var docs=snap.docs.filter(function(d){ return (d.data().status||'')==='pending'; });
+      if(!docs.length){ cont.innerHTML=''; return; }
       var tc=document.getElementById('detailTagsCard'); if(tc) tc.style.display='block';
       cont.innerHTML='<div style="margin-top:12px;border-top:1px solid var(--border);padding-top:11px"><div style="font-size:12.5px;font-weight:700;color:var(--text-1);margin-bottom:8px">💡 '+esc(L('Vorgeschlagene Merkmale','Etiquetas propuestas','Suggested features'))+'</div>'
-        + snap.docs.map(function(d){ var s=d.data();
+        + docs.map(function(d){ var s=d.data();
             return '<div id="ots_'+d.id+'" style="display:flex;align-items:center;gap:8px;padding:6px 0">'
               + '<span style="flex:1;min-width:0;font-size:13.5px;color:var(--text-1)">'+esc(tagLabel(s.tag))+'</span>'
               + '<button onclick="ownerApplyTag(\''+d.id+'\',\''+listingId+'\','+JSON.stringify(s.tag)+')" style="border:none;background:var(--yellow);color:#1a1400;font-weight:800;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer">'+esc(L('Übernehmen','Aplicar','Apply'))+'</button>'
               + '<button onclick="ownerRejectTag(\''+d.id+'\')" style="border:1px solid var(--border);background:transparent;color:var(--text-2);font-size:12px;padding:6px 10px;border-radius:8px;cursor:pointer">'+esc(L('Ablehnen','Rechazar','Dismiss'))+'</button>'
               + '</div>';
           }).join('') + '</div>';
-    } catch(e){ cont.innerHTML=''; } // Regeln evtl. noch nicht veröffentlicht
+    } catch(e){ cont.innerHTML=''; try{ console.warn('ownerTagSug', e&&e.code, e&&e.message); }catch(_){} }
   }
   async function ownerApplyTag(sugId, listingId, tag){
     try {
@@ -3950,7 +3952,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var row=document.getElementById('ots_'+sugId); if(row) row.remove();
       showToast(L('✓ Merkmal übernommen','✓ Etiqueta aplicada','✓ Feature applied'));
       showDetail(listingId);
-    } catch(e){ showToast(t('err_generic')||'Fehler'); }
+    } catch(e){ showToast('Fehler: '+((e&&e.code)||(e&&e.message)||'?')); }
   }
   async function ownerRejectTag(sugId){
     try { await db.collection('tag_suggestions').doc(sugId).update({ status:'rejected' });
@@ -6485,11 +6487,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (listing && listing.category_id === 'kat-immobilien') { section.innerHTML = ''; return; }
     if (!currentUser) { section.innerHTML = ''; return; }
     if (listing.owner_id === currentUser.uid) {
-      section.innerHTML = `<div class="detail-card owner-section verified">
-        <div class="owner-badge">⭐ Verifizierter Inhaber</div>
-        <button class="owner-edit-btn" onclick="openEditListing('${listing.id}')">Eintrag bearbeiten</button>
-      </div>
-      <div class="detail-card" style="background:linear-gradient(135deg,#FFF8EC 0%,white 100%)">
+      // Deals ergeben für Institutionen keinen Sinn -> Deal-Karte dort ausblenden
+      var _noDealSubcats = ['Schule','Behörde','Behörden','Botschaft','Polizei','Busbahnhof','Flughafen','Post'];
+      var _allowDeal = _noDealSubcats.indexOf(listing.subcategory||'') < 0;
+      var _dealCard = _allowDeal ? `<div class="detail-card" style="background:linear-gradient(135deg,#FFF8EC 0%,white 100%)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
           <div style="width:36px;height:36px;border-radius:50%;background:var(--yellow);display:flex;align-items:center;justify-content:center;color:white;font-weight:700"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" width="20" height="20"><path d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.78 0l-8-4a2 2 0 0 1-1.11-1.79V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z"/></svg></div>
           <div><div style="font-size:14px;font-weight:700;color:var(--text-1)">Buscar-Deal verwalten</div><div style="font-size:11px;color:var(--text-3)">Biete einen Vorteil für App-Nutzer</div></div>
@@ -6499,7 +6500,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         <input class="field-input" type="text" id="ownerDealCode" placeholder="Gutscheincode (optional)" value="${listing.deal_code||''}" style="font-size:13px;padding:10px 12px;margin-bottom:8px">
         <input class="field-input" type="text" id="ownerDealExpiry" placeholder="Gültig bis (z.B. 31.12.2025)" value="${listing.deal_expiry||''}" style="font-size:13px;padding:10px 12px;margin-bottom:8px">
         <div style="display:flex;gap:8px"><button onclick="saveOwnerDeal('${listing.id}')" style="flex:2;background:var(--yellow);color:white;border:none;border-radius:10px;padding:10px;font-weight:700;font-size:13px;cursor:pointer">Deal speichern</button>${listing.deal_text?`<button onclick="removeOwnerDeal('${listing.id}')" style="flex:1;background:var(--red-light);color:var(--red);border:none;border-radius:10px;padding:10px;font-weight:600;font-size:12px;cursor:pointer">Entfernen</button>`:''}</div>
-      </div>`;
+      </div>` : '';
+      section.innerHTML = `<div class="detail-card owner-section verified">
+        <div class="owner-badge">⭐ Verifizierter Inhaber</div>
+        <button class="owner-edit-btn" onclick="openEditListing('${listing.id}')">Eintrag bearbeiten</button>
+      </div>` + _dealCard;
       return;
     }
     // Eintrag hat bereits einen verifizierten Inhaber -> kein Claim-Button fuer andere Nutzer
