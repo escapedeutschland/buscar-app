@@ -6505,11 +6505,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       </div>` : '';
       // "Eintrag bearbeiten" nur zeigen, wenn nicht ohnehin die Bearbeiten/Löschen-Karte erscheint (Admin/Ersteller)
       var _hasCreatorControls = (currentUser.email === ADMIN_EMAIL) || (listing.created_by && listing.created_by === currentUser.uid);
-      var _editBtn = _hasCreatorControls ? '' : `<button class="owner-edit-btn" onclick="openEditListing('${listing.id}')">Eintrag bearbeiten</button>`;
-      section.innerHTML = `<div class="detail-card owner-section verified" style="display:flex;flex-direction:column;align-items:flex-start;gap:12px">
-        <div class="owner-badge">⭐ Verifizierter Inhaber</div>
-        ${_editBtn}
-      </div>` + _dealCard;
+      // Mit Edit-Button (echter Inhaber ohne weitere Controls): Karte. Sonst: nur der Chip, zentriert, ohne Container.
+      var _ownerHtml = _hasCreatorControls
+        ? `<div style="text-align:center;margin:2px 0 8px"><span class="owner-badge">⭐ Verifizierter Inhaber</span></div>`
+        : `<div class="detail-card owner-section verified" style="display:flex;flex-direction:column;align-items:flex-start;gap:12px"><div class="owner-badge">⭐ Verifizierter Inhaber</div><button class="owner-edit-btn" onclick="openEditListing('${listing.id}')">Eintrag bearbeiten</button></div>`;
+      section.innerHTML = _ownerHtml + _dealCard;
       return;
     }
     // Eintrag hat bereits einen verifizierten Inhaber -> kein Claim-Button fuer andere Nutzer
