@@ -3930,6 +3930,20 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var body = document.getElementById('wissenBody'); if (!body) return;
     var bodyHtml = esc(g.body||'').replace(/\n/g,'<br>');
     var updated = g.updated_at ? (' · ' + t('wissen_updated') + ': ' + formatDate(g.updated_at)) : '';
+    var contactsHtml = '';
+    if (Array.isArray(g.contacts) && g.contacts.length) {
+      contactsHtml = '<div style="margin-top:16px;display:flex;flex-direction:column;gap:9px">' + g.contacts.map(function(cc){
+        var num = String(cc.number||'');
+        var tel = num.replace(/[^0-9+]/g,'');
+        return '<a href="tel:'+esc(tel)+'" style="display:flex;align-items:center;gap:12px;text-decoration:none;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 14px">'
+          + '<div style="font-size:23px;line-height:1;flex-shrink:0">'+(cc.icon||'📞')+'</div>'
+          + '<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:14px;color:var(--text-1)">'+esc(cc.label||'')+'</div>'
+          + (cc.note?'<div style="font-size:12px;color:var(--text-2);margin-top:1px;line-height:1.35">'+esc(cc.note)+'</div>':'')+'</div>'
+          + '<div style="display:flex;align-items:center;gap:7px;flex-shrink:0"><span style="font-weight:800;font-size:18px;color:var(--yellow-dark);letter-spacing:.5px">'+esc(num)+'</span>'
+          + '<svg viewBox="0 0 24 24" fill="none" stroke="var(--yellow-dark)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div>'
+          + '</a>';
+      }).join('') + '</div>';
+    }
     var ctaHtml = '';
     if (g.cta && g.cta.category) {
       var _c = g.cta;
@@ -3942,6 +3956,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     body.innerHTML = '<div onclick="renderWissenList()" style="cursor:pointer;color:var(--yellow-dark);font-weight:700;font-size:13px;margin-bottom:12px;display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="15" height="15"><polyline points="15 18 9 12 15 6"/></svg>' + esc(t('wissen_back')) + '</div>'
       + '<div class="detail-card" style="padding:16px 18px"><div style="font-size:21px;font-weight:800;color:var(--text-1);line-height:1.25">' + (g.icon ? g.icon + ' ' : '') + esc(g.title||'') + '</div>'
       + '<div style="font-size:14.5px;line-height:1.6;color:var(--text-1);margin-top:12px">' + bodyHtml + '</div>'
+      + contactsHtml
       + ctaHtml
       + '<div style="font-size:11.5px;color:var(--text-3);margin-top:18px;border-top:1px solid var(--border);padding-top:10px">' + esc(t('wissen_disclaimer')) + updated + '</div></div>';
     var sc = document.getElementById('wissenScroll'); if (sc) sc.scrollTop = 0;
