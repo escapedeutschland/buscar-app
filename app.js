@@ -191,7 +191,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       tagline: 'Der Guide für Paraguay', guest_name: 'Gast', guest_login_cta: 'Einloggen / Registrieren', continue_guest: 'Als Gast fortfahren →', login_required: 'Bitte melde dich an oder registriere dich', open_now: 'Geöffnet', closed_now: 'Geschlossen', badge_new: 'Neu',
       // Profile
       to_home: 'Zur Startseite', suggest_entry_prof: 'Eintrag vorschlagen',
-      admin_panel: 'Admin Panel', change_username: 'Benutzername ändern',
+      admin_panel: 'Admin Panel', change_username: 'Benutzername ändern', replay_tour: 'App-Einführung ansehen',
       change_password: 'Passwort ändern', change_email: 'E-Mail ändern', my_favorites: 'Meine Favoriten',
       // Map
       map_title: 'Karte', map_sub_all: 'Alle Orte in Paraguay',
@@ -449,7 +449,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       tagline: 'La guía para Paraguay', guest_name: 'Invitado', guest_login_cta: 'Iniciar sesión / Registrarse', continue_guest: 'Continuar como invitado →', login_required: 'Iniciá sesión o registrate', open_now: 'Abierto', closed_now: 'Cerrado', badge_new: 'Nuevo',
       // Perfil
       to_home: 'Ir al inicio', suggest_entry_prof: 'Sugerir lugar',
-      admin_panel: 'Panel admin', change_username: 'Cambiar usuario',
+      admin_panel: 'Panel admin', change_username: 'Cambiar usuario', replay_tour: 'Ver introducción de la app',
       change_password: 'Cambiar contraseña', change_email: 'Cambiar correo', my_favorites: 'Mis favoritos',
       // Mapa
       map_title: 'Mapa', map_sub_all: 'Todos los lugares en Paraguay',
@@ -707,7 +707,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       tagline: 'The guide for Paraguay', guest_name: 'Guest', guest_login_cta: 'Log in / Sign up', continue_guest: 'Continue as guest →', login_required: 'Please log in or sign up', open_now: 'Open', closed_now: 'Closed', badge_new: 'New',
       // Profile
       to_home: 'To home', suggest_entry_prof: 'Suggest a place',
-      admin_panel: 'Admin panel', change_username: 'Change username',
+      admin_panel: 'Admin panel', change_username: 'Change username', replay_tour: 'View app intro',
       change_password: 'Change password', change_email: 'Change email', my_favorites: 'My favorites',
       // Map
       map_title: 'Map', map_sub_all: 'All places in Paraguay',
