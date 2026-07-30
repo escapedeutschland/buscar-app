@@ -2982,6 +2982,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   async function _ctGo(){
     var s=_ctSteps[_ctIdx]; if(!s){ _ctFinish(); return; }
     if(s.screen && typeof activeScreen!=='undefined' && activeScreen!==s.screen){ try{ if(s.nav) setNav(s.nav); showScreen(s.screen); }catch(e){} await new Promise(function(r){ setTimeout(r,480); }); }
+    if(!s.sel){ _ctRender(s, null); return; } // Station ohne Ziel (Begrüßung) -> zentriert, nicht überspringen
     var el=await _ctWaitFor(s.sel, s.screen==='screenMap'?2800:1400);
     if(!el && _ctIdx<_ctSteps.length-1){ _ctIdx++; return _ctGo(); } // Ziel fehlt -> überspringen (bricht nie)
     _ctRender(s, el);
