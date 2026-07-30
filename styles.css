@@ -42,6 +42,8 @@
     .ct-btn-pri { border:none; background:var(--yellow); color:#1a1400; font-weight:800; font-size:13.5px; padding:9px 18px; border-radius:10px; cursor:pointer; }
     .ct-skip { text-align:center; font-size:11.5px; color:var(--text-3); margin-top:10px; cursor:pointer; }
     .ct-caret { position:absolute; width:14px; height:14px; background:var(--card); transform:rotate(45deg); }
+    .ct-icon { font-size:48px; line-height:1; text-align:center; margin-bottom:8px; }
+    .ct-tip.ct-tip-center { text-align:center; }
     .splash-name { font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:white; }
     .splash-dot { width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.6);animation:splashPulse 1.2s ease-in-out infinite; }
     .splash-dot:nth-child(2){animation-delay:0.2s}.splash-dot:nth-child(3){animation-delay:0.4s}
