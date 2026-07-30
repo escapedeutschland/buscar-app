@@ -27,7 +27,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       share_cta: 'Entdeckt auf Buscar – dem Guide für Paraguay. Lade dir die App auch herunter! 👇',
       tags_title: 'Merkmale & Tags',
       lang_title: 'Gesprochene Sprachen', lang_hint: 'Welche Sprachen werden hier gesprochen? Hilft besonders Auswanderern.', lang_detail: 'Spricht', filter_lang_title: 'Sprache',
-      wissen_title: 'Ankommen in Paraguay', wissen_sub: 'Praktische Guides fürs Leben in Paraguay', wissen_entry: 'Ankommen in Paraguay', wissen_empty: 'Bald verfügbar – die Guides sind in Arbeit.', wissen_back: 'Zurück zur Übersicht', wissen_disclaimer: 'Ohne Gewähr – bitte immer bei den offiziellen Stellen prüfen.', wissen_updated: 'Stand',
+      wissen_title: 'Ankommen in Paraguay', wissen_sub: 'Praktische Guides fürs Leben in Paraguay', wissen_entry: 'Ankommen in Paraguay', wissen_empty: 'Bald verfügbar – die Guides sind in Arbeit.', wissen_back: 'Zurück zur Übersicht', wissen_disclaimer: 'Ohne Gewähr – bitte immer bei den offiziellen Stellen prüfen.', wissen_updated: 'Stand', wissen_cta: 'Passende Einträge in Buscar finden',
       tags_hint: 'Hilf anderen, diesen Ort zu finden. Wähle passende Merkmale oder füge eigene Stichwörter hinzu (z. B. „fluoridfreie Zahnpasta").',
       tags_empty_hint: 'Noch keine Merkmale hinterlegt. Kennst du welche?',
       tag_suggest: 'Merkmal vorschlagen',
@@ -284,7 +284,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       share_cta: 'Descubierto en Buscar – la guía para Paraguay. ¡Descargate la app también! 👇',
       tags_title: 'Características y etiquetas',
       lang_title: 'Idiomas hablados', lang_hint: '¿Qué idiomas se hablan aquí? Ayuda especialmente a los recién llegados.', lang_detail: 'Habla', filter_lang_title: 'Idioma',
-      wissen_title: 'Llegar a Paraguay', wissen_sub: 'Guías prácticas para vivir en Paraguay', wissen_entry: 'Llegar a Paraguay', wissen_empty: 'Próximamente – las guías están en preparación.', wissen_back: 'Volver al índice', wissen_disclaimer: 'Sin garantía – confirmá siempre con las entidades oficiales.', wissen_updated: 'Actualizado',
+      wissen_title: 'Llegar a Paraguay', wissen_sub: 'Guías prácticas para vivir en Paraguay', wissen_entry: 'Llegar a Paraguay', wissen_empty: 'Próximamente – las guías están en preparación.', wissen_back: 'Volver al índice', wissen_disclaimer: 'Sin garantía – confirmá siempre con las entidades oficiales.', wissen_updated: 'Actualizado', wissen_cta: 'Encontrar lugares en Buscar',
       tags_hint: 'Ayudá a otros a encontrar este lugar. Elegí características o agregá tus propias palabras clave (p. ej. „pasta dental sin flúor").',
       tags_empty_hint: 'Todavía no hay características. ¿Conocés alguna?',
       tag_suggest: 'Sugerir característica',
@@ -541,7 +541,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       share_cta: 'Discovered on Buscar – the guide for Paraguay. Download the app too! 👇',
       tags_title: 'Features & tags',
       lang_title: 'Languages spoken', lang_hint: 'Which languages are spoken here? Especially helpful for newcomers.', lang_detail: 'Speaks', filter_lang_title: 'Language',
-      wissen_title: 'Arriving in Paraguay', wissen_sub: 'Practical guides for life in Paraguay', wissen_entry: 'Arriving in Paraguay', wissen_empty: 'Coming soon – guides are in preparation.', wissen_back: 'Back to overview', wissen_disclaimer: 'No guarantee – please always verify with official bodies.', wissen_updated: 'Updated',
+      wissen_title: 'Arriving in Paraguay', wissen_sub: 'Practical guides for life in Paraguay', wissen_entry: 'Arriving in Paraguay', wissen_empty: 'Coming soon – guides are in preparation.', wissen_back: 'Back to overview', wissen_disclaimer: 'No guarantee – please always verify with official bodies.', wissen_updated: 'Updated', wissen_cta: 'Find matching places in Buscar',
       tags_hint: 'Help others find this place. Choose matching features or add your own keywords (e.g. "fluoride-free toothpaste").',
       tags_empty_hint: 'No features yet. Do you know any?',
       tag_suggest: 'Suggest feature',
@@ -3930,11 +3930,45 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var body = document.getElementById('wissenBody'); if (!body) return;
     var bodyHtml = esc(g.body||'').replace(/\n/g,'<br>');
     var updated = g.updated_at ? (' · ' + t('wissen_updated') + ': ' + formatDate(g.updated_at)) : '';
+    var ctaHtml = '';
+    if (g.cta && g.cta.category) {
+      var _c = g.cta;
+      var _cLbl = esc(_c.label || t('wissen_cta'));
+      var _cArgs = "'"+esc(_c.category)+"','"+esc(_c.subcat||'Alle')+"','"+esc(_c.lang||'Alle')+"'";
+      ctaHtml = '<button onclick="applyGuideCta('+_cArgs+')" style="margin-top:16px;width:100%;border:none;background:var(--yellow);color:#1a1400;font-weight:800;font-size:14.5px;padding:13px 16px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">'
+        + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>'
+        + _cLbl + '</button>';
+    }
     body.innerHTML = '<div onclick="renderWissenList()" style="cursor:pointer;color:var(--yellow-dark);font-weight:700;font-size:13px;margin-bottom:12px;display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="15" height="15"><polyline points="15 18 9 12 15 6"/></svg>' + esc(t('wissen_back')) + '</div>'
       + '<div class="detail-card" style="padding:16px 18px"><div style="font-size:21px;font-weight:800;color:var(--text-1);line-height:1.25">' + (g.icon ? g.icon + ' ' : '') + esc(g.title||'') + '</div>'
       + '<div style="font-size:14.5px;line-height:1.6;color:var(--text-1);margin-top:12px">' + bodyHtml + '</div>'
+      + ctaHtml
       + '<div style="font-size:11.5px;color:var(--text-3);margin-top:18px;border-top:1px solid var(--border);padding-top:10px">' + esc(t('wissen_disclaimer')) + updated + '</div></div>';
     var sc = document.getElementById('wissenScroll'); if (sc) sc.scrollTop = 0;
+  }
+  // Führt vom Guide zum gefilterten Home-Screen (Kategorie/Unterkategorie/Sprache)
+  function applyGuideCta(catId, subcat, lang){
+    setNav('navHome'); showScreen('screenHome');
+    activeCategory = catId || 'Alle';
+    activeSubcat = subcat || 'Alle';
+    activeLang = lang || 'Alle';
+    activeMinStars = 0; activeTags = []; _tagFilterTemp = [];
+    searchQuery = '';
+    var si = document.getElementById('searchInput'); if (si) si.value = '';
+    var sclr = document.getElementById('searchClear'); if (sclr) sclr.classList.remove('visible');
+    document.querySelectorAll('#catsScroll .cat-chip').forEach(function(c){ c.classList.toggle('active', c.dataset.cat === activeCategory); });
+    var filterBar = document.getElementById('filterBar');
+    if (filterBar) filterBar.style.display = (activeCategory === 'Alle') ? 'none' : 'block';
+    var subBtn = document.getElementById('filterSubBtn'), subLabel = document.getElementById('filterSubLabel');
+    if (subBtn){ if (activeSubcat !== 'Alle'){ subBtn.classList.add('active'); if(subLabel) subLabel.textContent = tSubcat(activeSubcat); } else { subBtn.classList.remove('active'); if(subLabel) subLabel.textContent = 'Unterkategorie'; } }
+    var starBtn = document.getElementById('filterStarBtn'), starLabel = document.getElementById('filterStarLabel');
+    if (starBtn){ starBtn.classList.remove('active'); if(starLabel) starLabel.textContent = 'Bewertung'; }
+    var tagsBtn = document.getElementById('filterTagsBtn'), tagsLabel = document.getElementById('filterTagsLabel');
+    if (tagsBtn){ tagsBtn.classList.remove('active'); if(tagsLabel) tagsLabel.textContent = t('filter_features'); }
+    var langBtn = document.getElementById('filterLangBtn'), langLabel = document.getElementById('filterLangLabel');
+    if (langBtn){ if (activeLang !== 'Alle'){ langBtn.classList.add('active'); if(langLabel) langLabel.textContent = LANG_NAMES[activeLang]||activeLang; } else { langBtn.classList.remove('active'); if(langLabel) langLabel.textContent = t('filter_lang_title'); } }
+    renderListings();
+    var lc = document.querySelector('.listings'); if (lc && lc.scrollTo) { lc.scrollTo(0,0); } else if (lc) { lc.scrollTop = 0; }
   }
   function _updateBoardHeader(){
     var title = document.querySelector('#screenQuestions .form-title');
