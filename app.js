@@ -26,6 +26,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       link_copied: '🔗 Link kopiert',
       share_cta: 'Entdeckt auf Buscar – dem Guide für Paraguay. Lade dir die App auch herunter! 👇',
       tags_title: 'Merkmale & Tags',
+      lang_title: 'Gesprochene Sprachen', lang_hint: 'Welche Sprachen werden hier gesprochen? Hilft besonders Auswanderern.', lang_detail: 'Spricht', filter_lang_title: 'Sprache',
       tags_hint: 'Hilf anderen, diesen Ort zu finden. Wähle passende Merkmale oder füge eigene Stichwörter hinzu (z. B. „fluoridfreie Zahnpasta").',
       tags_empty_hint: 'Noch keine Merkmale hinterlegt. Kennst du welche?',
       tag_suggest: 'Merkmal vorschlagen',
@@ -281,6 +282,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       link_copied: '🔗 Enlace copiado',
       share_cta: 'Descubierto en Buscar – la guía para Paraguay. ¡Descargate la app también! 👇',
       tags_title: 'Características y etiquetas',
+      lang_title: 'Idiomas hablados', lang_hint: '¿Qué idiomas se hablan aquí? Ayuda especialmente a los recién llegados.', lang_detail: 'Habla', filter_lang_title: 'Idioma',
       tags_hint: 'Ayudá a otros a encontrar este lugar. Elegí características o agregá tus propias palabras clave (p. ej. „pasta dental sin flúor").',
       tags_empty_hint: 'Todavía no hay características. ¿Conocés alguna?',
       tag_suggest: 'Sugerir característica',
@@ -536,6 +538,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       link_copied: '🔗 Link copied',
       share_cta: 'Discovered on Buscar – the guide for Paraguay. Download the app too! 👇',
       tags_title: 'Features & tags',
+      lang_title: 'Languages spoken', lang_hint: 'Which languages are spoken here? Especially helpful for newcomers.', lang_detail: 'Speaks', filter_lang_title: 'Language',
       tags_hint: 'Help others find this place. Choose matching features or add your own keywords (e.g. "fluoride-free toothpaste").',
       tags_empty_hint: 'No features yet. Do you know any?',
       tag_suggest: 'Suggest feature',
@@ -2953,6 +2956,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   // Filter state
   let activeSubcat = 'Alle';
+  let activeLang = 'Alle'; // Sprachfilter (spricht ...)
   let activeMinStars = 0;
   let activeOpenNow = false;
   let activeDeal = false;
@@ -2993,6 +2997,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           return '<div class="filter-chip' + (on ? ' active' : '') + '" onclick="toggleTagFilter(this,' + idx + ')">' + esc(tagLabel(k)) + '</div>';
         }).join('') + '</div></div>';
       }
+    } else if (mode === 'lang') {
+      document.getElementById('filterSheetTitle').textContent = t('filter_lang_title');
+      var langOpts = [['Alle', t('stars_all')], ['de','Deutsch'], ['en','English'], ['es','Español'], ['gn','Guaraní']];
+      content.innerHTML = '<div class="filter-section"><div class="filter-chips">' + langOpts.map(function(o){
+        return '<div class="filter-chip'+(activeLang===o[0]?' active':'')+'" onclick="selectLangFilter(\''+o[0]+'\')">'+esc(o[1])+'</div>';
+      }).join('') + '</div></div>';
     } else if (mode === 'sub') {
       document.getElementById('filterSheetTitle').textContent = 'Unterkategorie';
       const cats = subcats[activeCategory] || [];
@@ -3033,6 +3043,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function selectFilterChip(val) {
     activeSubcat = val;
     document.querySelectorAll('#filterSheetContent .filter-chip').forEach(c => c.classList.toggle('active', c.textContent === val));
+  }
+
+  function selectLangFilter(val) {
+    activeLang = val;
+    document.querySelectorAll('#filterSheetContent .filter-chip').forEach(c => c.classList.remove('active'));
+    if (typeof event !== 'undefined' && event && event.target) event.target.classList.add('active');
   }
 
   function toggleTagFilter(el, idx) {
@@ -3081,6 +3097,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var baseLbl = t('filter_features');
       if (activeTags.length) { tagsBtn.classList.add('active'); tagsLabel.textContent = baseLbl + ' (' + activeTags.length + ')'; }
       else { tagsBtn.classList.remove('active'); tagsLabel.textContent = baseLbl; }
+    }
+    var langBtn = document.getElementById('filterLangBtn'), langLabel = document.getElementById('filterLangLabel');
+    if (langBtn) {
+      if (activeLang !== 'Alle') { langBtn.classList.add('active'); langLabel.textContent = LANG_NAMES[activeLang] || activeLang; }
+      else { langBtn.classList.remove('active'); langLabel.textContent = t('filter_lang_title'); }
     }
     renderListings();
   }
@@ -3198,6 +3219,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (activeCategory !== 'Alle') filtered = filtered.filter(l => l.category_id === activeCategory);
     if (activeCity !== 'Alle') filtered = filtered.filter(l => norm(l.city||'') === norm(activeCity));
     if (activeSubcat !== 'Alle') filtered = filtered.filter(l => norm(l.subcategory||'') === norm(activeSubcat));
+    if (activeLang !== 'Alle') filtered = filtered.filter(l => Array.isArray(l.languages) && l.languages.indexOf(activeLang) >= 0);
     if (activeMinStars > 0) filtered = filtered.filter(l => { const avg = getAvgRating(l.id); return avg && avg >= activeMinStars; });
     if (activeOpenNow) filtered = filtered.filter(l => isOpen(l.opening_hours) === true);
     if (activeDeal) filtered = filtered.filter(l => l.deal_text && l.deal_text.trim() !== '');
@@ -3471,6 +3493,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     descEl.dataset.original = descContent;
     descEl.dataset.tlang = '';
     (function(){
+      // Gesprochene Sprachen anzeigen
+      var _langs = Array.isArray(l.languages) ? l.languages : [];
+      var lc=document.getElementById('detailLangsCard'), le=document.getElementById('detailLangs');
+      if(lc && le){ if(_langs.length){ le.innerHTML = _langs.map(function(k){ return '<span class="detail-lang">'+esc(LANG_NAMES[k]||k)+'</span>'; }).join(''); lc.style.display='block'; } else { lc.style.display='none'; } }
       var tc=document.getElementById('detailTagsCard'), te=document.getElementById('detailTags');
       if(!tc||!te) return;
       var tags=Array.isArray(l.tags)?l.tags:[];
@@ -3735,6 +3761,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   };
   function tagLabel(k){ var e=TAG_LABELS[k]; if(e) return e[currentLang]||e.de||k; return k; }
   function tagSearchStr(tags){ if(!tags||!tags.length) return ''; return tags.map(function(k){var e=TAG_LABELS[k]; return e?(k+' '+(e.de||'')+' '+(e.es||'')):k;}).join(' '); }
+
+  // Gesprochene Sprachen (Auswahl-Chips in Create/Edit, Anzeige im Detail, Filter)
+  var LANG_NAMES = { de:'Deutsch', en:'English', es:'Español', gn:'Guaraní' };
+  function toggleLangChip(btn){ if(btn) btn.classList.toggle('active'); }
+  function _readLangChips(containerId){ return Array.prototype.slice.call(document.querySelectorAll('#'+containerId+' .lang-chip.active')).map(function(b){ return b.getAttribute('data-lang'); }); }
+  function _setLangChips(containerId, langs){ langs = langs||[]; document.querySelectorAll('#'+containerId+' .lang-chip').forEach(function(b){ b.classList.toggle('active', langs.indexOf(b.getAttribute('data-lang'))>=0); }); }
 
   // Tag-Auswahl im Formular (Create + Edit + Vorschlag)
   var formTags = [], editTags = [], suggestTags = [], _editCatId = '', _suggestCatId = '', _suggestListing = null;
@@ -4870,7 +4902,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           re_rooms: _num('reRooms')
         };
       }
-      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: (()=>{ const d=document.getElementById('hoursDay').value; const f=document.getElementById('hoursFrom').value; const t=document.getElementById('hoursTo').value; const f2=document.getElementById('hoursFrom2').value; const t2=document.getElementById('hoursTo2').value; let val=''; if(d&&f&&t){val=d+' '+f+'-'+t; if(f2&&t2) val+=' & '+f2+'-'+t2;} const imported=(document.getElementById('newHours').value||'').trim(); if(val) document.getElementById('newHours').value=val; return val || imported || null; })(), lat: window._newLat, lng: window._newLng, tags: formTags.slice(), verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date(), ...reFields });
+      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: (()=>{ const d=document.getElementById('hoursDay').value; const f=document.getElementById('hoursFrom').value; const t=document.getElementById('hoursTo').value; const f2=document.getElementById('hoursFrom2').value; const t2=document.getElementById('hoursTo2').value; let val=''; if(d&&f&&t){val=d+' '+f+'-'+t; if(f2&&t2) val+=' & '+f2+'-'+t2;} const imported=(document.getElementById('newHours').value||'').trim(); if(val) document.getElementById('newHours').value=val; return val || imported || null; })(), lat: window._newLat, lng: window._newLng, tags: formTags.slice(), languages: _readLangChips('newLangChips'), verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date(), ...reFields });
       if (pendingFormPhotos.length) await uploadFormPhotos(ref.id);
       if (cat === 'kat-immobilien' && window._reCoverFile) {
         try {
@@ -4895,7 +4927,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       document.getElementById('newCategory').value = '';
       var _cfReset = document.getElementById('categoryField'); if (_cfReset) _cfReset.style.display = '';
       try { updateSubcatOptions(); } catch(e){}
-      formTags = []; _refreshTags('form');
+      formTags = []; _refreshTags('form'); _setLangChips('newLangChips', []);
       document.getElementById('nameCounter').textContent = '0 / 60';
       document.getElementById('descCounter').textContent = '0 / 500';
       window._newLat = null; window._newLng = null;
@@ -6335,6 +6367,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('editListingSuccess').style.display = 'none';
     document.getElementById('editListingBack').onclick = function() { showDetail(currentEditListingId); };
     _editCatId = l.category_id || ''; editTags = Array.isArray(l.tags) ? l.tags.slice() : []; _refreshTags('edit');
+    _setLangChips('editLangChips', Array.isArray(l.languages) ? l.languages : []);
     var _ef = document.getElementById('editImmoFields');
     if (_ef) {
       if (l.category_id === 'kat-immobilien') {
@@ -6386,9 +6419,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         address: document.getElementById('editAddress').value.trim() || null,
         opening_hours: document.getElementById('editHours').value.trim() || null,
         tags: editTags.slice(),
+        languages: _readLangChips('editLangChips'),
         updated_at: new Date(), ...reEdit, ...locUpdate
       });
-      if (_el) _el.tags = editTags.slice();
+      if (_el) { _el.tags = editTags.slice(); _el.languages = _readLangChips('editLangChips'); }
       if (_el && locUpdate.lat != null) { _el.lat = locUpdate.lat; _el.lng = locUpdate.lng; }
       document.getElementById('editListingSuccess').style.display = 'block';
       await loadListings();
@@ -6619,11 +6653,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (activeCategory === 'Alle') {
       filterBar.style.display = 'none';
       // Reset filters when going back to "All"
-      activeSubcat = 'Alle'; activeMinStars = 0;
+      activeSubcat = 'Alle'; activeMinStars = 0; activeLang = 'Alle';
       const subBtn = document.getElementById('filterSubBtn'); const starBtn = document.getElementById('filterStarBtn');
       if (subBtn) subBtn.classList.remove('active'); if (starBtn) starBtn.classList.remove('active');
       const subLabel = document.getElementById('filterSubLabel'); const starLabel = document.getElementById('filterStarLabel');
       if (subLabel) subLabel.textContent = 'Unterkategorie'; if (starLabel) starLabel.textContent = 'Bewertung';
+      const _lb = document.getElementById('filterLangBtn'); if (_lb) _lb.classList.remove('active');
+      const _ll = document.getElementById('filterLangLabel'); if (_ll) _ll.textContent = t('filter_lang_title');
     } else { filterBar.style.display = 'block'; }
     renderListings();
   });
