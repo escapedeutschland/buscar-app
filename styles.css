@@ -26,6 +26,7 @@
     #splash { position:fixed;inset:0;background:linear-gradient(180deg,#F5A623 0%,#F5A623 40%,#D4841A 75%,#B8661A 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:99999; }
     #splash.hidden { display:none; }
     .splash-icon { width:80px;height:80px;background:rgba(255,255,255,0.22);border-radius:22px;display:flex;align-items:center;justify-content:center; }
+    .splash-icon svg { width:44px;height:44px;display:block;flex-shrink:0; }
     .splash-name { font-family:'Fraunces',serif;font-size:36px;font-weight:700;color:white; }
     .splash-dot { width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.6);animation:splashPulse 1.2s ease-in-out infinite; }
     .splash-dot:nth-child(2){animation-delay:0.2s}.splash-dot:nth-child(3){animation-delay:0.4s}
