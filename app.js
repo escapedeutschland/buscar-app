@@ -2993,8 +2993,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       +'<button class="ct-btn-pri" id="ctNext">'+esc(last?L('Fertig','Listo','Done'):L('Weiter','Siguiente','Next'))+'</button>'
       +'</div></div>'
       +'<div class="ct-skip" id="ctSkip">'+esc(L('Tour überspringen','Saltar tour','Skip tour'))+'</div>';
-    tip.style.visibility='hidden';
-    requestAnimationFrame(function(){
+    // Synchron positionieren (offsetWidth erzwingt Layout) -> unabhängig von requestAnimationFrame
+    (function(){
       var tw=tip.offsetWidth, th=tip.offsetHeight, left, top, caretTop=false;
       if(r){
         left=Math.min(Math.max(12, r.left+r.width/2 - tw/2), vw-tw-12);
@@ -3003,7 +3003,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       tip.style.left=left+'px'; tip.style.top=top+'px'; tip.style.visibility='visible';
       var caret=document.getElementById('ctCaret');
       if(r && caret){ var cx=Math.min(Math.max(14, r.left+r.width/2 - left), tw-14); caret.style.display='block'; caret.style.left=(cx-7)+'px'; if(caretTop) caret.style.top='-6px'; else caret.style.bottom='-6px'; }
-    });
+    })();
     var nx=document.getElementById('ctNext'); nx.onclick=function(){ if(last) _ctFinish(); else { _ctIdx++; _ctGo(); } };
     var bk=document.getElementById('ctBack'); if(bk) bk.onclick=function(){ if(_ctIdx>0){ _ctIdx--; _ctGo(); } };
     document.getElementById('ctSkip').onclick=_ctFinish;
@@ -3014,7 +3014,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if(root){ root.style.opacity='0'; setTimeout(function(){ if(root.parentNode) root.parentNode.removeChild(root); },300); }
     try{ setNav('navHome'); showScreen('screenHome'); }catch(e){}
   }
-  function showWelcomeTour(){ _ctSteps=_ctBuildSteps(); _ctIdx=0; _ctEnsureRoot(); requestAnimationFrame(function(){ if(_ctRoot) _ctRoot.style.opacity='1'; }); _ctGo(); }
+  function showWelcomeTour(){ _ctSteps=_ctBuildSteps(); _ctIdx=0; _ctEnsureRoot(); setTimeout(function(){ if(_ctRoot) _ctRoot.style.opacity='1'; }, 20); _ctGo(); }
 
   // Blendet versehentliche Doppel-Eintraege aus: immer per ID (sicher) und – wenn
   // Koordinaten vorhanden sind – per Name + exakter Position (gleicher Name an exakt
