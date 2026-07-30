@@ -1182,6 +1182,59 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     return c;
   }
 
+  // Smart-Synonyme: sprachübergreifende Begriffs-Gruppen (normalisiert: ä→a, ü→u, ö→o, Akzente weg).
+  // Erweitert die Suche um sinnverwandte Wörter (ES/EN/DE) -> „farmacia" findet Apotheken usw. Rein clientseitig.
+  var SEARCH_SYN = [
+    ['apotheke','farmacia','pharmacy'],
+    ['backerei','panaderia','bakery','backwaren','brot','konditorei'],
+    ['supermarkt','supermercado','supermarket','lebensmittel','comestibles','despensa','almacen','markt','mercado'],
+    ['arzt','medico','doctor','doktor','consultorio','arztpraxis','sprechstunde','clinica','klinik','hospital','krankenhaus'],
+    ['zahnarzt','dentista','odontologo','odontologia','dental'],
+    ['tierarzt','veterinario','veterinaria'],
+    ['restaurant','restaurante','comida','essen','gastronomia','lokal','speisen'],
+    ['bar','kneipe','cerveceria','cocktail'],
+    ['parrilla','grill','asado','steakhaus','churrasqueria'],
+    ['cafe','cafeteria','kaffee','coffee'],
+    ['heladeria','eisdiele','helado'],
+    ['metzgerei','carniceria','fleisch','carne'],
+    ['bank','banco','geldautomat','cajero'],
+    ['wechselstube','cambio','geldwechsel','wechseln','casa de cambio'],
+    ['genossenschaft','cooperativa','kooperative'],
+    ['friseur','peluqueria','barbershop','barber','haarschnitt','coiffure','frisor'],
+    ['beauty','kosmetik','estetica','spa','wellness','manicura'],
+    ['hotel','unterkunft','hospedaje','alojamiento','posada','hostal','hostel','pension','cabanas'],
+    ['tankstelle','gasolinera','combustible','benzin','nafta','kraftstoff','tanken','estacion de servicio'],
+    ['reifen','gomeria','reifenservice','neumaticos','llantas','gomas'],
+    ['werkstatt','taller','mecanico','reparatur','autowerkstatt'],
+    ['anwalt','abogado','rechtsanwalt','jurist'],
+    ['notar','escribano','escribania','notario'],
+    ['schule','colegio','escuela','bildung'],
+    ['universitat','universidad','hochschule'],
+    ['versicherung','seguro'],
+    ['telekommunikation','internet','celular','handy','movil','telefonia'],
+    ['baumarkt','ferreteria','eisenwaren','werkzeug','baumaterial','herramientas'],
+    ['fitness','fitnessstudio','gimnasio','crossfit'],
+    ['kirche','iglesia','templo'],
+    ['museum','museo'],
+    ['glutenfrei','celiaco','zoliakie','sin gluten'],
+    ['vegan','vegano'],
+    ['vegetarisch','vegetariano'],
+    ['lieferung','delivery','envio','reparto','entrega']
+  ];
+  // Erweitert eine (normalisierte) Suchanfrage um synonyme Begriffe. Einmal pro Suche berechnet.
+  function _expandQuery(q){
+    if(!q || q.length<3) return [];
+    var qw = q.split(' '), out = [];
+    for(var i=0;i<SEARCH_SYN.length;i++){
+      var g = SEARCH_SYN[i], hit=false;
+      for(var j=0;j<g.length;j++){ var t=g[j];
+        if(t===q || qw.indexOf(t)>=0 || (t.indexOf(' ')>=0 && q.indexOf(t)>=0)){ hit=true; break; }
+      }
+      if(hit){ for(var k=0;k<g.length;k++){ if(g[k].length>=3 && out.indexOf(g[k])<0) out.push(g[k]); } }
+    }
+    return out;
+  }
+
   function getAvgRating(listingId) {
     // Bevorzugt das Aggregat am Eintrag (rating_sum/rating_count) -> keine Reviews-Lesung nötig
     var l = _listingIndex.get(listingId) || allListings.find(function(x){ return x.id === listingId; });
@@ -3277,7 +3330,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (activeOpenNow) filtered = filtered.filter(l => isOpen(l.opening_hours) === true);
     if (activeDeal) filtered = filtered.filter(l => l.deal_text && l.deal_text.trim() !== '');
     if (activeTags.length) filtered = filtered.filter(l => { const lt = (l.tags||[]).map(x => String(x).toLowerCase()); return activeTags.every(k => lt.indexOf(String(k).toLowerCase()) >= 0); });
-    if (searchQuery) { const q = norm(searchQuery); filtered = filtered.filter(l => _searchBlob(l).includes(q)); }
+    if (searchQuery) {
+      const q = norm(searchQuery);
+      const terms = [q].concat(_expandQuery(q).filter(function(t){ return t !== q; }));
+      filtered = filtered.filter(function(l){ var b = _searchBlob(l); for (var i=0;i<terms.length;i++){ if (b.indexOf(terms[i]) >= 0) return true; } return false; });
+    }
     // Score EINMAL pro Eintrag berechnen (nicht bei jedem Sortier-Vergleich) -> O(n log n) statt O(n²)
     filtered = filtered.map(function(l){ return { l: l, s: scoreEntry(l) }; })
       .sort(function(a, b){ return b.s - a.s; })
