@@ -2946,40 +2946,75 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if(typeof activeScreen!=='undefined' && activeScreen!=='screenHome') return;
     showWelcomeTour();
   }
-  function showWelcomeTour(){
-    var slides=[
-      { ic:'👋', t:L('Willkommen bei Buscar','Bienvenido a Buscar','Welcome to Buscar'), d:L('Dein Guide für Paraguay: echte Orte, Events und Community-Wissen – auf Deutsch, Español und English.','Tu guía para Paraguay: lugares reales, eventos y conocimiento de la comunidad – en alemán, español e inglés.','Your guide to Paraguay: real places, events and community knowledge – in German, Spanish and English.') },
-      { ic:'🔎', t:L('Finden & Filtern','Buscar y filtrar','Find & filter'), d:L('Suche Restaurants, Ärzte, Geschäfte und mehr. Filtere nach Kategorie, Stadt und sogar nach „spricht deine Sprache".','Buscá restaurantes, médicos, comercios y más. Filtrá por categoría, ciudad e incluso por „habla tu idioma".','Search restaurants, doctors, shops and more. Filter by category, city and even by "speaks your language".') },
-      { ic:'🧭', t:L('Ankommen & Community','Llegar y comunidad','Arrive & community'), d:L('Praktische Guides unter „Ankommen in Paraguay" – und stell Fragen bei „Frag die Community".','Guías prácticas en „Llegar a Paraguay" – y hacé preguntas en „Preguntá a la comunidad".','Practical guides under "Arriving in Paraguay" – and ask questions in "Ask the community".') },
-      { ic:'📅', t:L('Events & Karte','Eventos y mapa','Events & map'), d:L('Entdecke Veranstaltungen und finde alles auf Karte oder Radar in deiner Nähe.','Descubrí eventos y encontrá todo en el mapa o el radar cerca tuyo.','Discover events and find everything on the map or radar near you.') }
+  // Spotlight-Coach-Mark-Tour: dunkelt den Screen ab, leuchtet einzelne Elemente an,
+  // steuert die App selbst (Home -> Karte -> Profil). Läuft nur während der Tour.
+  var _ctSteps=null, _ctIdx=0, _ctRoot=null;
+  function _ctBuildSteps(){
+    return [
+      { screen:'screenHome', nav:'navHome', sel:'#searchInput', title:L('Suche','Buscar','Search'), text:L('Finde Orte, Ärzte, Restaurants und mehr – auch auf Spanisch/Englisch und sogar mit Tippfehlern.','Encontrá lugares, médicos, restaurantes y más – también en alemán/inglés e incluso con errores de tipeo.','Find places, doctors, restaurants and more – also in German/Spanish and even with typos.') },
+      { screen:'screenHome', nav:'navHome', sel:'#catsScroll', title:L('Kategorien','Categorías','Categories'), text:L('Filter schnell nach Kategorie. Bei aktiver Kategorie kannst du zusätzlich nach Unterkategorie, Bewertung und „spricht deine Sprache" verfeinern.','Filtrá por categoría. Con una categoría activa podés afinar por subcategoría, calificación e „idioma que habla".','Filter by category. With a category active you can refine by subcategory, rating and "speaks your language".') },
+      { screen:'screenHome', nav:'navHome', sel:'#cityPickerBtn', title:L('Stadt wählen','Elegir ciudad','Choose city'), text:L('Grenz alles auf deine Stadt oder Region ein.','Limitá todo a tu ciudad o región.','Narrow everything to your city or region.') },
+      { screen:'screenHome', nav:'navHome', sel:'#communityFab', title:L('Frag die Community','Preguntá a la comunidad','Ask the community'), text:L('Nichts gefunden? Stell eine Frage – echte Leute vor Ort helfen weiter.','¿No encontrás algo? Preguntá – gente real en el lugar te ayuda.','Didn\'t find it? Ask – real people on the ground help out.') },
+      { screen:'screenHome', nav:'navHome', sel:'#navForm', title:L('Eintrag hinzufügen','Agregar registro','Add a listing'), text:L('Kennst du einen Ort, der fehlt? Trag ihn hier ein – Events genauso im Events-Tab.','¿Conocés un lugar que falta? Agregalo acá – los eventos igual en la pestaña Eventos.','Know a place that\'s missing? Add it here – events likewise in the Events tab.') },
+      { screen:'screenMap', nav:'navMap', sel:'#eventsMapBtn', title:L('Events auf der Karte','Eventos en el mapa','Events on the map'), text:L('Blendet alle kommenden Events direkt auf der Karte ein.','Muestra todos los próximos eventos en el mapa.','Shows all upcoming events right on the map.') },
+      { screen:'screenMap', nav:'navMap', sel:'#radarFab', title:L('Radar','Radar','Radar'), text:L('Umschalten auf die Radar-Ansicht: Orte & Events im Umkreis um deinen Standort.','Cambiá a la vista radar: lugares y eventos alrededor de tu ubicación.','Switch to radar view: places & events around your location.') },
+      { screen:'screenMap', nav:'navMap', sel:'#mapCityPickerBtn', title:L('Karten-Filter','Filtros del mapa','Map filters'), text:L('Auch auf der Karte nach Stadt, Kategorie und Bewertung filtern.','También en el mapa: filtrá por ciudad, categoría y calificación.','On the map too: filter by city, category and rating.') },
+      { screen:'screenProfil', nav:'navProfil', sel:'[data-i18n="wissen_entry"]', title:L('Ankommen in Paraguay','Llegar a Paraguay','Arriving in Paraguay'), text:L('Praktische Guides + deine „Erste Schritte"-Checkliste fürs Ankommen. Viel Spaß mit Buscar!','Guías prácticas + tu lista de „primeros pasos". ¡Que disfrutes Buscar!','Practical guides + your "first steps" checklist. Enjoy Buscar!') }
     ];
-    var idx=0;
-    var ov=document.createElement('div');
-    ov.className='tour-overlay';
-    ov.style.cssText='position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity 0.3s';
-    function close(){ try{localStorage.setItem('buscar_tour_done','1');}catch(e){} ov.style.opacity='0'; setTimeout(function(){ if(ov.parentNode) ov.parentNode.removeChild(ov); },300); }
-    function render(){
-      var s=slides[idx], last=(idx===slides.length-1);
-      var dots=slides.map(function(_,i){ return '<span style="width:7px;height:7px;border-radius:50%;background:'+(i===idx?'var(--yellow-dark)':'var(--border)')+'"></span>'; }).join('');
-      ov.innerHTML='<div style="background:var(--card);border-radius:20px;max-width:340px;width:100%;padding:26px 24px 18px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.35)">'
-        + '<div style="font-size:56px;line-height:1">'+s.ic+'</div>'
-        + '<div style="font-size:20px;font-weight:800;color:var(--text-1);margin-top:10px">'+esc(s.t)+'</div>'
-        + '<div style="font-size:14px;color:var(--text-2);line-height:1.5;margin-top:8px">'+esc(s.d)+'</div>'
-        + '<div style="display:flex;gap:6px;justify-content:center;margin:18px 0 16px">'+dots+'</div>'
-        + '<div style="display:flex;gap:8px">'
-        +   (idx>0?'<button id="tourBack" style="flex:1;border:1px solid var(--border);background:transparent;color:var(--text-2);font-weight:700;font-size:14px;padding:12px;border-radius:12px;cursor:pointer">'+esc(L('Zurück','Atrás','Back'))+'</button>':'')
-        +   '<button id="tourNext" style="flex:2;border:none;background:var(--yellow);color:#1a1400;font-weight:800;font-size:14.5px;padding:12px;border-radius:12px;cursor:pointer">'+esc(last?L('Los geht\'s','¡Empezar!','Let\'s go'):L('Weiter','Siguiente','Next'))+'</button>'
-        + '</div>'
-        + '<div id="tourSkip" style="font-size:12px;color:var(--text-3);margin-top:12px;cursor:pointer">'+esc(L('Überspringen','Saltar','Skip'))+'</div>'
-        + '</div>';
-      ov.querySelector('#tourNext').onclick=function(){ if(last) close(); else { idx++; render(); } };
-      var bb=ov.querySelector('#tourBack'); if(bb) bb.onclick=function(){ idx--; render(); };
-      ov.querySelector('#tourSkip').onclick=close;
-    }
-    document.body.appendChild(ov);
-    render();
-    requestAnimationFrame(function(){ ov.style.opacity='1'; });
   }
+  function _ctEnsureRoot(){
+    if(_ctRoot) return;
+    _ctRoot=document.createElement('div'); _ctRoot.className='ct-root';
+    _ctRoot.innerHTML='<div class="ct-hole" id="ctHole" style="display:none"></div><div class="ct-tip" id="ctTip" style="visibility:hidden"></div>';
+    document.body.appendChild(_ctRoot);
+  }
+  function _ctWaitFor(sel, ms){
+    return new Promise(function(res){ var t0=Date.now(); (function p(){ var el=document.querySelector(sel); if(el){ var r=el.getBoundingClientRect(); if(r.width>0 && r.height>0) return res(el); } if(Date.now()-t0>ms) return res(null); setTimeout(p,120); })(); });
+  }
+  async function _ctGo(){
+    var s=_ctSteps[_ctIdx]; if(!s){ _ctFinish(); return; }
+    if(s.screen && typeof activeScreen!=='undefined' && activeScreen!==s.screen){ try{ if(s.nav) setNav(s.nav); showScreen(s.screen); }catch(e){} await new Promise(function(r){ setTimeout(r,480); }); }
+    var el=await _ctWaitFor(s.sel, s.screen==='screenMap'?2800:1400);
+    if(!el && _ctIdx<_ctSteps.length-1){ _ctIdx++; return _ctGo(); } // Ziel fehlt -> überspringen (bricht nie)
+    _ctRender(s, el);
+  }
+  function _ctRender(s, el){
+    _ctEnsureRoot();
+    var hole=document.getElementById('ctHole'), tip=document.getElementById('ctTip');
+    var vw=window.innerWidth, vh=window.innerHeight, total=_ctSteps.length, last=(_ctIdx===total-1), first=(_ctIdx===0);
+    var r=el?el.getBoundingClientRect():null, pad=8;
+    if(r){ hole.style.display='block'; hole.style.left=Math.max(4,r.left-pad)+'px'; hole.style.top=Math.max(4,r.top-pad)+'px'; hole.style.width=(r.width+pad*2)+'px'; hole.style.height=(r.height+pad*2)+'px'; }
+    else { hole.style.display='none'; }
+    tip.innerHTML='<div class="ct-caret" id="ctCaret" style="display:none"></div>'
+      +'<div class="ct-tip-title">'+esc(s.title)+'</div>'
+      +'<div class="ct-tip-text">'+esc(s.text)+'</div>'
+      +'<div class="ct-tip-foot"><span class="ct-tip-prog">'+(_ctIdx+1)+' / '+total+'</span><div class="ct-tip-btns">'
+      +(first?'':'<button class="ct-btn-sec" id="ctBack">'+esc(L('Zurück','Atrás','Back'))+'</button>')
+      +'<button class="ct-btn-pri" id="ctNext">'+esc(last?L('Fertig','Listo','Done'):L('Weiter','Siguiente','Next'))+'</button>'
+      +'</div></div>'
+      +'<div class="ct-skip" id="ctSkip">'+esc(L('Tour überspringen','Saltar tour','Skip tour'))+'</div>';
+    tip.style.visibility='hidden';
+    requestAnimationFrame(function(){
+      var tw=tip.offsetWidth, th=tip.offsetHeight, left, top, caretTop=false;
+      if(r){
+        left=Math.min(Math.max(12, r.left+r.width/2 - tw/2), vw-tw-12);
+        if(r.bottom+14+th <= vh-12){ top=r.bottom+14; caretTop=true; } else { top=Math.max(12, r.top-14-th); caretTop=false; }
+      } else { left=(vw-tw)/2; top=(vh-th)/2; }
+      tip.style.left=left+'px'; tip.style.top=top+'px'; tip.style.visibility='visible';
+      var caret=document.getElementById('ctCaret');
+      if(r && caret){ var cx=Math.min(Math.max(14, r.left+r.width/2 - left), tw-14); caret.style.display='block'; caret.style.left=(cx-7)+'px'; if(caretTop) caret.style.top='-6px'; else caret.style.bottom='-6px'; }
+    });
+    var nx=document.getElementById('ctNext'); nx.onclick=function(){ if(last) _ctFinish(); else { _ctIdx++; _ctGo(); } };
+    var bk=document.getElementById('ctBack'); if(bk) bk.onclick=function(){ if(_ctIdx>0){ _ctIdx--; _ctGo(); } };
+    document.getElementById('ctSkip').onclick=_ctFinish;
+  }
+  function _ctFinish(){
+    try{ localStorage.setItem('buscar_tour_done','1'); }catch(e){}
+    var root=_ctRoot; _ctRoot=null;
+    if(root){ root.style.opacity='0'; setTimeout(function(){ if(root.parentNode) root.parentNode.removeChild(root); },300); }
+    try{ setNav('navHome'); showScreen('screenHome'); }catch(e){}
+  }
+  function showWelcomeTour(){ _ctSteps=_ctBuildSteps(); _ctIdx=0; _ctEnsureRoot(); requestAnimationFrame(function(){ if(_ctRoot) _ctRoot.style.opacity='1'; }); _ctGo(); }
 
   // Blendet versehentliche Doppel-Eintraege aus: immer per ID (sicher) und – wenn
   // Koordinaten vorhanden sind – per Name + exakter Position (gleicher Name an exakt
