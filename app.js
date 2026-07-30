@@ -3902,12 +3902,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           +'<div style="background:#FFF8EC;border-left:3px solid var(--yellow);padding:8px 10px;border-radius:6px;margin:8px 0;font-size:13px">Vorschlag: <b>'+esc(tagLabel(s.tag))+'</b></div>'
           +(s.source==='answer'?'<div style="font-size:11px;color:var(--text-3);margin:-2px 0 8px">↳ '+esc(L('aus einer Community-Antwort','de una respuesta de la comunidad','from a community answer'))+'</div>':'')
           +'<div class="admin-actions">'
-            +'<button class="admin-btn approve" onclick="applyTagSuggestion(\''+s.id+'\',\''+s.listing_id+'\','+JSON.stringify(s.tag)+')">Übernehmen</button>'
+            +'<button class="admin-btn approve" onclick="applyTagSuggestion(\''+s.id+'\',\''+s.listing_id+'\','+_tagArg(s.tag)+')">Übernehmen</button>'
             +'<button class="admin-btn reject" onclick="rejectTagSuggestion(\''+s.id+'\')">Verwerfen</button>'
           +'</div></div>';
       }).join('');
     } catch(e){ body.innerHTML='<div class="admin-empty"><div class="admin-empty-text">Fehler beim Laden</div></div>'; }
   }
+  // Escaped einen Tag sicher als einzelquotiertes JS-Argument in einem doppelquotierten onclick-Attribut
+  function _tagArg(tg){ return "'"+String(tg).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/</g,'&lt;')+"'"; }
   async function applyTagSuggestion(sugId, listingId, tag){
     try {
       await db.collection('listings').doc(listingId).update({ tags: firebase.firestore.FieldValue.arrayUnion(tag) });
@@ -3937,7 +3939,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         + docs.map(function(d){ var s=d.data();
             return '<div id="ots_'+d.id+'" style="display:flex;align-items:center;gap:8px;padding:6px 0">'
               + '<span style="flex:1;min-width:0;font-size:13.5px;color:var(--text-1)">'+esc(tagLabel(s.tag))+'</span>'
-              + '<button onclick="ownerApplyTag(\''+d.id+'\',\''+listingId+'\','+JSON.stringify(s.tag)+')" style="border:none;background:var(--yellow);color:#1a1400;font-weight:800;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer">'+esc(L('Übernehmen','Aplicar','Apply'))+'</button>'
+              + '<button onclick="ownerApplyTag(\''+d.id+'\',\''+listingId+'\','+_tagArg(s.tag)+')" style="border:none;background:var(--yellow);color:#1a1400;font-weight:800;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer">'+esc(L('Übernehmen','Aplicar','Apply'))+'</button>'
               + '<button onclick="ownerRejectTag(\''+d.id+'\')" style="border:1px solid var(--border);background:transparent;color:var(--text-2);font-size:12px;padding:6px 10px;border-radius:8px;cursor:pointer">'+esc(L('Ablehnen','Rechazar','Dismiss'))+'</button>'
               + '</div>';
           }).join('') + '</div>';
@@ -6501,9 +6503,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         <input class="field-input" type="text" id="ownerDealExpiry" placeholder="Gültig bis (z.B. 31.12.2025)" value="${listing.deal_expiry||''}" style="font-size:13px;padding:10px 12px;margin-bottom:8px">
         <div style="display:flex;gap:8px"><button onclick="saveOwnerDeal('${listing.id}')" style="flex:2;background:var(--yellow);color:white;border:none;border-radius:10px;padding:10px;font-weight:700;font-size:13px;cursor:pointer">Deal speichern</button>${listing.deal_text?`<button onclick="removeOwnerDeal('${listing.id}')" style="flex:1;background:var(--red-light);color:var(--red);border:none;border-radius:10px;padding:10px;font-weight:600;font-size:12px;cursor:pointer">Entfernen</button>`:''}</div>
       </div>` : '';
-      section.innerHTML = `<div class="detail-card owner-section verified">
+      // "Eintrag bearbeiten" nur zeigen, wenn nicht ohnehin die Bearbeiten/Löschen-Karte erscheint (Admin/Ersteller)
+      var _hasCreatorControls = (currentUser.email === ADMIN_EMAIL) || (listing.created_by && listing.created_by === currentUser.uid);
+      var _editBtn = _hasCreatorControls ? '' : `<button class="owner-edit-btn" onclick="openEditListing('${listing.id}')">Eintrag bearbeiten</button>`;
+      section.innerHTML = `<div class="detail-card owner-section verified" style="display:flex;flex-direction:column;align-items:flex-start;gap:12px">
         <div class="owner-badge">⭐ Verifizierter Inhaber</div>
-        <button class="owner-edit-btn" onclick="openEditListing('${listing.id}')">Eintrag bearbeiten</button>
+        ${_editBtn}
       </div>` + _dealCard;
       return;
     }
