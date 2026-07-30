@@ -6485,6 +6485,38 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   let currentEditListingId = null;
 
+  // Betreiber-Signal (Stufe 1): zeigt dem Inhaber offene Community-Fragen, die zu seinem Eintrag passen.
+  // Läuft NUR für den verifizierten Inhaber (nicht im Home/Karte/Suche), eine gecachte index-freie Abfrage.
+  var _openQCache = null, _openQTs = 0;
+  async function _loadOwnerDemandSignal(listing){
+    var cont = document.getElementById('detailDemandSignal'); if(!cont || !listing) return;
+    try {
+      if(!_openQCache || (Date.now() - _openQTs > 180000)){
+        var snap = await db.collection('questions').orderBy('created_at','desc').limit(80).get();
+        _openQCache = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); }).filter(function(q){ return (q.status||'open') === 'open'; });
+        _openQTs = Date.now();
+      }
+      var terms = [];
+      if(listing.subcategory) terms.push(norm(listing.subcategory));
+      (listing.tags||[]).forEach(function(t){ var n=norm(String(t)); if(n && n.length>2) terms.push(n); });
+      norm(listing.name||'').split(' ').forEach(function(w){ if(w.length>3) terms.push(w); });
+      terms = terms.filter(Boolean);
+      if(!terms.length){ cont.innerHTML=''; return; }
+      var matches = _openQCache.filter(function(q){ var qt=norm(q.text||''); return terms.some(function(x){ return qt.indexOf(x)>=0; }); });
+      if(!matches.length){ cont.innerHTML=''; return; }
+      var rows = matches.slice(0,3).map(function(q){
+        return '<div onclick="openQuestionDetail(\''+q.id+'\')" style="display:flex;align-items:center;gap:9px;padding:9px 0;border-top:1px solid var(--border);cursor:pointer"><span style="flex:1;min-width:0;font-size:13.5px;color:var(--text-1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(q.text||'')+'</span><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="15" height="15" style="flex-shrink:0"><polyline points="9 18 15 12 9 6"/></svg></div>';
+      }).join('');
+      var more = matches.length>3 ? '<div onclick="openQuestions(\'all\')" style="text-align:center;font-size:12.5px;font-weight:700;color:var(--yellow-dark);margin-top:9px;cursor:pointer">'+esc(L('Alle ansehen','Ver todas','View all'))+'</div>' : '';
+      var head = matches.length + ' ' + (matches.length===1
+        ? L('offene Frage passt zu deinem Eintrag','pregunta abierta coincide con tu registro','open question matches your listing')
+        : L('offene Fragen passen zu deinem Eintrag','preguntas abiertas coinciden con tu registro','open questions match your listing'));
+      cont.innerHTML = '<div class="detail-card" style="padding:15px 16px">'
+        + '<div style="font-weight:800;font-size:14.5px;color:var(--text-1)">💡 '+esc(head)+'</div>'
+        + '<div style="font-size:12.5px;color:var(--text-2);margin-top:2px;line-height:1.4">'+esc(L('Leute suchen genau sowas – antworte und mach dich sichtbar.','La gente busca justo esto – respondé y hacete visible.','People are looking for this – answer and get discovered.'))+'</div>'
+        + rows + more + '</div>';
+    } catch(e){ cont.innerHTML=''; }
+  }
   async function loadOwnerSection(listing) {
     const section = document.getElementById('detailOwnerSection');
     if (listing && listing.category_id === 'kat-immobilien') { section.innerHTML = ''; return; }
@@ -6508,7 +6540,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var _hasCreatorControls = (currentUser.email === ADMIN_EMAIL) || (listing.created_by && listing.created_by === currentUser.uid);
       // "Verifizierter Inhaber" ist jetzt Badge oben in der Statusleiste. Hier nur noch Edit-Button (nur echte Inhaber ohne Admin/Ersteller-Controls) + Deal.
       var _editCard = _hasCreatorControls ? '' : `<div class="detail-card owner-section verified"><button class="owner-edit-btn" onclick="openEditListing('${listing.id}')">Eintrag bearbeiten</button></div>`;
-      section.innerHTML = _editCard + _dealCard;
+      section.innerHTML = _editCard + _dealCard + '<div id="detailDemandSignal"></div>';
+      _loadOwnerDemandSignal(listing); // Betreiber-Signal (async, blockiert das Rendern nicht)
       return;
     }
     // Eintrag hat bereits einen verifizierten Inhaber -> kein Claim-Button fuer andere Nutzer
