@@ -4408,8 +4408,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // Schlägt aus dem Fragetext ein kurzes Merkmal-Wort vor (nur Vorbefüllung, editierbar)
   function _suggestTagFromQuestion(){
     var q=_currentQuestion; if(!q||!q.text) return '';
-    var stop=/^(wo|wer|was|wie|wann|warum|wieso|gibt|es|der|die|das|den|dem|ein|eine|einen|ich|man|kann|koennt|finde|finden|suche|gesucht|nach|in|im|bei|einer|einem|und|oder|fuer|für|mit|zum|zur|hier|nahe|umgebung|donde|dónde|que|qué|hay|un|una|el|la|los|las|busco|para|con|en|de|del|puedo|encontrar|como|cómo|se|algun|algún|alguna|cerca)$/i;
-    var words=String(q.text).replace(/[?.!,;:¿¡]/g,' ').split(/\s+/).filter(function(w){ return w.length>2 && !stop.test(w); });
+    var stop=/^(wo|wer|was|wie|wann|warum|wieso|gibt|es|der|die|das|den|dem|ein|eine|einen|ich|man|kann|koennt|könnt|finde|finden|suche|gesucht|nach|in|im|bei|einer|einem|und|oder|fuer|für|mit|zum|zur|hier|nahe|nähe|umgebung|gegend|stadt|ort|bereich|kennt|jemand|jmd|empfehlung|empfehlen|empfiehlt|weiss|weiß|gut|gute|guter|gutes|beste|bester|bestes|zuverlaessige|zuverlässige|zuverlässig|guenstige|günstige|günstig|braucht|brauche|hallo|bitte|danke|hat|habt|habe|noch|schon|sehr|donde|dónde|que|qué|hay|un|una|el|la|los|las|busco|para|con|en|de|del|puedo|encontrar|como|cómo|se|algun|algún|alguna|cerca|zona|ciudad|lugar|recomienda|recomendar|conocen|conoce|sabe|saben|bueno|buena|buen|barato|barata|confiable|necesito|alguien)$/i;
+    var raw=String(q.text).replace(/[?.!,;:¿¡"'()]/g,' ').split(/\s+/).filter(Boolean);
+    // Bevorzugt großgeschriebene Nomen (Deutsch), nicht das erste Wort im Satz
+    var nouns=raw.filter(function(w,i){ return i>0 && /^[A-ZÄÖÜ]/.test(w) && w.length>3 && !stop.test(w); });
+    if(nouns.length) return nouns.slice(0,2).join(' ').slice(0,30);
+    var words=raw.filter(function(w){ return w.length>2 && !stop.test(w); });
     return words.slice(0,3).join(' ').slice(0,30);
   }
   function _renderSelectedAnswer(){
