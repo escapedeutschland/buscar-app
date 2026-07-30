@@ -3974,12 +3974,57 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       })
     };
   }
+  // ── „Neu in Paraguay"-Checkliste (lokal gespeichert, verlinkt mit den Guides) ──
+  function _clSteps(){ return [
+    { id:'residencia', match:'Residencia',  label: L('Residencia & Cédula','Residencia y cédula','Residency & cédula') },
+    { id:'bank',       match:'Bankkonto',   label: L('Bankkonto eröffnen','Abrir cuenta bancaria','Open a bank account') },
+    { id:'sim',        match:'SIM',         label: L('SIM-Karte & Internet','Chip (SIM) e internet','SIM card & internet') },
+    { id:'health',     match:'Krankenvers', label: L('Krankenversicherung','Seguro médico','Health insurance') },
+    { id:'auto',       match:'Auto:',       label: L('Führerschein / Auto','Licencia / auto','Driver\'s licence / car') },
+    { id:'notfall',    match:'Notfall',     label: L('Notfallnummern speichern','Guardar números de emergencia','Save emergency numbers') }
+  ]; }
+  function _clGet(){ try { return JSON.parse(localStorage.getItem('buscar_checklist')||'{}') || {}; } catch(e){ return {}; } }
+  function _clSet(m){ try { localStorage.setItem('buscar_checklist', JSON.stringify(m)); } catch(e){} }
+  function _clGuideId(match){ var g=(_guidesCache||[]).find(function(x){ return (x.title||'').indexOf(match)>=0; }); return g?g.id:null; }
+  function toggleChecklistStep(id){
+    var m=_clGet(); m[id]=!m[id]; _clSet(m);
+    var steps=_clSteps(); var done=steps.filter(function(s){return m[s.id];}).length;
+    var card=document.getElementById('clCard'); if(card){ card.outerHTML=_renderChecklistCard(); }
+    if(done===steps.length){
+      var celebrated=false; try{ celebrated=localStorage.getItem('buscar_cl_done')==='1'; }catch(e){}
+      if(!celebrated){ try{ localStorage.setItem('buscar_cl_done','1'); }catch(e){}
+        if(typeof showBadgeCelebration==='function') showBadgeCelebration([{ emoji:'🎉', name:L('Angekommen in Paraguay!','¡Llegaste a Paraguay!','You have arrived in Paraguay!'), desc:L('Du hast alle ersten Schritte erledigt.','Completaste todos los primeros pasos.','You completed all the first steps.') }]);
+      }
+    } else { try{ localStorage.removeItem('buscar_cl_done'); }catch(e){} }
+  }
+  function _renderChecklistCard(){
+    var steps=_clSteps(), m=_clGet();
+    var done=steps.filter(function(s){return m[s.id];}).length;
+    var pct=Math.round(done/steps.length*100), allDone=(done===steps.length);
+    var rows=steps.map(function(s){
+      var on=!!m[s.id], gid=_clGuideId(s.match);
+      var box='<span onclick="event.stopPropagation();toggleChecklistStep(\''+s.id+'\')" style="flex-shrink:0;width:22px;height:22px;border-radius:6px;border:2px solid '+(on?'var(--yellow-dark)':'var(--border)')+';background:'+(on?'var(--yellow)':'transparent')+';display:flex;align-items:center;justify-content:center;cursor:pointer">'+(on?'<svg viewBox="0 0 24 24" fill="none" stroke="#1a1400" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</span>';
+      var lbl='<span style="flex:1;min-width:0;font-size:14px;'+(on?'text-decoration:line-through;color:var(--text-3)':'color:var(--text-1)')+'">'+esc(s.label)+'</span>';
+      var chev= gid ? '<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="15" height="15" style="flex-shrink:0"><polyline points="9 18 15 12 9 6"/></svg>' : '';
+      var attr= gid ? ' onclick="openGuide(\''+gid+'\')" style="cursor:pointer;' : ' style="';
+      return '<div'+attr+'display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--border)">'+box+lbl+chev+'</div>';
+    }).join('');
+    return '<div id="clCard" class="detail-card" style="padding:15px 16px;margin-bottom:14px">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">'
+      +   '<div style="font-weight:800;font-size:15px;color:var(--text-1)">🧳 '+esc(L('Deine ersten Schritte','Tus primeros pasos','Your first steps'))+'</div>'
+      +   '<div style="font-size:12px;font-weight:800;color:var(--yellow-dark);flex-shrink:0">'+done+'/'+steps.length+'</div>'
+      + '</div>'
+      + '<div style="font-size:12.5px;color:var(--text-2);margin-top:3px;line-height:1.4">'+esc(allDone?L('Geschafft – willkommen in Paraguay! 🎉','¡Listo, bienvenido a Paraguay! 🎉','All done – welcome to Paraguay! 🎉'):L('Hak ab, was erledigt ist – jeder Punkt führt zum passenden Guide.','Marcá lo que ya hiciste – cada punto lleva a su guía.','Check off what you have done – each item links to its guide.'))+'</div>'
+      + '<div style="height:7px;border-radius:4px;background:var(--surface-2);margin:11px 0 3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--yellow);border-radius:4px;transition:width .3s"></div></div>'
+      + rows
+      + '</div>';
+  }
   function renderWissenList(){
     _wissenView = 'list';
     var body = document.getElementById('wissenBody'); if (!body) return;
     var guides = _guidesCache || [];
     if (!guides.length) { body.innerHTML = '<div class="empty-state" style="padding:44px 16px"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><div class="empty-title">'+esc(t('wissen_empty'))+'</div></div>'; return; }
-    body.innerHTML = guides.map(function(g){
+    body.innerHTML = _renderChecklistCard() + guides.map(function(g){
       var gl = _gL(g);
       return '<div class="detail-card" style="cursor:pointer;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:10px" onclick="openGuide(\''+g.id+'\')">'
         + '<div style="font-size:26px;line-height:1;flex-shrink:0">' + (g.icon || '📘') + '</div>'
