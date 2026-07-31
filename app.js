@@ -1875,6 +1875,66 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     });
   }
 
+  // ══ IN-APP-BEWERTUNGS-HINWEIS ════════════════════════════════════════════
+  // Dezenter Hinweis nach ein paar Nutzungen: bittet um eine Store-Bewertung
+  // (stärkster ASO-Faktor). Rein additiv, kein Netz, kein Dauer-Nerven.
+  var STORE_IOS = 'https://apps.apple.com/app/id6770427542';
+  var STORE_ANDROID = 'https://play.google.com/store/apps/details?id=io.github.escapedeutschland.buscar';
+  function _ratePlatform(){
+    var ua = navigator.userAgent || '';
+    if (/android/i.test(ua)) return 'android';
+    if (/iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && 'ontouchend' in document)) return 'ios';
+    return 'other';
+  }
+  function _rateStoreUrl(){ var p=_ratePlatform(); return p==='android'?STORE_ANDROID:(p==='ios'?STORE_IOS:'https://buscarpy.app/'); }
+  // Session-Zähler: genau EINMAL pro App-Start hochzählen.
+  try { if(!window._sessCounted){ window._sessCounted=1; var _sc=parseInt(localStorage.getItem('buscar_sessions')||'0',10)+1; localStorage.setItem('buscar_sessions', String(_sc)); } } catch(e){}
+  function maybeShowRatePrompt(){
+    try{
+      if(localStorage.getItem('buscar_rate_done')==='1') return;      // schon bewertet / dauerhaft abgelehnt
+      if(localStorage.getItem('buscar_tour_done_v2')!=='1') return;   // Tour hat Vorrang -> frühestens nächste Session
+      if(document.querySelector('.ct-root')) return;                  // Tour läuft gerade
+      if(document.getElementById('rateOverlay')) return;              // schon offen
+      var sp=document.getElementById('splash'); if(sp && !sp.classList.contains('hidden')) return;
+      if(typeof activeScreen!=='undefined' && activeScreen!=='screenHome') return;
+      var p=_ratePlatform(); if(p!=='ios' && p!=='android') return;   // nur in den echten App-Wrappern, nicht im Desktop-Web
+      var sessions=parseInt(localStorage.getItem('buscar_sessions')||'0',10);
+      if(sessions < 4) return;                                        // erst nach ein paar Nutzungen fragen
+      var snooze=parseInt(localStorage.getItem('buscar_rate_snooze')||'0',10);
+      if(snooze && (Date.now()-snooze) < 12*24*60*60*1000) return;    // „Später" -> 12 Tage Ruhe
+      showRatePrompt();
+    }catch(e){}
+  }
+  function showRatePrompt(){
+    var ov=document.createElement('div');
+    ov.className='confirm-overlay'; ov.id='rateOverlay';
+    ov.innerHTML='<div class="confirm-sheet rate-sheet" role="dialog" aria-modal="true">'
+      +'<div class="rate-stars">★★★★★</div>'
+      +'<div class="rate-title">'+esc(L('Gefällt dir Buscar?','¿Te gusta Buscar?','Enjoying Buscar?'))+'</div>'
+      +'<div class="confirm-msg rate-msg">'+esc(L('Eine kurze Bewertung im Store hilft anderen, Buscar zu finden – und uns riesig. Danke! 🙏',
+                                                  'Una breve reseña en la tienda ayuda a otros a descubrir Buscar – y a nosotros muchísimo. ¡Gracias! 🙏',
+                                                  'A quick rating in the store helps others discover Buscar – and helps us a lot. Thanks! 🙏'))+'</div>'
+      +'<div class="rate-actions">'
+      +'<button type="button" class="confirm-ok rate-go">'+esc(L('Jetzt bewerten','Calificar ahora','Rate now'))+'</button>'
+      +'<button type="button" class="rate-later">'+esc(L('Später','Más tarde','Later'))+'</button>'
+      +'<button type="button" class="rate-never">'+esc(L('Nein, danke','No, gracias','No thanks'))+'</button>'
+      +'</div></div>';
+    function close(){ if(ov.parentNode) ov.parentNode.removeChild(ov); document.removeEventListener('keydown', onKey); }
+    function onKey(e){ if(e.key==='Escape'){ try{localStorage.setItem('buscar_rate_snooze', String(Date.now()));}catch(_){} close(); } }
+    ov.querySelector('.rate-go').addEventListener('click', function(){
+      try{ localStorage.setItem('buscar_rate_done','1'); }catch(_){}
+      var url=_rateStoreUrl();
+      var w=null; try{ w=window.open(url,'_blank'); }catch(_){}
+      if(!w){ try{ location.href=url; }catch(_){} }
+      close();
+    });
+    ov.querySelector('.rate-later').addEventListener('click', function(){ try{localStorage.setItem('buscar_rate_snooze', String(Date.now()));}catch(_){} close(); });
+    ov.querySelector('.rate-never').addEventListener('click', function(){ try{localStorage.setItem('buscar_rate_done','1');}catch(_){} close(); });
+    ov.addEventListener('click', function(e){ if(e.target===ov){ try{localStorage.setItem('buscar_rate_snooze', String(Date.now()));}catch(_){} close(); } });
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(ov);
+  }
+
   // ══ EVENTS SYSTEM ═════════════════════════════════════════════════════════
   let allEvents = [];
   let evTimeFilter = 'all';
@@ -2885,6 +2945,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden');
       handleDeepLink();
       setTimeout(maybeShowWelcomeTour, 1000);
+      setTimeout(maybeShowRatePrompt, 2600);
     } else {
       // Gäste-Modus: ohne Konto nutzbar (nur Lesen). Aktionen (posten, favorisieren, fragen …) fordern Login an.
       var pn=document.getElementById('profilName'); if(pn) pn.textContent=t('guest_name');
@@ -2899,6 +2960,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden');
       handleDeepLink();
       setTimeout(maybeShowWelcomeTour, 1000);
+      setTimeout(maybeShowRatePrompt, 2600);
     }
   });
 

@@ -850,6 +850,18 @@
 .confirm-ok{background:var(--yellow);color:#fff}
 .confirm-ok.danger{background:var(--red);color:#fff}
 
+/* In-App-Bewertungs-Hinweis (nutzt confirm-overlay/-sheet) */
+.rate-sheet{text-align:center;padding-top:26px}
+.rate-stars{font-size:30px;letter-spacing:3px;color:var(--yellow);line-height:1;margin-bottom:12px}
+.rate-title{font-family:'Fraunces',serif;font-weight:700;font-size:21px;color:var(--text-1);margin-bottom:8px}
+.rate-msg{margin-bottom:20px}
+.rate-actions{display:flex;flex-direction:column;gap:9px}
+.rate-actions button{width:100%;padding:13px;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rate-actions button:active{opacity:.7}
+.rate-go{background:var(--yellow);color:#fff}
+.rate-later{background:var(--surface-2);color:var(--text-2)}
+.rate-never{background:transparent;color:var(--text-3);font-weight:600;font-size:13.5px;padding:6px}
+
 /* Performance: Browser überspringt Layout/Paint für Karten außerhalb des sichtbaren
    Bereichs. Verhindert, dass eine lange Liste (~680 Einträge) den Haupt-Thread bei
    der ersten Interaktion sekundenlang blockiert. contain-intrinsic-size = grobe
