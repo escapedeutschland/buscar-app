@@ -861,6 +861,11 @@
 .rate-go{background:var(--yellow);color:#fff}
 .rate-later{background:var(--surface-2);color:var(--text-2)}
 .rate-never{background:transparent;color:var(--text-3);font-weight:600;font-size:13.5px;padding:6px}
+/* Sanftere, dezentere Einblendung als bei den (bewusst schnellen) confirmSheet-Dialogen */
+.rate-overlay{background:rgba(0,0,0,0.34);animation:rateFade .5s ease both}
+.rate-overlay .rate-sheet{animation:rateUp .55s cubic-bezier(.16,1,.3,1) both}
+@keyframes rateFade{from{opacity:0}to{opacity:1}}
+@keyframes rateUp{from{transform:translateY(48px);opacity:0}to{transform:none;opacity:1}}
 
 /* Performance: Browser überspringt Layout/Paint für Karten außerhalb des sichtbaren
    Bereichs. Verhindert, dass eine lange Liste (~680 Einträge) den Haupt-Thread bei

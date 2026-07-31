@@ -1887,6 +1887,22 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     return 'other';
   }
   function _rateStoreUrl(){ var p=_ratePlatform(); return p==='android'?STORE_ANDROID:(p==='ios'?STORE_IOS:'https://buscarpy.app/'); }
+  // Store robust öffnen: in App-Wrappern (WKWebView/TWA) ist window.open oft ein
+  // No-Op, das trotzdem ein Objekt liefert -> zuerst echter Anker-Klick, dann als
+  // Fallback location.href (das fangen iOS/Android ab und öffnen die Store-App).
+  function _openStore(url){
+    var opened=false;
+    try{
+      var a=document.createElement('a');
+      a.href=url; a.target='_blank'; a.rel='noopener';
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ if(a.parentNode) a.parentNode.removeChild(a); }, 200);
+      opened=true;
+    }catch(e){}
+    // Wenn nach kurzem Moment die App noch im Vordergrund ist (also nichts aufging),
+    // hart per location.href navigieren -> Store fängt die URL ab.
+    setTimeout(function(){ try{ if(!document.hidden) location.href=url; }catch(_){} }, 500);
+  }
   // Session-Zähler: genau EINMAL pro App-Start hochzählen.
   try { if(!window._sessCounted){ window._sessCounted=1; var _sc=parseInt(localStorage.getItem('buscar_sessions')||'0',10)+1; localStorage.setItem('buscar_sessions', String(_sc)); } } catch(e){}
   function maybeShowRatePrompt(){
@@ -1907,7 +1923,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
   function showRatePrompt(){
     var ov=document.createElement('div');
-    ov.className='confirm-overlay'; ov.id='rateOverlay';
+    ov.className='confirm-overlay rate-overlay'; ov.id='rateOverlay';
     ov.innerHTML='<div class="confirm-sheet rate-sheet" role="dialog" aria-modal="true">'
       +'<div class="rate-stars">★★★★★</div>'
       +'<div class="rate-title">'+esc(L('Gefällt dir Buscar?','¿Te gusta Buscar?','Enjoying Buscar?'))+'</div>'
@@ -1923,9 +1939,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     function onKey(e){ if(e.key==='Escape'){ try{localStorage.setItem('buscar_rate_snooze', String(Date.now()));}catch(_){} close(); } }
     ov.querySelector('.rate-go').addEventListener('click', function(){
       try{ localStorage.setItem('buscar_rate_done','1'); }catch(_){}
-      var url=_rateStoreUrl();
-      var w=null; try{ w=window.open(url,'_blank'); }catch(_){}
-      if(!w){ try{ location.href=url; }catch(_){} }
+      _openStore(_rateStoreUrl());
       close();
     });
     ov.querySelector('.rate-later').addEventListener('click', function(){ try{localStorage.setItem('buscar_rate_snooze', String(Date.now()));}catch(_){} close(); });
