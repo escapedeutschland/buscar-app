@@ -192,7 +192,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Profile
       to_home: 'Zur Startseite', suggest_entry_prof: 'Eintrag vorschlagen',
       admin_panel: 'Admin Panel', change_username: 'Benutzername ändern', replay_tour: 'App-Einführung ansehen',
-      change_password: 'Passwort ändern', change_email: 'E-Mail ändern', my_favorites: 'Meine Favoriten',
+      change_password: 'Passwort ändern', change_email: 'E-Mail ändern', push_answers: 'Benachrichtigungen', my_favorites: 'Meine Favoriten',
       // Map
       map_title: 'Karte', map_sub_all: 'Alle Orte in Paraguay',
       // Filter
@@ -450,7 +450,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Perfil
       to_home: 'Ir al inicio', suggest_entry_prof: 'Sugerir lugar',
       admin_panel: 'Panel admin', change_username: 'Cambiar usuario', replay_tour: 'Ver introducción de la app',
-      change_password: 'Cambiar contraseña', change_email: 'Cambiar correo', my_favorites: 'Mis favoritos',
+      change_password: 'Cambiar contraseña', change_email: 'Cambiar correo', push_answers: 'Notificaciones', my_favorites: 'Mis favoritos',
       // Mapa
       map_title: 'Mapa', map_sub_all: 'Todos los lugares en Paraguay',
       // Filtros
@@ -708,7 +708,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Profile
       to_home: 'To home', suggest_entry_prof: 'Suggest a place',
       admin_panel: 'Admin panel', change_username: 'Change username', replay_tour: 'View app intro',
-      change_password: 'Change password', change_email: 'Change email', my_favorites: 'My favorites',
+      change_password: 'Change password', change_email: 'Change email', push_answers: 'Notifications', my_favorites: 'My favorites',
       // Map
       map_title: 'Map', map_sub_all: 'All places in Paraguay',
       // Filter
@@ -1139,6 +1139,91 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   const auth = firebase.auth();
   const storage = firebase.storage();
 
+  // === Push-Benachrichtigungen (Phase 1: "Antwort auf deine Community-Frage") =====
+  // Alles hier bleibt INAKTIV/unsichtbar, solange PUSH_VAPID_KEY leer ist. Das
+  // Messaging-SDK + der Push-SW werden NUR bei aktiver Zustimmung nachgeladen ->
+  // kein Einfluss auf App-Start/Home/Karte für Nutzer ohne Push.
+  var PUSH_VAPID_KEY = '';                       // <- öffentl. Web-Push-Zertifikat aus Firebase Console
+  var PUSH_MSG_SW    = 'firebase-messaging-sw.js';
+  var PUSH_SW_SCOPE  = 'fcm/';                   // enger relativer Scope -> stört den Caching-SW nicht
+  function _pushBuildReady(){ return !!PUSH_VAPID_KEY; }
+  function _pushSupported(){
+    return _pushBuildReady() && 'serviceWorker' in navigator && 'PushManager' in window
+      && 'Notification' in window && typeof firebase !== 'undefined';
+  }
+  var _fcmSdkLoading = null;
+  function _loadMessagingSdk(){
+    if (typeof firebase !== 'undefined' && firebase.messaging) return Promise.resolve();
+    if (_fcmSdkLoading) return _fcmSdkLoading;
+    _fcmSdkLoading = new Promise(function(resolve, reject){
+      var s = document.createElement('script');
+      s.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js';
+      s.async = true; s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+    return _fcmSdkLoading;
+  }
+  async function enablePushAnswers(silent){
+    if (!_pushSupported() || !currentUser) return false;
+    try {
+      var perm = Notification.permission;
+      if (perm === 'default') perm = await Notification.requestPermission();
+      if (perm !== 'granted'){ if(!silent) showToast(L('Benachrichtigungen sind ausgeschaltet.','Las notificaciones están desactivadas.','Notifications are off.')); return false; }
+      await _loadMessagingSdk();
+      var reg = await navigator.serviceWorker.register(PUSH_MSG_SW, { scope: PUSH_SW_SCOPE });
+      var messaging = firebase.messaging();
+      var token = await messaging.getToken({ vapidKey: PUSH_VAPID_KEY, serviceWorkerRegistration: reg });
+      if (!token) return false;
+      await db.collection('push_tokens').doc(currentUser.uid).set({
+        token: token, uid: currentUser.uid, platform: _ratePlatform(), lang: currentLang, answers: true, updated_at: new Date()
+      }, { merge: true });
+      try { localStorage.setItem('buscar_push_on','1'); } catch(e){}
+      if(!silent) showToast(L('Benachrichtigungen aktiviert.','Notificaciones activadas.','Notifications on.'));
+      _syncPushToggle();
+      return true;
+    } catch(e){ if(!silent) showToast(L('Benachrichtigungen konnten nicht aktiviert werden.','No se pudieron activar.','Could not enable notifications.')); return false; }
+  }
+  async function disablePushAnswers(){
+    try {
+      if (currentUser) { try { await db.collection('push_tokens').doc(currentUser.uid).delete(); } catch(e){} }
+      try { if (typeof firebase !== 'undefined' && firebase.messaging) await firebase.messaging().deleteToken(); } catch(e){}
+      try { localStorage.removeItem('buscar_push_on'); } catch(e){}
+      showToast(L('Benachrichtigungen ausgeschaltet.','Notificaciones desactivadas.','Notifications off.'));
+      _syncPushToggle();
+    } catch(e){}
+  }
+  function _pushIsOn(){ try { return localStorage.getItem('buscar_push_on')==='1' && Notification.permission==='granted'; } catch(e){ return false; } }
+  function togglePush(){ if (_pushIsOn()) disablePushAnswers(); else enablePushAnswers(false); }
+  // Zeigt/versteckt die Profil-Zeile und aktualisiert den Status-Text
+  function _syncPushToggle(){
+    var row = document.getElementById('pushToggleRow'); if(!row) return;
+    if (!_pushSupported()){ row.style.display='none'; return; }
+    row.style.display='';
+    var st = document.getElementById('pushToggleState');
+    if (st) st.textContent = _pushIsOn()
+      ? L('An','Activado','On')
+      : L('Aus','Desactivado','Off');
+  }
+  // Kontextuelles Opt-in direkt nach dem Stellen einer Frage (einmalig)
+  function _maybeAskPushAfterQuestion(){
+    if (!_pushSupported() || !currentUser) return;
+    if (Notification.permission !== 'default') return; // schon entschieden (OS)
+    var asked=false; try { asked = localStorage.getItem('buscar_push_asked')==='1'; } catch(e){}
+    if (asked) return;
+    try { localStorage.setItem('buscar_push_asked','1'); } catch(e){}
+    setTimeout(async function(){
+      var ok = await confirmSheet(
+        L('Sollen wir dich benachrichtigen, wenn jemand deine Frage beantwortet?',
+          '¿Querés que te avisemos cuando alguien responda tu pregunta?',
+          'Want to be notified when someone answers your question?'),
+        { confirmText: L('Ja, benachrichtigen','Sí, avisarme','Yes, notify me'),
+          cancelText:  L('Nein danke','No, gracias','No thanks') }
+      );
+      if (ok) enablePushAnswers(false);
+    }, 700);
+  }
+  // ================================================================================
+
   let allListings = [], activeCategory = 'Alle', mapCategory = 'Alle', activeCity = 'Alle', searchQuery = '', currentUser = null;
   let activeScreen = 'screenHome'; // Track current screen
   let pendingFormPhotos = [];
@@ -1512,6 +1597,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
     if (id === 'screenProfil' && currentUser) {
       loadBadges(currentUser.uid);
+      try { _syncPushToggle(); } catch(e){}
     }
     // === NEU: Beim Öffnen des Formulars Standort-Berechtigung pruefen
     if (id === 'screenForm') {
@@ -4658,6 +4744,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if(btn){ btn.disabled=false; btn.textContent=t('fc_ask_send'); }
       showToast(t('fc_asked'));
       openQuestionDetail(ref.id);
+      _maybeAskPushAfterQuestion();
     } catch(e){ if(btn){ btn.disabled=false; btn.textContent=t('fc_ask_send'); } showToast(t('err_generic')||'Fehler'); }
   }
 
