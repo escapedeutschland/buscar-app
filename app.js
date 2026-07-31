@@ -1926,10 +1926,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     ov.className='confirm-overlay rate-overlay'; ov.id='rateOverlay';
     ov.innerHTML='<div class="confirm-sheet rate-sheet" role="dialog" aria-modal="true">'
       +'<div class="rate-stars">★★★★★</div>'
-      +'<div class="rate-title">'+esc(L('Gefällt dir Buscar?','¿Te gusta Buscar?','Enjoying Buscar?'))+'</div>'
-      +'<div class="confirm-msg rate-msg">'+esc(L('Eine kurze Bewertung im Store hilft anderen, Buscar zu finden. Danke!',
-                                                  'Una breve reseña en la tienda ayuda a otros a descubrir Buscar. ¡Gracias!',
-                                                  'A quick rating in the store helps others discover Buscar. Thanks!'))+'</div>'
+      +'<div class="rate-title">'+esc(L('Zufrieden mit Buscar?','¿Contento con Buscar?','Happy with Buscar?'))+'</div>'
+      +'<div class="confirm-msg rate-msg">'+esc(L('Eine kurze Bewertung im Store hilft uns und besonders anderen, Buscar zu finden. Danke!',
+                                                  'Una breve reseña en la tienda nos ayuda y sobre todo ayuda a otros a descubrir Buscar. ¡Gracias!',
+                                                  'A quick rating in the store helps us and especially helps others discover Buscar. Thanks!'))+'</div>'
       +'<div class="rate-actions">'
       +'<button type="button" class="confirm-ok rate-go">'+esc(L('Jetzt bewerten','Calificar ahora','Rate now'))+'</button>'
       +'<button type="button" class="rate-later">'+esc(L('Später','Más tarde','Later'))+'</button>'
