@@ -4425,8 +4425,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (g.cta && g.cta.category) {
       var _c = g.cta;
       var _cLbl = esc(gl.ctaLabel || t('wissen_cta'));
-      var _cArgs = "'"+esc(_c.category)+"','"+esc(_c.subcat||'Alle')+"','"+esc(_c.lang||'Alle')+"'";
-      ctaHtml = '<button onclick="applyGuideCta('+_cArgs+')" style="margin-top:16px;width:100%;border:none;background:var(--yellow);color:#1a1400;font-weight:800;font-size:14.5px;padding:13px 16px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">'
+      // Kein Inline-onclick: delegierter Dokument-Listener (siehe unten) ist in
+      // WebViews zuverlaessiger als onclick-Attribute an per innerHTML erzeugten Buttons.
+      ctaHtml = '<button type="button" class="guide-cta-btn" data-cat="'+esc(_c.category)+'" data-sub="'+esc(_c.subcat||'Alle')+'" data-lang="'+esc(_c.lang||'Alle')+'" style="margin-top:16px;width:100%;border:none;background:var(--yellow);color:#1a1400;font-weight:800;font-size:14.5px;padding:13px 16px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:rgba(0,0,0,0.08)">'
         + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>'
         + _cLbl + '</button>';
     }
@@ -7307,6 +7308,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       const _ll = document.getElementById('filterLangLabel'); if (_ll) _ll.textContent = t('filter_lang_title');
     } else { filterBar.style.display = 'block'; }
     renderListings();
+  });
+
+  // Guide-CTA ("Jetzt … finden") delegiert behandeln – robust in allen WebViews,
+  // auch fuer die per innerHTML erzeugten Buttons im Wissen-Detail.
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest ? e.target.closest('.guide-cta-btn') : null;
+    if(!b) return;
+    e.preventDefault();
+    try { applyGuideCta(b.getAttribute('data-cat'), b.getAttribute('data-sub'), b.getAttribute('data-lang')); } catch(err){}
   });
 
   const searchInput = document.getElementById('searchInput');
