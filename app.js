@@ -4909,7 +4909,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var btn=document.getElementById('answerSubmitBtn'); if(btn){ btn.disabled=true; btn.textContent=t('saving')||'…'; }
     try {
       var l=_selectedAnswerListing;
-      await db.collection('answers').add({
+      var _ansRef = await db.collection('answers').add({
         question_id:_currentQuestion.id,
         listing_id: l?l.id:null,
         listing_name: l?(l.name||''):'',
@@ -4917,6 +4917,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         author_name: _currentUserName(),
         created_by:currentUser.uid, created_at:new Date()
       });
+      // Push an den Frage-Autor anstossen (nur wenn nicht selbst; Worker prueft zusaetzlich).
+      // Fire-and-forget: blockiert die UI nicht, Fehler werden ignoriert.
+      try {
+        if (_currentQuestion.created_by && _currentQuestion.created_by !== currentUser.uid) {
+          fetch(SHARE_BASE + '/notify-answer', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ questionId: _currentQuestion.id, answerId: _ansRef.id })
+          }).catch(function(){});
+        }
+      } catch(e){}
       // Selbstheilende Suche: verlinkter Eintrag + Merkmal -> Tag-Vorschlag (bestehende Freigabe/Owner-Weg)
       if(l){ var _tagEl=document.getElementById('answerTagInput'); var _tag=_tagEl?(_tagEl.value||'').trim():'';
         if(_tag){ var _ex=(l.tags||[]).map(function(x){return String(x).toLowerCase();});
@@ -7620,12 +7630,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function handleDeepLink() {
     try {
       var p = new URLSearchParams(location.search);
-      var ort = p.get('ort'), evid = p.get('event');
-      if (!ort && !evid) return;
+      var ort = p.get('ort'), evid = p.get('event'), qid = p.get('q');
+      if (!ort && !evid && !qid) return;
       // URL säubern, damit ein Reload nicht erneut aufspringt
       try { history.replaceState(null, '', location.pathname); } catch(e) {}
       if (ort) openSharedListing(ort);
       else if (evid) openSharedEvent(evid);
+      else if (qid) { try { openQuestionDetail(qid); } catch(e){} } // aus Push-Benachrichtigung
     } catch(e) {}
   }
 
