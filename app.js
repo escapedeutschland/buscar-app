@@ -1927,9 +1927,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     ov.innerHTML='<div class="confirm-sheet rate-sheet" role="dialog" aria-modal="true">'
       +'<div class="rate-stars">★★★★★</div>'
       +'<div class="rate-title">'+esc(L('Gefällt dir Buscar?','¿Te gusta Buscar?','Enjoying Buscar?'))+'</div>'
-      +'<div class="confirm-msg rate-msg">'+esc(L('Eine kurze Bewertung im Store hilft anderen, Buscar zu finden – und uns riesig. Danke! 🙏',
-                                                  'Una breve reseña en la tienda ayuda a otros a descubrir Buscar – y a nosotros muchísimo. ¡Gracias! 🙏',
-                                                  'A quick rating in the store helps others discover Buscar – and helps us a lot. Thanks! 🙏'))+'</div>'
+      +'<div class="confirm-msg rate-msg">'+esc(L('Eine kurze Bewertung im Store hilft anderen, Buscar zu finden. Danke!',
+                                                  'Una breve reseña en la tienda ayuda a otros a descubrir Buscar. ¡Gracias!',
+                                                  'A quick rating in the store helps others discover Buscar. Thanks!'))+'</div>'
       +'<div class="rate-actions">'
       +'<button type="button" class="confirm-ok rate-go">'+esc(L('Jetzt bewerten','Calificar ahora','Rate now'))+'</button>'
       +'<button type="button" class="rate-later">'+esc(L('Später','Más tarde','Later'))+'</button>'
