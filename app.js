@@ -1210,10 +1210,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var row = document.getElementById('pushToggleRow'); if(!row) return;
     if (!_pushSupported()){ row.style.display='none'; return; }
     row.style.display='';
-    var st = document.getElementById('pushToggleState');
-    if (st) st.textContent = _pushIsOn()
-      ? L('An','Activado','On')
-      : L('Aus','Desactivado','Off');
+    var sw = document.getElementById('pushToggleInput');
+    if (sw) sw.checked = _pushIsOn();
   }
   // Kontextuelles Opt-in direkt nach dem Stellen einer Frage (einmalig)
   function _maybeAskPushAfterQuestion(){
