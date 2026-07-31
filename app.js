@@ -1133,7 +1133,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
 
 
-  const firebaseConfig = { apiKey: "AIzaSyC_nxQL9Jo0EPUCtyI8QvnnRVKRBPbREKU", authDomain: "paraguay-app-8beb3.firebaseapp.com", projectId: "paraguay-app-8beb3", storageBucket: "paraguay-app-8beb3.firebasestorage.app" };
+  const firebaseConfig = { apiKey: "AIzaSyC_nxQL9Jo0EPUCtyI8QvnnRVKRBPbREKU", authDomain: "paraguay-app-8beb3.firebaseapp.com", projectId: "paraguay-app-8beb3", storageBucket: "paraguay-app-8beb3.firebasestorage.app", messagingSenderId: "966029575850", appId: "1:966029575850:web:59a41621877663bc0572d3" };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
   const auth = firebase.auth();
@@ -1143,7 +1143,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // Alles hier bleibt INAKTIV/unsichtbar, solange PUSH_VAPID_KEY leer ist. Das
   // Messaging-SDK + der Push-SW werden NUR bei aktiver Zustimmung nachgeladen ->
   // kein Einfluss auf App-Start/Home/Karte für Nutzer ohne Push.
-  var PUSH_VAPID_KEY = '';                       // <- öffentl. Web-Push-Zertifikat aus Firebase Console
+  var PUSH_VAPID_KEY = 'BEb7A2Qpj7H-StZ640TLnq4ovz9OH7OXVAs24cSS4mz0fjEB1cwbF9FkmkXG-gBe38o-t9KdyYRzhMMOAlGZvAs'; // öffentl. Web-Push-Zertifikat
   var PUSH_MSG_SW    = 'firebase-messaging-sw.js';
   var PUSH_SW_SCOPE  = 'fcm/';                   // enger relativer Scope -> stört den Caching-SW nicht
   function _pushBuildReady(){ return !!PUSH_VAPID_KEY; }

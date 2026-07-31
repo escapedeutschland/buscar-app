@@ -12,8 +12,8 @@ firebase.initializeApp({
   authDomain: 'paraguay-app-8beb3.firebaseapp.com',
   projectId: 'paraguay-app-8beb3',
   storageBucket: 'paraguay-app-8beb3.firebasestorage.app',
-  messagingSenderId: '__MESSAGING_SENDER_ID__', // <- aus Firebase Console eintragen
-  appId: '__APP_ID__'                            // <- aus Firebase Console eintragen
+  messagingSenderId: '966029575850',
+  appId: '1:966029575850:web:59a41621877663bc0572d3'
 });
 
 var messaging = firebase.messaging();
