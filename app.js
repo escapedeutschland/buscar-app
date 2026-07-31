@@ -1169,11 +1169,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var perm = Notification.permission;
       if (perm === 'default') perm = await Notification.requestPermission();
       if (perm !== 'granted'){ if(!silent) showToast(L('Benachrichtigungen sind ausgeschaltet.','Las notificaciones están desactivadas.','Notifications are off.')); return false; }
+      var _stage = 'sdk';
       await _loadMessagingSdk();
+      _stage = 'sw';
       var reg = await navigator.serviceWorker.register(PUSH_MSG_SW, { scope: PUSH_SW_SCOPE });
+      _stage = 'swready'; await navigator.serviceWorker.ready.catch(function(){});
+      _stage = 'token';
       var messaging = firebase.messaging();
       var token = await messaging.getToken({ vapidKey: PUSH_VAPID_KEY, serviceWorkerRegistration: reg });
-      if (!token) return false;
+      if (!token) { if(!silent) showToast('Push: kein Token erhalten'); return false; }
+      _stage = 'save';
       await db.collection('push_tokens').doc(currentUser.uid).set({
         token: token, uid: currentUser.uid, platform: _ratePlatform(), lang: currentLang, answers: true, updated_at: new Date()
       }, { merge: true });
@@ -1181,7 +1186,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if(!silent) showToast(L('Benachrichtigungen aktiviert.','Notificaciones activadas.','Notifications on.'));
       _syncPushToggle();
       return true;
-    } catch(e){ if(!silent) showToast(L('Benachrichtigungen konnten nicht aktiviert werden.','No se pudieron activar.','Could not enable notifications.')); return false; }
+    } catch(e){
+      // Aussagekraeftige Diagnose (temporaer): Stufe + Fehlercode/-text sichtbar machen
+      var _msg = (e && (e.code || e.name) ? (e.code || e.name) + ': ' : '') + (e && e.message ? e.message : String(e));
+      if(!silent) showToast('Push-Fehler [' + (typeof _stage!=='undefined'?_stage:'?') + ']: ' + _msg);
+      try { console.error('[push] enable failed at', typeof _stage!=='undefined'?_stage:'?', e); } catch(_){}
+      return false;
+    }
   }
   async function disablePushAnswers(){
     try {
