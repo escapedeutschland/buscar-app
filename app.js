@@ -192,7 +192,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Profile
       to_home: 'Zur Startseite', suggest_entry_prof: 'Eintrag vorschlagen',
       admin_panel: 'Admin Panel', change_username: 'Benutzername ändern', replay_tour: 'App-Einführung ansehen',
-      change_password: 'Passwort ändern', change_email: 'E-Mail ändern', push_answers: 'Benachrichtigungen', my_favorites: 'Meine Favoriten',
+      change_password: 'Passwort ändern', change_email: 'E-Mail ändern', push_answers: 'Antworten auf meine Fragen', push_events: 'Events in meiner Nähe', my_favorites: 'Meine Favoriten',
       // Map
       map_title: 'Karte', map_sub_all: 'Alle Orte in Paraguay',
       // Filter
@@ -450,7 +450,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Perfil
       to_home: 'Ir al inicio', suggest_entry_prof: 'Sugerir lugar',
       admin_panel: 'Panel admin', change_username: 'Cambiar usuario', replay_tour: 'Ver introducción de la app',
-      change_password: 'Cambiar contraseña', change_email: 'Cambiar correo', push_answers: 'Notificaciones', my_favorites: 'Mis favoritos',
+      change_password: 'Cambiar contraseña', change_email: 'Cambiar correo', push_answers: 'Respuestas a mis preguntas', push_events: 'Eventos cerca de mí', my_favorites: 'Mis favoritos',
       // Mapa
       map_title: 'Mapa', map_sub_all: 'Todos los lugares en Paraguay',
       // Filtros
@@ -708,7 +708,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Profile
       to_home: 'To home', suggest_entry_prof: 'Suggest a place',
       admin_panel: 'Admin panel', change_username: 'Change username', replay_tour: 'View app intro',
-      change_password: 'Change password', change_email: 'Change email', push_answers: 'Notifications', my_favorites: 'My favorites',
+      change_password: 'Change password', change_email: 'Change email', push_answers: 'Answers to my questions', push_events: 'Events near me', my_favorites: 'My favorites',
       // Map
       map_title: 'Map', map_sub_all: 'All places in Paraguay',
       // Filter
@@ -1163,55 +1163,109 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     });
     return _fcmSdkLoading;
   }
-  async function enablePushAnswers(silent){
+  // Gemeinsamer Weg: Berechtigung + SDK + Push-SW + Token. Wirft bei Fehler (mit .stage).
+  async function _pushEnsureToken(){
+    var perm = Notification.permission;
+    if (perm === 'default') perm = await Notification.requestPermission();
+    if (perm !== 'granted'){ var pe = new Error('permission'); pe.stage='perm'; throw pe; }
+    var stage='sdk';
+    try {
+      await _loadMessagingSdk();
+      stage='sw';
+      var reg = await navigator.serviceWorker.register(PUSH_MSG_SW, { scope: PUSH_SW_SCOPE });
+      stage='swready'; await navigator.serviceWorker.ready.catch(function(){});
+      stage='token';
+      var token = await firebase.messaging().getToken({ vapidKey: PUSH_VAPID_KEY, serviceWorkerRegistration: reg });
+      if (!token){ var te=new Error('no-token'); te.stage='token'; throw te; }
+      return token;
+    } catch(e){ if(!e.stage) e.stage=stage; throw e; }
+  }
+  // kind: 'answers' | 'events'
+  async function enablePush(kind, silent){
     if (!_pushSupported() || !currentUser) return false;
     try {
-      var perm = Notification.permission;
-      if (perm === 'default') perm = await Notification.requestPermission();
-      if (perm !== 'granted'){ if(!silent) showToast(L('Benachrichtigungen sind ausgeschaltet.','Las notificaciones están desactivadas.','Notifications are off.')); return false; }
-      var _stage = 'sdk';
-      await _loadMessagingSdk();
-      _stage = 'sw';
-      var reg = await navigator.serviceWorker.register(PUSH_MSG_SW, { scope: PUSH_SW_SCOPE });
-      _stage = 'swready'; await navigator.serviceWorker.ready.catch(function(){});
-      _stage = 'token';
-      var messaging = firebase.messaging();
-      var token = await messaging.getToken({ vapidKey: PUSH_VAPID_KEY, serviceWorkerRegistration: reg });
-      if (!token) { if(!silent) showToast('Push: kein Token erhalten'); return false; }
-      _stage = 'save';
-      await db.collection('push_tokens').doc(currentUser.uid).set({
-        token: token, uid: currentUser.uid, platform: _ratePlatform(), lang: currentLang, answers: true, updated_at: new Date()
-      }, { merge: true });
-      try { localStorage.setItem('buscar_push_on','1'); } catch(e){}
+      var region = null;
+      if (kind === 'events'){
+        region = await _pickEventRegion(_pushEventRegion());
+        if (!region) return false; // abgebrochen
+      }
+      var token = await _pushEnsureToken();
+      var payload = { token: token, uid: currentUser.uid, platform: _ratePlatform(), lang: currentLang, updated_at: new Date() };
+      payload[kind] = true;
+      if (kind === 'events'){ payload.event_region = region; try { localStorage.setItem('buscar_push_region', region); } catch(e){} }
+      await db.collection('push_tokens').doc(currentUser.uid).set(payload, { merge: true });
+      try { localStorage.setItem('buscar_push_' + kind, '1'); } catch(e){}
       if(!silent) showToast(L('Benachrichtigungen aktiviert.','Notificaciones activadas.','Notifications on.'));
       _syncPushToggle();
       return true;
     } catch(e){
-      // Aussagekraeftige Diagnose (temporaer): Stufe + Fehlercode/-text sichtbar machen
-      var _msg = (e && (e.code || e.name) ? (e.code || e.name) + ': ' : '') + (e && e.message ? e.message : String(e));
-      if(!silent) showToast('Push-Fehler [' + (typeof _stage!=='undefined'?_stage:'?') + ']: ' + _msg);
-      try { console.error('[push] enable failed at', typeof _stage!=='undefined'?_stage:'?', e); } catch(_){}
+      if(!silent){
+        if (e && e.stage === 'perm') showToast(L('Benachrichtigungen sind ausgeschaltet.','Las notificaciones están desactivadas.','Notifications are off.'));
+        else { var _m=(e&&(e.code||e.name)?(e.code||e.name)+': ':'')+(e&&e.message?e.message:String(e)); showToast('Push-Fehler ['+(e&&e.stage||'?')+']: '+_m); }
+      }
+      try { console.error('[push] enable('+kind+') failed', e); } catch(_){}
+      _syncPushToggle();
       return false;
     }
   }
-  async function disablePushAnswers(){
+  async function disablePush(kind){
     try {
-      if (currentUser) { try { await db.collection('push_tokens').doc(currentUser.uid).delete(); } catch(e){} }
-      try { if (typeof firebase !== 'undefined' && firebase.messaging) await firebase.messaging().deleteToken(); } catch(e){}
-      try { localStorage.removeItem('buscar_push_on'); } catch(e){}
+      if (currentUser){
+        var upd = {}; upd[kind] = false;
+        try { await db.collection('push_tokens').doc(currentUser.uid).set(upd, { merge: true }); } catch(e){}
+      }
+      try { localStorage.removeItem('buscar_push_' + kind); } catch(e){}
+      // Wenn ALLE Typen aus sind: Token ganz entfernen (sauberer Opt-out)
+      if (!_pushIsOn('answers') && !_pushIsOn('events')){
+        try { if (currentUser) await db.collection('push_tokens').doc(currentUser.uid).delete(); } catch(e){}
+        try { if (typeof firebase !== 'undefined' && firebase.messaging) await firebase.messaging().deleteToken(); } catch(e){}
+      }
       showToast(L('Benachrichtigungen ausgeschaltet.','Notificaciones desactivadas.','Notifications off.'));
       _syncPushToggle();
     } catch(e){}
   }
-  function _pushIsOn(){ try { return localStorage.getItem('buscar_push_on')==='1' && Notification.permission==='granted'; } catch(e){ return false; } }
-  function togglePush(){ if (_pushIsOn()) disablePushAnswers(); else enablePushAnswers(false); }
-  // Zeigt/versteckt die Profil-Zeile und aktualisiert den Status-Text
+  function _pushIsOn(kind){ try { return localStorage.getItem('buscar_push_' + kind)==='1' && Notification.permission==='granted'; } catch(e){ return false; } }
+  function _pushEventRegion(){ try { return localStorage.getItem('buscar_push_region') || 'all'; } catch(e){ return 'all'; } }
+  function togglePush(kind){ if (_pushIsOn(kind)) disablePush(kind); else enablePush(kind, false); }
+  // Zeigt/versteckt die Profil-Zeilen und spiegelt den Zustand der Schalter
   function _syncPushToggle(){
-    var row = document.getElementById('pushToggleRow'); if(!row) return;
-    if (!_pushSupported()){ row.style.display='none'; return; }
-    row.style.display='';
-    var sw = document.getElementById('pushToggleInput');
-    if (sw) sw.checked = _pushIsOn();
+    var supported = _pushSupported();
+    [['pushToggleRow','pushToggleInput','answers'], ['pushEventsRow','pushEventsInput','events']].forEach(function(x){
+      var row = document.getElementById(x[0]); if(!row) return;
+      if (!supported){ row.style.display='none'; return; }
+      row.style.display='';
+      var sw = document.getElementById(x[1]); if (sw) sw.checked = _pushIsOn(x[2]);
+    });
+  }
+  // Region-Auswahl (Bottom-Sheet) für Event-Benachrichtigungen
+  function _pushRegions(){ return [
+    { k:'gran_asuncion', l:L('Gran Asunción','Gran Asunción','Greater Asunción') },
+    { k:'este',   l:'Ciudad del Este / Alto Paraná' },
+    { k:'itapua', l:'Encarnación / Itapúa' },
+    { k:'chaco',  l:'Chaco' },
+    { k:'otros',  l:L('Übriges Paraguay','Resto de Paraguay','Rest of Paraguay') },
+    { k:'all',    l:L('Ganz Paraguay','Todo Paraguay','All of Paraguay') }
+  ]; }
+  function _pickEventRegion(current){
+    return new Promise(function(resolve){
+      var ov = document.createElement('div'); ov.className = 'confirm-overlay rate-overlay';
+      var btns = _pushRegions().map(function(r){
+        var on = r.k === current;
+        return '<button type="button" class="rate-region" data-k="'+r.k+'" style="width:100%;margin-top:8px;padding:12px 14px;border-radius:12px;border:1.5px solid '+(on?'var(--yellow)':'var(--border)')+';background:'+(on?'var(--yellow)':'var(--surface-2)')+';color:var(--text-1);font-weight:700;font-size:14px;cursor:pointer;text-align:left">'+esc(r.l)+'</button>';
+      }).join('');
+      ov.innerHTML = '<div class="confirm-sheet rate-sheet"><div style="font-weight:800;font-size:16px;color:var(--text-1)">'+esc(L('Für welche Region?','¿Para qué región?','Which region?'))+'</div>'
+        + '<div style="font-size:13px;color:var(--text-2);margin-top:4px">'+esc(L('Du bekommst neue Events aus dieser Region.','Recibirás nuevos eventos de esta región.','You\'ll get new events from this region.'))+'</div>'
+        + btns
+        + '<button type="button" class="rate-never" data-k="__cancel" style="width:100%;margin-top:10px">'+esc(L('Abbrechen','Cancelar','Cancel'))+'</button></div>';
+      document.body.appendChild(ov);
+      function done(v){ if(ov.parentNode) ov.parentNode.removeChild(ov); resolve(v); }
+      ov.addEventListener('click', function(e){
+        if (e.target === ov) return done(null);
+        var b = e.target.closest('button'); if(!b) return;
+        var k = b.getAttribute('data-k');
+        done(k === '__cancel' ? null : k);
+      });
+    });
   }
   // Kontextuelles Opt-in direkt nach dem Stellen einer Frage (einmalig)
   function _maybeAskPushAfterQuestion(){
@@ -1228,7 +1282,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         { confirmText: L('Ja, benachrichtigen','Sí, avisarme','Yes, notify me'),
           cancelText:  L('Nein danke','No, gracias','No thanks') }
       );
-      if (ok) enablePushAnswers(false);
+      if (ok) enablePush('answers', false);
     }, 700);
   }
   // ================================================================================
