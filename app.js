@@ -79,7 +79,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_pick_none: 'Kein passender Eintrag gefunden.',
       fc_pick_more: 'Tippe oben, um alle Einträge zu durchsuchen.',
       fc_answer_thanks: 'Danke für deine Antwort!',
-      fc_best_answer: 'Hilfreichste Antwort', fc_mark_best: 'Als hilfreich markieren', fc_unmark_best: 'Markierung entfernen',
+      fc_best_answer: 'Hilfreichste Antwort', fc_mark_best: 'Als hilfreich markieren', fc_unmark_best: 'Markierung entfernen', fc_reply: 'Antworten',
       fc_entry_prof: 'Frag die Community',
       fc_entry_mine: 'Meine Fragen',
       fc_entry_answers: 'Meine Antworten',
@@ -339,7 +339,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_pick_none: 'No se encontró ningún lugar.',
       fc_pick_more: 'Tocá arriba para buscar entre todos los lugares.',
       fc_answer_thanks: '¡Gracias por tu respuesta!',
-      fc_best_answer: 'Mejor respuesta', fc_mark_best: 'Marcar como útil', fc_unmark_best: 'Quitar marca',
+      fc_best_answer: 'Mejor respuesta', fc_mark_best: 'Marcar como útil', fc_unmark_best: 'Quitar marca', fc_reply: 'Responder',
       fc_entry_prof: 'Preguntá a la comunidad',
       fc_entry_mine: 'Mis preguntas',
       fc_entry_answers: 'Mis respuestas',
@@ -599,7 +599,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_pick_none: 'No matching entry found.',
       fc_pick_more: 'Tap above to search all entries.',
       fc_answer_thanks: 'Thanks for your answer!',
-      fc_best_answer: 'Best answer', fc_mark_best: 'Mark as helpful', fc_unmark_best: 'Remove mark',
+      fc_best_answer: 'Best answer', fc_mark_best: 'Mark as helpful', fc_unmark_best: 'Remove mark', fc_reply: 'Reply',
       fc_entry_prof: 'Ask the community',
       fc_entry_mine: 'My questions',
       fc_entry_answers: 'My answers',
@@ -4880,8 +4880,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch(e){ showToast(t('err_generic')||'Fehler'); }
   }
   var _lastAnswers = [];
-  // Fußzeile je Antwort: 👍-Reaktion + (für den Fragesteller) „hilfreichste Antwort" markieren
-  function _answerFoot(a, bestId, isAsker){
+  // Fußzeile je Antwort: 👍-Reaktion, „Antworten" (nur Top-Level) + (für den Fragesteller) „hilfreichste Antwort"
+  function _answerFoot(a, bestId, isAsker, isReply){
     var liked = !!(currentUser && Array.isArray(a.likers) && a.likers.indexOf(currentUser.uid) >= 0);
     var cnt = a.likes_count || 0;
     var thumb = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>';
@@ -4893,7 +4893,33 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } else if (isAsker){
       best = '<button class="ans-best-mark" onclick="event.stopPropagation();markBestAnswer(\''+a.id+'\')">'+esc(t('fc_mark_best'))+'</button>';
     }
-    return '<div class="ans-foot">'+best+like+'</div>';
+    // „Antworten" nur bei Top-Level-Antworten (einstufige Threads)
+    var reply = isReply ? '' : '<button class="ans-reply-btn" onclick="event.stopPropagation();openReplySheet(\''+a.id+'\')">'+esc(t('fc_reply'))+'</button>';
+    return '<div class="ans-foot">'+best+reply+like+'</div>';
+  }
+  // Rendert eine einzelne Antwortkarte (Top-Level oder Reply)
+  function _renderAnswerCard(a, bestId, isAsker, isReply){
+    var canDelA = currentUser && (currentUser.email===ADMIN_EMAIL || (a.created_by && a.created_by===currentUser.uid));
+    var delBtn = canDelA ? '<button class="answer-del" onclick="event.stopPropagation();deleteAnswer(\''+a.id+'\')">✕</button>' : '';
+    var by = a.author_name ? '<div class="answer-by">– '+esc(a.author_name)+'</div>' : '';
+    var txt = a.text || a.note || '';
+    var foot = _answerFoot(a, bestId, isAsker, isReply);
+    var bestCls = (a.id===bestId) ? ' answer-best' : '';
+    if(a.listing_id){
+      var l = allListings.find(function(x){ return x.id===a.listing_id; });
+      var col = catColors[(l&&l.category_id)] || '#6B6B6B';
+      return '<div class="answer-card'+bestCls+'" onclick="showDetail(\''+a.listing_id+'\')">'
+        + '<div class="answer-dot" style="background:'+col+'"></div>'
+        + '<div style="flex:1;min-width:0"><div class="answer-name">'+esc(a.listing_name||(l&&l.name)||'Eintrag')+'</div>'
+        + (txt ? '<div class="answer-note" data-original="'+esc(txt)+'">'+esc(txt)+'</div>' : '') + by + foot + '</div>'
+        + (canDelA ? delBtn : '<svg class="answer-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>')
+        + '</div>';
+    }
+    // Reine Text-Antwort  (Übersetzung greift via .answer-text[data-original])
+    return '<div class="answer-card answer-text-card'+bestCls+'">'
+      + '<div class="answer-dot answer-dot-text"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
+      + '<div style="flex:1;min-width:0"><div class="answer-text" data-original="'+esc(txt)+'">'+esc(txt)+'</div>'+by+foot+'</div>'
+      + delBtn + '</div>';
   }
   async function loadAnswers(qid){
     var c=document.getElementById('answerList'); if(!c) return;
@@ -4902,37 +4928,27 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var items = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
       var bestId = _currentQuestion && _currentQuestion.best_answer_id;
       var isAsker = !!(currentUser && _currentQuestion && _currentQuestion.created_by === currentUser.uid);
-      // Sortierung: hilfreichste zuerst, dann meiste 👍, dann neueste
-      items.sort(function(a,b){
-        var ab=(a.id===bestId)?1:0, bb=(b.id===bestId)?1:0; if(ab!==bb) return bb-ab;
-        var al=a.likes_count||0, bl=b.likes_count||0; if(al!==bl) return bl-al;
-        return _adminTs(b.created_at)-_adminTs(a.created_at);
-      });
       _lastAnswers = items;
-      var at=document.getElementById('qdAnswersTitle'); if(at) at.textContent=t('fc_answers')+(items.length?' ('+items.length+')':'');
+      // In Top-Level-Antworten und Replies (einstufig) aufteilen
+      var replies = {}, top = [];
+      items.forEach(function(a){
+        if (a.parent_answer_id){ (replies[a.parent_answer_id] = replies[a.parent_answer_id] || []).push(a); }
+        else { top.push(a); }
+      });
+      // Top-Level: hilfreichste zuerst, sonst chronologisch (älteste -> neueste) = lesbar wie ein Gespräch
+      top.sort(function(a,b){
+        var ab=(a.id===bestId)?1:0, bb=(b.id===bestId)?1:0; if(ab!==bb) return bb-ab;
+        return _adminTs(a.created_at)-_adminTs(b.created_at);
+      });
+      Object.keys(replies).forEach(function(k){ replies[k].sort(function(a,b){ return _adminTs(a.created_at)-_adminTs(b.created_at); }); });
+      var at=document.getElementById('qdAnswersTitle'); if(at) at.textContent=t('fc_answers')+(top.length?' ('+top.length+')':'');
       if(!items.length){ c.innerHTML = '<div class="q-empty-answers"><div class="q-empty-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="34" height="34"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="q-empty-answers-txt">'+t('fc_no_answers')+'</div></div>'; return; }
-      c.innerHTML = items.map(function(a){
-        var canDelA = currentUser && (currentUser.email===ADMIN_EMAIL || (a.created_by && a.created_by===currentUser.uid));
-        var delBtn = canDelA ? '<button class="answer-del" onclick="event.stopPropagation();deleteAnswer(\''+a.id+'\')">✕</button>' : '';
-        var by = a.author_name ? '<div class="answer-by">– '+esc(a.author_name)+'</div>' : '';
-        var txt = a.text || a.note || '';
-        var foot = _answerFoot(a, bestId, isAsker);
-        var bestCls = (a.id===bestId) ? ' answer-best' : '';
-        if(a.listing_id){
-          var l = allListings.find(function(x){ return x.id===a.listing_id; });
-          var col = catColors[(l&&l.category_id)] || '#6B6B6B';
-          return '<div class="answer-card'+bestCls+'" onclick="showDetail(\''+a.listing_id+'\')">'
-            + '<div class="answer-dot" style="background:'+col+'"></div>'
-            + '<div style="flex:1;min-width:0"><div class="answer-name">'+esc(a.listing_name||(l&&l.name)||'Eintrag')+'</div>'
-            + (txt ? '<div class="answer-note" data-original="'+esc(txt)+'">'+esc(txt)+'</div>' : '') + by + foot + '</div>'
-            + (canDelA ? delBtn : '<svg class="answer-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>')
-            + '</div>';
-        }
-        // Reine Text-Antwort  (Übersetzung greift via .answer-text[data-original])
-        return '<div class="answer-card answer-text-card'+bestCls+'">'
-          + '<div class="answer-dot answer-dot-text"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
-          + '<div style="flex:1;min-width:0"><div class="answer-text" data-original="'+esc(txt)+'">'+esc(txt)+'</div>'+by+foot+'</div>'
-          + delBtn + '</div>';
+      c.innerHTML = top.map(function(a){
+        var reps = replies[a.id] || [];
+        var repHtml = reps.length
+          ? '<div class="answer-replies">' + reps.map(function(r){ return _renderAnswerCard(r, bestId, isAsker, true); }).join('') + '</div>'
+          : '';
+        return _renderAnswerCard(a, bestId, isAsker, false) + repHtml;
       }).join('');
       if (currentLang !== 'de') translateVisibleContent();
     } catch(e){ c.innerHTML = '<div style="color:var(--text-3);font-size:13px">'+(t('err_generic')||'Fehler')+'</div>'; }
@@ -4958,6 +4974,45 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try{
       await db.collection('questions').doc(_currentQuestion.id).update({ best_answer_id: newBest });
       _currentQuestion.best_answer_id=newBest;
+      loadAnswers(_currentQuestion.id);
+    }catch(e){ showToast(t('err_generic')||'Fehler'); }
+  }
+  // Gezielt auf eine Antwort antworten (einstufiger Thread) – eigenes Sheet, unabhängig vom Listen-DOM
+  var _replyParent = null;
+  function openReplySheet(parentId){
+    if(!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
+    if(!_currentQuestion) return;
+    _replyParent = parentId;
+    var p = _lastAnswers.find(function(x){ return x.id===parentId; });
+    var name = (p && p.author_name) ? p.author_name : '';
+    var ov = document.createElement('div'); ov.className='confirm-overlay rate-overlay'; ov.id='replySheetOverlay';
+    ov.innerHTML = '<div class="confirm-sheet rate-sheet">'
+      + '<div style="font-weight:800;font-size:16px;color:var(--text-1)">'+esc(L('Antwort schreiben','Escribir respuesta','Write a reply'))+(name?' · '+esc(name):'')+'</div>'
+      + '<textarea id="replyText" class="field-textarea" maxlength="300" style="margin-top:10px;min-height:84px" placeholder="'+esc(L('Deine Antwort…','Tu respuesta…','Your reply…'))+'"></textarea>'
+      + '<div style="display:flex;gap:8px;margin-top:10px">'
+      + '<button type="button" class="confirm-ok" style="flex:1" onclick="submitReply()">'+esc(L('Senden','Enviar','Send'))+'</button>'
+      + '<button type="button" class="rate-never" onclick="closeReplySheet()">'+esc(L('Abbrechen','Cancelar','Cancel'))+'</button>'
+      + '</div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', function(e){ if(e.target===ov) closeReplySheet(); });
+    setTimeout(function(){ var ta=document.getElementById('replyText'); if(ta) ta.focus(); }, 120);
+  }
+  function closeReplySheet(){ var o=document.getElementById('replySheetOverlay'); if(o&&o.parentNode) o.parentNode.removeChild(o); _replyParent=null; }
+  async function submitReply(){
+    if(!currentUser || !_currentQuestion || !_replyParent) return;
+    var ta=document.getElementById('replyText'); var text=ta?(ta.value||'').trim().slice(0,300):'';
+    if(!text){ if(ta) ta.focus(); return; }
+    var pid=_replyParent;
+    try{
+      await db.collection('answers').add({
+        question_id:_currentQuestion.id, parent_answer_id:pid,
+        listing_id:null, listing_name:'', text:text,
+        author_name:_currentUserName(), created_by:currentUser.uid, created_at:new Date()
+      });
+      // Helfer-Zähler (Replies zählen als Community-Hilfe); answers_count der Frage bleibt = echte Antworten
+      try { db.collection('users').doc(currentUser.uid).set({ answers_given: firebase.firestore.FieldValue.increment(1) }, { merge:true }); } catch(e){}
+      closeReplySheet();
+      showToast(t('fc_answer_thanks'));
       loadAnswers(_currentQuestion.id);
     }catch(e){ showToast(t('err_generic')||'Fehler'); }
   }

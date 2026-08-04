@@ -793,6 +793,10 @@
 .ans-like svg { width:14px; height:14px; }
 .ans-like.liked { background:#FDEBCB; color:#B9790C; border-color:transparent; }
 .ans-best-mark { font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700; line-height:1; border-radius:20px; padding:5px 11px; background:transparent; color:var(--yellow-dark,#B9790C); border:1px solid var(--border); cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.ans-reply-btn { font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700; line-height:1; border-radius:20px; padding:5px 11px; background:transparent; color:var(--text-2,#6b5e4a); border:1px solid var(--border); cursor:pointer; -webkit-tap-highlight-color:transparent; }
+/* Einstufige Antwort-Threads: Replies eingerückt unter der Top-Level-Antwort */
+.answer-replies { margin:-3px 0 9px 30px; padding-left:12px; border-left:2px solid var(--border); }
+.answer-replies .answer-card { margin-bottom:8px; }
 .ans-best-tag { display:inline-flex; align-items:center; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:800; line-height:1; border-radius:20px; padding:5px 11px; background:#E7F6EA; color:#1E8E3E; }
 .answer-card.answer-best { border-color:#8BD3A0; background:linear-gradient(0deg, rgba(30,142,62,0.05), rgba(30,142,62,0.05)), var(--surface,#fff); align-items:flex-start; }
 
