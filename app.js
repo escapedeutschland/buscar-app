@@ -79,6 +79,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_pick_none: 'Kein passender Eintrag gefunden.',
       fc_pick_more: 'Tippe oben, um alle Einträge zu durchsuchen.',
       fc_answer_thanks: 'Danke für deine Antwort!',
+      fc_best_answer: 'Hilfreichste Antwort', fc_mark_best: 'Als hilfreich markieren', fc_unmark_best: 'Markierung entfernen',
       fc_entry_prof: 'Frag die Community',
       fc_entry_mine: 'Meine Fragen',
       fc_entry_answers: 'Meine Antworten',
@@ -260,6 +261,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_done: 'Schon erreicht ✓', badge_todo: 'Noch offen',
       badge_unlocked_title: 'Auszeichnung freigeschaltet!', badge_unlocked_cta: 'Super!',
       bdesc_first: 'Erstelle deinen ersten Eintrag.', bdesc_five: 'Erstelle 5 Einträge.', bdesc_ten: 'Erstelle 10 Einträge.', bdesc_twenty: 'Erstelle 20 Einträge.', bdesc_fifty: 'Erstelle 50 Einträge.', bdesc_hundred: 'Erstelle 100 Einträge.', bdesc_explorer: 'Erstelle Einträge in 3 verschiedenen Städten.', bdesc_chaco: 'Erstelle einen Eintrag im Chaco.',
+      badge_helper_first: 'Erste Antwort', badge_helper_ten: 'Community-Helfer', bdesc_helper_first: 'Beantworte eine Frage der Community.', bdesc_helper_ten: 'Beantworte 10 Fragen der Community.',
       badge_count_0: 'Noch keine eigenen Einträge', badge_count_1: '1 eigener Eintrag', badge_count_n: ' eigene Einträge',
     },
     es: {
@@ -337,6 +339,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_pick_none: 'No se encontró ningún lugar.',
       fc_pick_more: 'Tocá arriba para buscar entre todos los lugares.',
       fc_answer_thanks: '¡Gracias por tu respuesta!',
+      fc_best_answer: 'Mejor respuesta', fc_mark_best: 'Marcar como útil', fc_unmark_best: 'Quitar marca',
       fc_entry_prof: 'Preguntá a la comunidad',
       fc_entry_mine: 'Mis preguntas',
       fc_entry_answers: 'Mis respuestas',
@@ -518,6 +521,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_done: 'Ya conseguido ✓', badge_todo: 'Pendiente',
       badge_unlocked_title: '¡Insignia desbloqueada!', badge_unlocked_cta: '¡Genial!',
       bdesc_first: 'Crea tu primera entrada.', bdesc_five: 'Crea 5 entradas.', bdesc_ten: 'Crea 10 entradas.', bdesc_twenty: 'Crea 20 entradas.', bdesc_fifty: 'Crea 50 entradas.', bdesc_hundred: 'Crea 100 entradas.', bdesc_explorer: 'Crea entradas en 3 ciudades distintas.', bdesc_chaco: 'Crea una entrada en el Chaco.',
+      badge_helper_first: 'Primera respuesta', badge_helper_ten: 'Ayudante de la comunidad', bdesc_helper_first: 'Respondé una pregunta de la comunidad.', bdesc_helper_ten: 'Respondé 10 preguntas de la comunidad.',
       badge_count_0: 'Aún sin registros propios', badge_count_1: '1 registro propio', badge_count_n: ' registros propios',
     },
     en: {
@@ -595,6 +599,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_pick_none: 'No matching entry found.',
       fc_pick_more: 'Tap above to search all entries.',
       fc_answer_thanks: 'Thanks for your answer!',
+      fc_best_answer: 'Best answer', fc_mark_best: 'Mark as helpful', fc_unmark_best: 'Remove mark',
       fc_entry_prof: 'Ask the community',
       fc_entry_mine: 'My questions',
       fc_entry_answers: 'My answers',
@@ -776,6 +781,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_done: 'Earned ✓', badge_todo: 'Not yet',
       badge_unlocked_title: 'Badge unlocked!', badge_unlocked_cta: 'Awesome!',
       bdesc_first: 'Create your first entry.', bdesc_five: 'Create 5 entries.', bdesc_ten: 'Create 10 entries.', bdesc_twenty: 'Create 20 entries.', bdesc_fifty: 'Create 50 entries.', bdesc_hundred: 'Create 100 entries.', bdesc_explorer: 'Create entries in 3 different cities.', bdesc_chaco: 'Create an entry in the Chaco.',
+      badge_helper_first: 'First answer', badge_helper_ten: 'Community helper', bdesc_helper_first: 'Answer a community question.', bdesc_helper_ten: 'Answer 10 community questions.',
       badge_count_0: 'No entries of your own yet', badge_count_1: '1 entry of your own', badge_count_n: ' entries of your own',
     }
   };
@@ -1823,6 +1829,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     { id: 'hundred',  emoji: '💯', name: t('badge_hundred'),      threshold: 100,desc: t('bdesc_hundred') },
     { id: 'explorer', emoji: '🗺️', name: t('badge_explorer'),         threshold: 3,  special: 'cities3', desc: t('bdesc_explorer') },
     { id: 'chaco',    emoji: '🌵', name: t('badge_chaco'),      threshold: 1,  special: 'chaco',   desc: t('bdesc_chaco') },
+    { id: 'helper_first', emoji: '💬', name: t('badge_helper_first'), threshold: 1,  special: 'answers', desc: t('bdesc_helper_first') },
+    { id: 'helper_ten',   emoji: '🤝', name: t('badge_helper_ten'),   threshold: 10, special: 'answers', desc: t('bdesc_helper_ten') },
   ];; }
 
   var _badgesCache = null; // { uid, badges, count, ts } – vermeidet Netz-Warten beim erneuten Profil-Öffnen
@@ -1838,6 +1846,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Step 1: Show cached badges immediately from user doc (fast)
       const userDoc = await db.collection('users').doc(uid).get();
       const cached = userDoc.exists ? (userDoc.data().badges || []) : [];
+      const answersGiven = userDoc.exists ? (userDoc.data().answers_given || 0) : 0; // fuer Helfer-Badges
       renderBadgeGrid(cached); // instant render from cache
 
       // Step 2: Count listings in background to check for new badges
@@ -1859,6 +1868,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         let qualifies = false;
         if (b.special === 'cities3') qualifies = cities.size >= 3;
         else if (b.special === 'chaco') qualifies = hasChaco;
+        else if (b.special === 'answers') qualifies = answersGiven >= b.threshold;
         else qualifies = count >= b.threshold;
 
         if (qualifies && !earned.includes(b.id)) {
@@ -4869,12 +4879,36 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       _renderSeekBtn();
     } catch(e){ showToast(t('err_generic')||'Fehler'); }
   }
+  var _lastAnswers = [];
+  // Fußzeile je Antwort: 👍-Reaktion + (für den Fragesteller) „hilfreichste Antwort" markieren
+  function _answerFoot(a, bestId, isAsker){
+    var liked = !!(currentUser && Array.isArray(a.likers) && a.likers.indexOf(currentUser.uid) >= 0);
+    var cnt = a.likes_count || 0;
+    var thumb = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>';
+    var like = '<button class="ans-like'+(liked?' liked':'')+'" onclick="event.stopPropagation();toggleAnswerLike(\''+a.id+'\')">'+thumb+(cnt?('<span>'+cnt+'</span>'):'')+'</button>';
+    var best = '';
+    if (a.id === bestId){
+      best = '<span class="ans-best-tag">✓ '+esc(t('fc_best_answer'))+'</span>';
+      if (isAsker) best += '<button class="ans-best-mark" onclick="event.stopPropagation();markBestAnswer(\''+a.id+'\')">'+esc(t('fc_unmark_best'))+'</button>';
+    } else if (isAsker){
+      best = '<button class="ans-best-mark" onclick="event.stopPropagation();markBestAnswer(\''+a.id+'\')">'+esc(t('fc_mark_best'))+'</button>';
+    }
+    return '<div class="ans-foot">'+best+like+'</div>';
+  }
   async function loadAnswers(qid){
     var c=document.getElementById('answerList'); if(!c) return;
     try {
       var snap = await db.collection('answers').where('question_id','==',qid).get();
       var items = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
-      items.sort(function(a,b){ return _adminTs(b.created_at)-_adminTs(a.created_at); });
+      var bestId = _currentQuestion && _currentQuestion.best_answer_id;
+      var isAsker = !!(currentUser && _currentQuestion && _currentQuestion.created_by === currentUser.uid);
+      // Sortierung: hilfreichste zuerst, dann meiste 👍, dann neueste
+      items.sort(function(a,b){
+        var ab=(a.id===bestId)?1:0, bb=(b.id===bestId)?1:0; if(ab!==bb) return bb-ab;
+        var al=a.likes_count||0, bl=b.likes_count||0; if(al!==bl) return bl-al;
+        return _adminTs(b.created_at)-_adminTs(a.created_at);
+      });
+      _lastAnswers = items;
       var at=document.getElementById('qdAnswersTitle'); if(at) at.textContent=t('fc_answers')+(items.length?' ('+items.length+')':'');
       if(!items.length){ c.innerHTML = '<div class="q-empty-answers"><div class="q-empty-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="34" height="34"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="q-empty-answers-txt">'+t('fc_no_answers')+'</div></div>'; return; }
       c.innerHTML = items.map(function(a){
@@ -4882,24 +4916,50 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         var delBtn = canDelA ? '<button class="answer-del" onclick="event.stopPropagation();deleteAnswer(\''+a.id+'\')">✕</button>' : '';
         var by = a.author_name ? '<div class="answer-by">– '+esc(a.author_name)+'</div>' : '';
         var txt = a.text || a.note || '';
+        var foot = _answerFoot(a, bestId, isAsker);
+        var bestCls = (a.id===bestId) ? ' answer-best' : '';
         if(a.listing_id){
           var l = allListings.find(function(x){ return x.id===a.listing_id; });
           var col = catColors[(l&&l.category_id)] || '#6B6B6B';
-          return '<div class="answer-card" onclick="showDetail(\''+a.listing_id+'\')">'
+          return '<div class="answer-card'+bestCls+'" onclick="showDetail(\''+a.listing_id+'\')">'
             + '<div class="answer-dot" style="background:'+col+'"></div>'
             + '<div style="flex:1;min-width:0"><div class="answer-name">'+esc(a.listing_name||(l&&l.name)||'Eintrag')+'</div>'
-            + (txt ? '<div class="answer-note" data-original="'+esc(txt)+'">'+esc(txt)+'</div>' : '') + by + '</div>'
+            + (txt ? '<div class="answer-note" data-original="'+esc(txt)+'">'+esc(txt)+'</div>' : '') + by + foot + '</div>'
             + (canDelA ? delBtn : '<svg class="answer-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>')
             + '</div>';
         }
         // Reine Text-Antwort  (Übersetzung greift via .answer-text[data-original])
-        return '<div class="answer-card answer-text-card">'
+        return '<div class="answer-card answer-text-card'+bestCls+'">'
           + '<div class="answer-dot answer-dot-text"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
-          + '<div style="flex:1;min-width:0"><div class="answer-text" data-original="'+esc(txt)+'">'+esc(txt)+'</div>'+by+'</div>'
+          + '<div style="flex:1;min-width:0"><div class="answer-text" data-original="'+esc(txt)+'">'+esc(txt)+'</div>'+by+foot+'</div>'
           + delBtn + '</div>';
       }).join('');
       if (currentLang !== 'de') translateVisibleContent();
     } catch(e){ c.innerHTML = '<div style="color:var(--text-3);font-size:13px">'+(t('err_generic')||'Fehler')+'</div>'; }
+  }
+  // 👍 auf eine Antwort (Toggle). Gäste -> Login.
+  async function toggleAnswerLike(answerId){
+    if(!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
+    var a=_lastAnswers.find(function(x){ return x.id===answerId; });
+    var liked=!!(a && Array.isArray(a.likers) && a.likers.indexOf(currentUser.uid)>=0);
+    var FV=firebase.firestore.FieldValue;
+    try{
+      await db.collection('answers').doc(answerId).update(liked
+        ? { likers: FV.arrayRemove(currentUser.uid), likes_count: FV.increment(-1) }
+        : { likers: FV.arrayUnion(currentUser.uid),  likes_count: FV.increment(1) });
+      if(_currentQuestion) loadAnswers(_currentQuestion.id);
+    }catch(e){ showToast(t('err_generic')||'Fehler'); }
+  }
+  // „Hilfreichste Antwort" markieren/entfernen – nur der Fragesteller
+  async function markBestAnswer(answerId){
+    if(!currentUser || !_currentQuestion) return;
+    if(_currentQuestion.created_by !== currentUser.uid){ showToast(L('Das kann nur der Fragesteller.','Solo quien preguntó puede hacerlo.','Only the asker can do this.')); return; }
+    var newBest=(_currentQuestion.best_answer_id===answerId)?null:answerId;
+    try{
+      await db.collection('questions').doc(_currentQuestion.id).update({ best_answer_id: newBest });
+      _currentQuestion.best_answer_id=newBest;
+      loadAnswers(_currentQuestion.id);
+    }catch(e){ showToast(t('err_generic')||'Fehler'); }
   }
 
   var _selectedAnswerListing = null;
@@ -4992,6 +5052,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         if(_tag){ var _ex=(l.tags||[]).map(function(x){return String(x).toLowerCase();});
           if(_ex.indexOf(_tag.toLowerCase())<0){ try{ await db.collection('tag_suggestions').add({ listing_id:l.id, listing_name:l.name||'', tag:_tag, user_id:currentUser.uid, status:'pending', source:'answer', question_id:_currentQuestion.id, created_at:new Date() }); }catch(e){} } } }
       await db.collection('questions').doc(_currentQuestion.id).update({ answers_count: firebase.firestore.FieldValue.increment(1), status:'answered' });
+      // Helfer-Zähler am eigenen User-Doc (fire-and-forget) -> speist die Helfer-Badges
+      try { db.collection('users').doc(currentUser.uid).set({ answers_given: firebase.firestore.FieldValue.increment(1) }, { merge:true }); } catch(e){}
       _currentQuestion.answers_count=(_currentQuestion.answers_count||0)+1; _currentQuestion.status='answered';
       _markQuestionSeen(_currentQuestion.id, _currentQuestion.answers_count);
       _homeQuestions=null;
