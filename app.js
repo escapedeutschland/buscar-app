@@ -4993,7 +4993,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     setTimeout(function(){ var t2=document.getElementById('replyText'); if(t2) t2.focus(); }, 120);
   }
   function closeReplySheet(){ var ov=document.getElementById('replyOverlay'); if(ov) ov.classList.remove('visible'); _replyParent=null; }
-  async function submitReply(){
+  async function submitAnswerReply(){
     if(!currentUser || !_currentQuestion || !_replyParent) return;
     var ta=document.getElementById('replyText'); var text=ta?(ta.value||'').trim().slice(0,300):'';
     if(!text){ if(ta) ta.focus(); return; }
