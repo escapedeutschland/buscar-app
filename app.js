@@ -5000,13 +5000,23 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var pid=_replyParent;
     var btn=document.getElementById('replySubmitBtn'); if(btn){ btn.disabled=true; btn.textContent=t('saving')||'…'; }
     try{
-      await db.collection('answers').add({
+      var _repRef = await db.collection('answers').add({
         question_id:_currentQuestion.id, parent_answer_id:pid,
         listing_id:null, listing_name:'', text:text,
         author_name:_currentUserName(), created_by:currentUser.uid, created_at:new Date()
       });
       // Helfer-Zähler (Replies zählen als Community-Hilfe); answers_count der Frage bleibt = echte Antworten
       try { db.collection('users').doc(currentUser.uid).set({ answers_given: firebase.firestore.FieldValue.increment(1) }, { merge:true }); } catch(e){}
+      // Push an den Autor der Ursprungsantwort (Worker prüft parent_answer_id + Self-Skip)
+      try {
+        var _par=_lastAnswers.find(function(x){ return x.id===pid; });
+        if (_par && _par.created_by && _par.created_by !== currentUser.uid) {
+          fetch(SHARE_BASE + '/notify-answer', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ questionId:_currentQuestion.id, answerId:_repRef.id })
+          }).catch(function(){});
+        }
+      } catch(e){}
       closeReplySheet();
       showToast(t('fc_answer_thanks'));
       loadAnswers(_currentQuestion.id);
