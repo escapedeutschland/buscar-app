@@ -1,4 +1,4 @@
-/* Buscar – Push-Service-Worker (Phase 1: Antwort auf deine Community-Frage)
+/* Buscar – Push-Service-Worker (Phase 1/2: Community-Antworten & Events)
  * Bewusst getrennt vom Caching-SW (sw.js) und mit engem Scope registriert,
  * damit er den normalen Betrieb nicht beeinflusst. Wird NUR geladen, wenn ein
  * Nutzer Benachrichtigungen aktiv einschaltet – Standardnutzer laden ihn nie.
@@ -16,36 +16,9 @@ firebase.initializeApp({
   appId: '1:966029575850:web:59a41621877663bc0572d3'
 });
 
-var messaging = firebase.messaging();
-
-// Hintergrund-Nachrichten (App nicht im Vordergrund)
-messaging.onBackgroundMessage(function(payload) {
-  var n = payload.notification || payload.data || {};
-  var link = (payload.fcmOptions && payload.fcmOptions.link) ||
-             (payload.data && payload.data.link) || './';
-  return self.registration.showNotification(n.title || 'Buscar', {
-    body: n.body || '',
-    icon: './icon-192.png',
-    badge: './icon-192.png',
-    data: { link: link },
-    tag: (payload.data && payload.data.tag) || undefined
-  });
-});
-
-// Tippen auf die Mitteilung -> App fokussieren / passenden Screen öffnen
-self.addEventListener('notificationclick', function(event) {
-  event.notification.close();
-  var link = (event.notification.data && event.notification.data.link) || './';
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(cl) {
-      for (var i = 0; i < cl.length; i++) {
-        if (cl[i].url.indexOf('buscar-app') !== -1) {
-          cl[i].focus();
-          if ('navigate' in cl[i]) { try { cl[i].navigate(link); } catch (e) {} }
-          return;
-        }
-      }
-      return clients.openWindow(link);
-    })
-  );
-});
+// firebase.messaging() im Service Worker aktiviert den STANDARD-Hintergrund-Handler
+// von FCM: er zeigt eine Notification-Payload automatisch EINMAL an und öffnet bei
+// Klick webpush.fcm_options.link. Absichtlich KEIN eigener onBackgroundMessage- und
+// KEIN eigener notificationclick-Handler – sonst würde die Mitteilung DOPPELT
+// erscheinen (Auto-Anzeige + eigener showNotification).
+firebase.messaging();
