@@ -4977,7 +4977,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       loadAnswers(_currentQuestion.id);
     }catch(e){ showToast(t('err_generic')||'Fehler'); }
   }
-  // Gezielt auf eine Antwort antworten (einstufiger Thread) – eigenes Sheet, unabhängig vom Listen-DOM
+  // Gezielt auf eine Antwort antworten (einstufiger Thread) – nutzt das STATISCHE Overlay
+  // #replyOverlay aus index.html (exakt das bewährte Muster des Antwort-Dialogs, funktioniert überall).
   var _replyParent = null;
   function openReplySheet(parentId){
     if(!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
@@ -4985,31 +4986,19 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     _replyParent = parentId;
     var p = _lastAnswers.find(function(x){ return x.id===parentId; });
     var name = (p && p.author_name) ? p.author_name : '';
-    var ov = document.createElement('div'); ov.className='confirm-overlay rate-overlay'; ov.id='replySheetOverlay';
-    ov.innerHTML = '<div class="confirm-sheet rate-sheet">'
-      + '<div style="font-weight:800;font-size:16px;color:var(--text-1)">'+esc(L('Antwort schreiben','Escribir respuesta','Write a reply'))+(name?' · '+esc(name):'')+'</div>'
-      + '<textarea id="replyText" class="field-textarea" maxlength="300" style="margin-top:10px;min-height:84px" placeholder="'+esc(L('Deine Antwort…','Tu respuesta…','Your reply…'))+'"></textarea>'
-      + '<div style="display:flex;gap:8px;margin-top:10px">'
-      + '<button type="button" class="confirm-ok reply-send" style="flex:1">'+esc(L('Senden','Enviar','Send'))+'</button>'
-      + '<button type="button" class="rate-never reply-cancel">'+esc(L('Abbrechen','Cancelar','Cancel'))+'</button>'
-      + '</div></div>';
-    // Oben andocken statt unten: sonst verdeckt die Tastatur (Textfeld hat Fokus)
-    // den „Senden"-Button -> er wirkt „nicht klickbar". Nur dieses Sheet betroffen.
-    ov.style.alignItems = 'flex-start';
-    ov.style.paddingTop = 'calc(env(safe-area-inset-top,0px) + 24px)';
-    document.body.appendChild(ov);
-    // Buttons per addEventListener (robust in App-WebViews, im Gegensatz zu Inline-onclick)
-    ov.querySelector('.reply-send').addEventListener('click', function(){ submitReply(); });
-    ov.querySelector('.reply-cancel').addEventListener('click', function(){ closeReplySheet(); });
-    ov.addEventListener('click', function(e){ if(e.target===ov) closeReplySheet(); });
-    setTimeout(function(){ var ta=document.getElementById('replyText'); if(ta) ta.focus(); }, 120);
+    var titleEl = document.getElementById('replySheetTitle');
+    if(titleEl) titleEl.textContent = L('Antwort schreiben','Escribir respuesta','Write a reply') + (name ? ' · ' + name : '');
+    var ta = document.getElementById('replyText'); if(ta) ta.value = '';
+    var ov = document.getElementById('replyOverlay'); if(ov) ov.classList.add('visible');
+    setTimeout(function(){ var t2=document.getElementById('replyText'); if(t2) t2.focus(); }, 120);
   }
-  function closeReplySheet(){ var o=document.getElementById('replySheetOverlay'); if(o&&o.parentNode) o.parentNode.removeChild(o); _replyParent=null; }
+  function closeReplySheet(){ var ov=document.getElementById('replyOverlay'); if(ov) ov.classList.remove('visible'); _replyParent=null; }
   async function submitReply(){
     if(!currentUser || !_currentQuestion || !_replyParent) return;
     var ta=document.getElementById('replyText'); var text=ta?(ta.value||'').trim().slice(0,300):'';
     if(!text){ if(ta) ta.focus(); return; }
     var pid=_replyParent;
+    var btn=document.getElementById('replySubmitBtn'); if(btn){ btn.disabled=true; btn.textContent=t('saving')||'…'; }
     try{
       await db.collection('answers').add({
         question_id:_currentQuestion.id, parent_answer_id:pid,
@@ -5022,6 +5011,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       showToast(t('fc_answer_thanks'));
       loadAnswers(_currentQuestion.id);
     }catch(e){ showToast(t('err_generic')||'Fehler'); }
+    if(btn){ btn.disabled=false; btn.textContent=t('fc_answer_send_btn'); }
   }
 
   var _selectedAnswerListing = null;
