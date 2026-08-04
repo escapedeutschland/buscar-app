@@ -4993,6 +4993,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       + '<button type="button" class="confirm-ok reply-send" style="flex:1">'+esc(L('Senden','Enviar','Send'))+'</button>'
       + '<button type="button" class="rate-never reply-cancel">'+esc(L('Abbrechen','Cancelar','Cancel'))+'</button>'
       + '</div></div>';
+    // Oben andocken statt unten: sonst verdeckt die Tastatur (Textfeld hat Fokus)
+    // den „Senden"-Button -> er wirkt „nicht klickbar". Nur dieses Sheet betroffen.
+    ov.style.alignItems = 'flex-start';
+    ov.style.paddingTop = 'calc(env(safe-area-inset-top,0px) + 24px)';
     document.body.appendChild(ov);
     // Buttons per addEventListener (robust in App-WebViews, im Gegensatz zu Inline-onclick)
     ov.querySelector('.reply-send').addEventListener('click', function(){ submitReply(); });
