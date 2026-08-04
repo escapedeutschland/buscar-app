@@ -4990,10 +4990,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       + '<div style="font-weight:800;font-size:16px;color:var(--text-1)">'+esc(L('Antwort schreiben','Escribir respuesta','Write a reply'))+(name?' · '+esc(name):'')+'</div>'
       + '<textarea id="replyText" class="field-textarea" maxlength="300" style="margin-top:10px;min-height:84px" placeholder="'+esc(L('Deine Antwort…','Tu respuesta…','Your reply…'))+'"></textarea>'
       + '<div style="display:flex;gap:8px;margin-top:10px">'
-      + '<button type="button" class="confirm-ok" style="flex:1" onclick="submitReply()">'+esc(L('Senden','Enviar','Send'))+'</button>'
-      + '<button type="button" class="rate-never" onclick="closeReplySheet()">'+esc(L('Abbrechen','Cancelar','Cancel'))+'</button>'
+      + '<button type="button" class="confirm-ok reply-send" style="flex:1">'+esc(L('Senden','Enviar','Send'))+'</button>'
+      + '<button type="button" class="rate-never reply-cancel">'+esc(L('Abbrechen','Cancelar','Cancel'))+'</button>'
       + '</div></div>';
     document.body.appendChild(ov);
+    // Buttons per addEventListener (robust in App-WebViews, im Gegensatz zu Inline-onclick)
+    ov.querySelector('.reply-send').addEventListener('click', function(){ submitReply(); });
+    ov.querySelector('.reply-cancel').addEventListener('click', function(){ closeReplySheet(); });
     ov.addEventListener('click', function(e){ if(e.target===ov) closeReplySheet(); });
     setTimeout(function(){ var ta=document.getElementById('replyText'); if(ta) ta.focus(); }, 120);
   }
