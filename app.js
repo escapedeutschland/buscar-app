@@ -192,7 +192,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Profile
       to_home: 'Zur Startseite', suggest_entry_prof: 'Eintrag vorschlagen',
       admin_panel: 'Admin Panel', change_username: 'Benutzername ändern', replay_tour: 'App-Einführung ansehen',
-      change_password: 'Passwort ändern', change_email: 'E-Mail ändern', push_answers: 'Antworten auf meine Fragen', push_events: 'Events in meiner Nähe', my_favorites: 'Meine Favoriten',
+      change_password: 'Passwort ändern', change_email: 'E-Mail ändern', push_menu: 'App-Benachrichtigungen', push_answers: 'Antworten auf meine Fragen', push_events: 'Events in meiner Nähe', my_favorites: 'Meine Favoriten',
       // Map
       map_title: 'Karte', map_sub_all: 'Alle Orte in Paraguay',
       // Filter
@@ -450,7 +450,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Perfil
       to_home: 'Ir al inicio', suggest_entry_prof: 'Sugerir lugar',
       admin_panel: 'Panel admin', change_username: 'Cambiar usuario', replay_tour: 'Ver introducción de la app',
-      change_password: 'Cambiar contraseña', change_email: 'Cambiar correo', push_answers: 'Respuestas a mis preguntas', push_events: 'Eventos cerca de mí', my_favorites: 'Mis favoritos',
+      change_password: 'Cambiar contraseña', change_email: 'Cambiar correo', push_menu: 'Notificaciones de la app', push_answers: 'Respuestas a mis preguntas', push_events: 'Eventos cerca de mí', my_favorites: 'Mis favoritos',
       // Mapa
       map_title: 'Mapa', map_sub_all: 'Todos los lugares en Paraguay',
       // Filtros
@@ -708,7 +708,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Profile
       to_home: 'To home', suggest_entry_prof: 'Suggest a place',
       admin_panel: 'Admin panel', change_username: 'Change username', replay_tour: 'View app intro',
-      change_password: 'Change password', change_email: 'Change email', push_answers: 'Answers to my questions', push_events: 'Events near me', my_favorites: 'My favorites',
+      change_password: 'Change password', change_email: 'Change email', push_menu: 'App notifications', push_answers: 'Answers to my questions', push_events: 'Events near me', my_favorites: 'My favorites',
       // Map
       map_title: 'Map', map_sub_all: 'All places in Paraguay',
       // Filter
@@ -1180,19 +1180,37 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       return token;
     } catch(e){ if(!e.stage) e.stage=stage; throw e; }
   }
+  // Aktuellen Standort holen (Promise-Wrapper um die Geolocation-API)
+  function _getPosition(opts){
+    return new Promise(function(resolve, reject){
+      if (!('geolocation' in navigator)){ var e=new Error('geo-unavailable'); e.stage='geo'; return reject(e); }
+      navigator.geolocation.getCurrentPosition(resolve, function(err){
+        var e=new Error('geo-'+((err&&err.code)||'?')); e.stage='geo'; e.geoCode=err&&err.code; reject(e);
+      }, opts || { enableHighAccuracy:false, timeout:10000, maximumAge:600000 });
+    });
+  }
   // kind: 'answers' | 'events'
   async function enablePush(kind, silent){
     if (!_pushSupported() || !currentUser) return false;
     try {
-      var region = null;
+      var lat=null, lng=null;
       if (kind === 'events'){
-        region = await _pickEventRegion(_pushEventRegion());
-        if (!region) return false; // abgebrochen
+        // Live-Standort statt fester Ortswahl -> Events dort, wo der Nutzer GERADE ist.
+        var pos;
+        try { pos = await _getPosition(); }
+        catch(ge){
+          if(!silent) showToast(L('Für Events in deiner Nähe brauchen wir deinen Standort – bitte erlauben.',
+                                  'Para eventos cerca de ti necesitamos tu ubicación – permitilo, por favor.',
+                                  'We need your location for nearby events – please allow it.'));
+          _syncPushToggle(); return false;
+        }
+        lat = Math.round(pos.coords.latitude  * 10) / 10;  // ~11 km Raster (Privatsphäre)
+        lng = Math.round(pos.coords.longitude * 10) / 10;
       }
       var token = await _pushEnsureToken();
       var payload = { token: token, uid: currentUser.uid, platform: _ratePlatform(), lang: currentLang, updated_at: new Date() };
       payload[kind] = true;
-      if (kind === 'events'){ payload.event_region = region; try { localStorage.setItem('buscar_push_region', region); } catch(e){} }
+      if (kind === 'events'){ payload.event_lat = lat; payload.event_lng = lng; }
       await db.collection('push_tokens').doc(currentUser.uid).set(payload, { merge: true });
       try { localStorage.setItem('buscar_push_' + kind, '1'); } catch(e){}
       if(!silent) showToast(L('Benachrichtigungen aktiviert.','Notificaciones activadas.','Notifications on.'));
@@ -1225,47 +1243,34 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch(e){}
   }
   function _pushIsOn(kind){ try { return localStorage.getItem('buscar_push_' + kind)==='1' && Notification.permission==='granted'; } catch(e){ return false; } }
-  function _pushEventRegion(){ try { return localStorage.getItem('buscar_push_region') || 'all'; } catch(e){ return 'all'; } }
   function togglePush(kind){ if (_pushIsOn(kind)) disablePush(kind); else enablePush(kind, false); }
-  // Zeigt/versteckt die Profil-Zeilen und spiegelt den Zustand der Schalter
-  function _syncPushToggle(){
-    var supported = _pushSupported();
-    [['pushToggleRow','pushToggleInput','answers'], ['pushEventsRow','pushEventsInput','events']].forEach(function(x){
-      var row = document.getElementById(x[0]); if(!row) return;
-      if (!supported){ row.style.display='none'; return; }
-      row.style.display='';
-      var sw = document.getElementById(x[1]); if (sw) sw.checked = _pushIsOn(x[2]);
-    });
+  // Aus-/Einklappen des Benachrichtigungs-Menüpunkts
+  function togglePushPanel(){
+    var panel=document.getElementById('pushPanel'), chev=document.getElementById('pushChevron');
+    if(!panel) return;
+    var open = panel.style.display !== 'none';
+    panel.style.display = open ? 'none' : '';
+    if(chev) chev.style.transform = open ? '' : 'rotate(90deg)';
   }
-  // Region-Auswahl (Bottom-Sheet) für Event-Benachrichtigungen
-  function _pushRegions(){ return [
-    { k:'gran_asuncion', l:L('Gran Asunción','Gran Asunción','Greater Asunción') },
-    { k:'este',   l:'Ciudad del Este / Alto Paraná' },
-    { k:'itapua', l:'Encarnación / Itapúa' },
-    { k:'chaco',  l:'Chaco' },
-    { k:'otros',  l:L('Übriges Paraguay','Resto de Paraguay','Rest of Paraguay') },
-    { k:'all',    l:L('Ganz Paraguay','Todo Paraguay','All of Paraguay') }
-  ]; }
-  function _pickEventRegion(current){
-    return new Promise(function(resolve){
-      var ov = document.createElement('div'); ov.className = 'confirm-overlay rate-overlay';
-      var btns = _pushRegions().map(function(r){
-        var on = r.k === current;
-        return '<button type="button" class="rate-region" data-k="'+r.k+'" style="width:100%;margin-top:8px;padding:12px 14px;border-radius:12px;border:1.5px solid '+(on?'var(--yellow)':'var(--border)')+';background:'+(on?'var(--yellow)':'var(--surface-2)')+';color:var(--text-1);font-weight:700;font-size:14px;cursor:pointer;text-align:left">'+esc(r.l)+'</button>';
-      }).join('');
-      ov.innerHTML = '<div class="confirm-sheet rate-sheet"><div style="font-weight:800;font-size:16px;color:var(--text-1)">'+esc(L('Für welche Region?','¿Para qué región?','Which region?'))+'</div>'
-        + '<div style="font-size:13px;color:var(--text-2);margin-top:4px">'+esc(L('Du bekommst neue Events aus dieser Region.','Recibirás nuevos eventos de esta región.','You\'ll get new events from this region.'))+'</div>'
-        + btns
-        + '<button type="button" class="rate-never" data-k="__cancel" style="width:100%;margin-top:10px">'+esc(L('Abbrechen','Cancelar','Cancel'))+'</button></div>';
-      document.body.appendChild(ov);
-      function done(v){ if(ov.parentNode) ov.parentNode.removeChild(ov); resolve(v); }
-      ov.addEventListener('click', function(e){
-        if (e.target === ov) return done(null);
-        var b = e.target.closest('button'); if(!b) return;
-        var k = b.getAttribute('data-k');
-        done(k === '__cancel' ? null : k);
-      });
-    });
+  // Zeigt/versteckt den ganzen Menüpunkt und spiegelt den Zustand beider Schalter
+  function _syncPushToggle(){
+    var sec = document.getElementById('pushSection');
+    if (sec) sec.style.display = _pushSupported() ? '' : 'none';
+    var a=document.getElementById('pushToggleInput'); if(a) a.checked=_pushIsOn('answers');
+    var e=document.getElementById('pushEventsInput'); if(e) e.checked=_pushIsOn('events');
+  }
+  // Standort still aktualisieren (folgt dem Nutzer) – NUR wenn Events an + Standort bereits erlaubt.
+  // Fragt am App-Start NICHT ungefragt nach Standort.
+  async function _refreshPushLocation(){
+    try {
+      if (!_pushSupported() || !currentUser || !_pushIsOn('events')) return;
+      if (!(navigator.permissions && navigator.permissions.query)) return;
+      var st = await navigator.permissions.query({ name:'geolocation' });
+      if (st.state !== 'granted') return;
+      var pos = await _getPosition({ enableHighAccuracy:false, timeout:8000, maximumAge:300000 });
+      var lat = Math.round(pos.coords.latitude*10)/10, lng = Math.round(pos.coords.longitude*10)/10;
+      await db.collection('push_tokens').doc(currentUser.uid).set({ event_lat:lat, event_lng:lng, updated_at:new Date() }, { merge:true });
+    } catch(e){}
   }
   // Kontextuelles Opt-in direkt nach dem Stellen einer Frage (einmalig)
   function _maybeAskPushAfterQuestion(){
@@ -3101,6 +3106,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       updateGreeting();
       if (user.email === ADMIN_EMAIL) document.getElementById('adminRow').style.display = 'flex';
       var _grOn=document.getElementById('guestLoginSection'); if(_grOn) _grOn.style.display='none';
+      try { _refreshPushLocation(); } catch(e){} // Standort für Event-Push still nachziehen (folgt dem Nutzer)
       document.querySelectorAll('.auth-only').forEach(function(el){ el.style.display=''; });
       updateGreeting(); setNav('navHome'); showScreen('screenHome'); loadListings(); renderLegalScreens();
       setTimeout(function(){ try { updateMyAnswerBadge(true); } catch(e){} }, 1500);
