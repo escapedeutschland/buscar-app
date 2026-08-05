@@ -4771,12 +4771,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var days = Math.floor(h/24); if(days < 7) return days + ' ' + t('rt_d');
     var d = new Date(ms); return ('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.';
   }
+  // Deterministische Avatar-Farbe aus dem Namen (kein Netz, rein clientseitig)
+  function _nameColor(s){ s=String(s||''); var h=0; for(var i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))>>>0; } return 'hsl('+(h%360)+',52%,52%)'; }
+  function _avatarHtml(name, size){ size=size||24; var n=String(name||'').trim(); var ini=n?n.charAt(0).toUpperCase():'?'; return '<span class="bc-avatar" style="width:'+size+'px;height:'+size+'px;background:'+_nameColor(n)+';font-size:'+Math.round(size*0.46)+'px">'+esc(ini)+'</span>'; }
   function _renderQuestionCard(q){
     var answers = q.answers_count||0;
     var answered = (q.status==='answered' || answers>0);
     var col = _qCatColor(q.category_id), catLbl = _qCatLabel(q.category_id), date = _relTime(q.created_at);
     return '<div class="q-card" style="border-left:4px solid '+col+'" onclick="openQuestionDetail(\''+q.id+'\')">'
       + (catLbl ? '<div class="q-card-cat" style="color:'+col+';background:'+_hexA(col,0.12)+'">'+esc(catLbl)+'</div>' : '')
+      + (q.author_name ? '<div class="q-card-author">'+_avatarHtml(q.author_name,22)+'<span>'+esc(q.author_name)+'</span></div>' : '')
       + '<div class="q-card-text" data-original="'+esc(q.text||'')+'">'+esc(q.text||'')+'</div>'
       + '<div class="q-card-meta">'
         + _voteBtnHtml(q)
@@ -4843,12 +4847,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       (function(){
         var mr=document.getElementById('qdMetaRow'); if(!mr) return;
         var cl=_qCatLabel(q.category_id);
-        var info=[];
-        if(q.author_name) info.push(esc(t('fc_asked_by'))+' '+esc(q.author_name));
-        if(q.created_at) info.push(esc(formatDate(q.created_at)));
-        var infoStr=info.join(' · ');
-        mr.innerHTML = (cl?'<span class="qd-cat-chip">'+esc(cl)+'</span>':'') + (infoStr?'<div class="qd-info">'+infoStr+'</div>':'');
-        mr.style.display=(cl||infoStr)?'block':'none';
+        var when = q.created_at ? _relTime(q.created_at) : '';
+        var authorHtml = q.author_name
+          ? '<div class="qd-author">'+_avatarHtml(q.author_name,26)+'<span>'+esc(q.author_name)+(when?' · '+esc(when):'')+'</span></div>'
+          : (when ? '<div class="qd-info">'+esc(when)+'</div>' : '');
+        mr.innerHTML = (cl?'<span class="qd-cat-chip">'+esc(cl)+'</span>':'') + authorHtml;
+        mr.style.display=(cl||authorHtml)?'block':'none';
       })();
       var delBtn=document.getElementById('qdDeleteBtn');
       if(delBtn){ var canDel = currentUser && (currentUser.email===ADMIN_EMAIL || (q.created_by && q.created_by===currentUser.uid)); delBtn.style.display = canDel?'inline-flex':'none'; delBtn.onclick=function(){ deleteQuestion(q.id); }; }
@@ -4901,7 +4905,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function _renderAnswerCard(a, bestId, isAsker, isReply){
     var canDelA = currentUser && (currentUser.email===ADMIN_EMAIL || (a.created_by && a.created_by===currentUser.uid));
     var delBtn = canDelA ? '<button class="answer-del" onclick="event.stopPropagation();deleteAnswer(\''+a.id+'\')">✕</button>' : '';
-    var by = a.author_name ? '<div class="answer-by">– '+esc(a.author_name)+'</div>' : '';
+    var by = a.author_name ? '<div class="answer-by">'+_avatarHtml(a.author_name,18)+'<span>'+esc(a.author_name)+'</span></div>' : '';
     var txt = a.text || a.note || '';
     var foot = _answerFoot(a, bestId, isAsker, isReply);
     var bestCls = (a.id===bestId) ? ' answer-best' : '';
