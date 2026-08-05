@@ -79,7 +79,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_pick_none: 'Kein passender Eintrag gefunden.',
       fc_pick_more: 'Tippe oben, um alle Einträge zu durchsuchen.',
       fc_answer_thanks: 'Danke für deine Antwort!',
-      fc_best_answer: 'Hilfreichste Antwort', fc_mark_best: 'Als hilfreich markieren', fc_unmark_best: 'Markierung entfernen', fc_reply: 'Antworten',
+      fc_best_answer: 'Hilfreichste Antwort', fc_mark_best: 'Als hilfreich markieren', fc_unmark_best: 'Markierung entfernen', fc_reply: 'Antworten', fc_edit: 'Bearbeiten',
       fc_entry_prof: 'Frag die Community',
       fc_entry_mine: 'Meine Fragen',
       fc_entry_answers: 'Meine Antworten',
@@ -339,7 +339,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_pick_none: 'No se encontró ningún lugar.',
       fc_pick_more: 'Tocá arriba para buscar entre todos los lugares.',
       fc_answer_thanks: '¡Gracias por tu respuesta!',
-      fc_best_answer: 'Mejor respuesta', fc_mark_best: 'Marcar como útil', fc_unmark_best: 'Quitar marca', fc_reply: 'Responder',
+      fc_best_answer: 'Mejor respuesta', fc_mark_best: 'Marcar como útil', fc_unmark_best: 'Quitar marca', fc_reply: 'Responder', fc_edit: 'Editar',
       fc_entry_prof: 'Preguntá a la comunidad',
       fc_entry_mine: 'Mis preguntas',
       fc_entry_answers: 'Mis respuestas',
@@ -599,7 +599,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_pick_none: 'No matching entry found.',
       fc_pick_more: 'Tap above to search all entries.',
       fc_answer_thanks: 'Thanks for your answer!',
-      fc_best_answer: 'Best answer', fc_mark_best: 'Mark as helpful', fc_unmark_best: 'Remove mark', fc_reply: 'Reply',
+      fc_best_answer: 'Best answer', fc_mark_best: 'Mark as helpful', fc_unmark_best: 'Remove mark', fc_reply: 'Reply', fc_edit: 'Edit',
       fc_entry_prof: 'Ask the community',
       fc_entry_mine: 'My questions',
       fc_entry_answers: 'My answers',
@@ -4899,7 +4899,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
     // „Antworten" nur bei Top-Level-Antworten (einstufige Threads)
     var reply = isReply ? '' : '<button class="ans-reply-btn" onclick="event.stopPropagation();openReplySheet(\''+a.id+'\')">'+esc(t('fc_reply'))+'</button>';
-    return '<div class="ans-foot">'+best+reply+like+'</div>';
+    // „Bearbeiten" nur für den Autor der Antwort (Rules erlauben author-update)
+    var edit = (currentUser && a.created_by && a.created_by === currentUser.uid)
+      ? '<button class="ans-reply-btn" onclick="event.stopPropagation();openEditAnswer(\''+a.id+'\')">'+esc(t('fc_edit'))+'</button>' : '';
+    return '<div class="ans-foot">'+best+reply+edit+like+'</div>';
   }
   // Rendert eine einzelne Antwortkarte (Top-Level oder Reply)
   function _renderAnswerCard(a, bestId, isAsker, isReply){
@@ -4988,47 +4991,72 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
   // Gezielt auf eine Antwort antworten (einstufiger Thread) – nutzt das STATISCHE Overlay
   // #replyOverlay aus index.html (exakt das bewährte Muster des Antwort-Dialogs, funktioniert überall).
-  var _replyParent = null;
+  var _replyParent = null, _editAnswerId = null;
   function openReplySheet(parentId){
     if(!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
     if(!_currentQuestion) return;
-    _replyParent = parentId;
+    _replyParent = parentId; _editAnswerId = null;
     var p = _lastAnswers.find(function(x){ return x.id===parentId; });
     var name = (p && p.author_name) ? p.author_name : '';
     var titleEl = document.getElementById('replySheetTitle');
     if(titleEl) titleEl.textContent = L('Antwort schreiben','Escribir respuesta','Write a reply') + (name ? ' · ' + name : '');
-    var ta = document.getElementById('replyText'); if(ta) ta.value = '';
+    var sb = document.getElementById('replySubmitBtn'); if(sb) sb.textContent = t('fc_answer_send_btn');
+    var ta = document.getElementById('replyText'); if(ta){ ta.maxLength = 300; ta.value = ''; }
     var ov = document.getElementById('replyOverlay'); if(ov) ov.classList.add('visible');
     setTimeout(function(){ var t2=document.getElementById('replyText'); if(t2) t2.focus(); }, 120);
   }
-  function closeReplySheet(){ var ov=document.getElementById('replyOverlay'); if(ov) ov.classList.remove('visible'); _replyParent=null; }
+  // Eigene Antwort/Kommentar nachträglich bearbeiten (nur Autor; Rules erlauben author-update).
+  // Nutzt dasselbe statische Sheet im Edit-Modus.
+  function openEditAnswer(answerId){
+    if(!currentUser) return;
+    var a = _lastAnswers.find(function(x){ return x.id===answerId; });
+    if(!a || a.created_by !== currentUser.uid) return;
+    _editAnswerId = answerId; _replyParent = null;
+    var titleEl = document.getElementById('replySheetTitle');
+    if(titleEl) titleEl.textContent = L('Antwort bearbeiten','Editar respuesta','Edit answer');
+    var sb = document.getElementById('replySubmitBtn'); if(sb) sb.textContent = L('Speichern','Guardar','Save');
+    var ta = document.getElementById('replyText'); if(ta){ ta.maxLength = 400; ta.value = a.text || ''; }
+    var ov = document.getElementById('replyOverlay'); if(ov) ov.classList.add('visible');
+    setTimeout(function(){ var t2=document.getElementById('replyText'); if(t2){ t2.focus(); try{ t2.setSelectionRange(t2.value.length, t2.value.length); }catch(e){} } }, 120);
+  }
+  function closeReplySheet(){ var ov=document.getElementById('replyOverlay'); if(ov) ov.classList.remove('visible'); _replyParent=null; _editAnswerId=null; }
   async function submitAnswerReply(){
-    if(!currentUser || !_currentQuestion || !_replyParent) return;
-    var ta=document.getElementById('replyText'); var text=ta?(ta.value||'').trim().slice(0,300):'';
+    if(!currentUser) return;
+    var editing = !!_editAnswerId;
+    var ta=document.getElementById('replyText'); var text=ta?(ta.value||'').trim().slice(0, editing?400:300):'';
     if(!text){ if(ta) ta.focus(); return; }
-    var pid=_replyParent;
     var btn=document.getElementById('replySubmitBtn'); if(btn){ btn.disabled=true; btn.textContent=t('saving')||'…'; }
     try{
-      var _repRef = await db.collection('answers').add({
-        question_id:_currentQuestion.id, parent_answer_id:pid,
-        listing_id:null, listing_name:'', text:text,
-        author_name:_currentUserName(), created_by:currentUser.uid, created_at:new Date()
-      });
-      // Helfer-Zähler (Replies zählen als Community-Hilfe); answers_count der Frage bleibt = echte Antworten
-      try { db.collection('users').doc(currentUser.uid).set({ answers_given: firebase.firestore.FieldValue.increment(1) }, { merge:true }); } catch(e){}
-      // Push an den Autor der Ursprungsantwort (Worker prüft parent_answer_id + Self-Skip)
-      try {
-        var _par=_lastAnswers.find(function(x){ return x.id===pid; });
-        if (_par && _par.created_by && _par.created_by !== currentUser.uid) {
-          fetch(SHARE_BASE + '/notify-answer', {
-            method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ questionId:_currentQuestion.id, answerId:_repRef.id })
-          }).catch(function(){});
-        }
-      } catch(e){}
-      closeReplySheet();
-      showToast(t('fc_answer_thanks'));
-      loadAnswers(_currentQuestion.id);
+      if(editing){
+        // Nur den Text ändern; edited_at markiert die Bearbeitung
+        await db.collection('answers').doc(_editAnswerId).update({ text: text, edited_at: new Date() });
+        var _ea=_lastAnswers.find(function(x){ return x.id===_editAnswerId; }); if(_ea){ _ea.text=text; _ea.edited_at=new Date(); }
+        closeReplySheet();
+        showToast(L('Gespeichert','Guardado','Saved'));
+      } else {
+        if(!_currentQuestion || !_replyParent){ if(btn){ btn.disabled=false; btn.textContent=t('fc_answer_send_btn'); } return; }
+        var pid=_replyParent;
+        var _repRef = await db.collection('answers').add({
+          question_id:_currentQuestion.id, parent_answer_id:pid,
+          listing_id:null, listing_name:'', text:text,
+          author_name:_currentUserName(), created_by:currentUser.uid, created_at:new Date()
+        });
+        // Helfer-Zähler (Replies zählen als Community-Hilfe); answers_count der Frage bleibt = echte Antworten
+        try { db.collection('users').doc(currentUser.uid).set({ answers_given: firebase.firestore.FieldValue.increment(1) }, { merge:true }); } catch(e){}
+        // Push an den Autor der Ursprungsantwort (Worker prüft parent_answer_id + Self-Skip)
+        try {
+          var _par=_lastAnswers.find(function(x){ return x.id===pid; });
+          if (_par && _par.created_by && _par.created_by !== currentUser.uid) {
+            fetch(SHARE_BASE + '/notify-answer', {
+              method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({ questionId:_currentQuestion.id, answerId:_repRef.id })
+            }).catch(function(){});
+          }
+        } catch(e){}
+        closeReplySheet();
+        showToast(t('fc_answer_thanks'));
+      }
+      if(_currentQuestion) loadAnswers(_currentQuestion.id);
     }catch(e){ showToast(t('err_generic')||'Fehler'); }
     if(btn){ btn.disabled=false; btn.textContent=t('fc_answer_send_btn'); }
   }
