@@ -7791,6 +7791,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var name = ev ? ev.title : 'Buscar';
     shareLink(name, '🎉 ' + name + '\n' + t('share_cta'), SHARE_BASE + '/event/' + encodeURIComponent(_currentEventId));
   }
+  function shareCurrentQuestion() {
+    if (!_currentQuestion) return;
+    var q = (_currentQuestion.text || 'Buscar');
+    shareLink(q.slice(0,60), '💬 ' + q + '\n' + t('share_cta'), SHARE_BASE + '/frage/' + encodeURIComponent(_currentQuestion.id));
+  }
   async function openSharedListing(id) {
     try {
       if (!allListings.find(function(x){ return x.id === id; })) {
