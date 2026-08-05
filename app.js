@@ -79,7 +79,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_pick_none: 'Kein passender Eintrag gefunden.',
       fc_pick_more: 'Tippe oben, um alle Einträge zu durchsuchen.',
       fc_answer_thanks: 'Danke für deine Antwort!',
-      fc_best_answer: 'Hilfreichste Antwort', fc_mark_best: 'Als hilfreich markieren', fc_unmark_best: 'Markierung entfernen', fc_reply: 'Antworten', fc_edit: 'Bearbeiten',
+      fc_best_answer: 'Hilfreichste Antwort', fc_mark_best: 'Als hilfreich markieren', fc_unmark_best: 'Markierung entfernen', fc_reply: 'Antworten', fc_edit: 'Bearbeiten', fc_edited: 'bearbeitet',
       fc_entry_prof: 'Frag die Community',
       fc_entry_mine: 'Meine Fragen',
       fc_entry_answers: 'Meine Antworten',
@@ -339,7 +339,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_pick_none: 'No se encontró ningún lugar.',
       fc_pick_more: 'Tocá arriba para buscar entre todos los lugares.',
       fc_answer_thanks: '¡Gracias por tu respuesta!',
-      fc_best_answer: 'Mejor respuesta', fc_mark_best: 'Marcar como útil', fc_unmark_best: 'Quitar marca', fc_reply: 'Responder', fc_edit: 'Editar',
+      fc_best_answer: 'Mejor respuesta', fc_mark_best: 'Marcar como útil', fc_unmark_best: 'Quitar marca', fc_reply: 'Responder', fc_edit: 'Editar', fc_edited: 'editado',
       fc_entry_prof: 'Preguntá a la comunidad',
       fc_entry_mine: 'Mis preguntas',
       fc_entry_answers: 'Mis respuestas',
@@ -599,7 +599,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_pick_none: 'No matching entry found.',
       fc_pick_more: 'Tap above to search all entries.',
       fc_answer_thanks: 'Thanks for your answer!',
-      fc_best_answer: 'Best answer', fc_mark_best: 'Mark as helpful', fc_unmark_best: 'Remove mark', fc_reply: 'Reply', fc_edit: 'Edit',
+      fc_best_answer: 'Best answer', fc_mark_best: 'Mark as helpful', fc_unmark_best: 'Remove mark', fc_reply: 'Reply', fc_edit: 'Edit', fc_edited: 'edited',
       fc_entry_prof: 'Ask the community',
       fc_entry_mine: 'My questions',
       fc_entry_answers: 'My answers',
@@ -4908,7 +4908,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function _renderAnswerCard(a, bestId, isAsker, isReply){
     var canDelA = currentUser && (currentUser.email===ADMIN_EMAIL || (a.created_by && a.created_by===currentUser.uid));
     var delBtn = canDelA ? '<button class="answer-del" onclick="event.stopPropagation();deleteAnswer(\''+a.id+'\')">✕</button>' : '';
-    var by = a.author_name ? '<div class="answer-by">'+_avatarHtml(a.author_name,18)+'<span>'+esc(a.author_name)+'</span></div>' : '';
+    var editedMark = a.edited_at ? '<span class="ans-edited"> · '+esc(t('fc_edited'))+'</span>' : '';
+    var by = a.author_name ? '<div class="answer-by">'+_avatarHtml(a.author_name,18)+'<span>'+esc(a.author_name)+'</span>'+editedMark+'</div>' : '';
     var txt = a.text || a.note || '';
     var foot = _answerFoot(a, bestId, isAsker, isReply);
     var bestCls = (a.id===bestId) ? ' answer-best' : '';
@@ -4925,10 +4926,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     // Reine Text-Antwort: Avatar + Name oben, Text darunter (Kommentar-Layout).
     // (Übersetzung greift via .answer-text[data-original])
     return '<div class="answer-card answer-text-card'+bestCls+'">'
-      + '<div class="answer-head">'
-        + '<div class="answer-head-left">'+_avatarHtml(a.author_name,28)+'<span class="answer-head-name">'+esc(a.author_name||t('guest_name'))+'</span></div>'
-        + delBtn
-      + '</div>'
+      + delBtn
+      + '<div class="answer-head"><div class="answer-head-left">'+_avatarHtml(a.author_name,28)+'<span class="answer-head-name">'+esc(a.author_name||t('guest_name'))+'</span>'+editedMark+'</div></div>'
       + '<div class="answer-text" data-original="'+esc(txt)+'">'+esc(txt)+'</div>'
       + foot
       + '</div>';
