@@ -4919,11 +4919,16 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         + (canDelA ? delBtn : '<svg class="answer-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>')
         + '</div>';
     }
-    // Reine Text-Antwort  (Übersetzung greift via .answer-text[data-original])
+    // Reine Text-Antwort: Avatar + Name oben, Text darunter (Kommentar-Layout).
+    // (Übersetzung greift via .answer-text[data-original])
     return '<div class="answer-card answer-text-card'+bestCls+'">'
-      + '<div class="answer-dot answer-dot-text"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>'
-      + '<div style="flex:1;min-width:0"><div class="answer-text" data-original="'+esc(txt)+'">'+esc(txt)+'</div>'+by+foot+'</div>'
-      + delBtn + '</div>';
+      + '<div class="answer-head">'
+        + '<div class="answer-head-left">'+_avatarHtml(a.author_name,28)+'<span class="answer-head-name">'+esc(a.author_name||t('guest_name'))+'</span></div>'
+        + delBtn
+      + '</div>'
+      + '<div class="answer-text" data-original="'+esc(txt)+'">'+esc(txt)+'</div>'
+      + foot
+      + '</div>';
   }
   async function loadAnswers(qid){
     var c=document.getElementById('answerList'); if(!c) return;
