@@ -3924,10 +3924,6 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var es=(currentLang==='es');
     var l = listingId ? (typeof allListings!=='undefined'?allListings:[]).find(function(x){return x.id===listingId;}) : null;
     var objName = l ? (l.name||'') : '';
-    var waText = es
-      ? ('Hola, me gustaría destacar mi inmueble'+(objName?(' «'+objName+'»'):'')+' en Buscar / ser agente verificado.')
-      : ('Hallo, ich möchte mein Immobilien-Inserat'+(objName?(' „'+objName+'"'):'')+' bei Buscar hervorheben / als Makler verifiziert werden.');
-    var waHref='https://wa.me/'+MAKLER_WA+'?text='+encodeURIComponent(waText);
     var box=document.getElementById('maklerModalBox'); if(!box) return;
     box.innerHTML =
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
@@ -3936,16 +3932,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       +'</div>'
       +'<div style="font-size:13.5px;color:var(--text-2);line-height:1.5;margin-bottom:16px">'+L('Mehr Sichtbarkeit und Vertrauen für deine Immobilien bei Buscar.','Más visibilidad y confianza para tus inmuebles en Buscar.','More visibility and trust for your properties on Buscar.')+'</div>'
       +'<div class="makler-price-card">'
-        +'<div class="makler-price-head"><span class="makler-price-badge feat">★</span><span>'+L('Inserat hervorheben','Inmueble destacado','Feature listing')+'</span></div>'
-        +'<div class="makler-price-desc">'+L('Dein Objekt erscheint ganz oben — mit goldenem Rahmen und Badge.','Tu inmueble aparece arriba de todo, con marco y sello dorado.','Your listing appears at the very top — with a gold frame and badge.')+'</div>'
-        +'<div class="makler-price-val">USD 15 <span>(~14 €)</span> · <span>'+L('einmalig für 30 Tage','pago único por 30 días','one-time, 30 days')+'</span></div>'
-      +'</div>'
-      +'<div class="makler-price-card">'
         +'<div class="makler-price-head"><span class="makler-price-badge ver">✓</span><span>'+L('Verifizierter Makler','Agente verificado','Verified agent')+'</span></div>'
         +'<div class="makler-price-desc">'+L('Vertrauens-Badge „Verifiziert" an deinen Inseraten. Zur Verifizierung hinterlegst du Cédula und RUC — so sehen Nutzer, dass du ein echter, registrierter Anbieter bist.','Sello de confianza «verificado» en tus inmuebles. Para verificarte registras tu cédula y RUC — así los usuarios ven que eres un proveedor real y registrado.','A "verified" trust badge on your listings. To get verified, you register your Cédula and RUC — so users can see you are a real, registered provider.')+'</div>'
         +'<div class="makler-price-val">USD 20 <span>(~18 €)</span> · <span>'+L('pro Monat (Abo)','por mes (suscripción)','per month (subscription)')+'</span></div>'
       +'</div>'
-      +'<a href="'+waHref+'" target="_blank" rel="noopener" onclick="closeMaklerModal()" class="makler-wa-btn"><svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l-.999 3.648 3.978-1.595zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.71.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.247-.694.247-1.289.173-1.413z"/></svg>'+L('Per WhatsApp anfragen','Contactar por WhatsApp','Contact via WhatsApp')+'</a>'
       +'<button type="button" onclick="closeMaklerModal();openMaklerRequest('+(listingId?('\''+String(listingId).replace(/'/g,"")+'\''):'null')+')" style="width:100%;margin-top:10px;background:var(--yellow);color:#1a1400;border:none;border-radius:12px;padding:13px;font-family:\'DM Sans\',sans-serif;font-weight:800;font-size:14px;cursor:pointer">'+L('Verifizierung in der App beantragen','Solicitar verificación en la app','Request verification in the app')+'</button>'
       +'<div style="font-size:11.5px;color:var(--text-3);line-height:1.5;margin-top:12px;text-align:center">'+L('Zahlung per Überweisung / Tigo Money. Buscar schaltet die Sichtbarkeit manuell frei.','Pago por transferencia / Tigo Money. Buscar activa la visibilidad manualmente.','Payment via bank transfer / Tigo Money. Buscar activates visibility manually.')+'</div>';
     var m=document.getElementById('maklerModal'); if(m) m.style.display='flex';
