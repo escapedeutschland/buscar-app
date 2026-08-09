@@ -4194,10 +4194,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         _cre.innerHTML = '<div class="detail-card" style="display:flex;gap:8px;padding:12px">'
           + '<button onclick="openEditListing(\'' + l.id + '\')" style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:11px;font-family:\'DM Sans\',sans-serif;font-weight:600;font-size:13px;color:var(--text-1);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' + L('Bearbeiten','Editar','Edit') + '</button>'
           + '<button onclick="deleteOwnListing(\'' + l.id + '\')" style="flex:1;background:var(--red-light);border:none;border-radius:12px;padding:11px;font-family:\'DM Sans\',sans-serif;font-weight:600;font-size:13px;color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>' + L('Löschen','Eliminar','Delete') + '</button>'
-          + '</div>'
-          + (l.category_id === 'kat-immobilien'
-              ? '<div class="detail-card makler-promo-card" onclick="openMaklerModal(\'' + l.id + '\')"><div class="makler-promo-icon">★</div><div class="makler-promo-text"><div class="makler-promo-title">' + L('Dieses Objekt hervorheben?','¿Destacar este inmueble?','Feature this property?') + '</div><div class="makler-promo-sub">' + L('Ganz oben erscheinen + Verifiziert-Badge','Aparece arriba + sello de verificado','Appear at the top + verified badge') + '</div></div><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>'
-              : '');
+          + '</div>';
         _cre.style.display = 'block';
       } else { _cre.style.display = 'none'; _cre.innerHTML = ''; }
     }
