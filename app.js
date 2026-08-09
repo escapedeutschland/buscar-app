@@ -3324,6 +3324,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           allListings = JSON.parse(_cached);
           buildCityChips();
           renderListings();
+          if (activeScreen === 'screenImmobilien') { try { loadImmobilien(); } catch(e){} }
         }
       } catch(e) {}
       // Frischer Cache -> gar nicht erst Firestore abfragen (spart Reads/Kosten, v.a. bei Gästen)
@@ -3340,6 +3341,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       buildCityChips();
       renderListings(); // self-guarded auf Home
       if (activeScreen === 'screenMap' && maplibreMap) updateMapData(); // Karte offen -> Pins nachziehen
+      if (activeScreen === 'screenImmobilien') { try { loadImmobilien(); } catch(e){} } // Immobilien-Seite offen -> nachziehen
       document.getElementById('offlineBanner').classList.remove('visible');
       // Cache-Schreiben (JSON.stringify von ~400KB) in den Leerlauf verschieben,
       // damit es den ersten Render / erste Interaktionen nicht blockiert.
