@@ -3918,7 +3918,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   var MAKLER_WA = '4915222487351';
   function updateMaklerCta(){
     var el=document.getElementById('maklerCtaText'); if(!el) return;
-    el.textContent = L('Makler?','¿Agente?','Agent?');
+    el.textContent = L('Bist du Makler? Sichtbar werden & verifizieren','¿Sos agente? Hacete visible y verificate','Are you an agent? Get seen & verified');
   }
   function openMaklerModal(listingId){
     var es=(currentLang==='es');
