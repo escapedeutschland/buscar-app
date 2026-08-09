@@ -3934,10 +3934,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       +'<div class="makler-price-card">'
         +'<div class="makler-price-head"><span class="makler-price-badge ver">✓</span><span>'+L('Verifizierter Makler','Agente verificado','Verified agent')+'</span></div>'
         +'<div class="makler-price-desc">'+L('Vertrauens-Badge „Verifiziert" an deinen Inseraten. Zur Verifizierung hinterlegst du Cédula und RUC — so sehen Nutzer, dass du ein echter, registrierter Anbieter bist.','Sello de confianza «verificado» en tus inmuebles. Para verificarte registras tu cédula y RUC — así los usuarios ven que eres un proveedor real y registrado.','A "verified" trust badge on your listings. To get verified, you register your Cédula and RUC — so users can see you are a real, registered provider.')+'</div>'
-        +'<div class="makler-price-val">USD 20 <span>(~18 €)</span> · <span>'+L('pro Monat (Abo)','por mes (suscripción)','per month (subscription)')+'</span></div>'
+        +'<div class="makler-price-val" style="color:#0D9488">'+L('Kostenlos','Gratis','Free')+'</div>'
       +'</div>'
       +'<button type="button" onclick="closeMaklerModal();openMaklerRequest('+(listingId?('\''+String(listingId).replace(/'/g,"")+'\''):'null')+')" style="width:100%;margin-top:10px;background:var(--yellow);color:#1a1400;border:none;border-radius:12px;padding:13px;font-family:\'DM Sans\',sans-serif;font-weight:800;font-size:14px;cursor:pointer">'+L('Verifizierung in der App beantragen','Solicitar verificación en la app','Request verification in the app')+'</button>'
-      +'<div style="font-size:11.5px;color:var(--text-3);line-height:1.5;margin-top:12px;text-align:center">'+L('Zahlung per Überweisung / Tigo Money. Buscar schaltet die Sichtbarkeit manuell frei.','Pago por transferencia / Tigo Money. Buscar activa la visibilidad manualmente.','Payment via bank transfer / Tigo Money. Buscar activates visibility manually.')+'</div>';
+      +'<div style="font-size:11.5px;color:var(--text-3);line-height:1.5;margin-top:12px;text-align:center">'+L('Buscar prüft deine Angaben und schaltet das Verifiziert-Badge manuell frei.','Buscar revisa tus datos y activa el sello de verificación manualmente.','Buscar reviews your details and activates the verified badge manually.')+'</div>';
     var m=document.getElementById('maklerModal'); if(m) m.style.display='flex';
   }
   function closeMaklerModal(){ var m=document.getElementById('maklerModal'); if(m) m.style.display='none'; }
