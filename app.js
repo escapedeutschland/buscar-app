@@ -1864,13 +1864,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   ];; }
 
   var _badgesCache = null; // { uid, badges, count, ts } – vermeidet Netz-Warten beim erneuten Profil-Öffnen
-  async function loadBadges(uid) {
+  async function loadBadges(uid, opts) {
     // Sofort aus Session-Cache rendern -> Profil reagiert ohne Verzögerung
     if (_badgesCache && _badgesCache.uid === uid) {
       renderBadgeGrid(_badgesCache.badges);
       var _cc = _badgesCache.count, _cel = document.getElementById('profilListingsCount');
       if (_cel) _cel.textContent = _cc === 0 ? t('badge_count_0') : _cc === 1 ? t('badge_count_1') : _cc + t('badge_count_n');
-      if (Date.now() - _badgesCache.ts < 90000) return; // frisch -> kein erneuter Netz-Read
+      if (Date.now() - _badgesCache.ts < 90000 && !(opts && opts.nudge)) return; // frisch -> kein erneuter Netz-Read (bei Nudge trotzdem zählen)
     }
     try {
       // Step 1: Show cached badges immediately from user doc (fast)
@@ -1921,36 +1921,32 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         } catch(e) {}
       }
       _badgesCache = { uid: uid, badges: earned, count: count, ts: Date.now() }; // Session-Cache aktualisieren
-      try { renderBadgeProgress(count, answersGiven, earned); } catch(e){}
+      // Nach einer Eintrags-Aktion: "fast geschafft"-Nudge, wenn nichts frisch verdient wurde
+      if (opts && opts.nudge && !newlyEarned.length) { try { _nudgeOnly('listings', count, earned); } catch(e){} }
     } catch(e) { console.error('badge error', e); }
   }
 
   var _earnedBadges = [];
-  // #4A: Zeigt den Fortschritt zum NÄCHSTEN erreichbaren Abzeichen (kleinster Rest gewinnt).
-  // Nutzt nur bereits geladene Zahlen (count/answersGiven) -> keine zusätzlichen Reads.
-  function renderBadgeProgress(count, answersGiven, earned){
-    var el=document.getElementById('badgeProgress'); if(!el) return;
+  // Dopamin-Nudge: nach einer Aktion "fast geschafft"-Toast, wenn das nächste
+  // Abzeichen dieser Art nur noch 1–2 Schritte entfernt ist (nur das nächste, kein Spam).
+  function _nudgeOnly(kind, value, earned){
     earned = earned||[];
-    var best=null; // {def, current, remaining}
-    getBadgeDefs().forEach(function(b){
-      if(earned.indexOf(b.id)>=0) return;
-      var cur;
-      if(b.special==='answers') cur=answersGiven;
-      else if(b.special) return; // cities3/chaco: kein sinnvoller "noch X"-Zähler
-      else cur=count;
-      var rem=b.threshold-cur;
-      if(rem>0 && (!best || rem<best.remaining)) best={def:b, current:cur, remaining:rem};
-    });
-    if(!best){ el.style.display='none'; return; }
-    var isAns=(best.def.special==='answers');
-    var unit = best.remaining===1
-      ? (isAns ? L('Antwort','respuesta','answer') : L('Eintrag','entrada','entry'))
-      : (isAns ? L('Antworten','respuestas','answers') : L('Einträge','entradas','entries'));
-    var msg = L('Noch ','Faltan ','Just ')+best.remaining+' '+unit+L(' bis zum Abzeichen ',' para el distintivo ',' until the badge ')+'„'+best.def.name+'"';
-    var pct=Math.max(4, Math.min(100, Math.round(best.current/best.def.threshold*100)));
-    el.innerHTML = '<div class="badge-progress"><span class="bp-emoji">'+best.def.emoji+'</span><div class="bp-bar"><div class="bp-fill" style="width:'+pct+'%"></div></div></div>'
-      + '<div style="font-size:12px;color:var(--text-2);font-weight:700;margin:6px 4px 0">'+esc(msg)+'</div>';
-    el.style.display='';
+    var defs = getBadgeDefs().filter(function(b){ return kind==='answers' ? b.special==='answers' : !b.special; })
+                             .sort(function(a,b){ return a.threshold-b.threshold; });
+    for(var i=0;i<defs.length;i++){
+      var b=defs[i];
+      if(earned.indexOf(b.id)>=0) continue;
+      var rem=b.threshold-value;
+      if(rem<=0) return; // bereits erreicht -> wird an anderer Stelle gefeiert
+      if(rem<=2){
+        var isAns=(kind==='answers');
+        var unit = rem===1
+          ? (isAns?L('Antwort','respuesta','answer'):L('Eintrag','entrada','entry'))
+          : (isAns?L('Antworten','respuestas','answers'):L('Einträge','entradas','entries'));
+        showToast(b.emoji+' '+L('Nur noch ','¡Solo ','Just ')+rem+' '+unit+L(' bis zum Abzeichen ',' para el distintivo ',' until the ')+'„'+b.name+'"!');
+      }
+      return; // nur das nächste unverdiente Abzeichen betrachten
+    }
   }
   function renderBadgeGrid(earned) {
     _earnedBadges = earned || [];
@@ -4869,18 +4865,36 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
   // Kleiner Abzeichen-Chip neben dem Namen im Forum (nur wenn author_badge gesetzt)
   function _authorBadgeChip(o){ var e=(o&&o.author_badge)?String(o.author_badge):''; return e ? '<span class="author-badge" title="'+esc(L('Auszeichnung','Distintivo','Badge'))+'">'+e+'</span>' : ''; }
-  // Top-Abzeichen des aktuellen Nutzers ermitteln (für Denormalisierung beim Schreiben).
-  // plusAnswer=true: rechnet die gerade abgegebene Antwort mit ein (Helfer-Badge ab 1. Antwort).
-  async function _myTopBadgeEmoji(plusAnswer){
-    if(!currentUser) return '';
-    try{
-      var d=await db.collection('users').doc(currentUser.uid).get();
-      var data=d.exists?d.data():{};
-      var earned=Array.isArray(data.badges)?data.badges.slice():[];
-      var ag=(data.answers_given||0)+(plusAnswer?1:0);
-      getBadgeDefs().forEach(function(b){ if(b.special==='answers' && ag>=b.threshold && earned.indexOf(b.id)<0) earned.push(b.id); });
-      return _topBadgeEmoji(earned);
-    }catch(e){ return ''; }
+  // Badge-Stand des aktuellen Nutzers (1 Read): {badges[], answersGiven}
+  async function _getMyBadgeState(){
+    if(!currentUser) return { badges:[], answersGiven:0 };
+    try{ var d=await db.collection('users').doc(currentUser.uid).get(); var x=d.exists?d.data():{}; return { badges:Array.isArray(x.badges)?x.badges:[], answersGiven:x.answers_given||0 }; }
+    catch(e){ return { badges:[], answersGiven:0 }; }
+  }
+  // Top-Abzeichen-Emoji aus persistierten + (optional) aus answersGiven abgeleiteten Helfer-Badges.
+  function _topBadgeFromState(badges, answersGiven){
+    var earned=Array.isArray(badges)?badges.slice():[];
+    getBadgeDefs().forEach(function(b){ if(b.special==='answers' && answersGiven>=b.threshold && earned.indexOf(b.id)<0) earned.push(b.id); });
+    return _topBadgeEmoji(earned);
+  }
+  // Nach einer Antwort: frisch verdientes Helfer-Abzeichen persistieren + feiern, sonst "fast geschafft"-Nudge.
+  async function _rewardOrNudgeAnswers(newAG, persistedBadges){
+    if(!currentUser) return;
+    var earned=Array.isArray(persistedBadges)?persistedBadges.slice():[];
+    var defs=getBadgeDefs().filter(function(b){ return b.special==='answers'; }).sort(function(a,b){ return a.threshold-b.threshold; });
+    for(var i=0;i<defs.length;i++){
+      var b=defs[i];
+      if(earned.indexOf(b.id)>=0) continue;
+      if(newAG>=b.threshold){
+        earned.push(b.id);
+        try{ await db.collection('users').doc(currentUser.uid).set({ badges: earned }, { merge:true }); }catch(e){}
+        _badgesCache=null;
+        try{ showBadgeCelebration([b]); }catch(e){}
+        return;
+      }
+      break; // nächstes unverdientes ist zu weit -> Nudge unten
+    }
+    setTimeout(function(){ try{ _nudgeOnly('answers', newAG, earned); }catch(e){} }, 1400);
   }
   function _renderQuestionCard(q){
     var answers = q.answers_count||0;
@@ -4933,7 +4947,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var btn = document.getElementById('askSubmitBtn'); if(btn){ btn.disabled=true; btn.textContent=t('saving')||'…'; }
     var catSel = document.getElementById('askQuestionCat'); var catId = catSel ? (catSel.value||'') : '';
     try {
-      var _abQ = await _myTopBadgeEmoji(false);
+      var _stQ = await _getMyBadgeState();
+      var _abQ = _topBadgeFromState(_stQ.badges, _stQ.answersGiven);
       var ref = await db.collection('questions').add({
         text: title, body: body || null, norm_key: norm(title+' '+body), category_id: catId || null, author_name: _currentUserName(), author_badge: _abQ||null,
         created_by: currentUser.uid, created_at: new Date(), status: 'open', seekers: [currentUser.uid], seekers_count: 1, answers_count: 0
@@ -5153,7 +5168,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       } else {
         if(!_currentQuestion || !_replyParent){ if(btn){ btn.disabled=false; btn.textContent=t('fc_answer_send_btn'); } return; }
         var pid=_replyParent;
-        var _abR = await _myTopBadgeEmoji(true);
+        var _stR = await _getMyBadgeState();
+        var _newAGr = _stR.answersGiven + 1;
+        var _abR = _topBadgeFromState(_stR.badges, _newAGr);
         var _repRef = await db.collection('answers').add({
           question_id:_currentQuestion.id, parent_answer_id:pid,
           listing_id:null, listing_name:'', text:text,
@@ -5161,6 +5178,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         });
         // Helfer-Zähler (Replies zählen als Community-Hilfe); answers_count der Frage bleibt = echte Antworten
         try { db.collection('users').doc(currentUser.uid).set({ answers_given: firebase.firestore.FieldValue.increment(1) }, { merge:true }); } catch(e){}
+        _rewardOrNudgeAnswers(_newAGr, _stR.badges); // Helfer-Abzeichen feiern / "fast geschafft"-Nudge
         // Push an den Autor der Ursprungsantwort (Worker prüft parent_answer_id + Self-Skip)
         try {
           var _par=_lastAnswers.find(function(x){ return x.id===pid; });
@@ -5246,7 +5264,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var btn=document.getElementById('answerSubmitBtn'); if(btn){ btn.disabled=true; btn.textContent=t('saving')||'…'; }
     try {
       var l=_selectedAnswerListing;
-      var _abA = await _myTopBadgeEmoji(true);
+      var _stA = await _getMyBadgeState();
+      var _newAGa = _stA.answersGiven + 1;
+      var _abA = _topBadgeFromState(_stA.badges, _newAGa);
       var _ansRef = await db.collection('answers').add({
         question_id:_currentQuestion.id,
         listing_id: l?l.id:null,
@@ -5279,6 +5299,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       closeAnswerPick();
       showToast(t('fc_answer_thanks'));
       loadAnswers(_currentQuestion.id);
+      _rewardOrNudgeAnswers(_newAGa, _stA.badges); // Helfer-Abzeichen feiern / "fast geschafft"-Nudge
     } catch(e){ showToast(t('err_generic')||'Fehler'); }
     if(btn){ btn.disabled=false; btn.textContent=t('fc_answer_send_btn'); }
   }
@@ -5974,7 +5995,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       document.getElementById('formSuccess').textContent = t('submit_success'); document.getElementById('formSuccess').classList.add('visible');
       _badgesCache = null; // Zählung/Badges neu laden lassen
       showToast(t('submit_success'));
-      if (currentUser) { try { loadBadges(currentUser.uid); } catch(e){} } // ggf. neue Auszeichnung sofort zelebrieren
+      if (currentUser) { try { loadBadges(currentUser.uid, {nudge:true}); } catch(e){} } // ggf. neue Auszeichnung sofort zelebrieren + Nudge
       var _lhReset = document.getElementById('locationHint'); if (_lhReset) _lhReset.style.display = '';
       pendingFormPhotos = [];
       const grid2 = document.getElementById('formPhotoGrid');
