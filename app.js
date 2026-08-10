@@ -4855,7 +4855,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
   // Deterministische Avatar-Farbe aus dem Namen (kein Netz, rein clientseitig)
   function _nameColor(s){ s=String(s||''); var h=0; for(var i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))>>>0; } return 'hsl('+(h%360)+',52%,52%)'; }
-  function _avatarHtml(name, size){ size=size||24; var n=String(name||'').trim(); var ini=n?n.charAt(0).toUpperCase():'?'; return '<span class="bc-avatar" style="width:'+size+'px;height:'+size+'px;background:'+_nameColor(n)+';font-size:'+Math.round(size*0.46)+'px">'+esc(ini)+'</span>'; }
+  function _avatarHtml(name, size, ringColor){ size=size||24; var n=String(name||'').trim(); var ini=n?n.charAt(0).toUpperCase():'?'; var ring=ringColor?(';box-shadow:0 0 0 1.5px var(--card,#fff),0 0 0 3px '+ringColor):''; return '<span class="bc-avatar" style="width:'+size+'px;height:'+size+'px;background:'+_nameColor(n)+';font-size:'+Math.round(size*0.46)+'px'+ring+'">'+esc(ini)+'</span>'; }
   // Höchstwertiges Abzeichen (nach threshold) aus einer earned-Liste -> Emoji
   function _topBadgeEmoji(badges){
     if(!Array.isArray(badges)||!badges.length) return '';
@@ -4879,6 +4879,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     };
     return M[id] || null;
   }
+  // Ringfarbe fürs Profilbild = Farbe des Abzeichens (nur wenn ein bekanntes Badge gesetzt ist)
+  function _authorRingColor(o){ var v=(o&&o.author_badge)?String(o.author_badge):''; var m=_badgeChipMeta(v); return m?m.c:''; }
   // Abzeichen-Pill neben dem Namen im Forum. author_badge = Badge-ID (neu) -> Emoji+Titel+Farbe;
   // alter Bestand konnte nur ein Emoji sein -> dezenter Fallback.
   function _authorBadgeChip(o){
@@ -4929,7 +4931,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var col = _qCatColor(q.category_id), catLbl = _qCatLabel(q.category_id), date = _relTime(q.created_at);
     return '<div class="q-card" style="border-left:4px solid '+col+'" onclick="openQuestionDetail(\''+q.id+'\')">'
       + (catLbl ? '<div class="q-card-cat" style="color:'+col+';background:'+_hexA(col,0.12)+'">'+esc(catLbl)+'</div>' : '')
-      + (q.author_name ? '<div class="q-card-author">'+_avatarHtml(q.author_name,22)+'<span>'+esc(q.author_name)+'</span>'+_authorBadgeChip(q)+'</div>' : '')
+      + (q.author_name ? '<div class="q-card-author">'+_avatarHtml(q.author_name,22,_authorRingColor(q))+'<span>'+esc(q.author_name)+'</span>'+_authorBadgeChip(q)+'</div>' : '')
       + '<div class="q-card-text" data-original="'+esc(q.text||'')+'">'+esc(q.text||'')+'</div>'
       + (q.body ? '<div class="q-card-body" data-original="'+esc(q.body)+'">'+esc(q.body)+'</div>' : '')
       + '<div class="q-card-meta">'
@@ -5009,7 +5011,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         var cl=_qCatLabel(q.category_id);
         var when = q.created_at ? _relTime(q.created_at) : '';
         var authorHtml = q.author_name
-          ? '<div class="qd-author">'+_avatarHtml(q.author_name,26)+'<span>'+esc(q.author_name)+'</span>'+_authorBadgeChip(q)+(when?'<span class="qd-when"> · '+esc(when)+'</span>':'')+'</div>'
+          ? '<div class="qd-author">'+_avatarHtml(q.author_name,26,_authorRingColor(q))+'<span>'+esc(q.author_name)+'</span>'+_authorBadgeChip(q)+(when?'<span class="qd-when"> · '+esc(when)+'</span>':'')+'</div>'
           : (when ? '<div class="qd-info">'+esc(when)+'</div>' : '');
         mr.innerHTML = (cl?'<span class="qd-cat-chip">'+esc(cl)+'</span>':'') + authorHtml;
         mr.style.display=(cl||authorHtml)?'block':'none';
@@ -5069,7 +5071,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var canDelA = currentUser && (currentUser.email===ADMIN_EMAIL || (a.created_by && a.created_by===currentUser.uid));
     var delBtn = canDelA ? '<button class="answer-del" onclick="event.stopPropagation();deleteAnswer(\''+a.id+'\')">✕</button>' : '';
     var editedMark = a.edited_at ? '<span class="ans-edited"> · '+esc(t('fc_edited'))+'</span>' : '';
-    var by = a.author_name ? '<div class="answer-by">'+_avatarHtml(a.author_name,18)+'<span>'+esc(a.author_name)+'</span>'+_authorBadgeChip(a)+editedMark+'</div>' : '';
+    var by = a.author_name ? '<div class="answer-by">'+_avatarHtml(a.author_name,18,_authorRingColor(a))+'<span>'+esc(a.author_name)+'</span>'+_authorBadgeChip(a)+editedMark+'</div>' : '';
     var txt = a.text || a.note || '';
     var foot = _answerFoot(a, bestId, isAsker, isReply);
     var bestCls = (a.id===bestId) ? ' answer-best' : '';
@@ -5087,7 +5089,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     // (Übersetzung greift via .answer-text[data-original])
     return '<div class="answer-card answer-text-card'+bestCls+'">'
       + delBtn
-      + '<div class="answer-head"><div class="answer-head-left">'+_avatarHtml(a.author_name,28)+'<span class="answer-head-name">'+esc(a.author_name||t('guest_name'))+'</span>'+_authorBadgeChip(a)+editedMark+'</div></div>'
+      + '<div class="answer-head"><div class="answer-head-left">'+_avatarHtml(a.author_name,28,_authorRingColor(a))+'<span class="answer-head-name">'+esc(a.author_name||t('guest_name'))+'</span>'+_authorBadgeChip(a)+editedMark+'</div></div>'
       + '<div class="answer-text" data-original="'+esc(txt)+'">'+esc(txt)+'</div>'
       + foot
       + '</div>';
