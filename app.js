@@ -1895,10 +1895,37 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         } catch(e) {}
       }
       _badgesCache = { uid: uid, badges: earned, count: count, ts: Date.now() }; // Session-Cache aktualisieren
+      try { renderBadgeProgress(count, answersGiven, earned); } catch(e){}
     } catch(e) { console.error('badge error', e); }
   }
 
   var _earnedBadges = [];
+  // #4A: Zeigt den Fortschritt zum NÄCHSTEN erreichbaren Abzeichen (kleinster Rest gewinnt).
+  // Nutzt nur bereits geladene Zahlen (count/answersGiven) -> keine zusätzlichen Reads.
+  function renderBadgeProgress(count, answersGiven, earned){
+    var el=document.getElementById('badgeProgress'); if(!el) return;
+    earned = earned||[];
+    var best=null; // {def, current, remaining}
+    getBadgeDefs().forEach(function(b){
+      if(earned.indexOf(b.id)>=0) return;
+      var cur;
+      if(b.special==='answers') cur=answersGiven;
+      else if(b.special) return; // cities3/chaco: kein sinnvoller "noch X"-Zähler
+      else cur=count;
+      var rem=b.threshold-cur;
+      if(rem>0 && (!best || rem<best.remaining)) best={def:b, current:cur, remaining:rem};
+    });
+    if(!best){ el.style.display='none'; return; }
+    var isAns=(best.def.special==='answers');
+    var unit = best.remaining===1
+      ? (isAns ? L('Antwort','respuesta','answer') : L('Eintrag','entrada','entry'))
+      : (isAns ? L('Antworten','respuestas','answers') : L('Einträge','entradas','entries'));
+    var msg = L('Noch ','Faltan ','Just ')+best.remaining+' '+unit+L(' bis zum Abzeichen ',' para el distintivo ',' until the badge ')+'„'+best.def.name+'"';
+    var pct=Math.max(4, Math.min(100, Math.round(best.current/best.def.threshold*100)));
+    el.innerHTML = '<div class="badge-progress"><span class="bp-emoji">'+best.def.emoji+'</span><div class="bp-bar"><div class="bp-fill" style="width:'+pct+'%"></div></div></div>'
+      + '<div style="font-size:12px;color:var(--text-2);font-weight:700;margin:6px 4px 0">'+esc(msg)+'</div>';
+    el.style.display='';
+  }
   function renderBadgeGrid(earned) {
     _earnedBadges = earned || [];
     const grid = document.getElementById('badgeGrid');
@@ -4805,13 +4832,35 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // Deterministische Avatar-Farbe aus dem Namen (kein Netz, rein clientseitig)
   function _nameColor(s){ s=String(s||''); var h=0; for(var i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))>>>0; } return 'hsl('+(h%360)+',52%,52%)'; }
   function _avatarHtml(name, size){ size=size||24; var n=String(name||'').trim(); var ini=n?n.charAt(0).toUpperCase():'?'; return '<span class="bc-avatar" style="width:'+size+'px;height:'+size+'px;background:'+_nameColor(n)+';font-size:'+Math.round(size*0.46)+'px">'+esc(ini)+'</span>'; }
+  // Höchstwertiges Abzeichen (nach threshold) aus einer earned-Liste -> Emoji
+  function _topBadgeEmoji(badges){
+    if(!Array.isArray(badges)||!badges.length) return '';
+    var defs=getBadgeDefs(), best=null;
+    badges.forEach(function(id){ var d=defs.find(function(x){return x.id===id;}); if(d && (!best || d.threshold>best.threshold)) best=d; });
+    return best ? best.emoji : '';
+  }
+  // Kleiner Abzeichen-Chip neben dem Namen im Forum (nur wenn author_badge gesetzt)
+  function _authorBadgeChip(o){ var e=(o&&o.author_badge)?String(o.author_badge):''; return e ? '<span class="author-badge" title="'+esc(L('Auszeichnung','Distintivo','Badge'))+'">'+e+'</span>' : ''; }
+  // Top-Abzeichen des aktuellen Nutzers ermitteln (für Denormalisierung beim Schreiben).
+  // plusAnswer=true: rechnet die gerade abgegebene Antwort mit ein (Helfer-Badge ab 1. Antwort).
+  async function _myTopBadgeEmoji(plusAnswer){
+    if(!currentUser) return '';
+    try{
+      var d=await db.collection('users').doc(currentUser.uid).get();
+      var data=d.exists?d.data():{};
+      var earned=Array.isArray(data.badges)?data.badges.slice():[];
+      var ag=(data.answers_given||0)+(plusAnswer?1:0);
+      getBadgeDefs().forEach(function(b){ if(b.special==='answers' && ag>=b.threshold && earned.indexOf(b.id)<0) earned.push(b.id); });
+      return _topBadgeEmoji(earned);
+    }catch(e){ return ''; }
+  }
   function _renderQuestionCard(q){
     var answers = q.answers_count||0;
     var answered = (q.status==='answered' || answers>0);
     var col = _qCatColor(q.category_id), catLbl = _qCatLabel(q.category_id), date = _relTime(q.created_at);
     return '<div class="q-card" style="border-left:4px solid '+col+'" onclick="openQuestionDetail(\''+q.id+'\')">'
       + (catLbl ? '<div class="q-card-cat" style="color:'+col+';background:'+_hexA(col,0.12)+'">'+esc(catLbl)+'</div>' : '')
-      + (q.author_name ? '<div class="q-card-author">'+_avatarHtml(q.author_name,22)+'<span>'+esc(q.author_name)+'</span></div>' : '')
+      + (q.author_name ? '<div class="q-card-author">'+_avatarHtml(q.author_name,22)+'<span>'+esc(q.author_name)+'</span>'+_authorBadgeChip(q)+'</div>' : '')
       + '<div class="q-card-text" data-original="'+esc(q.text||'')+'">'+esc(q.text||'')+'</div>'
       + (q.body ? '<div class="q-card-body" data-original="'+esc(q.body)+'">'+esc(q.body)+'</div>' : '')
       + '<div class="q-card-meta">'
@@ -4856,8 +4905,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var btn = document.getElementById('askSubmitBtn'); if(btn){ btn.disabled=true; btn.textContent=t('saving')||'…'; }
     var catSel = document.getElementById('askQuestionCat'); var catId = catSel ? (catSel.value||'') : '';
     try {
+      var _abQ = await _myTopBadgeEmoji(false);
       var ref = await db.collection('questions').add({
-        text: title, body: body || null, norm_key: norm(title+' '+body), category_id: catId || null, author_name: _currentUserName(),
+        text: title, body: body || null, norm_key: norm(title+' '+body), category_id: catId || null, author_name: _currentUserName(), author_badge: _abQ||null,
         created_by: currentUser.uid, created_at: new Date(), status: 'open', seekers: [currentUser.uid], seekers_count: 1, answers_count: 0
       });
       _homeQuestions = null;
@@ -4889,7 +4939,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         var cl=_qCatLabel(q.category_id);
         var when = q.created_at ? _relTime(q.created_at) : '';
         var authorHtml = q.author_name
-          ? '<div class="qd-author">'+_avatarHtml(q.author_name,26)+'<span>'+esc(q.author_name)+(when?' · '+esc(when):'')+'</span></div>'
+          ? '<div class="qd-author">'+_avatarHtml(q.author_name,26)+'<span>'+esc(q.author_name)+'</span>'+_authorBadgeChip(q)+(when?'<span class="qd-when"> · '+esc(when)+'</span>':'')+'</div>'
           : (when ? '<div class="qd-info">'+esc(when)+'</div>' : '');
         mr.innerHTML = (cl?'<span class="qd-cat-chip">'+esc(cl)+'</span>':'') + authorHtml;
         mr.style.display=(cl||authorHtml)?'block':'none';
@@ -4949,7 +4999,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var canDelA = currentUser && (currentUser.email===ADMIN_EMAIL || (a.created_by && a.created_by===currentUser.uid));
     var delBtn = canDelA ? '<button class="answer-del" onclick="event.stopPropagation();deleteAnswer(\''+a.id+'\')">✕</button>' : '';
     var editedMark = a.edited_at ? '<span class="ans-edited"> · '+esc(t('fc_edited'))+'</span>' : '';
-    var by = a.author_name ? '<div class="answer-by">'+_avatarHtml(a.author_name,18)+'<span>'+esc(a.author_name)+'</span>'+editedMark+'</div>' : '';
+    var by = a.author_name ? '<div class="answer-by">'+_avatarHtml(a.author_name,18)+'<span>'+esc(a.author_name)+'</span>'+_authorBadgeChip(a)+editedMark+'</div>' : '';
     var txt = a.text || a.note || '';
     var foot = _answerFoot(a, bestId, isAsker, isReply);
     var bestCls = (a.id===bestId) ? ' answer-best' : '';
@@ -4967,7 +5017,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     // (Übersetzung greift via .answer-text[data-original])
     return '<div class="answer-card answer-text-card'+bestCls+'">'
       + delBtn
-      + '<div class="answer-head"><div class="answer-head-left">'+_avatarHtml(a.author_name,28)+'<span class="answer-head-name">'+esc(a.author_name||t('guest_name'))+'</span>'+editedMark+'</div></div>'
+      + '<div class="answer-head"><div class="answer-head-left">'+_avatarHtml(a.author_name,28)+'<span class="answer-head-name">'+esc(a.author_name||t('guest_name'))+'</span>'+_authorBadgeChip(a)+editedMark+'</div></div>'
       + '<div class="answer-text" data-original="'+esc(txt)+'">'+esc(txt)+'</div>'
       + foot
       + '</div>';
@@ -5075,10 +5125,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       } else {
         if(!_currentQuestion || !_replyParent){ if(btn){ btn.disabled=false; btn.textContent=t('fc_answer_send_btn'); } return; }
         var pid=_replyParent;
+        var _abR = await _myTopBadgeEmoji(true);
         var _repRef = await db.collection('answers').add({
           question_id:_currentQuestion.id, parent_answer_id:pid,
           listing_id:null, listing_name:'', text:text,
-          author_name:_currentUserName(), created_by:currentUser.uid, created_at:new Date()
+          author_name:_currentUserName(), author_badge:_abR||null, created_by:currentUser.uid, created_at:new Date()
         });
         // Helfer-Zähler (Replies zählen als Community-Hilfe); answers_count der Frage bleibt = echte Antworten
         try { db.collection('users').doc(currentUser.uid).set({ answers_given: firebase.firestore.FieldValue.increment(1) }, { merge:true }); } catch(e){}
@@ -5167,12 +5218,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var btn=document.getElementById('answerSubmitBtn'); if(btn){ btn.disabled=true; btn.textContent=t('saving')||'…'; }
     try {
       var l=_selectedAnswerListing;
+      var _abA = await _myTopBadgeEmoji(true);
       var _ansRef = await db.collection('answers').add({
         question_id:_currentQuestion.id,
         listing_id: l?l.id:null,
         listing_name: l?(l.name||''):'',
         text: text||'',
         author_name: _currentUserName(),
+        author_badge: _abA||null,
         created_by:currentUser.uid, created_at:new Date()
       });
       // Push an den Frage-Autor anstossen (nur wenn nicht selbst; Worker prueft zusaetzlich).
