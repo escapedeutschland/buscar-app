@@ -752,6 +752,7 @@
 .q-chip { font-size:11px; font-weight:700; border-radius:20px; padding:3px 9px; background:var(--surface-2,#f4f1ec); color:var(--text-3); }
 .q-chip.hot { background:#FDEBCB; color:#B9790C; }
 .q-chip.ok { background:#E3F4EA; color:#1F8C52; }
+.q-chip.q-chip-loc { background:#E6F0FB; color:#2563eb; }
 .q-seek-btn { display:inline-flex; align-items:center; gap:8px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; padding:11px 16px; border-radius:13px; border:1.5px solid var(--yellow); background:var(--yellow-light); color:var(--yellow-dark); cursor:pointer; }
 .q-seek-btn.active-seek { background:#E3F4EA; border-color:var(--green,#22A06B); color:#1F8C52; }
 .answer-card, .answer-pick-item { display:flex; align-items:center; gap:12px; background:var(--surface,#fff); border:1px solid var(--border); border-radius:14px; padding:12px 13px; margin-bottom:9px; cursor:pointer; }
