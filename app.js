@@ -176,7 +176,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       loc_remove: 'Standort entfernen',
       loc_locating: 'Standort wird ermittelt...',
       // === Ende NEU ===
-      photos_optional: 'Fotos (optional, max. 3)',
+      photos_optional: 'Fotos (optional)',
       photos_hint: 'Fotos helfen bei der Prüfung und werden nach Genehmigung sichtbar.',
       submit_btn: 'Eintrag einreichen', submitting: 'Wird eingereicht...',
       submit_success: 'Danke! Dein Eintrag wurde eingereicht und wird geprüft.',
@@ -436,7 +436,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       loc_remove: 'Quitar ubicación',
       loc_locating: 'Determinando ubicación...',
       // === Ende NEU ===
-      photos_optional: 'Fotos (opcional, máx. 3)',
+      photos_optional: 'Fotos (opcional)',
       photos_hint: 'Las fotos ayudan en la revisión y serán visibles tras aprobación.',
       submit_btn: 'Enviar listado', submitting: 'Enviando...',
       submit_success: '¡Gracias! Tu listado fue enviado y será revisado.',
@@ -696,7 +696,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       loc_remove: 'Remove location',
       loc_locating: 'Determining location...',
       // === End NEW ===
-      photos_optional: 'Photos (optional, max. 3)',
+      photos_optional: 'Photos (optional)',
       photos_hint: 'Photos help with the review and become visible after approval.',
       submit_btn: 'Submit entry', submitting: 'Submitting...',
       submit_success: 'Thanks! Your entry has been submitted and will be reviewed.',
@@ -1040,6 +1040,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const photosLabel = document.querySelector('.form-card-title:last-of-type');
     document.querySelectorAll('.form-card-title').forEach(el => {
       if (el.textContent.includes('Fotos') || el.textContent.includes('Foto')) {
+        el.id = 'formPhotosTitle';
         el.textContent = t('photos_optional');
       }
       if (el.textContent === 'Grundinfos' || el.textContent === 'Información básica' || el.textContent === 'Basic info') {
@@ -7134,8 +7135,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     });
   }
 
+  // Foto-Limit je nach Kategorie: Immobilien brauchen mehr Bilder als ein normaler Ort.
+  function _formPhotoMax(){ var c=(document.getElementById('newCategory')||{}).value; return c==='kat-immobilien' ? 10 : 6; }
+  function _updatePhotoLimitUI(){
+    var max=_formPhotoMax();
+    var title=document.getElementById('formPhotosTitle');
+    if(title) title.textContent = t('photos_optional') + ' · ' + L('max. ','máx. ','max. ') + max;
+    var grid=document.getElementById('formPhotoGrid');
+    if(grid){ var addBtn=grid.querySelector('label[for="formPhotoInput"]'); if(addBtn) addBtn.style.display = (pendingFormPhotos.length>=max) ? 'none' : ''; }
+  }
   function handleFormPhotos(event) {
-    const files = Array.from(event.target.files).slice(0, 3 - pendingFormPhotos.length);
+    const max = _formPhotoMax();
+    const files = Array.from(event.target.files).slice(0, max - pendingFormPhotos.length);
     files.forEach(file => {
       const reader = new FileReader();
       reader.onload = e => {
@@ -7147,7 +7158,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         div.style.cssText = 'aspect-ratio:1;border-radius:12px;overflow:hidden;position:relative';
         div.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover"><button onclick="removeFormPhoto(${idx})" style="position:absolute;top:6px;right:6px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:16px;line-height:1;cursor:pointer">×</button>`;
         grid.insertBefore(div, addBtn);
-        if (pendingFormPhotos.length >= 3) addBtn.style.display = 'none';
+        if (pendingFormPhotos.length >= max) addBtn.style.display = 'none';
       };
       reader.readAsDataURL(file);
     });
@@ -7171,6 +7182,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       div.innerHTML = `<img src="${p.preview}" style="width:100%;height:100%;object-fit:cover"><button onclick="removeFormPhoto(${idx})" style="position:absolute;top:6px;right:6px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:16px;line-height:1;cursor:pointer">×</button>`;
       grid.insertBefore(div, addBtn);
     });
+    try { _updatePhotoLimitUI(); } catch(e){}
   }
 
   async function uploadFormPhotos(listingId) {
@@ -7539,6 +7551,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var _hf = document.getElementById('hoursField');     if (_hf) _hf.style.display = isImmo ? 'none' : '';
     var _mi = document.getElementById('mapsImportCard'); if (_mi) _mi.style.display = isImmo ? 'none' : '';
     _refreshTags('form');
+    try { _updatePhotoLimitUI(); } catch(e){}
   }
 
   let mapSubcatFilter = 'Alle';
