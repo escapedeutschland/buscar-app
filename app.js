@@ -892,6 +892,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ...document.querySelectorAll('.event-card-title[data-original]'),
       ...document.querySelectorAll('.event-card-desc[data-original]'),
       ...document.querySelectorAll('.q-card-text[data-original]'),
+      ...document.querySelectorAll('.q-card-body[data-original]'),
       ...document.querySelectorAll('.answer-text[data-original]'),
       ...document.querySelectorAll('.answer-note[data-original]'),
     ];
@@ -899,6 +900,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (detailDesc && detailDesc.dataset.original) allEls.unshift(detailDesc);
     const qdTitleEl = document.getElementById('qdTitle');
     if (qdTitleEl && qdTitleEl.dataset.original) allEls.unshift(qdTitleEl);
+    const qdBodyEl = document.getElementById('qdBody');
+    if (qdBodyEl && qdBodyEl.dataset.original) allEls.unshift(qdBodyEl);
 
     // Only those not already shown in the target language
     const todo = allEls.filter(el =>
@@ -4810,6 +4813,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       + (catLbl ? '<div class="q-card-cat" style="color:'+col+';background:'+_hexA(col,0.12)+'">'+esc(catLbl)+'</div>' : '')
       + (q.author_name ? '<div class="q-card-author">'+_avatarHtml(q.author_name,22)+'<span>'+esc(q.author_name)+'</span></div>' : '')
       + '<div class="q-card-text" data-original="'+esc(q.text||'')+'">'+esc(q.text||'')+'</div>'
+      + (q.body ? '<div class="q-card-body" data-original="'+esc(q.body)+'">'+esc(q.body)+'</div>' : '')
       + '<div class="q-card-meta">'
         + _voteBtnHtml(q)
         + (answered ? '<span class="q-chip ok">✓ '+answers+' '+t('fc_answers')+'</span>' : '<span class="q-chip">💬 '+t('fc_open')+'</span>')
@@ -4833,21 +4837,27 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   function openAskQuestion(prefill){
     if(!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
-    var ta = document.getElementById('askQuestionText'); if(ta) ta.value = prefill || '';
+    var ti = document.getElementById('askQuestionTitle');
+    if(ti){ ti.value = prefill || ''; ti.placeholder = L('Titel – kurz & knackig','Título – corto y claro','Title – short & clear'); }
+    var ta = document.getElementById('askQuestionText');
+    if(ta){ ta.value = ''; ta.placeholder = L('Beschreibe deine Frage genauer (optional)…','Describe tu pregunta con más detalle (opcional)…','Describe your question in more detail (optional)…'); }
     var cs = document.getElementById('askQuestionCat'); if(cs) cs.value = '';
     document.getElementById('askQuestionOverlay').classList.add('visible');
-    setTimeout(function(){ var t2=document.getElementById('askQuestionText'); if(t2) t2.focus(); }, 120);
+    setTimeout(function(){ var t2=document.getElementById('askQuestionTitle'); if(t2) t2.focus(); }, 120);
   }
   function closeAskQuestion(){ document.getElementById('askQuestionOverlay').classList.remove('visible'); }
   async function submitQuestion(){
     if(!currentUser) return;
-    var text = (document.getElementById('askQuestionText').value||'').trim();
-    if(text.length < 3){ var ta=document.getElementById('askQuestionText'); if(ta) ta.focus(); return; }
+    var title = (document.getElementById('askQuestionTitle')||{}).value||''; title = title.trim();
+    var body = (document.getElementById('askQuestionText').value||'').trim();
+    // Titel ist Pflicht (Reddit-Stil). Fällt der Titel leer aus, aber Body vorhanden -> Body als Titel nehmen (Abwärtssicherheit).
+    if(!title && body){ title = body; body = ''; }
+    if(title.length < 3){ var ti=document.getElementById('askQuestionTitle'); if(ti) ti.focus(); return; }
     var btn = document.getElementById('askSubmitBtn'); if(btn){ btn.disabled=true; btn.textContent=t('saving')||'…'; }
     var catSel = document.getElementById('askQuestionCat'); var catId = catSel ? (catSel.value||'') : '';
     try {
       var ref = await db.collection('questions').add({
-        text: text, norm_key: norm(text), category_id: catId || null, author_name: _currentUserName(),
+        text: title, body: body || null, norm_key: norm(title+' '+body), category_id: catId || null, author_name: _currentUserName(),
         created_by: currentUser.uid, created_at: new Date(), status: 'open', seekers: [currentUser.uid], seekers_count: 1, answers_count: 0
       });
       _homeQuestions = null;
@@ -4869,6 +4879,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if(!doc.exists){ document.getElementById('qdTitle').textContent = t('err_generic')||'—'; return; }
       var q = Object.assign({id:doc.id}, doc.data()); _currentQuestion = q; _qCache[q.id] = q;
       var _qt=document.getElementById('qdTitle'); _qt.textContent = q.text||''; _qt.dataset.original = q.text||''; _qt.dataset.tlang = '';
+      var _qb=document.getElementById('qdBody');
+      if(_qb){ if(q.body){ _qb.textContent=q.body; _qb.dataset.original=q.body; _qb.dataset.tlang=''; _qb.style.display=''; } else { _qb.textContent=''; _qb.dataset.original=''; _qb.style.display='none'; } }
       if (currentLang !== 'de') translateVisibleContent();
       document.getElementById('qdMeta').textContent = (q.seekers_count||0)+' '+t('fc_seek_count');
       _renderSeekBtn();
