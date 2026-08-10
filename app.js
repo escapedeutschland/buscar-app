@@ -4863,19 +4863,46 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     badges.forEach(function(id){ var d=defs.find(function(x){return x.id===id;}); if(d && (!best || d.threshold>best.threshold)) best=d; });
     return best ? best.emoji : '';
   }
-  // Kleiner Abzeichen-Chip neben dem Namen im Forum (nur wenn author_badge gesetzt)
-  function _authorBadgeChip(o){ var e=(o&&o.author_badge)?String(o.author_badge):''; return e ? '<span class="author-badge" title="'+esc(L('Auszeichnung','Distintivo','Badge'))+'">'+e+'</span>' : ''; }
+  // Rollenhafter Titel + Farbe je Abzeichen für den Forum-Pill (lokalisiert, self-contained)
+  function _badgeChipMeta(id){
+    var M = {
+      first:       { t:L('Neuling','Novato','Newbie'),           c:'#16a34a' },
+      five:        { t:L('Aktiv','Activo','Active'),             c:'#0d9488' },
+      ten:         { t:L('Kenner','Conocedor','Regular'),        c:'#2563eb' },
+      twenty:      { t:L('Profi','Pro','Pro'),                   c:'#7c3aed' },
+      fifty:       { t:L('Experte','Experto','Expert'),          c:'#c026d3' },
+      hundred:     { t:L('Legende','Leyenda','Legend'),          c:'#db2777' },
+      explorer:    { t:L('Entdecker','Explorador','Explorer'),   c:'#ea580c' },
+      chaco:       { t:L('Chaco-Pionier','Pionero del Chaco','Chaco Pioneer'), c:'#65a30d' },
+      helper_first:{ t:L('Helfer','Ayudante','Helper'),          c:'#0891b2' },
+      helper_ten:  { t:L('Top-Helfer','Súper Ayudante','Top Helper'), c:'#d97706' }
+    };
+    return M[id] || null;
+  }
+  // Abzeichen-Pill neben dem Namen im Forum. author_badge = Badge-ID (neu) -> Emoji+Titel+Farbe;
+  // alter Bestand konnte nur ein Emoji sein -> dezenter Fallback.
+  function _authorBadgeChip(o){
+    var v=(o&&o.author_badge)?String(o.author_badge):''; if(!v) return '';
+    var def=getBadgeDefs().find(function(b){ return b.id===v; });
+    var meta=_badgeChipMeta(v);
+    if(def && meta){
+      return '<span class="author-badge-pill" style="color:'+meta.c+';background:'+_hexA(meta.c,0.13)+'">'+def.emoji+' '+esc(meta.t)+'</span>';
+    }
+    return '<span class="author-badge" title="'+esc(L('Auszeichnung','Distintivo','Badge'))+'">'+esc(v)+'</span>';
+  }
   // Badge-Stand des aktuellen Nutzers (1 Read): {badges[], answersGiven}
   async function _getMyBadgeState(){
     if(!currentUser) return { badges:[], answersGiven:0 };
     try{ var d=await db.collection('users').doc(currentUser.uid).get(); var x=d.exists?d.data():{}; return { badges:Array.isArray(x.badges)?x.badges:[], answersGiven:x.answers_given||0 }; }
     catch(e){ return { badges:[], answersGiven:0 }; }
   }
-  // Top-Abzeichen-Emoji aus persistierten + (optional) aus answersGiven abgeleiteten Helfer-Badges.
-  function _topBadgeFromState(badges, answersGiven){
+  // Höchstwertige Badge-ID (nach threshold) aus persistierten + aus answersGiven abgeleiteten Helfer-Badges.
+  function _topBadgeIdFromState(badges, answersGiven){
     var earned=Array.isArray(badges)?badges.slice():[];
     getBadgeDefs().forEach(function(b){ if(b.special==='answers' && answersGiven>=b.threshold && earned.indexOf(b.id)<0) earned.push(b.id); });
-    return _topBadgeEmoji(earned);
+    var defs=getBadgeDefs(), best=null;
+    earned.forEach(function(id){ var d=defs.find(function(x){return x.id===id;}); if(d && (!best||d.threshold>best.threshold)) best=d; });
+    return best ? best.id : '';
   }
   // Nach einer Antwort: frisch verdientes Helfer-Abzeichen persistieren + feiern, sonst "fast geschafft"-Nudge.
   async function _rewardOrNudgeAnswers(newAG, persistedBadges){
@@ -4948,7 +4975,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var catSel = document.getElementById('askQuestionCat'); var catId = catSel ? (catSel.value||'') : '';
     try {
       var _stQ = await _getMyBadgeState();
-      var _abQ = _topBadgeFromState(_stQ.badges, _stQ.answersGiven);
+      var _abQ = _topBadgeIdFromState(_stQ.badges, _stQ.answersGiven);
       var ref = await db.collection('questions').add({
         text: title, body: body || null, norm_key: norm(title+' '+body), category_id: catId || null, author_name: _currentUserName(), author_badge: _abQ||null,
         created_by: currentUser.uid, created_at: new Date(), status: 'open', seekers: [currentUser.uid], seekers_count: 1, answers_count: 0
@@ -5170,7 +5197,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         var pid=_replyParent;
         var _stR = await _getMyBadgeState();
         var _newAGr = _stR.answersGiven + 1;
-        var _abR = _topBadgeFromState(_stR.badges, _newAGr);
+        var _abR = _topBadgeIdFromState(_stR.badges, _newAGr);
         var _repRef = await db.collection('answers').add({
           question_id:_currentQuestion.id, parent_answer_id:pid,
           listing_id:null, listing_name:'', text:text,
@@ -5266,7 +5293,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var l=_selectedAnswerListing;
       var _stA = await _getMyBadgeState();
       var _newAGa = _stA.answersGiven + 1;
-      var _abA = _topBadgeFromState(_stA.badges, _newAGa);
+      var _abA = _topBadgeIdFromState(_stA.badges, _newAGa);
       var _ansRef = await db.collection('answers').add({
         question_id:_currentQuestion.id,
         listing_id: l?l.id:null,
