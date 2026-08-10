@@ -800,6 +800,9 @@
 .answer-head-name { font-weight:700; font-size:13.5px; color:var(--text-1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 /* Abzeichen-Chip neben dem Namen im Forum */
 .author-badge { flex-shrink:0; font-size:13px; line-height:1; margin-left:1px; }
+/* On-Demand-Übersetzen-Link */
+.translate-link { margin-top:9px; background:none; border:none; padding:2px 0; font-family:'DM Sans',sans-serif; font-size:12.5px; font-weight:700; color:var(--yellow-dark,#8a6d00); cursor:pointer; }
+.translate-link:active { opacity:0.6; }
 .qd-when { color:var(--text-3); font-weight:600; }
 /* Fortschritt zum nächsten Abzeichen */
 .badge-progress { margin:10px 4px 2px; font-size:12.5px; font-weight:700; color:var(--text-2); background:var(--surface-2,#f4f1ec); border-radius:10px; padding:9px 12px; display:flex; align-items:center; gap:8px; }

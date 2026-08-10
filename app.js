@@ -934,6 +934,32 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     contentTranslated = true;
   }
 
+  // #2: On-Demand-Übersetzung eines Nutzer-Textes in die AKTUELLE App-Sprache.
+  // Nutzt den bestehenden kostenlosen detectAndTranslate (gtx, sl=auto) + Cache -> $0, kein Key.
+  // Funktioniert in JEDEM Sprachmodus (auch DE) und toggelt Original <-> Übersetzung.
+  async function toggleTranslate(elId, btnId){
+    var el=document.getElementById(elId), btn=document.getElementById(btnId);
+    if(!el||!btn) return;
+    var orig = (el.dataset.original!=null && el.dataset.original!=='') ? el.dataset.original : (el.textContent||'');
+    if(!orig.trim()) return;
+    if(el.dataset.showingTranslation==='1'){
+      el.textContent = orig; el.dataset.showingTranslation='0';
+      btn.textContent = L('🌐 Übersetzen','🌐 Traducir','🌐 Translate');
+      return;
+    }
+    var old = btn.textContent; btn.disabled=true; btn.textContent='⏳';
+    try{
+      var tr = await detectAndTranslate(orig, currentLang);
+      if(tr && tr.trim() && tr.trim()!==orig.trim()){
+        el.textContent = tr; el.dataset.showingTranslation='1';
+        btn.textContent = L('Original anzeigen','Ver original','Show original');
+      } else {
+        btn.textContent = L('Schon in deiner Sprache','Ya está en tu idioma','Already in your language');
+        setTimeout(function(){ if(btn) btn.textContent = old; }, 1800);
+      }
+    }catch(e){ btn.textContent = old; }
+    btn.disabled=false;
+  }
   // Auto-wire: any leaf element whose German text exactly matches a dictionary
   // value gets the matching data-i18n key — covers elements where a key exists
   // but the attribute was never added. Runs once. Exact-match only = safe.
@@ -4087,6 +4113,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     descEl.innerHTML = esc(descContent) || t('no_description');
     descEl.dataset.original = descContent;
     descEl.dataset.tlang = '';
+    descEl.dataset.showingTranslation = '0';
+    (function(){ var _tb=document.getElementById('detailTranslateBtn'); if(_tb){ _tb.textContent = L('🌐 Übersetzen','🌐 Traducir','🌐 Translate'); _tb.style.display = descContent.trim() ? '' : 'none'; } })();
     (function(){
       // Gesprochene Sprachen anzeigen
       var _langs = Array.isArray(l.languages) ? l.languages : [];
