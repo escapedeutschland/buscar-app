@@ -62,6 +62,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_seek_count: 'suchen das',
       fc_answers: 'Antworten',
       fc_open: 'offen',
+      fc_sort_smart: 'Relevant', fc_sort_new: 'Neueste', fc_sort_popular: 'Beliebt',
       fc_seek: 'Ich suche das auch',
       fc_seeking: '✓ Du suchst das auch',
       fc_no_answers: 'Noch keine Antworten – kennst du einen Tipp?',
@@ -322,6 +323,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_seek_count: 'buscan esto',
       fc_answers: 'respuestas',
       fc_open: 'abierta',
+      fc_sort_smart: 'Relevante', fc_sort_new: 'Recientes', fc_sort_popular: 'Populares',
       fc_seek: 'Yo también busco esto',
       fc_seeking: '✓ Vos también buscás esto',
       fc_no_answers: 'Aún sin respuestas: ¿tenés un dato?',
@@ -582,6 +584,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       fc_seek_count: 'are looking for this',
       fc_answers: 'answers',
       fc_open: 'open',
+      fc_sort_smart: 'Relevant', fc_sort_new: 'Newest', fc_sort_popular: 'Popular',
       fc_seek: 'I\'m looking for this too',
       fc_seeking: '✓ You\'re looking for this too',
       fc_no_answers: 'No answers yet – do you have a tip?',
@@ -4539,7 +4542,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // ══════════ FRAG DIE COMMUNITY (Phase 2) ══════════
   var _currentQuestion = null;
 
-  var _qBoardMode = 'all', _qLoaded = [], _qSearch = '', _qCat = 'Alle';
+  var _qBoardMode = 'all', _qLoaded = [], _qSearch = '', _qCat = 'Alle', _qSort = 'smart';
   function openQuestions(mode){
     _qBoardMode = mode || 'all';
     _qSearch = ''; _qCat = 'Alle';
@@ -4764,6 +4767,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       items.forEach(function(q){ _qCache[q.id]=q; });
       _qLoaded = items;
       renderQCats();
+      renderQSort();
       renderQuestionList();
     } catch(e){ list.innerHTML = _qEmpty(t('fc_load_err'), t('fc_load_sub')); }
   }
@@ -4773,6 +4777,27 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     c.innerHTML = QCATS.map(function(x){ return '<button class="q-cat-chip'+(_qCat===x[0]?' active':'')+'" onclick="selectQCat(\''+x[0]+'\')">'+esc(t(x[1]))+'</button>'; }).join('');
   }
   function selectQCat(cat){ _qCat=cat; renderQCats(); renderQuestionList(); }
+  // Sortier-Modi der Pinnwand
+  var QSORTS = [['smart','fc_sort_smart'],['new','fc_sort_new'],['popular','fc_sort_popular']];
+  function renderQSort(){
+    var c=document.getElementById('qSortScroll'); if(!c) return;
+    // Sortier-Chips nur im Haupt-Board sinnvoll (nicht bei "Meine Fragen"/"Meine Antworten")
+    if(_qBoardMode!=='all'){ c.style.display='none'; return; }
+    c.style.display='';
+    c.innerHTML = QSORTS.map(function(x){ return '<button class="q-sort-chip'+(_qSort===x[0]?' active':'')+'" onclick="selectQSort(\''+x[0]+'\')">'+esc(t(x[1]))+'</button>'; }).join('');
+  }
+  function selectQSort(s){ _qSort=s; renderQSort(); renderQuestionList(); }
+  // Sortiert die (gefilterte) Fragenliste je nach _qSort. Rein clientseitig.
+  function _sortQuestions(arr){
+    var ts=function(q){ return _adminTs(q.created_at)||0; };
+    var isOpen=function(q){ return !(q.status==='answered' || (q.answers_count||0)>0); };
+    if(_qSort==='new'){ arr.sort(function(a,b){ return ts(b)-ts(a); }); }
+    else if(_qSort==='popular'){ arr.sort(function(a,b){ var d=(b.seekers_count||0)-(a.seekers_count||0); return d!==0?d:ts(b)-ts(a); }); }
+    else { // smart: offene zuerst, innerhalb jeder Gruppe neueste zuerst
+      arr.sort(function(a,b){ var oa=isOpen(a)?1:0, ob=isOpen(b)?1:0; if(oa!==ob) return ob-oa; return ts(b)-ts(a); });
+    }
+    return arr;
+  }
   function _qCatLabel(catId){ if(!catId) return ''; for(var i=0;i<QCATS.length;i++){ if(QCATS[i][0]===catId) return t(QCATS[i][1]); } return ''; }
   function filterQuestions(){ var i=document.getElementById('qSearchInput'); _qSearch = i ? i.value : ''; renderQuestionList(); }
   function renderQuestionList(){
@@ -4785,6 +4810,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       return true;
     });
     if(!filtered.length){ list.innerHTML = _qEmpty(t('fc_no_match'), t('fc_no_match_sub')); return; }
+    if(_qBoardMode==='all') _sortQuestions(filtered);
     list.innerHTML = filtered.map(_renderQuestionCard).join('');
     if (currentLang !== 'de') translateVisibleContent();
   }
