@@ -1760,10 +1760,20 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     btn.disabled = true; btn.textContent = 'Einloggen...';
     document.getElementById('authError').classList.remove('visible');
     try {
-      await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
+      // E-Mail trimmen (iOS-Autofill/Autokorrektur hängt oft Leerzeichen an); Passwort bleibt unangetastet
+      var _email = (document.getElementById('loginEmail').value||'').trim();
+      var _pw = document.getElementById('loginPassword').value||'';
+      await auth.signInWithEmailAndPassword(_email, _pw);
     } catch (err) {
-      const msgs = { 'auth/user-not-found': 'Kein Konto mit dieser E-Mail.', 'auth/wrong-password': 'Falsches Passwort.', 'auth/invalid-email': 'Ungültige E-Mail.', 'auth/too-many-requests': 'Zu viele Versuche.' };
-      showAuthError(msgs[err.code] || 'Fehler beim Einloggen.');
+      const msgs = {
+        'auth/user-not-found': L('Kein Konto mit dieser E-Mail.','No hay cuenta con este correo.','No account with this email.'),
+        'auth/wrong-password': L('Falsches Passwort.','Contraseña incorrecta.','Wrong password.'),
+        'auth/invalid-credential': L('E-Mail oder Passwort ist falsch. Tipp: Leerzeichen/Autofill prüfen oder „Passwort vergessen?" nutzen.','Correo o contraseña incorrectos. Revisa espacios/autocompletar o usa «¿Olvidaste tu contraseña?».','Email or password is wrong. Check for spaces/autofill or use “Forgot password?”.'),
+        'auth/invalid-email': L('Ungültige E-Mail.','Correo inválido.','Invalid email.'),
+        'auth/too-many-requests': L('Zu viele Versuche. Bitte kurz warten oder Passwort zurücksetzen.','Demasiados intentos. Espera un momento o restablece la contraseña.','Too many attempts. Wait a moment or reset your password.'),
+        'auth/network-request-failed': L('Keine Verbindung. Prüfe dein Internet und versuche es erneut.','Sin conexión. Revisa tu internet e inténtalo de nuevo.','No connection. Check your internet and try again.')
+      };
+      showAuthError(msgs[err.code] || (L('Fehler beim Einloggen','Error al iniciar sesión','Login error')+' ('+(err.code||'?')+')'));
       btn.disabled = false; btn.textContent = 'Einloggen';
     }
   }
