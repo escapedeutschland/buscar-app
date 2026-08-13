@@ -5032,38 +5032,52 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch(e){ if(btn){ btn.disabled=false; btn.textContent=t('fc_ask_send'); } showToast(t('err_generic')||'Fehler'); }
   }
 
+  // Rendert Titel/Text/Meta einer Frage ins Detail (aus Cache ODER frischem Doc).
+  function _applyQuestionToDetail(q){
+    var _qt=document.getElementById('qdTitle'); if(_qt){ _qt.textContent = q.text||''; _qt.dataset.original = q.text||''; _qt.dataset.tlang = ''; }
+    var _qb=document.getElementById('qdBody');
+    if(_qb){ if(q.body){ _qb.textContent=q.body; _qb.dataset.original=q.body; _qb.dataset.tlang=''; _qb.style.display=''; } else { _qb.textContent=''; _qb.dataset.original=''; _qb.style.display='none'; } }
+    if (currentLang !== 'de') translateVisibleContent();
+    var _qm=document.getElementById('qdMeta'); if(_qm) _qm.textContent = (q.seekers_count||0)+' '+t('fc_seek_count');
+    _renderSeekBtn();
+    var mr=document.getElementById('qdMetaRow');
+    if(mr){
+      var cl=_qCatLabel(q.category_id);
+      var when = q.created_at ? _relTime(q.created_at) : '';
+      var authorHtml = q.author_name
+        ? '<div class="qd-author">'+_avatarHtml(q.author_name,26,_authorRingColor(q))+'<span>'+esc(q.author_name)+'</span>'+_authorBadgeChip(q)+(when?'<span class="qd-when"> · '+esc(when)+'</span>':'')+'</div>'
+        : (when ? '<div class="qd-info">'+esc(when)+'</div>' : '');
+      var cityChip = q.city ? '<span class="qd-cat-chip" style="background:var(--surface-2,#f4f1ec);color:var(--text-2)">📍 '+esc(prettyCity(q.city))+'</span>' : '';
+      mr.innerHTML = (cl?'<span class="qd-cat-chip">'+esc(cl)+'</span>':'') + cityChip + authorHtml;
+      mr.style.display=(cl||cityChip||authorHtml)?'block':'none';
+    }
+    var delBtn=document.getElementById('qdDeleteBtn');
+    if(delBtn){ var canDel = currentUser && (currentUser.email===ADMIN_EMAIL || (q.created_by && q.created_by===currentUser.uid)); delBtn.style.display = canDel?'inline-flex':'none'; delBtn.onclick=function(){ deleteQuestion(q.id); }; }
+  }
   async function openQuestionDetail(id){
     showScreen('screenQuestionDetail');
-    document.getElementById('qdTitle').textContent = '…';
-    document.getElementById('qdMeta').textContent = '';
-    document.getElementById('answerList').innerHTML = '';
-    try {
-      var doc = await db.collection('questions').doc(id).get();
-      if(!doc.exists){ document.getElementById('qdTitle').textContent = t('err_generic')||'—'; return; }
-      var q = Object.assign({id:doc.id}, doc.data()); _currentQuestion = q; _qCache[q.id] = q;
-      var _qt=document.getElementById('qdTitle'); _qt.textContent = q.text||''; _qt.dataset.original = q.text||''; _qt.dataset.tlang = '';
-      var _qb=document.getElementById('qdBody');
-      if(_qb){ if(q.body){ _qb.textContent=q.body; _qb.dataset.original=q.body; _qb.dataset.tlang=''; _qb.style.display=''; } else { _qb.textContent=''; _qb.dataset.original=''; _qb.style.display='none'; } }
-      if (currentLang !== 'de') translateVisibleContent();
-      document.getElementById('qdMeta').textContent = (q.seekers_count||0)+' '+t('fc_seek_count');
-      _renderSeekBtn();
-      (function(){
-        var mr=document.getElementById('qdMetaRow'); if(!mr) return;
-        var cl=_qCatLabel(q.category_id);
-        var when = q.created_at ? _relTime(q.created_at) : '';
-        var authorHtml = q.author_name
-          ? '<div class="qd-author">'+_avatarHtml(q.author_name,26,_authorRingColor(q))+'<span>'+esc(q.author_name)+'</span>'+_authorBadgeChip(q)+(when?'<span class="qd-when"> · '+esc(when)+'</span>':'')+'</div>'
-          : (when ? '<div class="qd-info">'+esc(when)+'</div>' : '');
-        var cityChip = q.city ? '<span class="qd-cat-chip" style="background:var(--surface-2,#f4f1ec);color:var(--text-2)">📍 '+esc(prettyCity(q.city))+'</span>' : '';
-        mr.innerHTML = (cl?'<span class="qd-cat-chip">'+esc(cl)+'</span>':'') + cityChip + authorHtml;
-        mr.style.display=(cl||cityChip||authorHtml)?'block':'none';
-      })();
-      var delBtn=document.getElementById('qdDeleteBtn');
-      if(delBtn){ var canDel = currentUser && (currentUser.email===ADMIN_EMAIL || (q.created_by && q.created_by===currentUser.uid)); delBtn.style.display = canDel?'inline-flex':'none'; delBtn.onclick=function(){ deleteQuestion(q.id); }; }
-      _markQuestionSeen(q.id, q.answers_count||0);
+    var cached = _qCache[id];
+    if(cached){
+      // Sofort aus Cache rendern -> Titel/Text/Meta ohne Netz-Wartezeit sichtbar
+      _currentQuestion = cached;
+      _applyQuestionToDetail(cached);
+      document.getElementById('answerList').innerHTML = '<div style="text-align:center;padding:22px;color:var(--text-3)">'+(t('loading')||'…')+'</div>';
+      _markQuestionSeen(cached.id, cached.answers_count||0);
       updateMyAnswerBadge(true);
       loadAnswers(id);
-    } catch(e){ document.getElementById('qdTitle').textContent = t('err_generic')||'—'; }
+    } else {
+      document.getElementById('qdTitle').textContent = '…';
+      document.getElementById('qdMeta').textContent = '';
+      document.getElementById('answerList').innerHTML = '';
+    }
+    try {
+      var doc = await db.collection('questions').doc(id).get();
+      if(!doc.exists){ if(!cached) document.getElementById('qdTitle').textContent = t('err_generic')||'—'; return; }
+      var q = Object.assign({id:doc.id}, doc.data()); _currentQuestion = q; _qCache[q.id] = q;
+      _applyQuestionToDetail(q); // frische Daten (seekers_count etc.) still nachziehen
+      _markQuestionSeen(q.id, q.answers_count||0);
+      if(!cached){ updateMyAnswerBadge(true); loadAnswers(id); }
+    } catch(e){ if(!cached) document.getElementById('qdTitle').textContent = t('err_generic')||'—'; }
   }
   function _renderSeekBtn(){
     var q=_currentQuestion, btn=document.getElementById('qdSeekBtn'); if(!q||!btn) return;
