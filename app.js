@@ -235,7 +235,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ev_back: 'Zurück', ev_to_event: 'Zum Event →',
       ev_entry: 'Eintritt', ev_capacity: 'Kapazität', ev_rules: 'Regeln',
       ev_website_label: 'Website / Tickets (optional)', ev_tickets_info: 'Tickets & Infos',
-      ev_free: 'Kostenlos', ev_paid_label: 'Kostenpflichtig',
+      ev_free: 'Kostenlos', ev_paid_label: 'Kostenpflichtig', ev_entry: 'Eintritt',
       ev_spots: 'Plätze frei', ev_full: 'Ausgebucht', ev_cancelled: 'Abgesagt',
       ev_none_filter: 'Keine Events für diesen Filter', ev_none_city: 'Aktuell keine Events in {city}', ev_show_all_cities: 'Alle Städte anzeigen',
       ev_signup_btn: 'Anmelden', ev_login_signup: 'Einloggen zum Anmelden',
@@ -496,7 +496,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ev_back: 'Volver', ev_to_event: 'Ver evento →',
       ev_entry: 'Entrada', ev_capacity: 'Capacidad', ev_rules: 'Reglas',
       ev_website_label: 'Sitio web / Entradas (opcional)', ev_tickets_info: 'Entradas e info',
-      ev_free: 'Gratis', ev_paid_label: 'Con costo',
+      ev_free: 'Gratis', ev_paid_label: 'Con costo', ev_entry: 'Entrada',
       ev_spots: 'lugares disponibles', ev_full: 'Agotado', ev_cancelled: 'Cancelado',
       ev_none_filter: 'No hay eventos para este filtro', ev_none_city: 'Actualmente no hay eventos en {city}', ev_show_all_cities: 'Mostrar todas las ciudades',
       ev_signup_btn: 'Registrarse', ev_login_signup: 'Iniciar sesión para registrarse',
@@ -757,7 +757,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ev_back: 'Back', ev_to_event: 'To event →',
       ev_entry: 'Entry', ev_capacity: 'Capacity', ev_rules: 'Rules',
       ev_website_label: 'Website / tickets (optional)', ev_tickets_info: 'Tickets & info',
-      ev_free: 'Free', ev_paid_label: 'Paid',
+      ev_free: 'Free', ev_paid_label: 'Paid', ev_entry: 'Admission',
       ev_spots: 'spots left', ev_full: 'Sold out', ev_cancelled: 'Cancelled',
       ev_none_filter: 'No events for this filter', ev_none_city: 'Currently no events in {city}', ev_show_all_cities: 'Show all cities',
       ev_signup_btn: 'Sign up', ev_login_signup: 'Log in to sign up',
@@ -2343,7 +2343,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var typeClass = 'type-' + (ev.type||'').toLowerCase();
       var isFull = ev.has_signup && ev.capacity > 0 && (ev.signups_count||0) >= ev.capacity;
       var isCancelled = ev.status === 'cancelled';
-      var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString(dateLoc()) + ' ₲' : t('ev_paid_label')) : t('ev_free');
+      var priceStr = _evPriceLabel(ev);
       var spotsLeft = ev.has_signup && ev.capacity > 0 ? (ev.capacity - (ev.signups_count||0)) + ' ' + t('ev_spots') : '';
       var statusHtml = isCancelled ? '<span class=\"event-status-cancelled\">'+t('ev_cancelled')+'</span>' :
                        isFull ? '<span class=\"event-status-full\">'+t('ev_full')+'</span>' :
@@ -2365,7 +2365,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         + '</div>'
         + '<div class="event-card-desc" data-original="' + esc(ev.description) + '">' + esc(ev.description) + '</div>'
         + '<div class="event-card-footer">'
-        + '<span class="event-price">' + priceStr + '</span>'
+        + (priceStr ? '<span class="event-price">' + priceStr + '</span>' : '')
         + statusHtml
         + '</div>'
         + '</div></div>';
@@ -2373,6 +2373,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (currentLang !== 'de') translateVisibleContent();
   }
 
+  // Ehrliches Preis-Label: "Kostenlos" NUR wenn wirklich gratis (free===true) oder ohne Ticket-/Website-Link.
+  // Bei unbekanntem Preis mit Link -> leer (keine irreführende "Kostenlos"-Behauptung; der Ticket-Button spricht für sich).
+  function _evPriceLabel(ev){
+    if (ev.is_paid) return ev.ticket_price ? Number(ev.ticket_price).toLocaleString(dateLoc()) + ' ₲' : t('ev_paid_label');
+    if (ev.free === true) return t('ev_free');
+    if (ev.website) return '';
+    return t('ev_free');
+  }
   var _currentEventId = null;
   function showEventDetail(id, source) {
     _currentEventId = id;
@@ -2403,7 +2411,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
     var isFull = ev.has_signup && ev.capacity > 0 && (ev.signups_count||0) >= ev.capacity;
     var isCancelled = ev.status === 'cancelled';
-    var priceStr = ev.is_paid ? (ev.ticket_price ? Number(ev.ticket_price).toLocaleString(dateLoc()) + ' Guaraní' : t('ev_paid_label')) : t('ev_free');
+    var priceStr = _evPriceLabel(ev);
 
     var photoHtml = '';
     if (ev.photos && ev.photos.length) {
@@ -2419,16 +2427,19 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       + '<p style="font-size:15px;line-height:1.6;color:var(--text-1);margin:0">' + esc(ev.description) + '</p>'
       + '</div>';
 
-    bodyHtml += '<div style="background:var(--card);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px">';
-    bodyHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
-      + '<span style="font-size:13px;color:var(--text-2)">Eintritt</span>'
-      + '<span style="font-size:15px;font-weight:700;color:var(--yellow)">' + priceStr + '</span></div>';
-    if (ev.has_signup && ev.capacity > 0) {
-      bodyHtml += '<div style="display:flex;justify-content:space-between;align-items:center">'
-        + '<span style="font-size:13px;color:var(--text-2)">Kapazität</span>'
-        + '<span style="font-size:15px;font-weight:700">' + (ev.signups_count||0) + ' / ' + ev.capacity + '</span></div>';
+    var _hasCap = ev.has_signup && ev.capacity > 0;
+    if (priceStr || _hasCap) {
+      bodyHtml += '<div style="background:var(--card);border-radius:var(--radius-lg);padding:16px;margin-bottom:14px">';
+      if (priceStr) bodyHtml += '<div style="display:flex;justify-content:space-between;align-items:center' + (_hasCap ? ';margin-bottom:8px' : '') + '">'
+        + '<span style="font-size:13px;color:var(--text-2)">' + t('ev_entry') + '</span>'
+        + '<span style="font-size:15px;font-weight:700;color:var(--yellow)">' + priceStr + '</span></div>';
+      if (_hasCap) {
+        bodyHtml += '<div style="display:flex;justify-content:space-between;align-items:center">'
+          + '<span style="font-size:13px;color:var(--text-2)">Kapazität</span>'
+          + '<span style="font-size:15px;font-weight:700">' + (ev.signups_count||0) + ' / ' + ev.capacity + '</span></div>';
+      }
+      bodyHtml += '</div>';
     }
-    bodyHtml += '</div>';
 
     if (ev.website) {
       var _w = String(ev.website).trim();
