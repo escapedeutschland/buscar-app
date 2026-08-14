@@ -4117,9 +4117,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           var _srating=_src>0 ? (l.rating_sum/_src).toFixed(1) : '–';
           var _row=document.getElementById('detailStatsRow');
           if(_row) _row.innerHTML =
-              '<div class="ds-item"><div class="ds-num">'+_sv+'</div><div class="ds-lab">👁 '+esc(L('Aufrufe','Vistas','Views'))+'</div></div>'
-            + '<div class="ds-item"><div class="ds-num">'+_sf+'</div><div class="ds-lab">❤️ '+esc(L('Favoriten','Favoritos','Favorites'))+'</div></div>'
-            + '<div class="ds-item"><div class="ds-num">'+_srating+(_src>0?' <span class="ds-sub">('+_src+')</span>':'')+'</div><div class="ds-lab">⭐ '+esc(L('Bewertung','Valoración','Rating'))+'</div></div>';
+              '<div class="ds-item"><div class="ds-num">'+_sv+'</div><div class="ds-lab">'+_STAT_ICONS.view+' '+esc(L('Aufrufe','Vistas','Views'))+'</div></div>'
+            + '<div class="ds-item"><div class="ds-num">'+_sf+'</div><div class="ds-lab">'+_STAT_ICONS.fav+' '+esc(L('Favoriten','Favoritos','Favorites'))+'</div></div>'
+            + '<div class="ds-item"><div class="ds-num">'+_srating+(_src>0?' <span class="ds-sub">('+_src+')</span>':'')+'</div><div class="ds-lab">'+_STAT_ICONS.star+' '+esc(L('Bewertung','Valoración','Rating'))+'</div></div>';
+          // immer eingeklappt starten
+          if(_row) _row.style.display='none';
+          var _chev=document.getElementById('dsChevron'); if(_chev) _chev.style.transform='';
           var _tt=_stBox.querySelector('.ds-title-txt'); if(_tt) _tt.textContent=L('Statistik','Estadísticas','Statistics');
           var _pv=_stBox.querySelector('.ds-private'); if(_pv) _pv.textContent=L('nur für dich sichtbar','solo visible para vos','only visible to you');
           _stBox.style.display='';
@@ -4622,6 +4625,19 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if(body) body.innerHTML = '<div class="empty-state"><div class="empty-title">'+esc(t('error_loading')||'Fehler')+'</div></div>';
     }
   }
+  // Dezente App-Icons für Statistik (Strich-Stil, currentColor) – statt Emojis
+  var _STAT_ICONS = {
+    view: '<svg class="ds-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>',
+    fav:  '<svg class="ds-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+    star: '<svg class="ds-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
+  };
+  function toggleDetailStats(){
+    var row=document.getElementById('detailStatsRow'), chev=document.getElementById('dsChevron');
+    if(!row) return;
+    var open = row.style.display!=='none';
+    row.style.display = open ? 'none' : 'flex';
+    if(chev) chev.style.transform = open ? '' : 'rotate(90deg)';
+  }
   // Statistik nur für verifizierte Inhaber (owner_id) bzw. bei Immobilien den Ersteller (created_by); Admin immer.
   function _canSeeStats(l){
     if(!currentUser) return false;
@@ -4646,8 +4662,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var statsHtml='';
       if(_canSeeStats(l)){
         var v=l.views_count||0, f=l.favorites_count||0, rc=l.rating_count||0;
-        var s = '👁 '+v+'  ·  ❤️ '+f;
-        if(rc>0) s += '  ·  ⭐ '+(l.rating_sum/rc).toFixed(1)+' ('+rc+')';
+        var s = _STAT_ICONS.view+' '+v+'  ·  '+_STAT_ICONS.fav+' '+f;
+        if(rc>0) s += '  ·  '+_STAT_ICONS.star+' '+(l.rating_sum/rc).toFixed(1)+' ('+rc+')';
         statsHtml='<div class="ml-stats">'+s+'</div>';
       }
       return '<div class="ml-card" onclick="showDetail(\''+l.id+'\')">'

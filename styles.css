@@ -815,6 +815,9 @@
 .ml-stats { font-size:11.5px; color:var(--text-2); margin-top:4px; font-weight:600; }
 /* Inhaber-Statistik im Detail */
 #detailStats .ds-private { font-size:10px; font-weight:700; color:var(--text-3); background:var(--surface-2,#f4f1ec); border-radius:20px; padding:2px 8px; margin-left:6px; text-transform:none; letter-spacing:0; vertical-align:middle; }
+.ds-head { display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+.ds-chev { color:var(--text-3); flex-shrink:0; margin-right:16px; transition:transform 0.25s; }
+.ds-ic { width:13px; height:13px; vertical-align:-2px; color:var(--text-3); }
 .ds-row { display:flex; gap:8px; padding:0 16px 16px; }
 .ds-item { flex:1; background:var(--surface-2,#f4f1ec); border-radius:12px; padding:12px 6px; text-align:center; }
 .ds-num { font-size:19px; font-weight:800; color:var(--text-1); font-family:'DM Sans',sans-serif; line-height:1.1; }
