@@ -243,6 +243,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ev_delete_btn: 'Löschen', ev_delete_confirm: 'Event endgültig löschen?', ev_delete_ok: 'Event gelöscht.',
       // Profile events
       my_events_title: 'Meine Events', loading: 'Wird geladen...', error_loading: 'Fehler beim Laden.', ev_cancel_done: 'Event wurde abgesagt.', my_signups_title: 'Angemeldete Events',
+      my_listings_title: 'Meine Einträge', my_listings_empty: 'Du hast noch keine Einträge.', status_verified: 'Geprüft', status_pending: 'In Prüfung',
       my_events_none: 'Du hast noch keine Events erstellt.',
       my_events_count_0: 'Noch keine Events', my_events_count_1: '1 Event',
       my_signups_none: 'Du hast dich noch bei keinem Event angemeldet.',
@@ -504,6 +505,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ev_delete_btn: 'Eliminar', ev_delete_confirm: '¿Eliminar este evento definitivamente?', ev_delete_ok: 'Evento eliminado.',
       // Perfil eventos
       my_events_title: 'Mis Eventos', loading: 'Cargando...', error_loading: 'Error al cargar.', ev_cancel_done: 'Evento cancelado.', my_signups_title: 'Eventos Registrados',
+      my_listings_title: 'Mis entradas', my_listings_empty: 'Todavía no tenés entradas.', status_verified: 'Verificado', status_pending: 'En revisión',
       my_events_none: 'Aún no has creado ningún evento.',
       my_events_count_0: 'Sin eventos', my_events_count_1: '1 Evento',
       my_signups_none: 'Aún no te has registrado en ningún evento.',
@@ -765,6 +767,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       ev_delete_btn: 'Delete', ev_delete_confirm: 'Permanently delete this event?', ev_delete_ok: 'Event deleted.',
       // Profile events
       my_events_title: 'My events', loading: 'Loading...', error_loading: 'Error loading.', ev_cancel_done: 'Event has been cancelled.', my_signups_title: 'Registered events',
+      my_listings_title: 'My entries', my_listings_empty: 'You have no entries yet.', status_verified: 'Verified', status_pending: 'Under review',
       my_events_none: 'You haven\'t created any events yet.',
       my_events_count_0: 'No events yet', my_events_count_1: '1 event',
       my_signups_none: 'You haven\'t signed up for any events yet.',
@@ -4564,6 +4567,54 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     _maybeShowFcHint();
     loadQuestions();
     _markAllMyQuestionsSeen(); // Board geöffnet -> eigene Fragen als gesehen markieren, Bubble-Badge leeren
+  }
+  // ── Meine Einträge (eigene + beanspruchte Listings) ───────────────────────
+  async function openMyListings(){
+    if(!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
+    showScreen('screenMyListings');
+    var body=document.getElementById('myListingsBody');
+    if(body) body.innerHTML = '<div style="text-align:center;padding:34px;color:var(--text-3)">'+(t('loading')||'…')+'</div>';
+    var sub=document.getElementById('myListingsSub'); if(sub) sub.textContent='';
+    try{
+      var uid=currentUser.uid;
+      // Zwei indizierte Abfragen (eigene + beanspruchte); nur beim Öffnen -> kein Start-Overhead
+      var snaps = await Promise.all([
+        db.collection('listings').where('created_by','==',uid).get(),
+        db.collection('listings').where('owner_id','==',uid).get()
+      ]);
+      var map={};
+      snaps.forEach(function(snap){ snap.forEach(function(d){ map[d.id]=Object.assign({id:d.id}, d.data()); }); });
+      var items=Object.keys(map).map(function(k){ return map[k]; });
+      // Nicht-verifizierte ("In Prüfung") zuerst, dann neueste
+      items.sort(function(a,b){ var va=a.verified?1:0, vb=b.verified?1:0; if(va!==vb) return va-vb; return _adminTs(b.created_at)-_adminTs(a.created_at); });
+      renderMyListings(items);
+    }catch(e){
+      if(body) body.innerHTML = '<div class="empty-state"><div class="empty-title">'+esc(t('error_loading')||'Fehler')+'</div></div>';
+    }
+  }
+  function renderMyListings(items){
+    var body=document.getElementById('myListingsBody'); if(!body) return;
+    var sub=document.getElementById('myListingsSub');
+    if(sub) sub.textContent = items.length ? (items.length+' '+L(items.length===1?'Eintrag':'Einträge', items.length===1?'entrada':'entradas', items.length===1?'entry':'entries')) : '';
+    if(!items.length){
+      body.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1-5h16l1 5"/><path d="M4 9v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/></svg></div><div class="empty-title">'+esc(t('my_listings_empty'))+'</div><div class="empty-sub">'+esc(L('Reiche über „Eintrag vorschlagen" einen Ort ein.','Sugerí un lugar con „Sugerir entrada".','Add a place via “Suggest entry”.'))+'</div></div>';
+      return;
+    }
+    body.innerHTML = items.map(function(l){
+      var col = catColors[l.category_id] || '#6B6B6B';
+      var emoji = catEmojis[l.category_id] || '📍';
+      var status = l.verified
+        ? '<span class="ml-badge ok">'+esc(t('status_verified'))+'</span>'
+        : '<span class="ml-badge pend">'+esc(t('status_pending'))+'</span>';
+      return '<div class="ml-card" onclick="showDetail(\''+l.id+'\')">'
+        + '<div class="ml-dot" style="background:'+col+'">'+emoji+'</div>'
+        + '<div class="ml-main"><div class="ml-name">'+esc(l.name||'')+'</div>'
+        + (l.city ? '<div class="ml-meta">'+esc(prettyCity(l.city))+'</div>' : '')
+        + '</div>'
+        + status
+        + '<svg class="ml-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>'
+        + '</div>';
+    }).join('');
   }
   function _maybeShowFcHint(){
     var el=document.getElementById('fcHint'); if(!el) return;
