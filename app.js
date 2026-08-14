@@ -4108,6 +4108,24 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         }
       }
     } catch(e){}
+    // Inhaber-Statistik im Detail (nur für berechtigte; Daten liegen bereits an l -> keine Extra-Reads)
+    try {
+      var _stBox=document.getElementById('detailStats');
+      if(_stBox){
+        if(_canSeeStats(l)){
+          var _sv=l.views_count||0, _sf=l.favorites_count||0, _src=l.rating_count||0;
+          var _srating=_src>0 ? (l.rating_sum/_src).toFixed(1) : '–';
+          var _row=document.getElementById('detailStatsRow');
+          if(_row) _row.innerHTML =
+              '<div class="ds-item"><div class="ds-num">'+_sv+'</div><div class="ds-lab">👁 '+esc(L('Aufrufe','Vistas','Views'))+'</div></div>'
+            + '<div class="ds-item"><div class="ds-num">'+_sf+'</div><div class="ds-lab">❤️ '+esc(L('Favoriten','Favoritos','Favorites'))+'</div></div>'
+            + '<div class="ds-item"><div class="ds-num">'+_srating+(_src>0?' <span class="ds-sub">('+_src+')</span>':'')+'</div><div class="ds-lab">⭐ '+esc(L('Bewertung','Valoración','Rating'))+'</div></div>';
+          var _tt=_stBox.querySelector('.ds-title-txt'); if(_tt) _tt.textContent=L('Statistik','Estadísticas','Statistics');
+          var _pv=_stBox.querySelector('.ds-private'); if(_pv) _pv.textContent=L('nur für dich sichtbar','solo visible para vos','only visible to you');
+          _stBox.style.display='';
+        } else { _stBox.style.display='none'; }
+      }
+    } catch(e){}
     // Cover
     const hero=document.getElementById('detailHero');
     const cov=document.getElementById('detailCover');

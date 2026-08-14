@@ -813,6 +813,13 @@
 .ml-name { font-size:14.5px; font-weight:700; color:var(--text-1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .ml-meta { font-size:12px; color:var(--text-3); margin-top:2px; }
 .ml-stats { font-size:11.5px; color:var(--text-2); margin-top:4px; font-weight:600; }
+/* Inhaber-Statistik im Detail */
+#detailStats .ds-private { font-size:10px; font-weight:700; color:var(--text-3); background:var(--surface-2,#f4f1ec); border-radius:20px; padding:2px 8px; margin-left:6px; text-transform:none; letter-spacing:0; vertical-align:middle; }
+.ds-row { display:flex; gap:8px; padding:0 16px 16px; }
+.ds-item { flex:1; background:var(--surface-2,#f4f1ec); border-radius:12px; padding:12px 6px; text-align:center; }
+.ds-num { font-size:19px; font-weight:800; color:var(--text-1); font-family:'DM Sans',sans-serif; line-height:1.1; }
+.ds-num .ds-sub { font-size:12px; font-weight:700; color:var(--text-3); }
+.ds-lab { font-size:10.5px; color:var(--text-2); margin-top:5px; font-weight:600; white-space:nowrap; }
 .ml-badge { flex-shrink:0; font-size:10.5px; font-weight:800; border-radius:20px; padding:3px 9px; white-space:nowrap; }
 .ml-badge.ok { background:#E3F4EA; color:#1F8C52; }
 .ml-badge.pend { background:#FDEBCB; color:#B9790C; }
