@@ -4096,6 +4096,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function showDetail(id) {
     const l = allListings.find(x => x.id === id);
     if (!l) return;
+    // Aufruf zählen: fire-and-forget, max. 1×/Sitzung/Eintrag, NICHT beim Inhaber/Ersteller/Admin (kein Selbst-Inflating)
+    try {
+      var _ownView = currentUser && (currentUser.email===ADMIN_EMAIL || (l.owner_id&&l.owner_id===currentUser.uid) || (l.created_by&&l.created_by===currentUser.uid));
+      if (!_ownView) {
+        if (!window._viewedSession) window._viewedSession = {};
+        if (!window._viewedSession[id]) {
+          window._viewedSession[id] = 1;
+          db.collection('listings').doc(id).update({ views_count: firebase.firestore.FieldValue.increment(1) }).catch(function(){});
+          l.views_count = (typeof l.views_count === 'number' ? l.views_count : 0) + 1;
+        }
+      }
+    } catch(e){}
     // Cover
     const hero=document.getElementById('detailHero');
     const cov=document.getElementById('detailCover');
@@ -4592,6 +4604,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if(body) body.innerHTML = '<div class="empty-state"><div class="empty-title">'+esc(t('error_loading')||'Fehler')+'</div></div>';
     }
   }
+  // Statistik nur für verifizierte Inhaber (owner_id) bzw. bei Immobilien den Ersteller (created_by); Admin immer.
+  function _canSeeStats(l){
+    if(!currentUser) return false;
+    if(currentUser.email===ADMIN_EMAIL) return true;
+    if(l.category_id==='kat-immobilien') return !!(l.created_by && l.created_by===currentUser.uid);
+    return !!(l.owner_id && l.owner_id===currentUser.uid);
+  }
   function renderMyListings(items){
     var body=document.getElementById('myListingsBody'); if(!body) return;
     var sub=document.getElementById('myListingsSub');
@@ -4606,10 +4625,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var status = l.verified
         ? '<span class="ml-badge ok">'+esc(t('status_verified'))+'</span>'
         : '<span class="ml-badge pend">'+esc(t('status_pending'))+'</span>';
+      var statsHtml='';
+      if(_canSeeStats(l)){
+        var v=l.views_count||0, f=l.favorites_count||0, rc=l.rating_count||0;
+        var s = '👁 '+v+'  ·  ❤️ '+f;
+        if(rc>0) s += '  ·  ⭐ '+(l.rating_sum/rc).toFixed(1)+' ('+rc+')';
+        statsHtml='<div class="ml-stats">'+s+'</div>';
+      }
       return '<div class="ml-card" onclick="showDetail(\''+l.id+'\')">'
         + '<div class="ml-dot" style="background:'+col+'">'+emoji+'</div>'
         + '<div class="ml-main"><div class="ml-name">'+esc(l.name||'')+'</div>'
         + (l.city ? '<div class="ml-meta">'+esc(prettyCity(l.city))+'</div>' : '')
+        + statsHtml
         + '</div>'
         + status
         + '<svg class="ml-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>'
@@ -7771,17 +7798,24 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   async function toggleFavorite() {
     if (requireLogin()) return;
     if (!currentListingId) return;
+    var _lid = currentListingId, _delta;
     const btn = document.getElementById('favBtn');
-    if (currentFavorites.has(currentListingId)) {
-      currentFavorites.delete(currentListingId);
-      btn.classList.remove('active');
+    if (currentFavorites.has(_lid)) {
+      currentFavorites.delete(_lid);
+      btn.classList.remove('active'); _delta = -1;
     } else {
-      currentFavorites.add(currentListingId);
-      btn.classList.add('active');
+      currentFavorites.add(_lid);
+      btn.classList.add('active'); _delta = 1;
     }
     try {
       await db.collection('users').doc(currentUser.uid).set({ favorites: [...currentFavorites] }, { merge: true });
     } catch(e) {}
+    // Favoriten-Zähler am Eintrag pflegen (fire-and-forget) -> für Inhaber-Statistik
+    try {
+      db.collection('listings').doc(_lid).update({ favorites_count: firebase.firestore.FieldValue.increment(_delta) }).catch(function(){});
+      var _ll = allListings.find(function(x){ return x.id===_lid; });
+      if (_ll) _ll.favorites_count = Math.max(0, (_ll.favorites_count||0) + _delta);
+    } catch(e){}
   }
 
   function showFavorites() {
