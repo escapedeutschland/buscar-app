@@ -4120,8 +4120,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
               '<div class="ds-item"><div class="ds-num">'+_sv+'</div><div class="ds-lab">'+_STAT_ICONS.view+' '+esc(L('Aufrufe','Vistas','Views'))+'</div></div>'
             + '<div class="ds-item"><div class="ds-num">'+_sf+'</div><div class="ds-lab">'+_STAT_ICONS.fav+' '+esc(L('Favoriten','Favoritos','Favorites'))+'</div></div>'
             + '<div class="ds-item"><div class="ds-num">'+_srating+(_src>0?' <span class="ds-sub">('+_src+')</span>':'')+'</div><div class="ds-lab">'+_STAT_ICONS.star+' '+esc(L('Bewertung','Valoración','Rating'))+'</div></div>';
+          // Kontakt-Aktionen (nur relevante): Anruf/Route/Website
+          var _acts=[];
+          if(l.phone) _acts.push([_STAT_ICONS.call, L('Anrufe','Llamadas','Calls'), l.calls_count||0]);
+          if(l.lat && l.lng) _acts.push([_STAT_ICONS.route, L('Route','Cómo llegar','Directions'), l.routes_count||0]);
+          if(l.website) _acts.push([_STAT_ICONS.web, L('Website','Sitio web','Website'), l.website_count||0]);
+          var _actsEl=document.getElementById('detailStatsActions');
+          if(_actsEl) _actsEl.innerHTML = _acts.map(function(a){ return '<div class="ds-act"><span class="ds-act-l">'+a[0]+' '+esc(a[1])+'</span><span class="ds-act-n">'+a[2]+'</span></div>'; }).join('');
           // immer eingeklappt starten
-          if(_row) _row.style.display='none';
+          var _body=document.getElementById('detailStatsBody'); if(_body) _body.style.display='none';
           var _chev=document.getElementById('dsChevron'); if(_chev) _chev.style.transform='';
           var _tt=_stBox.querySelector('.ds-title-txt'); if(_tt) _tt.textContent=L('Statistik','Estadísticas','Statistics');
           var _pv=_stBox.querySelector('.ds-private'); if(_pv) _pv.textContent=L('nur für dich sichtbar','solo visible para vos','only visible to you');
@@ -4207,15 +4214,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.getElementById('detailBadgeRow').innerHTML = ownerBadge + featBadge + maklerBadge + (l.verified?'<span class="detail-badge green">'+t('verified')+'</span>':'') + (isNew(l.created_at)?'<span class="detail-badge blue">'+t('badge_new')+'</span>':'') + openBadge;
     badges.style.display = (ownerBadge || featBadge || maklerBadge || l.verified || isNew(l.created_at) || openStatus!==null) ? 'block' : 'none';
     let infoHTML = '';
-    if (l.phone) infoHTML += `<a class="detail-row" href="tel:${esc(l.phone)}"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Telefon</div><div class="detail-row-value">${esc(l.phone)}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
-    if (l.website) { var _wHref = /^https?:\/\//i.test(String(l.website).trim()) ? String(l.website).trim() : 'https://' + String(l.website).trim(); infoHTML += `<a class="detail-row" href="${esc(_wHref)}" target="_blank" rel="noopener noreferrer"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Website</div><div class="detail-row-value">${esc(l.website)}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`; }
+    if (l.phone) infoHTML += `<a class="detail-row" href="tel:${esc(l.phone)}" onclick="_trackAction('${l.id}','calls_count')"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Telefon</div><div class="detail-row-value">${esc(l.phone)}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
+    if (l.website) { var _wHref = /^https?:\/\//i.test(String(l.website).trim()) ? String(l.website).trim() : 'https://' + String(l.website).trim(); infoHTML += `<a class="detail-row" href="${esc(_wHref)}" target="_blank" rel="noopener noreferrer" onclick="_trackAction('${l.id}','website_count')"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Website</div><div class="detail-row-value">${esc(l.website)}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`; }
     if (l.opening_hours) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Öffnungszeiten</div><div class="detail-row-value">${formatHours(l.opening_hours)}</div></div></div></div>`;
     if (l.address) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Adresse</div><div class="detail-row-value">${esc(l.address)}</div></div></div></div>`;
     const infoCard = document.getElementById('detailInfoCard');
     infoCard.innerHTML = infoHTML; infoCard.style.display = infoHTML?'block':'none';
     let ctaHTML = '';
-    if (l.phone) ctaHTML += `<a class="detail-cta-btn primary" href="tel:${esc(l.phone)}"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${t('call')}</a>`;
-    if (l.lat && l.lng) ctaHTML += `<a class="detail-cta-btn secondary" href="https://maps.google.com/?q=${l.lat},${l.lng}" target="_blank"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>${t('route')}</a>`;
+    if (l.phone) ctaHTML += `<a class="detail-cta-btn primary" href="tel:${esc(l.phone)}" onclick="_trackAction('${l.id}','calls_count')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${t('call')}</a>`;
+    if (l.lat && l.lng) ctaHTML += `<a class="detail-cta-btn secondary" href="https://maps.google.com/?q=${l.lat},${l.lng}" target="_blank" onclick="_trackAction('${l.id}','routes_count')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>${t('route')}</a>`;
     document.getElementById('detailCta').innerHTML = ctaHTML;
     // Render deal
     const dealCard = document.getElementById('detailDealCard');
@@ -4629,14 +4636,29 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   var _STAT_ICONS = {
     view: '<svg class="ds-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>',
     fav:  '<svg class="ds-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
-    star: '<svg class="ds-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
+    star: '<svg class="ds-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+    call: '<svg class="ds-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>',
+    route:'<svg class="ds-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>',
+    web:  '<svg class="ds-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>'
   };
   function toggleDetailStats(){
-    var row=document.getElementById('detailStatsRow'), chev=document.getElementById('dsChevron');
-    if(!row) return;
-    var open = row.style.display!=='none';
-    row.style.display = open ? 'none' : 'flex';
+    var b=document.getElementById('detailStatsBody'), chev=document.getElementById('dsChevron');
+    if(!b) return;
+    var open = b.style.display!=='none';
+    b.style.display = open ? 'none' : 'block';
     if(chev) chev.style.transform = open ? '' : 'rotate(90deg)';
+  }
+  // Aktions-Klick zählen (Anruf/Route/Website): fire-and-forget, 1×/Sitzung/Eintrag/Aktion, nicht beim Inhaber/Ersteller/Admin.
+  function _trackAction(id, field){
+    try{
+      var l=allListings.find(function(x){return x.id===id;});
+      if(currentUser && (currentUser.email===ADMIN_EMAIL || (l&&((l.owner_id&&l.owner_id===currentUser.uid)||(l.created_by&&l.created_by===currentUser.uid))))) return;
+      if(!window._actedSession) window._actedSession={};
+      var key=id+'|'+field; if(window._actedSession[key]) return; window._actedSession[key]=1;
+      var upd={}; upd[field]=firebase.firestore.FieldValue.increment(1);
+      db.collection('listings').doc(id).update(upd).catch(function(){});
+      if(l) l[field]=(l[field]||0)+1;
+    }catch(e){}
   }
   // Statistik nur für verifizierte Inhaber (owner_id) bzw. bei Immobilien den Ersteller (created_by); Admin immer.
   function _canSeeStats(l){
