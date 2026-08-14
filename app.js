@@ -4660,8 +4660,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if(l) l[field]=(l[field]||0)+1;
     }catch(e){}
   }
+  // Schalter: Inhaber-Statistik-ANZEIGE. Aus, solange noch wenig los ist (leere Zahlen wirken schlecht).
+  // Tracking (Aufrufe/Favoriten/Aktionen) läuft unabhängig weiter -> Daten sammeln sich schon an.
+  // Zum Aktivieren später einfach auf true setzen + neu deployen.
+  var STATS_UI_ENABLED = false;
   // Statistik nur für verifizierte Inhaber (owner_id) bzw. bei Immobilien den Ersteller (created_by); Admin immer.
   function _canSeeStats(l){
+    if(!STATS_UI_ENABLED) return false;
     if(!currentUser) return false;
     if(currentUser.email===ADMIN_EMAIL) return true;
     if(l.category_id==='kat-immobilien') return !!(l.created_by && l.created_by===currentUser.uid);
