@@ -803,7 +803,7 @@
 .author-badge-pill { flex-shrink:0; display:inline-flex; align-items:center; gap:3px; font-size:10.5px; font-weight:800; line-height:1; padding:3px 7px 3px 6px; border-radius:20px; letter-spacing:0.2px; white-space:nowrap; }
 .author-badge { flex-shrink:0; font-size:13px; line-height:1; margin-left:1px; }
 /* On-Demand-Übersetzen-Link */
-.translate-link { margin-top:9px; background:none; border:none; padding:2px 0; font-family:'DM Sans',sans-serif; font-size:12.5px; font-weight:700; color:var(--yellow-dark,#8a6d00); cursor:pointer; }
+.translate-link { display:inline-flex; align-items:center; margin:0 16px 14px; padding:4px 0; background:none; border:none; font-family:'DM Sans',sans-serif; font-size:12.5px; font-weight:700; line-height:1.4; color:var(--yellow-dark,#8a6d00); cursor:pointer; }
 .translate-link:active { opacity:0.6; }
 .qd-when { color:var(--text-3); font-weight:600; }
 /* Antwort-Fußzeile: 👍 + hilfreichste Antwort */
