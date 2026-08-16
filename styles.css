@@ -825,6 +825,19 @@
 .ds-lab { font-size:10.5px; color:var(--text-2); margin-top:5px; font-weight:600; white-space:nowrap; }
 .ds-actions { display:flex; flex-direction:column; gap:2px; padding:0 16px 14px; }
 .ds-actions:empty { display:none; }
+
+/* ── Feiertage & Traditionen ── */
+.fer-banner { display:flex; align-items:center; gap:11px; margin:0 16px 10px; padding:11px 13px; background:var(--surface-1,#fff); border:1.5px solid var(--border); border-radius:14px; cursor:pointer; flex-shrink:0; }
+.fer-banner:active { transform:scale(0.985); }
+.fer-banner-ico { width:34px; height:34px; border-radius:10px; background:var(--yellow-light,#FFF8EC); color:var(--yellow-dark,#B8661A); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.fer-banner-title { font-weight:700; font-size:13.5px; color:var(--text-1); }
+.fer-banner-sub { font-size:11.5px; color:var(--text-3); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fer-badge { display:inline-flex; align-items:center; font-size:10px; font-weight:800; letter-spacing:0.3px; padding:2.5px 8px; border-radius:20px; text-transform:uppercase; flex-shrink:0; }
+.fer-badge-state { background:var(--yellow-light,#FFF8EC); color:var(--yellow-dark,#B8661A); border:1px solid var(--yellow,#F5A623); }
+.fer-badge-trad { background:var(--surface-2); color:var(--text-2); border:1px solid var(--border); }
+.fer-badge-next { background:var(--green-light,#E8F5EC); color:var(--green,#2E9E5B); border:1px solid var(--green,#2E9E5B); }
+.fer-card { padding:13px 15px; margin-bottom:9px; }
+.fer-past { opacity:0.5; }
 .ds-act { display:flex; align-items:center; justify-content:space-between; padding:7px 0; border-top:1px solid var(--border); font-size:12.5px; }
 .ds-act:first-child { border-top:none; }
 .ds-act-l { display:flex; align-items:center; gap:7px; color:var(--text-2); font-weight:600; }

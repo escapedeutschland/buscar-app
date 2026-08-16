@@ -2302,6 +2302,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   function renderEvents() {
+    try{ _updateHolidayBanner(); }catch(e){}
     var now = new Date();
     var todayEnd = new Date(); todayEnd.setHours(23,59,59);
     var weekEnd = new Date(); weekEnd.setDate(weekEnd.getDate()+7);
@@ -4714,6 +4715,102 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function dismissFcHint(){ try{ localStorage.setItem('buscar_fc_hint','1'); }catch(e){} var el=document.getElementById('fcHint'); if(el) el.style.display='none'; }
 
   // ── WISSEN / ANKOMMEN IN PARAGUAY ──────────────────────────────────────────
+  // ── FEIERTAGE & TRADITIONEN ────────────────────────────────────────────────
+  // Komplett statisch (0 Firestore-Reads, 0 Netzwerk). Gesetzliche Feiertage lt.
+  // Gesetz + kulturelle Traditionen. Bewegliche Feiertage (Ley 7544) können per
+  // Dekret auf einen Montag verlegt werden -> Hinweis statt fester Verlegung.
+  function _easterDate(y){ // Gregorianischer Oster-Algorithmus (anonymous Gauss)
+    var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;
+    return new Date(y,mo-1,da);
+  }
+  function _pyHolidayList(y){
+    var easter=_easterDate(y);
+    function off(base,days){ var d=new Date(base); d.setDate(d.getDate()+days); return d; }
+    function S(date,mov,name,info){ return {date:date,state:true,mov:!!mov,name:name,info:info}; }
+    function T(date,name,info){ return {date:date,state:false,mov:false,name:name,info:info}; }
+    var list=[
+      S(new Date(y,0,1),false, L('Neujahr','Año Nuevo','New Year'), L('Alles geschlossen. Gefeiert wird schon am Vorabend um Mitternacht – mit Feuerwerk und Familienessen.','Todo cerrado. Se celebra la víspera a medianoche con fuegos artificiales y cena familiar.','Everything closed. Celebrated at midnight the night before with fireworks and a family dinner.')),
+      T(new Date(y,0,6), L('Heilige Drei Könige (Reyes Magos)','Día de los Reyes Magos','Three Kings Day (Reyes Magos)'), L('Kein Feiertag – Kinder bekommen traditionell Süßigkeiten oder kleine Geschenke.','No es feriado – los niños reciben dulces o pequeños regalos.','Not a public holiday – children traditionally receive sweets or small gifts.')),
+      T(new Date(y,1,3), L('San Blas – Schutzpatron Paraguays','San Blas – Patrono del Paraguay','San Blas – Patron Saint of Paraguay'), L('Kein Feiertag, aber landesweit gefeiert – besonders in Ciudad del Este und Itá. Prozessionen und Feste zu Ehren des Landespatrons.','No es feriado, pero se celebra en todo el país – especialmente en Ciudad del Este e Itá, con procesiones y fiestas patronales.','Not a public holiday but celebrated nationwide – especially in Ciudad del Este and Itá, with processions honoring the national patron saint.')),
+      T(off(easter,-47), L('Karneval (Carnaval)','Carnaval','Carnival (Carnaval)'), L('Kein gesetzlicher Feiertag. Höhepunkt ist der Karneval von Encarnación – der größte des Landes, an mehreren Wochenenden im Januar/Februar.','No es feriado. El más famoso es el Carnaval de Encarnación – el más grande del país, varios fines de semana en enero/febrero.','Not a public holiday. The highlight is the Encarnación Carnival – the country’s biggest, spread over several weekends in Jan/Feb.')),
+      S(new Date(y,2,1),true, L('Tag der Helden (Día de los Héroes)','Día de los Héroes','Heroes’ Day (Día de los Héroes)'), L('Gedenkt Marschall López und der Gefallenen des Tripel-Allianz-Krieges. Behörden und Banken zu, viele Geschäfte ebenfalls.','Conmemora al Mcal. López y a los caídos de la Guerra de la Triple Alianza. Oficinas públicas y bancos cerrados.','Honors Marshal López and the fallen of the Triple Alliance War. Government offices and banks closed, many shops too.')),
+      S(off(easter,-3),false, L('Gründonnerstag (Jueves Santo)','Jueves Santo','Maundy Thursday (Jueves Santo)'), L('Feiertag. Familien bereiten gemeinsam Chipa vor – der traditionelle Chipa-Backtag. Vieles schließt schon mittags.','Feriado. Las familias preparan chipa juntas – el día tradicional de la chipa. Mucho cierra al mediodía.','Public holiday. Families bake chipa together – the traditional chipa-baking day. Much closes by noon.')),
+      S(off(easter,-2),false, L('Karfreitag (Viernes Santo)','Viernes Santo','Good Friday (Viernes Santo)'), L('Stillster Tag des Jahres: fast alles geschlossen, kaum Verkehr. Traditionell kein Fleisch – gegessen wird Chipa und Fisch.','El día más silencioso del año: casi todo cerrado. Tradicionalmente sin carne – se come chipa y pescado.','Quietest day of the year: almost everything closed. Traditionally no meat – people eat chipa and fish.')),
+      S(new Date(y,4,1),false, L('Tag der Arbeit','Día del Trabajador','Labour Day'), L('Alles geschlossen. Oft verbunden mit Asado im Familien- und Freundeskreis.','Todo cerrado. Suele celebrarse con un asado entre familia y amigos.','Everything closed. Often celebrated with an asado among family and friends.')),
+      S(new Date(y,4,14),false, L('Unabhängigkeitstag (1. Tag)','Independencia Nacional (día 1)','Independence Day (day 1)'), L('Paraguay feiert als einziges Land der Region zwei Unabhängigkeitstage: 14. und 15. Mai (Revolution von 1811). Paraden und Feste, alles zu.','Paraguay celebra dos días de independencia: 14 y 15 de mayo (revolución de 1811). Desfiles y fiestas, todo cerrado.','Paraguay uniquely celebrates two independence days: May 14–15 (1811 revolution). Parades and festivities, everything closed.')),
+      S(new Date(y,4,15),false, L('Unabhängigkeitstag (2. Tag) & Muttertag','Independencia Nacional (día 2) y Día de la Madre','Independence Day (day 2) & Mother’s Day'), L('Zweiter Unabhängigkeitstag – zugleich Muttertag, der in Paraguay sehr groß gefeiert wird.','Segundo día de la independencia – también Día de la Madre, muy celebrado en Paraguay.','Second independence day – also Mother’s Day, celebrated in a big way in Paraguay.')),
+      S(new Date(y,5,12),true, L('Friede des Chaco (Paz del Chaco)','Paz del Chaco','Chaco Armistice (Paz del Chaco)'), L('Erinnert an das Ende des Chaco-Krieges 1935 gegen Bolivien. Behörden und Banken geschlossen.','Recuerda el fin de la Guerra del Chaco (1935) contra Bolivia. Oficinas públicas y bancos cerrados.','Marks the end of the 1935 Chaco War against Bolivia. Government offices and banks closed.')),
+      T(new Date(y,5,24), L('San Juan Ára (Johannisfest)','San Juan Ára','San Juan Ára (St John’s festivities)'), L('Kein Feiertag, aber überall Volksfeste rund um dieses Datum: traditionelle Spiele mit Feuer (tata ári jehasa – über Glut laufen), Pelota tata, typisches Essen.','No es feriado, pero hay fiestas populares por todo el país: juegos con fuego (tata ári jehasa), pelota tata y comidas típicas.','Not a public holiday, but folk festivals everywhere around this date: fire games (walking over embers), pelota tata, traditional food.')),
+      S(new Date(y,7,15),false, L('Gründung von Asunción','Fundación de Asunción','Founding of Asunción'), L('Asunción wurde 1537 gegründet – „Mutter der Städte". Landesweiter Feiertag, alles zu.','Asunción fue fundada en 1537 – „Madre de Ciudades". Feriado nacional, todo cerrado.','Asunción was founded in 1537 – the “Mother of Cities”. National holiday, everything closed.')),
+      T(new Date(y,7,16), L('Tag des Kindes (Día del Niño)','Día del Niño','Children’s Day (Día del Niño)'), L('Kein Feiertag, aber sehr präsent: gedenkt der Kinder-Schlacht von Acosta Ñu (1869). Schulen und Familien feiern die Kinder.','No es feriado, pero muy presente: recuerda la batalla de Acosta Ñu (1869). Escuelas y familias celebran a los niños.','Not a public holiday but widely observed: commemorates the child soldiers of Acosta Ñu (1869). Schools and families celebrate children.')),
+      S(new Date(y,8,29),true, L('Sieg von Boquerón','Victoria de Boquerón','Victory of Boquerón'), L('Gedenkt der Schlacht von Boquerón im Chaco-Krieg (1932). Behörden und Banken geschlossen.','Conmemora la batalla de Boquerón (1932) en la Guerra del Chaco. Oficinas públicas y bancos cerrados.','Commemorates the 1932 Battle of Boquerón in the Chaco War. Government offices and banks closed.')),
+      T(new Date(y,10,1), L('Allerheiligen & Totengedenken','Todos los Santos y Día de los Difuntos','All Saints & Day of the Dead'), L('1./2. November – kein Feiertag, aber Familien besuchen die Friedhöfe, schmücken Gräber und treffen sich zum Gedenken.','1 y 2 de noviembre – no es feriado, pero las familias visitan los cementerios y adornan las tumbas.','Nov 1–2 – not a public holiday, but families visit cemeteries, decorate graves and gather in remembrance.')),
+      S(new Date(y,11,8),false, L('Jungfrau von Caacupé','Virgen de Caacupé','Virgin of Caacupé'), L('Wichtigster religiöser Feiertag: Hunderttausende pilgern – viele zu Fuß – nach Caacupé. Alles geschlossen, Straßen dorthin voll.','El feriado religioso más importante: cientos de miles peregrinan – muchos a pie – a Caacupé. Todo cerrado.','The most important religious holiday: hundreds of thousands make the pilgrimage – many on foot – to Caacupé. Everything closed.')),
+      T(new Date(y,11,24), L('Heiligabend (Nochebuena)','Nochebuena','Christmas Eve (Nochebuena)'), L('Kein Feiertag, aber ab Mittag schließt vieles. DER große Weihnachtsabend: Familienessen und um Mitternacht Feuerwerk.','No es feriado, pero desde el mediodía mucho cierra. LA gran noche: cena familiar y fuegos artificiales a medianoche.','Not a holiday, but much closes from noon. THE big Christmas celebration: family dinner and fireworks at midnight.')),
+      S(new Date(y,11,25),false, L('Weihnachten','Navidad','Christmas Day'), L('Alles geschlossen. Der Tag verläuft ruhig – gefeiert wurde bereits an Nochebuena.','Todo cerrado. Día tranquilo – la celebración fue en Nochebuena.','Everything closed. A quiet day – the celebration happened on Christmas Eve.')),
+      T(new Date(y,11,31), L('Silvester (Víspera de Año Nuevo)','Víspera de Año Nuevo','New Year’s Eve'), L('Kein Feiertag, aber nachmittags schließt fast alles. Um Mitternacht Feuerwerk und Familienfeste.','No es feriado, pero por la tarde casi todo cierra. A medianoche, fuegos artificiales y fiesta en familia.','Not a holiday, but almost everything closes in the afternoon. Fireworks and family parties at midnight.'))
+    ];
+    // Neuer Feiertag seit 2026 (Ley: Juramento de la Constitución Nacional)
+    if (y >= 2026) list.push(S(new Date(y,5,20),true, L('Tag der Verfassung (seit 2026)','Juramento de la Constitución Nacional (desde 2026)','Constitution Day (since 2026)'), L('Neuer gesetzlicher Feiertag zum Gedenken an die Verfassung von 1992. Behörden und Banken geschlossen.','Nuevo feriado nacional que conmemora la Constitución de 1992. Oficinas públicas y bancos cerrados.','New national holiday commemorating the 1992 Constitution. Government offices and banks closed.')));
+    list.sort(function(a,b){ return a.date - b.date; });
+    return list;
+  }
+  function _nextPyHoliday(){ // nächster gesetzlicher Feiertag ab heute (inkl. Jahreswechsel)
+    var today=new Date(); today.setHours(0,0,0,0);
+    var y=today.getFullYear();
+    var all=_pyHolidayList(y).concat(_pyHolidayList(y+1));
+    for(var i=0;i<all.length;i++){ if(all[i].state && all[i].date>=today) return all[i]; }
+    return null;
+  }
+  function _updateHolidayBanner(){
+    try{
+      var tEl=document.getElementById('ferBannerTitle'), sEl=document.getElementById('ferBannerSub');
+      if(!tEl||!sEl) return;
+      tEl.textContent=L('Feiertage & Traditionen','Feriados y tradiciones','Holidays & traditions');
+      var n=_nextPyHoliday();
+      if(n){
+        var today=new Date(); today.setHours(0,0,0,0);
+        var days=Math.round((n.date-today)/86400000);
+        var when=days===0?L('heute','hoy','today'):days===1?L('morgen','mañana','tomorrow'):L('in '+days+' Tagen','en '+days+' días','in '+days+' days');
+        sEl.textContent=L('Nächster Feiertag','Próximo feriado','Next holiday')+': '+n.name+' · '+when;
+      } else sEl.textContent='';
+    }catch(e){}
+  }
+  function openFeiertage(){
+    showScreen('screenFeiertage');
+    var tEl=document.getElementById('ferTitle'), sEl=document.getElementById('ferSub');
+    if(tEl) tEl.textContent=L('Feiertage & Traditionen','Feriados y tradiciones','Holidays & traditions');
+    if(sEl) sEl.textContent=L('Was in Paraguay wann gefeiert wird – und was geschlossen hat','Qué se celebra en Paraguay – y qué cierra','What Paraguay celebrates – and what closes');
+    renderFeiertage();
+  }
+  function renderFeiertage(){
+    var body=document.getElementById('ferBody'); if(!body) return;
+    var today=new Date(); today.setHours(0,0,0,0);
+    var y=today.getFullYear();
+    var list=_pyHolidayList(y);
+    var next=_nextPyHoliday();
+    var loc=dateLoc();
+    // Legende: der Kern von Angelikas Idee – staatlich vs. freiwillig
+    var legend='<div class="detail-card" style="padding:14px 16px;margin-bottom:12px">'
+      +'<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:9px"><span class="fer-badge fer-badge-state">'+L('Gesetzlich','Feriado','Public holiday')+'</span><span style="font-size:12.5px;color:var(--text-2);line-height:1.45">'+L('Staatlicher Feiertag: Behörden, Banken und die meisten Geschäfte sind geschlossen.','Feriado nacional: oficinas públicas, bancos y la mayoría de los comercios cierran.','National holiday: government offices, banks and most shops are closed.')+'</span></div>'
+      +'<div style="display:flex;gap:8px;align-items:flex-start"><span class="fer-badge fer-badge-trad">'+L('Tradition','Tradición','Tradition')+'</span><span style="font-size:12.5px;color:var(--text-2);line-height:1.45">'+L('Kein Feiertag – jeder darf öffnen. Aber gut zu kennen, um nicht überrascht zu werden.','No es feriado – cada uno decide si abre. Pero conviene conocerlas.','Not a public holiday – businesses may open. But good to know so you’re not caught off guard.')+'</span></div>'
+      +'</div>';
+    var cards=list.map(function(h){
+      var past=h.date<today;
+      var isNext=next && h.state && h.date.getTime()===next.date.getTime() && h.date.getFullYear()===next.date.getFullYear();
+      var dateStr=h.date.toLocaleDateString(loc,{weekday:'short',day:'numeric',month:'long'});
+      var badge=h.state?'<span class="fer-badge fer-badge-state">'+L('Gesetzlich','Feriado','Public holiday')+'</span>':'<span class="fer-badge fer-badge-trad">'+L('Tradition','Tradición','Tradition')+'</span>';
+      var movNote=h.mov?'<div style="font-size:11px;color:var(--text-3);margin-top:6px">↔ '+L('Beweglich – kann per Dekret auf einen Montag verlegt werden','Trasladable – puede moverse a un lunes por decreto','Movable – may be shifted to a Monday by decree')+'</div>':'';
+      var nextTag=isNext?'<span class="fer-badge fer-badge-next">'+L('Nächster','Próximo','Next')+'</span>':'';
+      return '<div class="detail-card fer-card'+(past?' fer-past':'')+'">'
+        +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px"><span style="font-weight:800;font-size:13px;color:'+(h.state?'var(--yellow-dark,#B8661A)':'var(--text-2)')+'">'+dateStr+'</span>'+badge+nextTag+'</div>'
+        +'<div style="font-weight:700;font-size:14.5px;color:var(--text-1);margin-bottom:5px">'+h.name+'</div>'
+        +'<div style="font-size:12.5px;color:var(--text-2);line-height:1.5">'+h.info+'</div>'
+        +movNote+'</div>';
+    }).join('');
+    var foot='<div style="font-size:11px;color:var(--text-3);text-align:center;padding:14px 10px 0;line-height:1.5">'+y+' · '+t('wissen_disclaimer')+'</div>';
+    body.innerHTML=legend+cards+foot;
+  }
   var _guidesCache = null, _wissenFrom = 'profil', _wissenView = 'list';
   function openWissen(from){ _wissenFrom = from || 'profil'; _wissenView = 'list'; showScreen('screenWissen'); renderWissenList(); loadGuides(); }
   function wissenBack(){
