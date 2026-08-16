@@ -4776,40 +4776,113 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       } else sEl.textContent='';
     }catch(e){}
   }
+  var _ferView='list', _ferPastOpen=false, _ferCalBase=null, _ferSelKey=null;
   function openFeiertage(){
+    _ferView='list'; _ferPastOpen=false; _ferSelKey=null;
+    var n=new Date(); _ferCalBase=new Date(n.getFullYear(),n.getMonth(),1);
     showScreen('screenFeiertage');
     var tEl=document.getElementById('ferTitle'), sEl=document.getElementById('ferSub');
     if(tEl) tEl.textContent=L('Feiertage & Traditionen','Feriados y tradiciones','Holidays & traditions');
     if(sEl) sEl.textContent=L('Was in Paraguay wann gefeiert wird – und was geschlossen hat','Qué se celebra en Paraguay – y qué cierra','What Paraguay celebrates – and what closes');
     renderFeiertage();
   }
+  function setFerView(v){ _ferView=v; renderFeiertage(); }
+  function setFerPast(){ _ferPastOpen=!_ferPastOpen; renderFeiertage(); }
+  function _ferLongWeekend(h){ // gesetzlicher Feiertag an Mo/Fr -> langes Wochenende (Puente)
+    if(!h.state) return false; var d=h.date.getDay(); return d===1||d===5;
+  }
+  function _ferBadges(h,isNext){
+    var b=h.state?'<span class="fer-badge fer-badge-state">'+L('Gesetzlich','Feriado','Public holiday')+'</span>':'<span class="fer-badge fer-badge-trad">'+L('Tradition','Tradición','Tradition')+'</span>';
+    if(isNext) b+='<span class="fer-badge fer-badge-next">'+L('Nächster','Próximo','Next')+'</span>';
+    if(_ferLongWeekend(h)) b+='<span class="fer-badge fer-badge-lw">'+L('Langes WE','Finde largo','Long wknd')+'</span>';
+    return b;
+  }
+  function _ferCard(h,isNext,loc){
+    var dateStr=h.date.toLocaleDateString(loc,{weekday:'short',day:'numeric',month:'long'});
+    var movNote=h.mov?'<div style="font-size:11px;color:var(--text-3);margin-top:6px">↔ '+L('Beweglich – kann per Dekret auf einen Montag verlegt werden','Trasladable – puede moverse a un lunes por decreto','Movable – may be shifted to a Monday by decree')+'</div>':'';
+    return '<div class="detail-card fer-card'+(isNext?' fer-next':'')+'">'
+      +'<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:5px"><span style="font-weight:800;font-size:13px;color:'+(h.state?'var(--yellow-dark,#B8661A)':'var(--text-2)')+'">'+dateStr+'</span>'+_ferBadges(h,isNext)+'</div>'
+      +'<div style="font-weight:700;font-size:14.5px;color:var(--text-1);margin-bottom:5px">'+h.name+'</div>'
+      +'<div style="font-size:12.5px;color:var(--text-2);line-height:1.5">'+h.info+'</div>'+movNote+'</div>';
+  }
   function renderFeiertage(){
     var body=document.getElementById('ferBody'); if(!body) return;
     var today=new Date(); today.setHours(0,0,0,0);
-    var y=today.getFullYear();
-    var list=_pyHolidayList(y);
-    var next=_nextPyHoliday();
-    var loc=dateLoc();
-    // Legende: der Kern von Angelikas Idee – staatlich vs. freiwillig
-    var legend='<div class="detail-card" style="padding:14px 16px;margin-bottom:12px">'
-      +'<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:9px"><span class="fer-badge fer-badge-state">'+L('Gesetzlich','Feriado','Public holiday')+'</span><span style="font-size:12.5px;color:var(--text-2);line-height:1.45">'+L('Staatlicher Feiertag: Behörden, Banken und die meisten Geschäfte sind geschlossen.','Feriado nacional: oficinas públicas, bancos y la mayoría de los comercios cierran.','National holiday: government offices, banks and most shops are closed.')+'</span></div>'
-      +'<div style="display:flex;gap:8px;align-items:flex-start"><span class="fer-badge fer-badge-trad">'+L('Tradition','Tradición','Tradition')+'</span><span style="font-size:12.5px;color:var(--text-2);line-height:1.45">'+L('Kein Feiertag – jeder darf öffnen. Aber gut zu kennen, um nicht überrascht zu werden.','No es feriado – cada uno decide si abre. Pero conviene conocerlas.','Not a public holiday – businesses may open. But good to know so you’re not caught off guard.')+'</span></div>'
+    var y=today.getFullYear(); var loc=dateLoc();
+    var toggle='<div class="fer-seg-wrap"><div class="fer-seg">'
+      +'<button class="fer-seg-btn'+(_ferView==='list'?' active':'')+'" onclick="setFerView(\'list\')">'+L('Liste','Lista','List')+'</button>'
+      +'<button class="fer-seg-btn'+(_ferView==='cal'?' active':'')+'" onclick="setFerView(\'cal\')">'+L('Kalender','Calendario','Calendar')+'</button>'
+      +'</div></div>';
+    var foot='<div style="font-size:11px;color:var(--text-3);text-align:center;padding:14px 10px 0;line-height:1.5">'+t('wissen_disclaimer')+'</div>';
+    if(_ferView==='cal'){ body.innerHTML=toggle+_ferCalHTML(today)+foot; return; }
+    // Legende – kompakt mit Icons (Kern der Idee: gesetzlich = zu, Tradition = jeder darf öffnen)
+    var legend='<div class="detail-card" style="padding:13px 15px;margin-bottom:12px">'
+      +'<div class="fer-leg-row"><div class="fer-leg-ico fer-leg-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></div><div><b>'+L('Gesetzlich','Feriado','Public holiday')+'</b> – '+L('Behörden, Banken & die meisten Geschäfte geschlossen','oficinas, bancos y la mayoría de comercios cierran','offices, banks & most shops closed')+'</div></div>'
+      +'<div class="fer-leg-row" style="margin-top:8px"><div class="fer-leg-ico fer-leg-trad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div><b>'+L('Tradition','Tradición','Tradition')+'</b> – '+L('kein Feiertag, jeder darf öffnen','no es feriado, cada uno decide si abre','not a holiday, businesses may open')+'</div></div>'
       +'</div>';
-    var cards=list.map(function(h){
-      var past=h.date<today;
-      var isNext=next && h.state && h.date.getTime()===next.date.getTime() && h.date.getFullYear()===next.date.getFullYear();
-      var dateStr=h.date.toLocaleDateString(loc,{weekday:'short',day:'numeric',month:'long'});
-      var badge=h.state?'<span class="fer-badge fer-badge-state">'+L('Gesetzlich','Feriado','Public holiday')+'</span>':'<span class="fer-badge fer-badge-trad">'+L('Tradition','Tradición','Tradition')+'</span>';
-      var movNote=h.mov?'<div style="font-size:11px;color:var(--text-3);margin-top:6px">↔ '+L('Beweglich – kann per Dekret auf einen Montag verlegt werden','Trasladable – puede moverse a un lunes por decreto','Movable – may be shifted to a Monday by decree')+'</div>':'';
-      var nextTag=isNext?'<span class="fer-badge fer-badge-next">'+L('Nächster','Próximo','Next')+'</span>':'';
-      return '<div class="detail-card fer-card'+(past?' fer-past':'')+'">'
-        +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px"><span style="font-weight:800;font-size:13px;color:'+(h.state?'var(--yellow-dark,#B8661A)':'var(--text-2)')+'">'+dateStr+'</span>'+badge+nextTag+'</div>'
-        +'<div style="font-weight:700;font-size:14.5px;color:var(--text-1);margin-bottom:5px">'+h.name+'</div>'
-        +'<div style="font-size:12.5px;color:var(--text-2);line-height:1.5">'+h.info+'</div>'
-        +movNote+'</div>';
-    }).join('');
-    var foot='<div style="font-size:11px;color:var(--text-3);text-align:center;padding:14px 10px 0;line-height:1.5">'+y+' · '+t('wissen_disclaimer')+'</div>';
-    body.innerHTML=legend+cards+foot;
+    // Kommende zuerst (rollierende 12 Monate über den Jahreswechsel), Vergangene eingeklappt ans Ende
+    var horizon=new Date(today); horizon.setFullYear(horizon.getFullYear()+1);
+    var next=_nextPyHoliday();
+    var upcoming=_pyHolidayList(y).concat(_pyHolidayList(y+1)).filter(function(h){ return h.date>=today && h.date<horizon; });
+    var past=_pyHolidayList(y).filter(function(h){ return h.date<today; });
+    var cards='', lastYear=y;
+    upcoming.forEach(function(h){
+      var hy=h.date.getFullYear();
+      if(hy!==lastYear){ cards+='<div class="fer-year-div">'+hy+'</div>'; lastYear=hy; }
+      var isNext=next && h.state && h.date.getTime()===next.date.getTime();
+      cards+=_ferCard(h,isNext,loc);
+    });
+    var pastHtml='';
+    if(past.length){
+      pastHtml='<div class="fer-past-toggle" onclick="setFerPast()">'+(_ferPastOpen?'▾ ':'▸ ')+L('Bereits vorbei','Ya pasaron','Already passed')+' '+y+' ('+past.length+')</div>';
+      if(_ferPastOpen) pastHtml+='<div style="opacity:0.55">'+past.map(function(h){ return _ferCard(h,false,loc); }).join('')+'</div>';
+    }
+    body.innerHTML=toggle+legend+cards+pastHtml+foot;
+  }
+  function ferCalNav(dir){
+    var b=_ferCalBase||new Date(); var n=new Date(b.getFullYear(),b.getMonth()+dir,1);
+    var today=new Date(); var minY=today.getFullYear(), maxY=minY+1;
+    if(n.getFullYear()<minY||n.getFullYear()>maxY) return;
+    _ferCalBase=n; _ferSelKey=null; renderFeiertage();
+  }
+  function ferSelDay(key){ _ferSelKey=(_ferSelKey===key?null:key); renderFeiertage(); }
+  function _ferCalHTML(today){
+    var b=_ferCalBase||new Date(today.getFullYear(),today.getMonth(),1);
+    var cy=b.getFullYear(), cm=b.getMonth();
+    var list=_pyHolidayList(cy);
+    var byDay={};
+    list.forEach(function(h){ if(h.date.getMonth()===cm){ var k=h.date.getDate(); (byDay[k]=byDay[k]||[]).push(h); } });
+    var loc=dateLoc();
+    var monthName=new Date(cy,cm,1).toLocaleDateString(loc,{month:'long',year:'numeric'});
+    var wd=[L('Mo','Lu','Mo'),L('Di','Ma','Tu'),L('Mi','Mi','We'),L('Do','Ju','Th'),L('Fr','Vi','Fr'),L('Sa','Sá','Sa'),L('So','Do','Su')];
+    var head='<div class="fer-cal-nav"><button class="fer-cal-arr" onclick="ferCalNav(-1)">‹</button><div class="fer-cal-month">'+monthName+'</div><button class="fer-cal-arr" onclick="ferCalNav(1)">›</button></div>';
+    var grid='<div class="fer-cal-grid">'+wd.map(function(w){ return '<div class="fer-cal-wd">'+w+'</div>'; }).join('');
+    var first=new Date(cy,cm,1); var pad=(first.getDay()+6)%7;
+    var dim=new Date(cy,cm+1,0).getDate();
+    for(var i=0;i<pad;i++) grid+='<div></div>';
+    for(var d=1;d<=dim;d++){
+      var hs=byDay[d]||[];
+      var isToday=(today.getFullYear()===cy&&today.getMonth()===cm&&today.getDate()===d);
+      var key=cy+'-'+cm+'-'+d;
+      var sel=(_ferSelKey===key);
+      var dots=hs.slice(0,2).map(function(h){ return '<span class="fer-dot '+(h.state?'fer-dot-state':'fer-dot-trad')+'"></span>'; }).join('');
+      var cls='fer-cal-day'+(isToday?' fer-cal-today':'')+(hs.length?' fer-cal-has':'')+(sel?' fer-cal-sel':'');
+      grid+='<div class="'+cls+'"'+(hs.length?' onclick="ferSelDay(\''+key+'\')"':'')+'><span>'+d+'</span><div class="fer-dots">'+dots+'</div></div>';
+    }
+    grid+='</div>';
+    var info='';
+    if(_ferSelKey){
+      var p=_ferSelKey.split('-');
+      if(parseInt(p[0],10)===cy&&parseInt(p[1],10)===cm){
+        var hs2=byDay[parseInt(p[2],10)]||[];
+        var nx=_nextPyHoliday();
+        info=hs2.map(function(h){ var isNext=nx&&h.state&&h.date.getTime()===nx.date.getTime(); return _ferCard(h,isNext,loc); }).join('');
+      }
+    } else {
+      info='<div style="font-size:12px;color:var(--text-3);text-align:center;padding:12px 10px 0">'+L('Tippe auf einen markierten Tag für Details','Tocá un día marcado para ver detalles','Tap a marked day for details')+'</div>';
+    }
+    var legendMini='<div class="fer-cal-leg"><span class="fer-dot fer-dot-state"></span>'+L('Gesetzlich','Feriado','Holiday')+'<span class="fer-dot fer-dot-trad" style="margin-left:12px"></span>'+L('Tradition','Tradición','Tradition')+'</div>';
+    return '<div class="detail-card" style="padding:13px 13px 11px;margin-bottom:10px">'+head+grid+legendMini+'</div>'+info;
   }
   var _guidesCache = null, _wissenFrom = 'profil', _wissenView = 'list';
   function openWissen(from){ _wissenFrom = from || 'profil'; _wissenView = 'list'; showScreen('screenWissen'); renderWissenList(); loadGuides(); }
