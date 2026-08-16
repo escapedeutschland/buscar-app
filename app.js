@@ -2888,6 +2888,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } else if (_evDetailSource === 'profil') {
       setNav('navProfil');
       showScreen('screenProfil');
+    } else if (_evDetailSource === 'fer') {
+      // zurück zum Feiertags-Kalender (Ansicht + gewählter Tag bleiben erhalten)
+      showScreen('screenFeiertage');
+      renderFeiertage();
     } else {
       setNav('navEvents');
       showScreen('screenEvents');
@@ -4846,12 +4850,29 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     _ferCalBase=n; _ferSelKey=null; renderFeiertage();
   }
   function ferSelDay(key){ _ferSelKey=(_ferSelKey===key?null:key); renderFeiertage(); }
+  var _ferShowEv=true, _ferEvLoading=false; // Community-Events im Kalender (Session-Einstellung)
+  function toggleFerEvents(){ _ferShowEv=!_ferShowEv; renderFeiertage(); }
   function _ferCalHTML(today){
     var b=_ferCalBase||new Date(today.getFullYear(),today.getMonth(),1);
     var cy=b.getFullYear(), cm=b.getMonth();
     var list=_pyHolidayList(cy);
     var byDay={};
     list.forEach(function(h){ if(h.date.getMonth()===cm){ var k=h.date.getDate(); (byDay[k]=byDay[k]||[]).push(h); } });
+    // Community-Events des Monats: nutzt die bereits geladenen allEvents (0 zusätzliche Reads).
+    // Falls noch nicht geladen (Screen direkt geöffnet) -> einmalig nachladen, dann neu zeichnen.
+    var evByDay={};
+    if(_ferShowEv){
+      if(typeof allEvents!=='undefined' && allEvents && allEvents.length){
+        allEvents.forEach(function(ev){
+          if(ev.status==='cancelled') return;
+          var d=_evDate(ev.date_start); if(!d) return;
+          if(d.getFullYear()===cy && d.getMonth()===cm){ var k=d.getDate(); (evByDay[k]=evByDay[k]||[]).push(ev); }
+        });
+      } else if(typeof loadEvents==='function' && !_ferEvLoading){
+        _ferEvLoading=true;
+        try{ Promise.resolve(loadEvents()).then(function(){ _ferEvLoading=false; if(activeScreen==='screenFeiertage'&&_ferView==='cal') renderFeiertage(); }).catch(function(){ _ferEvLoading=false; }); }catch(e){ _ferEvLoading=false; }
+      }
+    }
     var loc=dateLoc();
     var monthName=new Date(cy,cm,1).toLocaleDateString(loc,{month:'long',year:'numeric'});
     var wd=[L('Mo','Lu','Mo'),L('Di','Ma','Tu'),L('Mi','Mi','We'),L('Do','Ju','Th'),L('Fr','Vi','Fr'),L('Sa','Sá','Sa'),L('So','Do','Su')];
@@ -4862,27 +4883,43 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     for(var i=0;i<pad;i++) grid+='<div></div>';
     for(var d=1;d<=dim;d++){
       var hs=byDay[d]||[];
+      var evs=evByDay[d]||[];
       var isToday=(today.getFullYear()===cy&&today.getMonth()===cm&&today.getDate()===d);
       var key=cy+'-'+cm+'-'+d;
       var sel=(_ferSelKey===key);
       var dots=hs.slice(0,2).map(function(h){ return '<span class="fer-dot '+(h.state?'fer-dot-state':'fer-dot-trad')+'"></span>'; }).join('');
-      var cls='fer-cal-day'+(isToday?' fer-cal-today':'')+(hs.length?' fer-cal-has':'')+(sel?' fer-cal-sel':'');
-      grid+='<div class="'+cls+'"'+(hs.length?' onclick="ferSelDay(\''+key+'\')"':'')+'><span>'+d+'</span><div class="fer-dots">'+dots+'</div></div>';
+      dots+=evs.slice(0,2).map(function(ev){ return '<span class="fer-dot" style="background:'+(EVENT_TYPE_COLORS[ev.type]||'#7C5CBF')+'"></span>'; }).join('');
+      var has=hs.length||evs.length;
+      var cls='fer-cal-day'+(isToday?' fer-cal-today':'')+(has?' fer-cal-has':'')+(sel?' fer-cal-sel':'');
+      grid+='<div class="'+cls+'"'+(has?' onclick="ferSelDay(\''+key+'\')"':'')+'><span>'+d+'</span><div class="fer-dots">'+dots+'</div></div>';
     }
     grid+='</div>';
     var info='';
     if(_ferSelKey){
       var p=_ferSelKey.split('-');
       if(parseInt(p[0],10)===cy&&parseInt(p[1],10)===cm){
-        var hs2=byDay[parseInt(p[2],10)]||[];
+        var selD=parseInt(p[2],10);
+        var hs2=byDay[selD]||[];
         var nx=_nextPyHoliday();
         info=hs2.map(function(h){ var isNext=nx&&h.state&&h.date.getTime()===nx.date.getTime(); return _ferCard(h,isNext,loc); }).join('');
+        var evs2=evByDay[selD]||[];
+        info+=evs2.map(function(ev){
+          var color=EVENT_TYPE_COLORS[ev.type]||'#7C5CBF';
+          var emoji=EVENT_TYPE_EMOJIS[ev.type]||'📌';
+          var st=_evDate(ev.date_start);
+          var timeStr=st?st.toLocaleTimeString(loc,{hour:'2-digit',minute:'2-digit'}):'';
+          var cityStr=ev.city?prettyCity(ev.city):'';
+          return '<div class="detail-card fer-ev-card" style="border-left:4px solid '+color+'" onclick="showEventDetail(\''+ev.id+'\',\'fer\')">'
+            +'<div style="font-weight:700;font-size:13.5px;color:var(--text-1)">'+emoji+' '+esc(ev.title||'')+'</div>'
+            +'<div class="fer-ev-meta">'+timeStr+(cityStr?' · '+esc(cityStr):'')+' · '+L('Von der Community','De la comunidad','From the community')+'</div></div>';
+        }).join('');
       }
     } else {
       info='<div style="font-size:12px;color:var(--text-3);text-align:center;padding:12px 10px 0">'+L('Tippe auf einen markierten Tag für Details','Tocá un día marcado para ver detalles','Tap a marked day for details')+'</div>';
     }
-    var legendMini='<div class="fer-cal-leg"><span class="fer-dot fer-dot-state"></span>'+L('Gesetzlich','Feriado','Holiday')+'<span class="fer-dot fer-dot-trad" style="margin-left:12px"></span>'+L('Tradition','Tradición','Tradition')+'</div>';
-    return '<div class="detail-card" style="padding:13px 13px 11px;margin-bottom:10px">'+head+grid+legendMini+'</div>'+info;
+    var legendMini='<div class="fer-cal-leg"><span class="fer-dot fer-dot-state"></span>'+L('Gesetzlich','Feriado','Holiday')+'<span class="fer-dot fer-dot-trad" style="margin-left:12px"></span>'+L('Tradition','Tradición','Tradition')+(_ferShowEv?'<span class="fer-dot" style="background:#7C5CBF;margin-left:12px"></span>'+L('Events','Eventos','Events'):'')+'</div>';
+    var evToggle='<div class="fer-ev-toggle'+(_ferShowEv?' on':'')+'" onclick="toggleFerEvents()"><span class="fer-ev-toggle-dot"></span>'+L('Community-Events anzeigen','Mostrar eventos de la comunidad','Show community events')+'</div>';
+    return '<div class="detail-card" style="padding:13px 13px 11px;margin-bottom:10px">'+head+grid+legendMini+evToggle+'</div>'+info;
   }
   var _guidesCache = null, _wissenFrom = 'profil', _wissenView = 'list';
   function openWissen(from){ _wissenFrom = from || 'profil'; _wissenView = 'list'; showScreen('screenWissen'); renderWissenList(); loadGuides(); }
