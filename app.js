@@ -879,7 +879,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       const res = await fetch(url);
       const data = await res.json();
       // Google returns [[["translated","original",...],...],...]
-      const translated = data?.[0]?.map(item => item?.[0]).filter(Boolean).join('');
+      const translated = (data && data[0] ? data[0].map(function(item){ return item && item[0]; }).filter(Boolean).join('') : '');
       if (translated && translated !== text) { translationCache[ck] = translated; _schedulePersistTCache(); return translated; }
     } catch(e) {}
     return null;
@@ -1089,7 +1089,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     // Location button
     const locBtn = document.getElementById('locationBtn');
     if (locBtn && !locBtn.dataset.saved) {
-      const svgPart = locBtn.innerHTML.match(/<svg[^>]*>.*?<\/svg>/s)?.[0] || '';
+      const _svgM = locBtn.innerHTML.match(/<svg[^>]*>[\s\S]*?<\/svg>/);
+      const svgPart = (_svgM && _svgM[0]) || '';
       locBtn.innerHTML = svgPart + ' ' + t('location_btn');
     }
 
@@ -3229,7 +3230,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const h = new Date().getHours();
     const el = document.getElementById('headerGreeting');
     if (!el) return;
-    const rawName = currentUser ? (document.getElementById('profilName')?.textContent||currentUser.email.split('@')[0]||'') : '';
+    const _pn = document.getElementById('profilName');
+    const rawName = currentUser ? ((_pn && _pn.textContent)||currentUser.email.split('@')[0]||'') : '';
     const name = rawName && rawName !== '-' ? rawName.split(' ')[0] : '';
     const suffix = name ? ', ' + name + '!' : '!';
     if (h >= 5 && h < 12) el.textContent = t('greet_morning') + suffix;
@@ -7086,7 +7088,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const list = document.getElementById('commentsList');
     if (!topLevel.length) { list.innerHTML = '<div style="padding:12px 16px;font-size:13px;color:var(--text-3)">Noch keine Kommentare.</div>'; return; }
     list.innerHTML = topLevel.map(c => {
-      const replies = (repliesMap[c.id] || []).sort((a,b) => (a.created_at?.toDate?.()||0) - (b.created_at?.toDate?.()||0));
+      const _cd = function(x){ return (x && x.created_at && x.created_at.toDate) ? x.created_at.toDate() : 0; };
+      const replies = (repliesMap[c.id] || []).sort((a,b) => _cd(a) - _cd(b));
       const myComment = currentUser && c.user_id === currentUser.uid;
       const repliesHTML = replies.map(r => {
         const myReply = currentUser && r.user_id === currentUser.uid;
