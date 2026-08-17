@@ -4770,7 +4770,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try{
       var tEl=document.getElementById('ferBannerTitle'), sEl=document.getElementById('ferBannerSub');
       if(!tEl||!sEl) return;
-      tEl.textContent=L('Feiertage & Traditionen','Feriados y tradiciones','Holidays & traditions');
+      tEl.textContent=L('Paraguay-Kalender','Calendario paraguayo','Paraguay calendar');
       var n=_nextPyHoliday();
       if(n){
         var today=new Date(); today.setHours(0,0,0,0);
@@ -4787,8 +4787,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var n=new Date(); _ferCalBase=new Date(n.getFullYear(),n.getMonth(),1);
     showScreen('screenFeiertage');
     var tEl=document.getElementById('ferTitle'), sEl=document.getElementById('ferSub');
-    if(tEl) tEl.textContent=L('Feiertage & Traditionen','Feriados y tradiciones','Holidays & traditions');
-    if(sEl) sEl.textContent=L('Was in Paraguay wann gefeiert wird – und was geschlossen hat','Qué se celebra en Paraguay – y qué cierra','What Paraguay celebrates – and what closes');
+    if(tEl) tEl.textContent=L('Paraguay-Kalender','Calendario paraguayo','Paraguay calendar');
+    if(sEl) sEl.textContent=L('Feiertage, Traditionen & Community-Events','Feriados, tradiciones y eventos de la comunidad','Holidays, traditions & community events');
     renderFeiertage();
   }
   function setFerView(v){ _ferView=v; renderFeiertage(); }
