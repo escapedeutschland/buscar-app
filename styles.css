@@ -850,6 +850,22 @@
 .fer-leg-state { background:var(--yellow-light,#FFF8EC); color:var(--yellow-dark,#B8661A); }
 .fer-leg-trad { background:var(--surface-2); color:var(--text-2); }
 .fer-year-div { font-weight:800; font-size:15px; color:var(--text-1); margin:16px 2px 9px; font-family:'Fraunces',serif; }
+.fer-leg-line { display:flex; align-items:center; justify-content:center; gap:5px; flex-wrap:wrap; font-size:11px; color:var(--text-3); margin-bottom:10px; }
+.fer-month-div { font-family:'Fraunces',serif; font-weight:800; font-size:14.5px; color:var(--text-1); margin:15px 2px 8px; text-transform:capitalize; }
+.fer-item { display:flex; align-items:center; gap:11px; background:var(--surface-1,#fff); border:1px solid var(--border); border-radius:13px; padding:10px 12px; margin-bottom:7px; cursor:pointer; }
+.fer-item.open { align-items:flex-start; }
+.fer-item.open .fer-item-chev { margin-top:4px; }
+.fer-item-next { border:1.5px solid var(--green,#2E9E5B); }
+.fer-date { width:42px; height:44px; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; }
+.fer-date-state { background:var(--yellow-light,#FFF8EC); color:var(--yellow-dark,#B8661A); }
+.fer-date-trad { background:var(--surface-2); color:var(--text-2); }
+.fer-date-d { font-weight:800; font-size:16.5px; line-height:1; }
+.fer-date-wd { font-size:9.5px; font-weight:700; margin-top:2px; text-transform:uppercase; letter-spacing:0.4px; opacity:0.8; }
+.fer-item-body { flex:1; min-width:0; }
+.fer-item-top { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.fer-item-name { font-weight:700; font-size:13.5px; color:var(--text-1); line-height:1.3; }
+.fer-item-info { font-size:12.5px; color:var(--text-2); line-height:1.5; margin-top:6px; }
+.fer-item-chev { color:var(--text-3); flex-shrink:0; }
 .fer-past-toggle { text-align:center; font-size:12.5px; font-weight:700; color:var(--text-3); padding:12px; cursor:pointer; }
 .fer-cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
 .fer-cal-month { font-weight:800; font-size:14.5px; color:var(--text-1); text-transform:capitalize; }

@@ -4783,6 +4783,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   var _ferView='list', _ferPastOpen=false, _ferCalBase=null, _ferSelKey=null;
   function openFeiertage(){
     _ferView='list'; _ferPastOpen=false; _ferSelKey=null;
+    var _nx=_nextPyHoliday(); _ferOpenKey=_nx?_ferKey(_nx):null; // nächster Feiertag startet aufgeklappt
     var n=new Date(); _ferCalBase=new Date(n.getFullYear(),n.getMonth(),1);
     showScreen('screenFeiertage');
     var tEl=document.getElementById('ferTitle'), sEl=document.getElementById('ferSub');
@@ -4809,6 +4810,24 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       +'<div style="font-weight:700;font-size:14.5px;color:var(--text-1);margin-bottom:5px">'+h.name+'</div>'
       +'<div style="font-size:12.5px;color:var(--text-2);line-height:1.5">'+h.info+'</div>'+movNote+'</div>';
   }
+  var _ferOpenKey=null;
+  function ferToggleItem(key){ _ferOpenKey=(_ferOpenKey===key?null:key); renderFeiertage(); }
+  function _ferKey(h){ return h.date.getFullYear()+'-'+h.date.getMonth()+'-'+h.date.getDate(); }
+  // Kompaktes Agenda-Item: Datums-Block links (Farbe = Typ), Name, Info erst beim Aufklappen
+  function _ferItem(h,isNext,loc){
+    var key=_ferKey(h);
+    var open=(_ferOpenKey===key);
+    var wdStr=h.date.toLocaleDateString(loc,{weekday:'short'});
+    var tags='';
+    if(isNext) tags+='<span class="fer-badge fer-badge-next">'+L('Nächster','Próximo','Next')+'</span>';
+    if(_ferLongWeekend(h)) tags+='<span class="fer-badge fer-badge-lw">'+L('Langes WE','Finde largo','Long wknd')+'</span>';
+    var movNote=h.mov?'<div style="font-size:11px;color:var(--text-3);margin-top:6px">↔ '+L('Beweglich – kann per Dekret auf einen Montag verlegt werden','Trasladable – puede moverse a un lunes por decreto','Movable – may be shifted to a Monday by decree')+'</div>':'';
+    return '<div class="fer-item'+(open?' open':'')+(isNext?' fer-item-next':'')+'" onclick="ferToggleItem(\''+key+'\')">'
+      +'<div class="fer-date '+(h.state?'fer-date-state':'fer-date-trad')+'"><span class="fer-date-d">'+h.date.getDate()+'</span><span class="fer-date-wd">'+wdStr+'</span></div>'
+      +'<div class="fer-item-body"><div class="fer-item-top"><span class="fer-item-name">'+h.name+'</span>'+tags+'</div>'
+      +(open?'<div class="fer-item-info">'+h.info+movNote+'</div>':'')
+      +'</div><svg class="fer-item-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="'+(open?'18 15 12 9 6 15':'6 9 12 15 18 9')+'"/></svg></div>';
+  }
   function renderFeiertage(){
     var body=document.getElementById('ferBody'); if(!body) return;
     var today=new Date(); today.setHours(0,0,0,0);
@@ -4819,27 +4838,24 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       +'</div></div>';
     var foot='<div style="font-size:11px;color:var(--text-3);text-align:center;padding:14px 10px 0;line-height:1.5">'+t('wissen_disclaimer')+'</div>';
     if(_ferView==='cal'){ body.innerHTML=toggle+_ferCalHTML(today)+foot; return; }
-    // Legende – kompakt mit Icons (Kern der Idee: gesetzlich = zu, Tradition = jeder darf öffnen)
-    var legend='<div class="detail-card" style="padding:13px 15px;margin-bottom:12px">'
-      +'<div class="fer-leg-row"><div class="fer-leg-ico fer-leg-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></div><div><b>'+L('Gesetzlich','Feriado','Public holiday')+'</b> – '+L('Behörden, Banken & die meisten Geschäfte geschlossen','oficinas, bancos y la mayoría de comercios cierran','offices, banks & most shops closed')+'</div></div>'
-      +'<div class="fer-leg-row" style="margin-top:8px"><div class="fer-leg-ico fer-leg-trad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div><b>'+L('Tradition','Tradición','Tradition')+'</b> – '+L('kein Feiertag, jeder darf öffnen','no es feriado, cada uno decide si abre','not a holiday, businesses may open')+'</div></div>'
-      +'</div>';
-    // Kommende zuerst (rollierende 12 Monate über den Jahreswechsel), Vergangene eingeklappt ans Ende
+    // Dezente Ein-Zeilen-Legende statt eigener Karte
+    var legend='<div class="fer-leg-line"><span class="fer-dot fer-dot-state"></span>'+L('Gesetzlich – alles geschlossen','Feriado – todo cerrado','Public holiday – all closed')+'<span class="fer-dot fer-dot-trad" style="margin-left:14px"></span>'+L('Tradition – geöffnet erlaubt','Tradición – pueden abrir','Tradition – may open')+'</div>';
+    // Kommende zuerst (rollierende 12 Monate), nach Monaten gruppiert; Vergangene eingeklappt ans Ende
     var horizon=new Date(today); horizon.setFullYear(horizon.getFullYear()+1);
     var next=_nextPyHoliday();
     var upcoming=_pyHolidayList(y).concat(_pyHolidayList(y+1)).filter(function(h){ return h.date>=today && h.date<horizon; });
     var past=_pyHolidayList(y).filter(function(h){ return h.date<today; });
-    var cards='', lastYear=y;
+    var cards='', lastMonth=-1;
     upcoming.forEach(function(h){
-      var hy=h.date.getFullYear();
-      if(hy!==lastYear){ cards+='<div class="fer-year-div">'+hy+'</div>'; lastYear=hy; }
+      var hy=h.date.getFullYear(), mk=hy*12+h.date.getMonth();
+      if(mk!==lastMonth){ cards+='<div class="fer-month-div">'+h.date.toLocaleDateString(loc,{month:'long'})+(hy!==y?' '+hy:'')+'</div>'; lastMonth=mk; }
       var isNext=next && h.state && h.date.getTime()===next.date.getTime();
-      cards+=_ferCard(h,isNext,loc);
+      cards+=_ferItem(h,isNext,loc);
     });
     var pastHtml='';
     if(past.length){
       pastHtml='<div class="fer-past-toggle" onclick="setFerPast()">'+(_ferPastOpen?'▾ ':'▸ ')+L('Bereits vorbei','Ya pasaron','Already passed')+' '+y+' ('+past.length+')</div>';
-      if(_ferPastOpen) pastHtml+='<div style="opacity:0.55">'+past.map(function(h){ return _ferCard(h,false,loc); }).join('')+'</div>';
+      if(_ferPastOpen) pastHtml+='<div style="opacity:0.55">'+past.map(function(h){ return _ferItem(h,false,loc); }).join('')+'</div>';
     }
     body.innerHTML=toggle+legend+cards+pastHtml+foot;
   }
