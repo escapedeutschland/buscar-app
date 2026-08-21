@@ -7535,22 +7535,29 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     _lbUrls = photos.map(function(p){ return p.url; });
     let html = photos.map((p, _i) => `<div class="photo-thumb-wrap" style="position:relative"><img class="photo-thumb" loading="lazy" decoding="async" src="${p.url}" onclick="openLightbox(${_i})">${canDelete ? `<button onclick="deletePhoto('${p.id}','${p.path}',event)" style="position:absolute;top:4px;right:4px;width:24px;height:24px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;color:white;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>` : ''}</div>`).join('');
     if (currentUser) html += `<div class="photo-upload" onclick="document.getElementById('photoFileInput').click()" style="aspect-ratio:1;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" width="22" height="22"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:11px;color:var(--text-3);font-weight:500">${t('photo_add_label')}</span></div>`;
-    grid.innerHTML = html + `<input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="uploadPhoto(event)">`;
+    grid.innerHTML = html + `<input type="file" id="photoFileInput" accept="image/*" multiple style="display:none" onchange="uploadPhoto(event)">`;
   }
 
   function compressImage(file, maxW, maxH, quality) {
+    // WICHTIG: onerror-Pfade muessen reject-en, sonst haengt ein await auf dieser
+    // Promise endlos (z.B. bei nicht dekodierbarem Format wie HEIC) und der ganze
+    // Upload-/Einreichen-Vorgang friert kommentarlos ein.
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Foto konnte nicht gelesen werden.'));
       reader.onload = e => {
         const img = new Image();
+        img.onerror = () => reject(new Error('Foto-Format nicht unterstützt. Bitte JPG oder PNG verwenden.'));
         img.onload = () => {
-          let w = img.width, h = img.height;
-          if (w > maxW) { h *= maxW/w; w = maxW; }
-          if (h > maxH) { w *= maxH/h; h = maxH; }
-          const canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          canvas.toBlob(b => resolve(b), 'image/jpeg', quality);
+          try {
+            let w = img.width, h = img.height;
+            if (w > maxW) { h *= maxW/w; w = maxW; }
+            if (h > maxH) { w *= maxH/h; h = maxH; }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            canvas.toBlob(b => b ? resolve(b) : reject(new Error('Foto konnte nicht komprimiert werden.')), 'image/jpeg', quality);
+          } catch(err) { reject(err); }
         };
         img.src = e.target.result;
       };
@@ -7571,65 +7578,57 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   async function uploadPhoto(event) {
     if (!currentUser) { showToast('Du musst eingeloggt sein.'); return; }
     if (!currentListingId) { showToast(t('toast_no_entry')); return; }
-    const file = event.target.files[0];
-    if (!file) return;
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
+    // Input sofort zurücksetzen damit dieselben Fotos erneut wählbar sind
+    try { event.target.value = ''; } catch(e) {}
 
     const prog = document.getElementById('photoProgress');
-    if (prog) { prog.classList.add('visible'); prog.textContent = 'Foto wird komprimiert...'; }
+    const isAdmin = currentUser.email === ADMIN_EMAIL;
+    let failed = 0, lastErr = '';
 
-    try {
-      // Komprimieren
-      let blob;
+    for (let i = 0; i < files.length; i++) {
+      const label = files.length > 1 ? ('Foto ' + (i+1) + '/' + files.length) : 'Foto';
+      if (prog) { prog.classList.add('visible'); prog.textContent = label + ' ' + L('wird hochgeladen...','subiendo...','uploading...'); }
       try {
-        blob = await compressImage(file, 1200, 1200, 0.7);
-      } catch(compErr) {
-        console.error('Compress error:', compErr);
-        throw new Error('Foto-Format nicht unterstützt. Bitte JPG oder PNG verwenden.');
+        const blob = await compressImage(files[i], 1200, 1200, 0.7);
+        const filename = Date.now() + '_' + Math.random().toString(36).substr(2,5) + '.jpg';
+        const path = 'listings/' + currentListingId + '/' + filename;
+        const ref = storage.ref(path);
+        const snap = await ref.put(blob, { contentType: 'image/jpeg' });
+        const url = await snap.ref.getDownloadURL();
+        await db.collection('listing_photos').add({
+          listing_id: currentListingId, url, path, user_id: currentUser.uid,
+          pending: !isAdmin, created_at: new Date()
+        });
+      } catch(e) {
+        console.error('Photo upload error:', e);
+        failed++;
+        lastErr = (e && e.message) ? e.message : 'Unbekannter Fehler';
       }
-      if (prog) prog.textContent = 'Foto wird hochgeladen...';
+    }
 
-      // Upload zu Firebase Storage
-      const filename = Date.now() + '_' + Math.random().toString(36).substr(2,5) + '.jpg';
-      const path = 'listings/' + currentListingId + '/' + filename;
-      const ref = storage.ref(path);
-      const snap = await ref.put(blob, { contentType: 'image/jpeg' });
-      const url = await snap.ref.getDownloadURL();
-
-      // Eintrag in Firestore
-      const isAdmin = currentUser.email === ADMIN_EMAIL;
-      await db.collection('listing_photos').add({
-        listing_id: currentListingId, url, path, user_id: currentUser.uid,
-        pending: !isAdmin, created_at: new Date()
-      });
-
-      // Erfolg: sichtbarer Toast + verlängerte Status-Anzeige
-      if (isAdmin) {
-        if (prog) {
-          prog.textContent = '✓ Hochgeladen!';
-          setTimeout(function(){ if (prog) prog.classList.remove('visible'); }, 2500);
-        }
-        showToast(t('toast_photo_uploaded'));
-        loadPhotos(currentListingId);
-      } else {
-        if (prog) {
-          prog.textContent = '✓ Foto wird geprüft und nach Freigabe sichtbar';
-          setTimeout(function(){ if (prog) prog.classList.remove('visible'); }, 5000);
-        }
-        showToast(t('toast_photo_submitted'));
-      }
-
-      // Input zurücksetzen damit gleiches Foto erneut wählbar ist
-      try { event.target.value = ''; } catch(e) {}
-
-    } catch(e) {
-      console.error('Photo upload error:', e);
-      const msg = (e && e.message) ? e.message : 'Unbekannter Fehler';
+    if (failed) {
       if (prog) {
-        prog.textContent = '✗ ' + msg;
+        prog.textContent = '✗ ' + (files.length > 1 ? failed + '/' + files.length + ' ' + L('fehlgeschlagen: ','fallaron: ','failed: ') : '') + lastErr;
         setTimeout(function(){ if (prog) prog.classList.remove('visible'); }, 5000);
       }
-      showToast('✗ ' + t('err_prefix') + msg);
+      showToast('✗ ' + t('err_prefix') + lastErr);
+    } else if (isAdmin) {
+      if (prog) {
+        prog.textContent = '✓ Hochgeladen!';
+        setTimeout(function(){ if (prog) prog.classList.remove('visible'); }, 2500);
+      }
+      showToast(t('toast_photo_uploaded'));
+    } else {
+      if (prog) {
+        prog.textContent = '✓ ' + (files.length > 1 ? L('Fotos werden geprüft und sind nach Freigabe sichtbar','Las fotos se revisan y serán visibles tras aprobación','Photos are reviewed and visible after approval') : L('Foto wird geprüft und nach Freigabe sichtbar','La foto se revisa y será visible tras aprobación','Photo is reviewed and visible after approval'));
+        setTimeout(function(){ if (prog) prog.classList.remove('visible'); }, 5000);
+      }
+      showToast(t('toast_photo_submitted'));
     }
+    // Grid aktualisieren (bei bereits freigegebenem Eintrag erscheinen die Fotos sofort)
+    if (failed < files.length) loadPhotos(currentListingId);
   }
 
   var _lbUrls = [], _lbIndex = 0, _lbSwiped = false, _lbGesturesInit = false;
@@ -7763,20 +7762,35 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   async function uploadFormPhotos(listingId) {
     if (!pendingFormPhotos.length) return;
     const prog = document.getElementById('formPhotoProgress'); prog.style.display = 'block';
-    for (let i = 0; i < pendingFormPhotos.length; i++) {
-      prog.textContent = `Foto ${i+1}/${pendingFormPhotos.length} wird hochgeladen...`;
-      try {
-        const blob = await compressImage(pendingFormPhotos[i].file, 1200, 1200, 0.7);
-        const filename = Date.now() + '_' + i + '.jpg';
-        const path = 'listings/' + listingId + '/' + filename;
-        const snap = await storage.ref(path).put(blob, { contentType: 'image/jpeg' });
-        const url = await snap.ref.getDownloadURL();
-        await db.collection('listing_photos').add({
-          listing_id: listingId, url, path, user_id: currentUser.uid, pending: true, created_at: new Date()
-        });
-      } catch(e) {}
+    const total = pendingFormPhotos.length;
+    let failed = 0;
+    for (let i = 0; i < total; i++) {
+      prog.textContent = `Foto ${i+1}/${total} wird hochgeladen...`;
+      // 2 Versuche pro Foto (mobile Netze in PY brechen gern mal weg); Fehler
+      // NICHT still schlucken — sonst glaubt der Nutzer, seine Fotos seien drin
+      // (Fall "Heladeria Hiro": Eintrag kam an, alle Fotos fehlten kommentarlos).
+      let ok = false;
+      for (let attempt = 0; attempt < 2 && !ok; attempt++) {
+        try {
+          const blob = await compressImage(pendingFormPhotos[i].file, 1200, 1200, 0.7);
+          const filename = Date.now() + '_' + i + '.jpg';
+          const path = 'listings/' + listingId + '/' + filename;
+          const snap = await storage.ref(path).put(blob, { contentType: 'image/jpeg' });
+          const url = await snap.ref.getDownloadURL();
+          await db.collection('listing_photos').add({
+            listing_id: listingId, url, path, user_id: currentUser.uid, pending: true, created_at: new Date()
+          });
+          ok = true;
+        } catch(e) { console.warn('uploadFormPhotos: Foto ' + (i+1) + ', Versuch ' + (attempt+1) + ' fehlgeschlagen', e); }
+      }
+      if (!ok) failed++;
     }
-    prog.textContent = '✓ Hochgeladen';
+    if (failed) {
+      prog.textContent = '⚠️ ' + failed + '/' + total + ' ' + L('Fotos konnten nicht hochgeladen werden. Du kannst sie später im Eintrag nachreichen.','fotos no se pudieron subir. Puedes agregarlas luego en la entrada.','photos could not be uploaded. You can add them later in the entry.');
+      showToast(L('Einige Fotos konnten nicht hochgeladen werden.','Algunas fotos no se pudieron subir.','Some photos could not be uploaded.'));
+    } else {
+      prog.textContent = '✓ ' + L('Hochgeladen','Subido','Uploaded');
+    }
   }
 
   async function deleteAvatar() {
