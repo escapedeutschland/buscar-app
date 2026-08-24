@@ -5502,18 +5502,24 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var canDelA = currentUser && (currentUser.email===ADMIN_EMAIL || (a.created_by && a.created_by===currentUser.uid));
     var delBtn = canDelA ? '<button class="answer-del" onclick="event.stopPropagation();deleteAnswer(\''+a.id+'\')">✕</button>' : '';
     var editedMark = a.edited_at ? '<span class="ans-edited"> · '+esc(t('fc_edited'))+'</span>' : '';
-    var by = a.author_name ? '<div class="answer-by">'+_avatarHtml(a.author_name,18,_authorRingColor(a))+'<span>'+esc(a.author_name)+'</span>'+_authorBadgeChip(a)+editedMark+'</div>' : '';
     var txt = a.text || a.note || '';
     var foot = _answerFoot(a, bestId, isAsker, isReply);
     var bestCls = (a.id===bestId) ? ' answer-best' : '';
     if(a.listing_id){
       var l = allListings.find(function(x){ return x.id===a.listing_id; });
       var col = catColors[(l&&l.category_id)] || '#6B6B6B';
-      return '<div class="answer-card'+bestCls+'" onclick="showDetail(\''+a.listing_id+'\')">'
+      // Autor-Kopfzeile OBEN (wie bei Text-Antworten und der Frage selbst); der
+      // verlinkte Eintrag ist ein eigener antippbarer Chip statt Ganz-Karten-Klick.
+      return '<div class="answer-card answer-text-card'+bestCls+'">'
+        + delBtn
+        + '<div class="answer-head"><div class="answer-head-left">'+_avatarHtml(a.author_name,28,_authorRingColor(a))+'<span class="answer-head-name">'+esc(a.author_name||t('guest_name'))+'</span>'+_authorBadgeChip(a)+editedMark+'</div></div>'
+        + '<div class="answer-listing-row" onclick="event.stopPropagation();showDetail(\''+a.listing_id+'\')">'
         + '<div class="answer-dot" style="background:'+col+'"></div>'
-        + '<div style="flex:1;min-width:0"><div class="answer-name">'+esc(a.listing_name||(l&&l.name)||'Eintrag')+'</div>'
-        + (txt ? '<div class="answer-note" data-original="'+esc(txt)+'">'+esc(txt)+'</div>' : '') + by + foot + '</div>'
-        + (canDelA ? delBtn : '<svg class="answer-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>')
+        + '<div class="answer-name" style="flex:1;min-width:0">'+esc(a.listing_name||(l&&l.name)||'Eintrag')+'</div>'
+        + '<svg class="answer-chev" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>'
+        + '</div>'
+        + (txt ? '<div class="answer-note" data-original="'+esc(txt)+'">'+esc(txt)+'</div>' : '')
+        + foot
         + '</div>';
     }
     // Reine Text-Antwort: Avatar + Name oben, Text darunter (Kommentar-Layout).
