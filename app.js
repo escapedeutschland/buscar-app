@@ -264,6 +264,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_unlocked_title: 'Auszeichnung freigeschaltet!', badge_unlocked_cta: 'Super!',
       bdesc_first: 'Erstelle deinen ersten Eintrag.', bdesc_five: 'Erstelle 5 Einträge.', bdesc_ten: 'Erstelle 10 Einträge.', bdesc_twenty: 'Erstelle 20 Einträge.', bdesc_fifty: 'Erstelle 50 Einträge.', bdesc_hundred: 'Erstelle 100 Einträge.', bdesc_explorer: 'Erstelle Einträge in 3 verschiedenen Städten.', bdesc_chaco: 'Erstelle einen Eintrag im Chaco.',
       badge_helper_first: 'Erste Antwort', badge_helper_ten: 'Community-Helfer', bdesc_helper_first: 'Beantworte eine Frage der Community.', bdesc_helper_ten: 'Beantworte 10 Fragen der Community.',
+      badge_event_first: 'Erstes Event', badge_event_five: 'Event-Veranstalter', bdesc_event_first: 'Veranstalte dein erstes Event.', bdesc_event_five: 'Veranstalte 5 Events.',
       badge_count_0: 'Noch keine eigenen Einträge', badge_count_1: '1 eigener Eintrag', badge_count_n: ' eigene Einträge',
     },
     es: {
@@ -526,6 +527,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_unlocked_title: '¡Insignia desbloqueada!', badge_unlocked_cta: '¡Genial!',
       bdesc_first: 'Crea tu primera entrada.', bdesc_five: 'Crea 5 entradas.', bdesc_ten: 'Crea 10 entradas.', bdesc_twenty: 'Crea 20 entradas.', bdesc_fifty: 'Crea 50 entradas.', bdesc_hundred: 'Crea 100 entradas.', bdesc_explorer: 'Crea entradas en 3 ciudades distintas.', bdesc_chaco: 'Crea una entrada en el Chaco.',
       badge_helper_first: 'Primera respuesta', badge_helper_ten: 'Ayudante de la comunidad', bdesc_helper_first: 'Respondé una pregunta de la comunidad.', bdesc_helper_ten: 'Respondé 10 preguntas de la comunidad.',
+      badge_event_first: 'Primer evento', badge_event_five: 'Organizador de eventos', bdesc_event_first: 'Organizá tu primer evento.', bdesc_event_five: 'Organizá 5 eventos.',
       badge_count_0: 'Aún sin registros propios', badge_count_1: '1 registro propio', badge_count_n: ' registros propios',
     },
     en: {
@@ -788,6 +790,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_unlocked_title: 'Badge unlocked!', badge_unlocked_cta: 'Awesome!',
       bdesc_first: 'Create your first entry.', bdesc_five: 'Create 5 entries.', bdesc_ten: 'Create 10 entries.', bdesc_twenty: 'Create 20 entries.', bdesc_fifty: 'Create 50 entries.', bdesc_hundred: 'Create 100 entries.', bdesc_explorer: 'Create entries in 3 different cities.', bdesc_chaco: 'Create an entry in the Chaco.',
       badge_helper_first: 'First answer', badge_helper_ten: 'Community helper', bdesc_helper_first: 'Answer a community question.', bdesc_helper_ten: 'Answer 10 community questions.',
+      badge_event_first: 'First event', badge_event_five: 'Event organizer', bdesc_event_first: 'Host your first event.', bdesc_event_five: 'Host 5 events.',
       badge_count_0: 'No entries of your own yet', badge_count_1: '1 entry of your own', badge_count_n: ' entries of your own',
     }
   };
@@ -1878,6 +1881,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     { id: 'chaco',    emoji: '🌵', name: t('badge_chaco'),      threshold: 1,  special: 'chaco',   desc: t('bdesc_chaco') },
     { id: 'helper_first', emoji: '💬', name: t('badge_helper_first'), threshold: 1,  special: 'answers', desc: t('bdesc_helper_first') },
     { id: 'helper_ten',   emoji: '🤝', name: t('badge_helper_ten'),   threshold: 10, special: 'answers', desc: t('bdesc_helper_ten') },
+    { id: 'event_first',  emoji: '🎪', name: t('badge_event_first'),  threshold: 1,  special: 'events',  desc: t('bdesc_event_first') },
+    { id: 'event_five',   emoji: '🎉', name: t('badge_event_five'),   threshold: 5,  special: 'events',  desc: t('bdesc_event_five') },
   ];; }
 
   var _badgesCache = null; // { uid, badges, count, ts } – vermeidet Netz-Warten beim erneuten Profil-Öffnen
@@ -1894,6 +1899,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       const userDoc = await db.collection('users').doc(uid).get();
       const cached = userDoc.exists ? (userDoc.data().badges || []) : [];
       const answersGiven = userDoc.exists ? (userDoc.data().answers_given || 0) : 0; // fuer Helfer-Badges
+      const eventsCreated = userDoc.exists ? (userDoc.data().events_created || 0) : 0; // fuer Veranstalter-Badges
       renderBadgeGrid(cached); // instant render from cache
 
       // Step 2: Count listings in background to check for new badges
@@ -1916,6 +1922,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         if (b.special === 'cities3') qualifies = cities.size >= 3;
         else if (b.special === 'chaco') qualifies = hasChaco;
         else if (b.special === 'answers') qualifies = answersGiven >= b.threshold;
+        else if (b.special === 'events') qualifies = eventsCreated >= b.threshold;
         else qualifies = count >= b.threshold;
 
         if (qualifies && !earned.includes(b.id)) {
@@ -1939,7 +1946,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       }
       _badgesCache = { uid: uid, badges: earned, count: count, ts: Date.now() }; // Session-Cache aktualisieren
       // Nach einer Eintrags-Aktion: "fast geschafft"-Nudge, wenn nichts frisch verdient wurde
-      if (opts && opts.nudge && !newlyEarned.length) { try { _nudgeOnly('listings', count, earned); } catch(e){} }
+      if (opts && opts.nudge && !newlyEarned.length) { try {
+        if (opts.nudgeKind === 'events') _nudgeOnly('events', eventsCreated, earned);
+        else _nudgeOnly('listings', count, earned);
+      } catch(e){} }
     } catch(e) { console.error('badge error', e); }
   }
 
@@ -1948,7 +1958,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   // Abzeichen dieser Art nur noch 1–2 Schritte entfernt ist (nur das nächste, kein Spam).
   function _nudgeOnly(kind, value, earned){
     earned = earned||[];
-    var defs = getBadgeDefs().filter(function(b){ return kind==='answers' ? b.special==='answers' : !b.special; })
+    var defs = getBadgeDefs().filter(function(b){
+                               if(kind==='answers') return b.special==='answers';
+                               if(kind==='events') return b.special==='events';
+                               return !b.special;
+                             })
                              .sort(function(a,b){ return a.threshold-b.threshold; });
     for(var i=0;i<defs.length;i++){
       var b=defs[i];
@@ -1956,10 +1970,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var rem=b.threshold-value;
       if(rem<=0) return; // bereits erreicht -> wird an anderer Stelle gefeiert
       if(rem<=2){
-        var isAns=(kind==='answers');
-        var unit = rem===1
-          ? (isAns?L('Antwort','respuesta','answer'):L('Eintrag','entrada','entry'))
-          : (isAns?L('Antworten','respuestas','answers'):L('Einträge','entradas','entries'));
+        var unit;
+        if(kind==='answers') unit = rem===1 ? L('Antwort','respuesta','answer') : L('Antworten','respuestas','answers');
+        else if(kind==='events') unit = rem===1 ? L('Event','evento','event') : L('Events','eventos','events');
+        else unit = rem===1 ? L('Eintrag','entrada','entry') : L('Einträge','entradas','entries');
         showToast(b.emoji+' '+L('Nur noch ','¡Solo ','Just ')+rem+' '+unit+L(' bis zum Abzeichen ',' para el distintivo ',' until the ')+'„'+b.name+'"!');
       }
       return; // nur das nächste unverdiente Abzeichen betrachten
@@ -2709,6 +2723,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       }));
 
       if (evPendingPhotos.length) await uploadEvPhotos(evRef.id);
+      // Veranstalter-Zähler fürs Abzeichen (nur bei NEUEN Events, nicht beim Bearbeiten);
+      // await, damit loadBadges danach den frischen Stand liest.
+      try { await db.collection('users').doc(currentUser.uid).set({ events_created: firebase.firestore.FieldValue.increment(1) }, { merge: true }); } catch(e){}
+      _badgesCache = null;
+      try { loadBadges(currentUser.uid, {nudge:true, nudgeKind:'events'}); } catch(e){}
       showScreen('screenEvents');
       loadEvents();
     } catch(e) {
@@ -5287,7 +5306,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       explorer:    { t:L('Entdecker','Explorador','Explorer'),   c:'#ea580c' },
       chaco:       { t:L('Chaco-Pionier','Pionero del Chaco','Chaco Pioneer'), c:'#65a30d' },
       helper_first:{ t:L('Helfer','Ayudante','Helper'),          c:'#0891b2' },
-      helper_ten:  { t:L('Top-Helfer','Súper Ayudante','Top Helper'), c:'#d97706' }
+      helper_ten:  { t:L('Top-Helfer','Súper Ayudante','Top Helper'), c:'#d97706' },
+      event_first: { t:L('Veranstalter','Organizador','Organizer'),   c:'#9333ea' },
+      event_five:  { t:L('Top-Veranstalter','Súper Organizador','Top Organizer'), c:'#e11d48' }
     };
     return M[id] || null;
   }
