@@ -8520,7 +8520,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   // ── Teilen + Deep-Link ──────────────────────────────────────────────
-  var SHARE_BASE = "https://buscar-share.maximechristalle.workers.dev";
+  var SHARE_BASE = "https://buscar-share.maximechristalle.workers.dev"; // API-Endpunkte (/place, /notify-*) — NICHT auf buscarpy.app geroutet
+  var SHARE_LINK_BASE = "https://buscarpy.app"; // Teilen-/SEO-Links: /ort/* /frage/* /event/* laufen seit 2026-08-26 über die eigene Domain (Cloudflare-Route auf den Worker)
   function shareLink(title, text, url) {
     var msg = text + '\n' + url;
     if (navigator.share) {
@@ -8536,18 +8537,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!currentListingId) return;
     var l = allListings.find(function(x){ return x.id === currentListingId; });
     var name = l ? l.name : 'Buscar';
-    shareLink(name, '📍 ' + name + '\n' + t('share_cta'), SHARE_BASE + '/ort/' + encodeURIComponent(currentListingId));
+    shareLink(name, '📍 ' + name + '\n' + t('share_cta'), SHARE_LINK_BASE + '/ort/' + encodeURIComponent(currentListingId));
   }
   function shareCurrentEvent() {
     if (!_currentEventId) return;
     var ev = (allEvents||[]).find(function(e){ return e.id === _currentEventId; });
     var name = ev ? ev.title : 'Buscar';
-    shareLink(name, '🎉 ' + name + '\n' + t('share_cta'), SHARE_BASE + '/event/' + encodeURIComponent(_currentEventId));
+    shareLink(name, '🎉 ' + name + '\n' + t('share_cta'), SHARE_LINK_BASE + '/event/' + encodeURIComponent(_currentEventId));
   }
   function shareCurrentQuestion() {
     if (!_currentQuestion) return;
     var q = (_currentQuestion.text || 'Buscar');
-    shareLink(q.slice(0,60), '💬 ' + q + '\n' + t('share_cta'), SHARE_BASE + '/frage/' + encodeURIComponent(_currentQuestion.id));
+    shareLink(q.slice(0,60), '💬 ' + q + '\n' + t('share_cta'), SHARE_LINK_BASE + '/frage/' + encodeURIComponent(_currentQuestion.id));
   }
   async function openSharedListing(id) {
     try {
