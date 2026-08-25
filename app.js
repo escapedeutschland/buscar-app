@@ -3389,9 +3389,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
     return out;
   }
-  // Schalter: exakte Doppel in der App ausblenden? Aktuell AUS (Übergangslösung, damit die
-  // Eintrags-Zahl wieder ~767 zeigt). Auf true setzen, sobald 750+ einzigartige echte Einträge da sind.
-  var DEDUPE_HIDE_DUPLICATES = false;
+  // Schalter: exakte Doppel in der App ausblenden. Seit 2026-08-24 AN: die DB hat 904
+  // einzigartige verifizierte Eintraege (Alt-Duplikate bereinigt), das Flag schuetzt nur noch
+  // gegen KUENFTIGE Doppel-Freigaben (gleicher Name + gleiche Koordinaten).
+  var DEDUPE_HIDE_DUPLICATES = true;
   var LISTINGS_TTL = 10 * 60 * 1000; // 10 Min – innerhalb dieser Zeit aus Cache, keine Firestore-Reads
   // Führt eine Aufgabe im Leerlauf aus (blockiert nicht den ersten Render/Interaktionen).
   // Fallback für Browser ohne requestIdleCallback (z.B. älteres iOS Safari).
