@@ -6885,7 +6885,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('listings').doc(id).delete();
       _resolveReportsForListing(id);
       showToast('✓ Duplikat gelöscht');
-      await loadListings();
+      await loadListings(true);
       loadAdminDuplicates();
     } catch(e){ showToast(t('err_prefix') + (e.message || e)); }
   }
@@ -7048,7 +7048,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var card = document.getElementById('adminCard_' + id);
       if (card) card.remove();
       showToast('✓ Eintrag freigegeben');
-      await loadListings();
+      await loadListings(true);
     } catch (err) {
       console.error('approveEntry: UI refresh failed', err);
     }
@@ -7089,7 +7089,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('listings').doc(listingId).update({
         deal_text: dealText || null, deal_code: dealCode || null, deal_expiry: dealExpiry || null
       });
-      await loadListings();
+      await loadListings(true);
       const btn = event.target;
       btn.textContent = '✓ Gespeichert!';
       setTimeout(() => { btn.textContent = 'Deal speichern'; }, 2000);
@@ -7100,7 +7100,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!await confirmSheet(t('del_deal_confirm'))) return;
     try {
       await db.collection('listings').doc(listingId).update({ deal_text: null, deal_code: null, deal_expiry: null });
-      await loadListings();
+      await loadListings(true);
       loadAdminDeals();
     } catch(e) { showToast(t('err_generic')); }
   }
@@ -8198,7 +8198,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if (_el) { _el.tags = editTags.slice(); _el.languages = _readLangChips('editLangChips'); }
       if (_el && locUpdate.lat != null) { _el.lat = locUpdate.lat; _el.lng = locUpdate.lng; }
       document.getElementById('editListingSuccess').style.display = 'block';
-      await loadListings();
+      await loadListings(true);
       setTimeout(() => showDetail(currentEditListingId), 1500);
     } catch(e) { err.textContent='Fehler.'; err.style.display='block'; }
   }
@@ -8371,7 +8371,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('listings').doc(listingId).update({
         deal_text: text || null, deal_code: code || null, deal_expiry: expiry || null
       });
-      await loadListings();
+      await loadListings(true);
       const l = allListings.find(x => x.id === listingId);
       if (l) showDetail(listingId);
     } catch(e) { showToast(t('err_prefix') + e.message); }
@@ -8381,7 +8381,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!await confirmSheet(t('del_deal_confirm'))) return;
     try {
       await db.collection('listings').doc(listingId).update({ deal_text: null, deal_code: null, deal_expiry: null });
-      await loadListings();
+      await loadListings(true);
       showDetail(listingId);
     } catch(e) { showToast(t('err_generic')); }
   }
@@ -8484,7 +8484,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         }
       }
       await db.collection('listings').doc(listingId).update({ cover_url: null });
-      await loadListings();
+      await loadListings(true);
       showDetail(listingId);
     } catch(e) { showToast(t('err_generic')); }
   }
@@ -8508,7 +8508,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         var snap=await storage.ref(path).put(blob,{contentType:'image/jpeg'});
         var url=await snap.ref.getDownloadURL();
         await db.collection('listings').doc(currentListingId).update({cover_url:url});
-        await loadListings();
+        // (force wie überall nach Mutationen — TTL-Cache würde die Änderung sonst bis 10 Min verstecken)
+        await loadListings(true);
         showDetail(currentListingId);
       }catch(err){showToast(t('err_upload'));}
       hero.style.opacity='1';
