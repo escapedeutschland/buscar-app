@@ -886,13 +886,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       const data = await res.json();
       // Google returns [[["translated","original",...],...],...]
       const translated = (data && data[0] ? data[0].map(function(item){ return item && item[0]; }).filter(Boolean).join('') : '');
-      if (translated && translated !== text) { translationCache[ck] = translated; _schedulePersistTCache(); return translated; }
+      // Auch IDENTISCHE Ergebnisse cachen (Text ist bereits in der Zielsprache) — sonst
+      // würde derselbe Text bei jedem Render erneut gegen gtx geprüft (bidirektionaler Modus).
+      if (translated) { translationCache[ck] = translated; _schedulePersistTCache(); return translated; }
     } catch(e) {}
     return null;
   }
 
   async function translateVisibleContent() {
-    // de -> Originale wiederherstellen (kein API-Call); es/en -> maschinell übersetzen
+    // BIDIREKTIONAL (v352): Inhalte werden in JEDE aktuelle App-Sprache übersetzt — auch nach
+    // Deutsch (sl=auto erkennt die Quellsprache; deutsche Originale bleiben dabei unverändert).
+    // Vorher zeigte der DE-Modus fremdsprachige Beiträge (es/gn) unübersetzt — Nutzer-Report:
+    // Guaraní-Antwort im Forum war für deutsche Nutzer unverständlich.
     const targetLang = currentLang;
 
     // Collect all dynamic-content elements (entries, reviews, comments, replies, detail desc)
@@ -920,12 +925,6 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       el.dataset.original && el.dataset.original.length > 3 && el.dataset.tlang !== targetLang
     );
     if (!todo.length) return;
-
-    // Back to German: just restore the originals — no API needed
-    if (targetLang === 'de') {
-      todo.forEach(el => { el.textContent = el.dataset.original; el.dataset.tlang = 'de'; });
-      return;
-    }
 
     const btn = document.getElementById('langToggle');
     const origText = btn ? btn.textContent : '';
@@ -2392,7 +2391,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         + '</div>'
         + '</div></div>';
     }).join('');
-    if (currentLang !== 'de') translateVisibleContent();
+    translateVisibleContent();
   }
 
   // Ehrliches Preis-Label: "Kostenlos" NUR wenn wirklich gratis (free===true) oder ohne Ticket-/Website-Link.
@@ -3798,7 +3797,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var container = document.getElementById('listingsInner'); if (!container) return;
     container.insertAdjacentHTML('beforeend', _homeFiltered.slice(_homeRendered, _homeRendered + _homeBatch).map(_homeCardHtml).join(''));
     _homeRendered += _homeBatch;
-    if (currentLang !== 'de') translateVisibleContent();
+    translateVisibleContent();
   }
   function _bindHomeScroll() {
     if (_homeScrollBound) return;
@@ -3888,7 +3887,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     _homeCardHtml = _cardHtml;
     container.innerHTML = filtered.slice(0, _homeBatch).map(_cardHtml).join('');
     _homeRendered = Math.min(_homeBatch, filtered.length);
-    if (currentLang !== 'de') translateVisibleContent();
+    translateVisibleContent();
     _bindHomeScroll();
   }
 
@@ -4402,7 +4401,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     loadPhotos(id);
     loadOwnerSection(l);
     loadFavoriteStatus(id);
-    if (currentLang !== 'de') setTimeout(() => translateVisibleContent(), 300);
+    setTimeout(() => translateVisibleContent(), 300);
   }
 
   let maplibreMap = null;
@@ -5212,7 +5211,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if(!filtered.length){ list.innerHTML = _qEmpty(t('fc_no_match'), t('fc_no_match_sub')); return; }
     if(_qBoardMode==='all') _sortQuestions(filtered);
     list.innerHTML = filtered.map(_renderQuestionCard).join('');
-    if (currentLang !== 'de') translateVisibleContent();
+    translateVisibleContent();
   }
 
   // „Frag die Community" – FAB-Badge = eigene Fragen mit NEUEN (ungesehenen) Antworten
@@ -5439,7 +5438,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var _qt=document.getElementById('qdTitle'); if(_qt){ _qt.textContent = q.text||''; _qt.dataset.original = q.text||''; _qt.dataset.tlang = ''; }
     var _qb=document.getElementById('qdBody');
     if(_qb){ if(q.body){ _qb.textContent=q.body; _qb.dataset.original=q.body; _qb.dataset.tlang=''; _qb.style.display=''; } else { _qb.textContent=''; _qb.dataset.original=''; _qb.style.display='none'; } }
-    if (currentLang !== 'de') translateVisibleContent();
+    translateVisibleContent();
     var _qm=document.getElementById('qdMeta'); if(_qm) _qm.textContent = (q.seekers_count||0)+' '+t('fc_seek_count');
     _renderSeekBtn();
     var mr=document.getElementById('qdMetaRow');
@@ -5587,7 +5586,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           : '';
         return _renderAnswerCard(a, bestId, isAsker, false) + repHtml;
       }).join('');
-      if (currentLang !== 'de') translateVisibleContent();
+      translateVisibleContent();
     } catch(e){ c.innerHTML = '<div style="color:var(--text-3);font-size:13px">'+(t('err_generic')||'Fehler')+'</div>'; }
   }
   // 👍 auf eine Antwort (Toggle). Gäste -> Login.
@@ -7180,7 +7179,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         <div class="review-item-text" data-original="${esc(r.comment)}">${esc(r.comment)}</div>
         <div class="review-item-date">${formatDate(r.created_at)}</div>
       </div>`).join('');
-    if (currentLang !== 'de') translateVisibleContent();
+    translateVisibleContent();
   }
 
   window.addEventListener('load', function() { (function() {
@@ -7433,7 +7432,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         </div>
       </div>`;
     }).join('');
-    if (currentLang !== 'de') translateVisibleContent();
+    translateVisibleContent();
   }
 
   async function deleteReview(reviewId, listingId) {
