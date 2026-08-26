@@ -877,18 +877,27 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       _idleWrite(function(){ try { var j = JSON.stringify(translationCache); if (j.length < 1200000) localStorage.setItem('buscar_tcache', j); } catch(e){} });
     }, 1500);
   }
+  // Sitzungs-Merker für Texte, die bereits in der Zielsprache sind. Bewusst NICHT persistiert:
+  // ein einmaliger gtx-Aussetzer (Antwort = Original) darf einen Text nicht dauerhaft
+  // als "unübersetzbar" einfrieren — nächste Sitzung wird neu versucht.
+  var _tlSameCache = {};
   async function detectAndTranslate(text, targetLang) {
     const ck = targetLang + '|' + text;
-    if (translationCache[ck]) return translationCache[ck];
+    if (translationCache[ck]) {
+      // Selbstheilung: identisch gecachte Einträge (v352-Zeitfenster) entfernen und neu versuchen
+      if (translationCache[ck] === text) { delete translationCache[ck]; _schedulePersistTCache(); }
+      else return translationCache[ck];
+    }
+    if (_tlSameCache[ck]) return text;
     try {
       const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text.substring(0,500))}`;
       const res = await fetch(url);
       const data = await res.json();
       // Google returns [[["translated","original",...],...],...]
       const translated = (data && data[0] ? data[0].map(function(item){ return item && item[0]; }).filter(Boolean).join('') : '');
-      // Auch IDENTISCHE Ergebnisse cachen (Text ist bereits in der Zielsprache) — sonst
-      // würde derselbe Text bei jedem Render erneut gegen gtx geprüft (bidirektionaler Modus).
-      if (translated) { translationCache[ck] = translated; _schedulePersistTCache(); return translated; }
+      if (translated && translated !== text) { translationCache[ck] = translated; _schedulePersistTCache(); return translated; }
+      // Identisch = bereits in Zielsprache: nur für DIESE Sitzung merken (kein Persist, s.o.)
+      if (translated) { _tlSameCache[ck] = 1; return translated; }
     } catch(e) {}
     return null;
   }
