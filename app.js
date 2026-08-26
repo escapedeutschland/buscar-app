@@ -265,7 +265,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       bdesc_first: 'Erstelle deinen ersten Eintrag.', bdesc_five: 'Erstelle 5 Einträge.', bdesc_ten: 'Erstelle 10 Einträge.', bdesc_twenty: 'Erstelle 20 Einträge.', bdesc_fifty: 'Erstelle 50 Einträge.', bdesc_hundred: 'Erstelle 100 Einträge.', bdesc_explorer: 'Erstelle Einträge in 3 verschiedenen Städten.', bdesc_chaco: 'Erstelle einen Eintrag im Chaco.',
       badge_helper_first: 'Erste Antwort', badge_helper_ten: 'Community-Helfer', bdesc_helper_first: 'Beantworte eine Frage der Community.', bdesc_helper_ten: 'Beantworte 10 Fragen der Community.',
       badge_event_first: 'Erstes Event', badge_event_five: 'Event-Veranstalter', bdesc_event_first: 'Veranstalte dein erstes Event.', bdesc_event_five: 'Veranstalte 5 Events.',
-      re_discreet: 'Genauen Standort verbergen', re_discreet_sub: 'Öffentlich nur ungefähre Lage (~1 km)', re_discreet_hint: 'Ungefähre Lage – genauer Standort auf Anfrage',
+      re_discreet: 'Genauen Standort verbergen', re_discreet_sub: 'Setze den Pin ruhig genau – veröffentlicht wird nur die ungefähre Gegend (~1 km), nie der exakte Punkt.', re_discreet_hint: 'Ungefähre Lage – genauer Standort auf Anfrage',
       badge_count_0: 'Noch keine eigenen Einträge', badge_count_1: '1 eigener Eintrag', badge_count_n: ' eigene Einträge',
     },
     es: {
@@ -529,7 +529,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       bdesc_first: 'Crea tu primera entrada.', bdesc_five: 'Crea 5 entradas.', bdesc_ten: 'Crea 10 entradas.', bdesc_twenty: 'Crea 20 entradas.', bdesc_fifty: 'Crea 50 entradas.', bdesc_hundred: 'Crea 100 entradas.', bdesc_explorer: 'Crea entradas en 3 ciudades distintas.', bdesc_chaco: 'Crea una entrada en el Chaco.',
       badge_helper_first: 'Primera respuesta', badge_helper_ten: 'Ayudante de la comunidad', bdesc_helper_first: 'Respondé una pregunta de la comunidad.', bdesc_helper_ten: 'Respondé 10 preguntas de la comunidad.',
       badge_event_first: 'Primer evento', badge_event_five: 'Organizador de eventos', bdesc_event_first: 'Organizá tu primer evento.', bdesc_event_five: 'Organizá 5 eventos.',
-      re_discreet: 'Ocultar ubicación exacta', re_discreet_sub: 'Públicamente solo zona aproximada (~1 km)', re_discreet_hint: 'Zona aproximada – ubicación exacta a pedido',
+      re_discreet: 'Ocultar ubicación exacta', re_discreet_sub: 'Marcá el punto exacto tranquilo: se publica solo la zona aproximada (~1 km), nunca el punto exacto.', re_discreet_hint: 'Zona aproximada – ubicación exacta a pedido',
       badge_count_0: 'Aún sin registros propios', badge_count_1: '1 registro propio', badge_count_n: ' registros propios',
     },
     en: {
@@ -793,7 +793,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       bdesc_first: 'Create your first entry.', bdesc_five: 'Create 5 entries.', bdesc_ten: 'Create 10 entries.', bdesc_twenty: 'Create 20 entries.', bdesc_fifty: 'Create 50 entries.', bdesc_hundred: 'Create 100 entries.', bdesc_explorer: 'Create entries in 3 different cities.', bdesc_chaco: 'Create an entry in the Chaco.',
       badge_helper_first: 'First answer', badge_helper_ten: 'Community helper', bdesc_helper_first: 'Answer a community question.', bdesc_helper_ten: 'Answer 10 community questions.',
       badge_event_first: 'First event', badge_event_five: 'Event organizer', bdesc_event_first: 'Host your first event.', bdesc_event_five: 'Host 5 events.',
-      re_discreet: 'Hide exact location', re_discreet_sub: 'Public sees approx. area only (~1 km)', re_discreet_hint: 'Approximate area – exact location on request',
+      re_discreet: 'Hide exact location', re_discreet_sub: 'Feel free to set the exact pin – only the approximate area (~1 km) is published, never the exact spot.', re_discreet_hint: 'Approximate area – exact location on request',
       badge_count_0: 'No entries of your own yet', badge_count_1: '1 entry of your own', badge_count_n: ' entries of your own',
     }
   };
