@@ -34,7 +34,7 @@
   <meta name="apple-touch-fullscreen" content="yes">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=355">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=356">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <title>Buscar – Der Guide für Paraguay</title>
   <meta name="description" content="Buscar ist der Guide für Paraguay: Geschäfte, Dienstleistungen, Restaurants, Ärzte, Behörden und Events – für Auswanderer und Einheimische. Finde geprüfte Orte in Asunción, Encarnación, Ciudad del Este und ganz Paraguay.">
@@ -52,17 +52,17 @@
   <meta name="twitter:title" content="Buscar – Der Guide für Paraguay">
   <meta name="twitter:description" content="Der Guide für Paraguay: geprüfte Orte, Dienstleistungen und Events – für Auswanderer und Einheimische.">
   <meta name="twitter:image" content="https://escapedeutschland.github.io/buscar-app/og-default.jpg">
-  <link rel="preload" href="styles.css?v=355" as="style">
-  <link rel="preload" href="app.js?v=355" as="script">
+  <link rel="preload" href="styles.css?v=356" as="style">
+  <link rel="preload" href="app.js?v=356" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" integrity="sha384-MinO0mNliZ3vwppuPOUnGa+iq619pfMhLVUXfC4LHwSCvF9H+6P/KO4Q7qBOYV5V" crossorigin="anonymous">
-  <link href="styles.css?v=355" rel="stylesheet">
+  <link href="styles.css?v=356" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" integrity="sha384-SYKAG6cglRMN0RVvhNeBY0r3FYKNOJtznwA0v7B5Vp9tr31xAHsZC0DqkQ/pZDmj" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" integrity="sha384-yuGdyIzzYtOBlBG6JOWn+Ey9kpq7HocusNuxEGyyohr1eEyXpeEyehIIXC/hznw4" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" integrity="sha384-nwX2Qpkhc2sv6L0ZPkLefLGguao67toSowvePuQvGF6cG+8MUphGI2uI94Ls3JF7" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" integrity="sha384-lI+CxEx/bCvWP1b0OK13j5HTrTZP7yf1xle8TVOFq2smz6KC1RChTarRV/RHP5PP" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js" integrity="sha384-oze9siCpFoiDBZ37lLp99ZmOMO+je1s/xtvwtbNv3NXQXLpbpfPSzZSpbT3xV9da" crossorigin="anonymous"></script>
-  <script defer src="app.js?v=355"></script>
+  <script defer src="app.js?v=356"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -1405,6 +1405,7 @@
           <span id="qdSeekLabel">Ich suche das auch</span>
         </button>
         <button class="q-del-btn" id="qdShareBtn" onclick="shareCurrentQuestion()" aria-label="Frage teilen" style="color:var(--text-2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+        <button class="q-del-btn" id="qdPinBtn" style="display:none;color:var(--yellow-dark)" aria-label="Frage anpinnen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 17v5"/><path d="M9 10.76V7a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3.76a2 2 0 0 0 .59 1.42l1.7 1.7a1 1 0 0 1-.7 1.7H7.41a1 1 0 0 1-.7-1.7l1.7-1.7A2 2 0 0 0 9 10.76z"/><path d="M8 6h8"/></svg></button>
         <button class="q-del-btn" id="qdDeleteBtn" style="display:none" aria-label="Frage löschen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
       </div>
       <div class="detail-section-title" id="qdAnswersTitle" style="margin-top:24px" data-i18n="fc_answers">Antworten</div>

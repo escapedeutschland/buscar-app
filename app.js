@@ -5211,6 +5211,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     else { // smart: offene zuerst, innerhalb jeder Gruppe neueste zuerst
       arr.sort(function(a,b){ var oa=isOpen(a)?1:0, ob=isOpen(b)?1:0; if(oa!==ob) return ob-oa; return ts(b)-ts(a); });
     }
+    // 📌 Angepinnte Fragen kleben IMMER oben (egal welcher Sortier-Chip aktiv ist)
+    var pinnedArr = arr.filter(function(q){ return !!q.pinned; });
+    if (pinnedArr.length) {
+      var rest = arr.filter(function(q){ return !q.pinned; });
+      arr.length = 0;
+      pinnedArr.concat(rest).forEach(function(q){ arr.push(q); });
+    }
     return arr;
   }
   function _qCatLabel(catId){ if(!catId) return ''; for(var i=0;i<QCATS.length;i++){ if(QCATS[i][0]===catId) return t(QCATS[i][1]); } return ''; }
@@ -5383,6 +5390,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var answered = (q.status==='answered' || answers>0);
     var col = _qCatColor(q.category_id), catLbl = _qCatLabel(q.category_id), date = _relTime(q.created_at);
     return '<div class="q-card" style="border-left:4px solid '+col+'" onclick="openQuestionDetail(\''+q.id+'\')">'
+      + (q.pinned ? '<div class="q-card-pin">📌 '+esc(L('Angepinnt','Fijado','Pinned'))+'</div>' : '')
       + (catLbl ? '<div class="q-card-cat" style="color:'+col+';background:'+_hexA(col,0.12)+'">'+esc(catLbl)+'</div>' : '')
       + (q.author_name ? '<div class="q-card-author">'+_avatarHtml(q.author_name,22,_authorRingColor(q))+'<span>'+esc(q.author_name)+'</span>'+_authorBadgeChip(q)+'</div>' : '')
       + '<div class="q-card-text" data-original="'+esc(q.text||'')+'">'+esc(q.text||'')+'</div>'
@@ -5470,6 +5478,27 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     }
     var delBtn=document.getElementById('qdDeleteBtn');
     if(delBtn){ var canDel = currentUser && (currentUser.email===ADMIN_EMAIL || (q.created_by && q.created_by===currentUser.uid)); delBtn.style.display = canDel?'inline-flex':'none'; delBtn.onclick=function(){ deleteQuestion(q.id); }; }
+    // 📌 Anpinnen: nur Admin (Rules: istAdmin() darf questions frei updaten)
+    var pinBtn=document.getElementById('qdPinBtn');
+    if(pinBtn){
+      var isAdm = currentUser && currentUser.email===ADMIN_EMAIL;
+      pinBtn.style.display = isAdm?'inline-flex':'none';
+      pinBtn.style.opacity = q.pinned ? '1' : '0.55';
+      pinBtn.title = q.pinned ? L('Anpinnen lösen','Quitar fijado','Unpin') : L('Anpinnen','Fijar','Pin');
+      pinBtn.onclick=function(){ toggleQuestionPin(); };
+    }
+  }
+  async function toggleQuestionPin(){
+    if(!currentUser || currentUser.email!==ADMIN_EMAIL) return;
+    var q=_currentQuestion; if(!q) return;
+    var nv = !q.pinned;
+    try{
+      await db.collection('questions').doc(q.id).update({ pinned: nv });
+      q.pinned = nv; _qCache[q.id] = q;
+      var qq = _qLoaded && _qLoaded.find ? _qLoaded.find(function(x){ return x.id===q.id; }) : null; if(qq) qq.pinned = nv;
+      _applyQuestionToDetail(q);
+      showToast(nv ? L('📌 Frage angepinnt','📌 Pregunta fijada','📌 Question pinned') : L('Anpinnen gelöst','Fijado quitado','Unpinned'));
+    }catch(e){ showToast((t('err_prefix')||'')+((e&&e.message)||'Fehler')); }
   }
   async function openQuestionDetail(id){
     showScreen('screenQuestionDetail');
