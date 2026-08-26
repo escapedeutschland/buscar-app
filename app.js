@@ -5864,6 +5864,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     '#6B6B6B'
   ];
 
+  // Umkreis-Polygon (64 Punkte, geografisch echter Radius) für diskrete Immobilien:
+  // Radius 1100 m um den verwaschenen Punkt enthält das Objekt IMMER (Blur versetzt max. ~900 m).
+  function _circlePolygon(lat, lng, radiusM){
+    var pts = [], R = 6371000;
+    var dLat = (radiusM / R) * (180 / Math.PI);
+    var dLng = dLat / Math.max(0.2, Math.cos(lat * Math.PI / 180));
+    for (var i = 0; i <= 64; i++) {
+      var a = (i / 64) * 2 * Math.PI;
+      pts.push([lng + Math.cos(a) * dLng, lat + Math.sin(a) * dLat]);
+    }
+    return { type: 'Polygon', coordinates: [pts] };
+  }
   function buildGeoJSON(listings) {
     return {
       type: 'FeatureCollection',
@@ -5871,7 +5883,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         .filter(l => l.lat && l.lng)
         .map(l => ({
           type: 'Feature',
-          geometry: { type:'Point', coordinates:[l.lng, l.lat] },
+          geometry: l.re_discreet ? _circlePolygon(l.lat, l.lng, 1100) : { type:'Point', coordinates:[l.lng, l.lat] },
           properties: {
             id: l.id,
             name: l.name || '',
@@ -6002,6 +6014,34 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         });
         pendingData = null;
 
+        // Diskrete Immobilien: gestrichelter Umkreis statt Pin (unter den Pins gezeichnet)
+        maplibreMap.addLayer({
+          id: 'listings-discreet-fill', type: 'fill', source: 'listings',
+          filter: ['==', ['geometry-type'], 'Polygon'],
+          paint: { 'fill-color': '#0D9488', 'fill-opacity': 0.16 }
+        });
+        maplibreMap.addLayer({
+          id: 'listings-discreet-line', type: 'line', source: 'listings',
+          filter: ['==', ['geometry-type'], 'Polygon'],
+          paint: { 'line-color': '#0D9488', 'line-opacity': 0.65, 'line-width': 2, 'line-dasharray': [2, 2] }
+        });
+        maplibreMap.on('click', 'listings-discreet-fill', e => {
+          // Falls ein normaler Pin im Kreis liegt und getroffen wurde, hat dessen Popup Vorrang
+          var pinsHit = maplibreMap.getLayer('listings-pins') ? maplibreMap.queryRenderedFeatures(e.point, { layers: ['listings-pins'] }) : [];
+          if (pinsHit.length) return;
+          const p = e.features[0].properties;
+          new maplibregl.Popup({ closeButton:false, maxWidth:'220px' })
+            .setLngLat(e.lngLat)
+            .setHTML(`<div class="map-popup" onclick="showDetail('${p.id}')">
+              <div class="map-popup-name">${esc(p.name)}</div>
+              <div class="map-popup-city">${esc(prettyCity(p.city))}</div>
+              <div class="map-popup-cat">${esc(p.catLabel)} · ${esc(L('ungefähre Lage','zona aproximada','approximate area'))}</div>
+            </div>`)
+            .addTo(maplibreMap);
+        });
+        maplibreMap.on('mouseenter','listings-discreet-fill',()=>{ maplibreMap.getCanvas().style.cursor='pointer'; });
+        maplibreMap.on('mouseleave','listings-discreet-fill',()=>{ maplibreMap.getCanvas().style.cursor=''; });
+
         const pinDefs = [
           { id:'pin-restaurants',    color:'#F5A623', emoji:'🍽' },
           { id:'pin-unterkunft',     color:'#8B5CF6', emoji:'🛏' },
@@ -6036,6 +6076,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
             id: 'listings-pins',
             type: 'symbol',
             source: 'listings',
+            filter: ['==', ['geometry-type'], 'Point'],
             layout: {
               'icon-image': ['match', ['get','cat'],
                 'kat-restaurants',    'pin-restaurants',
