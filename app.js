@@ -8085,6 +8085,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         _ef.style.display = 'block';
       } else { _ef.style.display = 'none'; }
     }
+    var _erdr = document.getElementById('editReDiscreetRow');
+    if (_erdr) _erdr.style.display = (l.category_id === 'kat-immobilien') ? 'block' : 'none';
     showScreen('screenEditListing');
     initEditLocationMap(l.lat, l.lng);
   }
@@ -8207,6 +8209,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var isImmo = (cat === 'kat-immobilien');
     var imo = document.getElementById('immobilienFields');
     if (imo) imo.style.display = isImmo ? 'block' : 'none';
+    // Diskret-Schalter sitzt in der Standort-Karte, gilt aber nur für Immobilien
+    var _rdr = document.getElementById('reDiscreetRow');
+    if (_rdr) _rdr.style.display = isImmo ? 'block' : 'none';
     // Bei Immobilien unpassend -> ausblenden: Merkmale/Tags, Öffnungszeiten, Maps-Import
     var _tc = document.getElementById('tagsCard');       if (_tc) _tc.style.display = isImmo ? 'none' : '';
     var _hf = document.getElementById('hoursField');     if (_hf) _hf.style.display = isImmo ? 'none' : '';
