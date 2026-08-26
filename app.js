@@ -938,6 +938,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         const translated = await detectAndTranslate(el.dataset.original, targetLang);
         el.textContent = translated || el.dataset.original;
         el.dataset.tlang = targetLang;
+        // Transparenz: WIRKLICH übersetzte Texte dezent kennzeichnen (CSS ::after via Attribut) —
+        // Leser sollen wissen, dass sie nicht die Originalworte des Autors lesen.
+        if (translated && translated.trim() !== el.dataset.original.trim()) {
+          el.setAttribute('data-tl-label', L('· automatisch übersetzt','· traducción automática','· machine translated'));
+        } else {
+          el.removeAttribute('data-tl-label');
+        }
       }));
     }
 
