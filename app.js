@@ -265,6 +265,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       bdesc_first: 'Erstelle deinen ersten Eintrag.', bdesc_five: 'Erstelle 5 Einträge.', bdesc_ten: 'Erstelle 10 Einträge.', bdesc_twenty: 'Erstelle 20 Einträge.', bdesc_fifty: 'Erstelle 50 Einträge.', bdesc_hundred: 'Erstelle 100 Einträge.', bdesc_explorer: 'Erstelle Einträge in 3 verschiedenen Städten.', bdesc_chaco: 'Erstelle einen Eintrag im Chaco.',
       badge_helper_first: 'Erste Antwort', badge_helper_ten: 'Community-Helfer', bdesc_helper_first: 'Beantworte eine Frage der Community.', bdesc_helper_ten: 'Beantworte 10 Fragen der Community.',
       badge_event_first: 'Erstes Event', badge_event_five: 'Event-Veranstalter', bdesc_event_first: 'Veranstalte dein erstes Event.', bdesc_event_five: 'Veranstalte 5 Events.',
+      re_discreet: 'Genauen Standort verbergen', re_discreet_sub: 'Öffentlich nur ungefähre Lage (~1 km)', re_discreet_hint: 'Ungefähre Lage – genauer Standort auf Anfrage',
       badge_count_0: 'Noch keine eigenen Einträge', badge_count_1: '1 eigener Eintrag', badge_count_n: ' eigene Einträge',
     },
     es: {
@@ -528,6 +529,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       bdesc_first: 'Crea tu primera entrada.', bdesc_five: 'Crea 5 entradas.', bdesc_ten: 'Crea 10 entradas.', bdesc_twenty: 'Crea 20 entradas.', bdesc_fifty: 'Crea 50 entradas.', bdesc_hundred: 'Crea 100 entradas.', bdesc_explorer: 'Crea entradas en 3 ciudades distintas.', bdesc_chaco: 'Crea una entrada en el Chaco.',
       badge_helper_first: 'Primera respuesta', badge_helper_ten: 'Ayudante de la comunidad', bdesc_helper_first: 'Respondé una pregunta de la comunidad.', bdesc_helper_ten: 'Respondé 10 preguntas de la comunidad.',
       badge_event_first: 'Primer evento', badge_event_five: 'Organizador de eventos', bdesc_event_first: 'Organizá tu primer evento.', bdesc_event_five: 'Organizá 5 eventos.',
+      re_discreet: 'Ocultar ubicación exacta', re_discreet_sub: 'Públicamente solo zona aproximada (~1 km)', re_discreet_hint: 'Zona aproximada – ubicación exacta a pedido',
       badge_count_0: 'Aún sin registros propios', badge_count_1: '1 registro propio', badge_count_n: ' registros propios',
     },
     en: {
@@ -791,6 +793,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       bdesc_first: 'Create your first entry.', bdesc_five: 'Create 5 entries.', bdesc_ten: 'Create 10 entries.', bdesc_twenty: 'Create 20 entries.', bdesc_fifty: 'Create 50 entries.', bdesc_hundred: 'Create 100 entries.', bdesc_explorer: 'Create entries in 3 different cities.', bdesc_chaco: 'Create an entry in the Chaco.',
       badge_helper_first: 'First answer', badge_helper_ten: 'Community helper', bdesc_helper_first: 'Answer a community question.', bdesc_helper_ten: 'Answer 10 community questions.',
       badge_event_first: 'First event', badge_event_five: 'Event organizer', bdesc_event_first: 'Host your first event.', bdesc_event_five: 'Host 5 events.',
+      re_discreet: 'Hide exact location', re_discreet_sub: 'Public sees approx. area only (~1 km)', re_discreet_hint: 'Approximate area – exact location on request',
       badge_count_0: 'No entries of your own yet', badge_count_1: '1 entry of your own', badge_count_n: ' entries of your own',
     }
   };
@@ -3910,6 +3913,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (typeMap[l.re_type]) items.push([L('Typ','Tipo','Type'), typeMap[l.re_type]]);
     if (areaStr) items.push([L('Fläche','Superficie','Area'), areaStr]);
     if (l.re_rooms != null) items.push([L('Zimmer','Habitaciones','Rooms'), String(l.re_rooms)]);
+    if (l.re_discreet) items.push([L('Lage','Ubicación','Location'), L('ungefähr (~1 km)','aproximada (~1 km)','approximate (~1 km)')]);
     var rows = items.map(function(it, i){
       var border = (i < items.length - 1) ? 'border-bottom:1px solid var(--border);' : '';
       return '<div style="display:flex;justify-content:space-between;gap:14px;padding:9px 0;' + border + 'font-size:14px"><span style="color:var(--text-3)">' + it[0] + '</span><span style="font-weight:600;color:var(--text-1);text-align:right;word-break:break-word">' + it[1] + '</span></div>';
@@ -4244,12 +4248,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (l.phone) infoHTML += `<a class="detail-row" href="tel:${esc(l.phone)}" onclick="_trackAction('${l.id}','calls_count')"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Telefon</div><div class="detail-row-value">${esc(l.phone)}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`;
     if (l.website) { var _wHref = /^https?:\/\//i.test(String(l.website).trim()) ? String(l.website).trim() : 'https://' + String(l.website).trim(); infoHTML += `<a class="detail-row" href="${esc(_wHref)}" target="_blank" rel="noopener noreferrer" onclick="_trackAction('${l.id}','website_count')"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Website</div><div class="detail-row-value">${esc(l.website)}</div></div></div><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></a>`; }
     if (l.opening_hours) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Öffnungszeiten</div><div class="detail-row-value">${formatHours(l.opening_hours)}</div></div></div></div>`;
-    if (l.address) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Adresse</div><div class="detail-row-value">${esc(l.address)}</div></div></div></div>`;
+    if (l.address && !l.re_discreet) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="detail-row-info"><div class="detail-row-label">Adresse</div><div class="detail-row-value">${esc(l.address)}</div></div></div></div>`;
+    if (l.re_discreet) infoHTML += `<div class="detail-row"><div class="detail-row-left"><div class="detail-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="detail-row-info"><div class="detail-row-label">${esc(L('Lage','Ubicación','Location'))}</div><div class="detail-row-value">${esc(t('re_discreet_hint'))}</div></div></div></div>`;
     const infoCard = document.getElementById('detailInfoCard');
     infoCard.innerHTML = infoHTML; infoCard.style.display = infoHTML?'block':'none';
     let ctaHTML = '';
     if (l.phone) ctaHTML += `<a class="detail-cta-btn primary" href="tel:${esc(l.phone)}" onclick="_trackAction('${l.id}','calls_count')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>${t('call')}</a>`;
-    if (l.lat && l.lng) ctaHTML += `<a class="detail-cta-btn secondary" href="https://maps.google.com/?q=${l.lat},${l.lng}" target="_blank" onclick="_trackAction('${l.id}','routes_count')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>${t('route')}</a>`;
+    if (l.lat && l.lng && !l.re_discreet) ctaHTML += `<a class="detail-cta-btn secondary" href="https://maps.google.com/?q=${l.lat},${l.lng}" target="_blank" onclick="_trackAction('${l.id}','routes_count')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>${t('route')}</a>`;
     document.getElementById('detailCta').innerHTML = ctaHTML;
     // Render deal
     const dealCard = document.getElementById('detailDealCard');
@@ -6413,6 +6418,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const nm = document.getElementById('newName'); if (nm) nm.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
+  // Diskreter Immobilien-Standort: die exakte Koordinate wird NIE gespeichert (listings sind
+  // öffentlich lesbar!) — beim Speichern auf ~1-km-Raster runden + kleiner Zufallsversatz.
+  function _blurCoord(lat, lng){
+    return {
+      lat: Math.round(lat * 100) / 100 + (Math.random() - 0.5) * 0.008,
+      lng: Math.round(lng * 100) / 100 + (Math.random() - 0.5) * 0.008
+    };
+  }
+
   async function submitListing() {
     const name = document.getElementById('newName').value.trim();
     const cat = document.getElementById('newCategory').value;
@@ -6463,10 +6477,17 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           re_period: (document.getElementById('reDeal').value === 'miete') ? 'monat' : null,
           re_area: _num('reArea'),
           re_area_unit: document.getElementById('reAreaUnit').value || null,
-          re_rooms: _num('reRooms')
+          re_rooms: _num('reRooms'),
+          re_discreet: !!(document.getElementById('reDiscreet') || {}).checked
         };
       }
-      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: (()=>{ const d=document.getElementById('hoursDay').value; const f=document.getElementById('hoursFrom').value; const t=document.getElementById('hoursTo').value; const f2=document.getElementById('hoursFrom2').value; const t2=document.getElementById('hoursTo2').value; let val=''; if(d&&f&&t){val=d+' '+f+'-'+t; if(f2&&t2) val+=' & '+f2+'-'+t2;} const imported=(document.getElementById('newHours').value||'').trim(); if(val) document.getElementById('newHours').value=val; return val || imported || null; })(), lat: window._newLat, lng: window._newLng, tags: formTags.slice(), languages: _readLangChips('newLangChips'), verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date(), ...reFields });
+      // Diskrete Immobilie: Koordinaten VOR dem Speichern verwaschen (Original landet nirgends)
+      var _lSaveLat = window._newLat, _lSaveLng = window._newLng;
+      if (cat === 'kat-immobilien' && reFields.re_discreet && typeof _lSaveLat === 'number' && typeof _lSaveLng === 'number') {
+        var _bl0 = _blurCoord(_lSaveLat, _lSaveLng);
+        _lSaveLat = _bl0.lat; _lSaveLng = _bl0.lng;
+      }
+      const ref = await db.collection('listings').add({ name, category_id: cat, city, description: desc, subcategory: document.getElementById('newSubcategory').value||null, phone: phone||null, website: document.getElementById('newWebsite').value.trim()||null, address: document.getElementById('newAddress').value.trim()||null, opening_hours: (()=>{ const d=document.getElementById('hoursDay').value; const f=document.getElementById('hoursFrom').value; const t=document.getElementById('hoursTo').value; const f2=document.getElementById('hoursFrom2').value; const t2=document.getElementById('hoursTo2').value; let val=''; if(d&&f&&t){val=d+' '+f+'-'+t; if(f2&&t2) val+=' & '+f2+'-'+t2;} const imported=(document.getElementById('newHours').value||'').trim(); if(val) document.getElementById('newHours').value=val; return val || imported || null; })(), lat: _lSaveLat, lng: _lSaveLng, tags: formTags.slice(), languages: _readLangChips('newLangChips'), verified: false, created_by: currentUser?currentUser.uid:null, created_at: new Date(), ...reFields });
       if (pendingFormPhotos.length) await uploadFormPhotos(ref.id);
       if (cat === 'kat-immobilien' && window._reCoverFile) {
         try {
@@ -6496,6 +6517,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       document.getElementById('nameCounter').textContent = '0 / 60';
       document.getElementById('descCounter').textContent = '0 / 500';
       window._newLat = null; window._newLng = null;
+      var _rdReset = document.getElementById('reDiscreet'); if (_rdReset) _rdReset.checked = false;
       const btn2 = document.getElementById('locationBtn');
       btn2.disabled = false; btn2.style.background = 'var(--yellow-light)'; btn2.style.borderColor = 'var(--yellow)'; btn2.style.color = 'var(--yellow-dark)';
       btn2.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg> Meinen Standort verwenden';
@@ -8059,6 +8081,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         document.getElementById('editReArea').value = (l.re_area != null ? l.re_area : '');
         document.getElementById('editReAreaUnit').value = l.re_area_unit || 'm2';
         document.getElementById('editReRooms').value = (l.re_rooms != null ? l.re_rooms : '');
+        var _erd = document.getElementById('editReDiscreet'); if (_erd) _erd.checked = !!l.re_discreet;
         _ef.style.display = 'block';
       } else { _ef.style.display = 'none'; }
     }
@@ -8085,12 +8108,26 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         re_period: (document.getElementById('editReDeal').value === 'miete') ? 'monat' : null,
         re_area: _en('editReArea'),
         re_area_unit: document.getElementById('editReAreaUnit').value || null,
-        re_rooms: _en('editReRooms')
+        re_rooms: _en('editReRooms'),
+        re_discreet: !!(document.getElementById('editReDiscreet') || {}).checked
       };
     }
     var locUpdate = {};
     if (typeof window._editLat === 'number' && !isNaN(window._editLat) && typeof window._editLng === 'number' && !isNaN(window._editLng)) {
       locUpdate = { lat: window._editLat, lng: window._editLng };
+    }
+    // Diskrete Immobilie beim Bearbeiten: verwaschen NUR wenn der Schalter neu angeht oder die
+    // Position neu gesetzt wurde — sonst würden bereits verwaschene Koordinaten weiter driften.
+    if (_el && _el.category_id === 'kat-immobilien' && reEdit.re_discreet) {
+      var _coordsChanged = (locUpdate.lat != null) && (Math.abs(locUpdate.lat - (_el.lat || 0)) > 1e-7 || Math.abs(locUpdate.lng - (_el.lng || 0)) > 1e-7);
+      if (!_el.re_discreet || _coordsChanged) {
+        var _srcLat = (locUpdate.lat != null) ? locUpdate.lat : _el.lat;
+        var _srcLng = (locUpdate.lng != null) ? locUpdate.lng : _el.lng;
+        if (typeof _srcLat === 'number' && typeof _srcLng === 'number') {
+          var _blE = _blurCoord(_srcLat, _srcLng);
+          locUpdate = { lat: _blE.lat, lng: _blE.lng };
+        }
+      }
     }
     try {
       await db.collection('listings').doc(currentEditListingId).update({

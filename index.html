@@ -34,7 +34,7 @@
   <meta name="apple-touch-fullscreen" content="yes">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=346">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=347">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <title>Buscar – Der Guide für Paraguay</title>
   <meta name="description" content="Buscar ist der Guide für Paraguay: Geschäfte, Dienstleistungen, Restaurants, Ärzte, Behörden und Events – für Auswanderer und Einheimische. Finde geprüfte Orte in Asunción, Encarnación, Ciudad del Este und ganz Paraguay.">
@@ -52,17 +52,17 @@
   <meta name="twitter:title" content="Buscar – Der Guide für Paraguay">
   <meta name="twitter:description" content="Der Guide für Paraguay: geprüfte Orte, Dienstleistungen und Events – für Auswanderer und Einheimische.">
   <meta name="twitter:image" content="https://escapedeutschland.github.io/buscar-app/og-default.jpg">
-  <link rel="preload" href="styles.css?v=346" as="style">
-  <link rel="preload" href="app.js?v=346" as="script">
+  <link rel="preload" href="styles.css?v=347" as="style">
+  <link rel="preload" href="app.js?v=347" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" integrity="sha384-MinO0mNliZ3vwppuPOUnGa+iq619pfMhLVUXfC4LHwSCvF9H+6P/KO4Q7qBOYV5V" crossorigin="anonymous">
-  <link href="styles.css?v=346" rel="stylesheet">
+  <link href="styles.css?v=347" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" integrity="sha384-SYKAG6cglRMN0RVvhNeBY0r3FYKNOJtznwA0v7B5Vp9tr31xAHsZC0DqkQ/pZDmj" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" integrity="sha384-yuGdyIzzYtOBlBG6JOWn+Ey9kpq7HocusNuxEGyyohr1eEyXpeEyehIIXC/hznw4" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" integrity="sha384-nwX2Qpkhc2sv6L0ZPkLefLGguao67toSowvePuQvGF6cG+8MUphGI2uI94Ls3JF7" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" integrity="sha384-lI+CxEx/bCvWP1b0OK13j5HTrTZP7yf1xle8TVOFq2smz6KC1RChTarRV/RHP5PP" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js" integrity="sha384-oze9siCpFoiDBZ37lLp99ZmOMO+je1s/xtvwtbNv3NXQXLpbpfPSzZSpbT3xV9da" crossorigin="anonymous"></script>
-  <script defer src="app.js?v=346"></script>
+  <script defer src="app.js?v=347"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -735,6 +735,10 @@
           <label class="field-label">Zimmer (optional)</label>
           <input class="field-input" type="number" inputmode="numeric" id="reRooms" placeholder="z.B. 4">
         </div>
+        <div class="event-toggle-row" style="margin-bottom:14px">
+          <div><span class="event-toggle-label" data-i18n="re_discreet">Genauen Standort verbergen</span><div style="font-size:11px;color:var(--text-3);margin-top:2px" data-i18n="re_discreet_sub">Öffentlich nur ungefähre Lage (~1 km)</div></div>
+          <label class="event-toggle"><input type="checkbox" id="reDiscreet"><span class="event-toggle-slider"></span></label>
+        </div>
         <div class="form-field">
           <label class="field-label">Titelbild (optional)</label>
           <div id="reCoverPreview" style="display:none;width:100%;height:150px;border-radius:12px;background-size:cover;background-position:center;margin-bottom:8px;border:1px solid var(--border)"></div>
@@ -1247,6 +1251,10 @@
         <div class="form-field">
           <label class="field-label">Zimmer (optional)</label>
           <input class="field-input" type="number" inputmode="numeric" id="editReRooms" placeholder="z.B. 4">
+        </div>
+        <div class="event-toggle-row">
+          <div><span class="event-toggle-label" data-i18n="re_discreet">Genauen Standort verbergen</span><div style="font-size:11px;color:var(--text-3);margin-top:2px" data-i18n="re_discreet_sub">Öffentlich nur ungefähre Lage (~1 km)</div></div>
+          <label class="event-toggle"><input type="checkbox" id="editReDiscreet"><span class="event-toggle-slider"></span></label>
         </div>
       </div>
       <div id="editListingError" style="display:none;background:var(--red-light);color:var(--red);padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:14px"></div>
