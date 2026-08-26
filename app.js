@@ -6419,12 +6419,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   // Diskreter Immobilien-Standort: die exakte Koordinate wird NIE gespeichert (listings sind
-  // öffentlich lesbar!) — beim Speichern auf ~1-km-Raster runden + kleiner Zufallsversatz.
+  // öffentlich lesbar!). Polar-Versatz in zufällige Richtung mit GARANTIERTEM Mindestabstand
+  // (~450–900 m) — die frühere Raster+Jitter-Formel konnte zufällig fast am Original landen.
   function _blurCoord(lat, lng){
-    return {
-      lat: Math.round(lat * 100) / 100 + (Math.random() - 0.5) * 0.008,
-      lng: Math.round(lng * 100) / 100 + (Math.random() - 0.5) * 0.008
-    };
+    var ang = Math.random() * 2 * Math.PI;
+    var dist = 0.004 + Math.random() * 0.004; // in Grad ≈ 450–900 m
+    var bLat = lat + Math.sin(ang) * dist;
+    var bLng = lng + Math.cos(ang) * dist / Math.max(0.2, Math.cos(lat * Math.PI / 180));
+    return { lat: Math.round(bLat * 1e5) / 1e5, lng: Math.round(bLng * 1e5) / 1e5 };
   }
 
   async function submitListing() {
@@ -7988,7 +7990,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       await db.collection('listings').doc(id).delete();
       _resolveReportsForListing(id);
       _badgesCache = null; // Zählung/Badges neu laden lassen
-      try{ await loadListings(); }catch(e){}
+      // Sofort aus der lokalen Liste nehmen + Cache ZWANGS-aktualisieren — der 10-Min-TTL-Cache
+      // würde den gelöschten Eintrag sonst weiter anzeigen (Nutzer-Report 2026-08-26).
+      allListings = allListings.filter(function(x){ return x.id !== id; });
+      try { renderListings(); } catch(e){}
+      try{ await loadListings(true); }catch(e){}
       if(typeof showToast==='function') showToast(L('✓ Eintrag gelöscht','✓ Eliminado','✓ Listing deleted'));
       setNav('navHome'); showScreen('screenHome');
     }catch(e){
