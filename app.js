@@ -267,6 +267,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_event_first: 'Erstes Event', badge_event_five: 'Event-Veranstalter', bdesc_event_first: 'Veranstalte dein erstes Event.', bdesc_event_five: 'Veranstalte 5 Events.',
       re_discreet: 'Genauen Standort verbergen', re_discreet_sub: 'Setze den Pin ruhig genau – veröffentlicht wird nur die ungefähre Gegend (~1 km), nie der exakte Punkt.', re_discreet_hint: 'Ungefähre Lage – genauer Standort auf Anfrage',
       create_title: 'Was möchtest du erstellen?', create_entry: 'Eintrag', create_entry_sub: 'Ort, Geschäft oder Dienstleistung', create_event: 'Event', create_event_sub: 'Veranstaltung ankündigen', create_question: 'Frage', create_question_sub: 'Frag oder diskutier mit der Community',
+      ev_calendar: 'Zum Kalender',
       badge_count_0: 'Noch keine eigenen Einträge', badge_count_1: '1 eigener Eintrag', badge_count_n: ' eigene Einträge',
     },
     es: {
@@ -532,6 +533,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_event_first: 'Primer evento', badge_event_five: 'Organizador de eventos', bdesc_event_first: 'Organizá tu primer evento.', bdesc_event_five: 'Organizá 5 eventos.',
       re_discreet: 'Ocultar ubicación exacta', re_discreet_sub: 'Marcá el punto exacto tranquilo: se publica solo la zona aproximada (~1 km), nunca el punto exacto.', re_discreet_hint: 'Zona aproximada – ubicación exacta a pedido',
       create_title: '¿Qué querés crear?', create_entry: 'Entrada', create_entry_sub: 'Lugar, negocio o servicio', create_event: 'Evento', create_event_sub: 'Anunciá un evento', create_question: 'Pregunta', create_question_sub: 'Preguntá o debatí con la comunidad',
+      ev_calendar: 'Al calendario',
       badge_count_0: 'Aún sin registros propios', badge_count_1: '1 registro propio', badge_count_n: ' registros propios',
     },
     en: {
@@ -797,6 +799,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_event_first: 'First event', badge_event_five: 'Event organizer', bdesc_event_first: 'Host your first event.', bdesc_event_five: 'Host 5 events.',
       re_discreet: 'Hide exact location', re_discreet_sub: 'Feel free to set the exact pin – only the approximate area (~1 km) is published, never the exact spot.', re_discreet_hint: 'Approximate area – exact location on request',
       create_title: 'What do you want to create?', create_entry: 'Entry', create_entry_sub: 'Place, business or service', create_event: 'Event', create_event_sub: 'Announce an event', create_question: 'Question', create_question_sub: 'Ask or discuss with the community',
+      ev_calendar: 'Add to calendar',
       badge_count_0: 'No entries of your own yet', badge_count_1: '1 entry of your own', badge_count_n: ' entries of your own',
     }
   };
@@ -2452,11 +2455,24 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
     var evRouteUrl = (ev.lat && ev.lng) ? 'https://maps.google.com/?q=' + ev.lat + ',' + ev.lng
       : ((ev.address || ev.city) ? 'https://maps.google.com/?q=' + encodeURIComponent([ev.address, ev.city].filter(Boolean).join(', ')) : '');
+    // Kalender-Export: Termin landet im privaten Kalender des Nutzers, das SYSTEM erinnert dann
+    // (Push-Ersatz, funktioniert auch auf iOS). Google-Kalender-Template-Link = überall lauffähig.
+    var evCalUrl = '';
+    if (start) {
+      var _calFmt = function(d){ return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); };
+      var _calEnd = (end && end > start) ? end : new Date(start.getTime() + 2 * 3600 * 1000);
+      evCalUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+        + '&text=' + encodeURIComponent(ev.title || 'Event')
+        + '&dates=' + _calFmt(start) + '/' + _calFmt(_calEnd)
+        + '&details=' + encodeURIComponent((ev.description ? String(ev.description).substring(0, 300) + '\n\n' : '') + 'Details: https://buscarpy.app/event/' + id)
+        + '&location=' + encodeURIComponent([ev.address, prettyCity(ev.city || '')].filter(Boolean).join(', '));
+    }
     document.getElementById('evDetailMeta').innerHTML =
       '<div class="event-detail-meta">📅 ' + dateStr + '</div>'
       + (timeStr ? '<div class="event-detail-meta">🕐 ' + timeStr + (timeEndStr ? ' – ' + timeEndStr : '') + '</div>' : '')
       + '<div class="event-detail-meta">📍 ' + esc(prettyCity(ev.city||'')) + (ev.address ? ', ' + esc(ev.address) : '') + '</div>'
-      + (evRouteUrl ? '<a class="ev-route-btn" href="' + evRouteUrl + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Route starten</a>' : '');
+      + (evRouteUrl ? '<a class="ev-route-btn" href="' + evRouteUrl + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Route starten</a>' : '')
+      + (evCalUrl ? '<a class="ev-route-btn" href="' + evCalUrl + '" target="_blank" rel="noopener" style="margin-left:8px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="13" x2="12" y2="19"/><line x1="9" y1="16" x2="15" y2="16"/></svg>' + esc(t('ev_calendar')) + '</a>' : '');
 
     var isFull = ev.has_signup && ev.capacity > 0 && (ev.signups_count||0) >= ev.capacity;
     var isCancelled = ev.status === 'cancelled';
