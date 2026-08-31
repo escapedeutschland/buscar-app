@@ -605,7 +605,7 @@
     .nav-item.active span { color: var(--yellow); }
     /* Erstellen-Button mittig als erhabener Orange-Kreis (IG/TikTok-Muster, v357) */
     .nav-create span { display: none; }
-    .nav-create svg { width: 46px; height: 46px; padding: 11px; box-sizing: border-box; background: var(--yellow); stroke: #fff; border-radius: 50%; margin-top: -16px; box-shadow: 0 6px 16px rgba(245,166,35,0.45); }
+    .nav-create svg { width: 42px; height: 42px; padding: 10px; box-sizing: border-box; background: var(--yellow); stroke: #fff; border-radius: 50%; box-shadow: 0 3px 10px rgba(245,166,35,0.35); }
     .nav-create.active svg { stroke: #fff; background: var(--yellow-dark); }
   
     /* ── EVENTS ─────────────────────────────────────────────────────────── */
