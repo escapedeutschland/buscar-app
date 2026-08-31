@@ -2456,9 +2456,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var evRouteUrl = (ev.lat && ev.lng) ? 'https://maps.google.com/?q=' + ev.lat + ',' + ev.lng
       : ((ev.address || ev.city) ? 'https://maps.google.com/?q=' + encodeURIComponent([ev.address, ev.city].filter(Boolean).join(', ')) : '');
     // Kalender-Export: Termin landet im privaten Kalender des Nutzers, das SYSTEM erinnert dann
-    // (Push-Ersatz, funktioniert auch auf iOS). Google-Kalender-Template-Link = überall lauffähig.
+    // (Push-Ersatz). iOS -> .ics von buscarpy.app (öffnet Apple-Kalender nativ, Worker-Route
+    // /event/<id>.ics seit 2026-08-31); Android/Rest -> Google-Kalender-Template-Link (öffnet dort die App).
     var evCalUrl = '';
-    if (start) {
+    var _calIsIOS = /iPad|iPhone|iPod/.test(navigator.userAgent || '');
+    if (start && _calIsIOS) {
+      evCalUrl = 'https://buscarpy.app/event/' + encodeURIComponent(id) + '.ics';
+    } else if (start) {
       var _calFmt = function(d){ return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); };
       var _calEnd = (end && end > start) ? end : new Date(start.getTime() + 2 * 3600 * 1000);
       evCalUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
