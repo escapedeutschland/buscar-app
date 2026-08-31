@@ -266,7 +266,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_helper_first: 'Erste Antwort', badge_helper_ten: 'Community-Helfer', bdesc_helper_first: 'Beantworte eine Frage der Community.', bdesc_helper_ten: 'Beantworte 10 Fragen der Community.',
       badge_event_first: 'Erstes Event', badge_event_five: 'Event-Veranstalter', bdesc_event_first: 'Veranstalte dein erstes Event.', bdesc_event_five: 'Veranstalte 5 Events.',
       re_discreet: 'Genauen Standort verbergen', re_discreet_sub: 'Setze den Pin ruhig genau – veröffentlicht wird nur die ungefähre Gegend (~1 km), nie der exakte Punkt.', re_discreet_hint: 'Ungefähre Lage – genauer Standort auf Anfrage',
-      create_title: 'Was möchtest du erstellen?', create_entry: 'Eintrag', create_entry_sub: 'Ort, Geschäft oder Dienstleistung', create_event: 'Event', create_event_sub: 'Veranstaltung ankündigen', create_question: 'Frage', create_question_sub: 'Frag die Community',
+      create_title: 'Was möchtest du erstellen?', create_entry: 'Eintrag', create_entry_sub: 'Ort, Geschäft oder Dienstleistung', create_event: 'Event', create_event_sub: 'Veranstaltung ankündigen', create_question: 'Frage', create_question_sub: 'Frag oder diskutier mit der Community',
       badge_count_0: 'Noch keine eigenen Einträge', badge_count_1: '1 eigener Eintrag', badge_count_n: ' eigene Einträge',
     },
     es: {
@@ -531,7 +531,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_helper_first: 'Primera respuesta', badge_helper_ten: 'Ayudante de la comunidad', bdesc_helper_first: 'Respondé una pregunta de la comunidad.', bdesc_helper_ten: 'Respondé 10 preguntas de la comunidad.',
       badge_event_first: 'Primer evento', badge_event_five: 'Organizador de eventos', bdesc_event_first: 'Organizá tu primer evento.', bdesc_event_five: 'Organizá 5 eventos.',
       re_discreet: 'Ocultar ubicación exacta', re_discreet_sub: 'Marcá el punto exacto tranquilo: se publica solo la zona aproximada (~1 km), nunca el punto exacto.', re_discreet_hint: 'Zona aproximada – ubicación exacta a pedido',
-      create_title: '¿Qué querés crear?', create_entry: 'Entrada', create_entry_sub: 'Lugar, negocio o servicio', create_event: 'Evento', create_event_sub: 'Anunciá un evento', create_question: 'Pregunta', create_question_sub: 'Preguntá a la comunidad',
+      create_title: '¿Qué querés crear?', create_entry: 'Entrada', create_entry_sub: 'Lugar, negocio o servicio', create_event: 'Evento', create_event_sub: 'Anunciá un evento', create_question: 'Pregunta', create_question_sub: 'Preguntá o debatí con la comunidad',
       badge_count_0: 'Aún sin registros propios', badge_count_1: '1 registro propio', badge_count_n: ' registros propios',
     },
     en: {
@@ -796,7 +796,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_helper_first: 'First answer', badge_helper_ten: 'Community helper', bdesc_helper_first: 'Answer a community question.', bdesc_helper_ten: 'Answer 10 community questions.',
       badge_event_first: 'First event', badge_event_five: 'Event organizer', bdesc_event_first: 'Host your first event.', bdesc_event_five: 'Host 5 events.',
       re_discreet: 'Hide exact location', re_discreet_sub: 'Feel free to set the exact pin – only the approximate area (~1 km) is published, never the exact spot.', re_discreet_hint: 'Approximate area – exact location on request',
-      create_title: 'What do you want to create?', create_entry: 'Entry', create_entry_sub: 'Place, business or service', create_event: 'Event', create_event_sub: 'Announce an event', create_question: 'Question', create_question_sub: 'Ask the community',
+      create_title: 'What do you want to create?', create_entry: 'Entry', create_entry_sub: 'Place, business or service', create_event: 'Event', create_event_sub: 'Announce an event', create_question: 'Question', create_question_sub: 'Ask or discuss with the community',
       badge_count_0: 'No entries of your own yet', badge_count_1: '1 entry of your own', badge_count_n: ' entries of your own',
     }
   };
