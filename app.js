@@ -2456,21 +2456,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var evRouteUrl = (ev.lat && ev.lng) ? 'https://maps.google.com/?q=' + ev.lat + ',' + ev.lng
       : ((ev.address || ev.city) ? 'https://maps.google.com/?q=' + encodeURIComponent([ev.address, ev.city].filter(Boolean).join(', ')) : '');
     // Kalender-Export: Termin landet im privaten Kalender des Nutzers, das SYSTEM erinnert dann
-    // (Push-Ersatz). iOS -> .ics von buscarpy.app (öffnet Apple-Kalender nativ, Worker-Route
-    // /event/<id>.ics seit 2026-08-31); Android/Rest -> Google-Kalender-Template-Link (öffnet dort die App).
-    var evCalUrl = '';
-    var _calIsIOS = /iPad|iPhone|iPod/.test(navigator.userAgent || '');
-    if (start && _calIsIOS) {
-      evCalUrl = 'https://buscarpy.app/event/' + encodeURIComponent(id) + '.ics';
-    } else if (start) {
-      var _calFmt = function(d){ return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); };
-      var _calEnd = (end && end > start) ? end : new Date(start.getTime() + 2 * 3600 * 1000);
-      evCalUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
-        + '&text=' + encodeURIComponent(ev.title || 'Event')
-        + '&dates=' + _calFmt(start) + '/' + _calFmt(_calEnd)
-        + '&details=' + encodeURIComponent((ev.description ? String(ev.description).substring(0, 300) + '\n\n' : '') + 'Details: https://buscarpy.app/event/' + id)
-        + '&location=' + encodeURIComponent([ev.address, prettyCity(ev.city || '')].filter(Boolean).join(', '));
-    }
+    // (Push-Ersatz). EIN Weg für ALLE Plattformen: .ics von buscarpy.app (Worker-Route
+    // /event/<id>.ics, inkl. VALARM-Erinnerung 1 Tag vorher). Der frühere Google-Link-Weg
+    // öffnete auf Android/iOS nur die Web-Version bzw. ausgeloggt sogar workspace.google.com
+    // (Browser übergeben https-Links nie an Apps) — Nutzer-Report 2026-08-31.
+    var evCalUrl = start ? ('https://buscarpy.app/event/' + encodeURIComponent(id) + '.ics') : '';
     document.getElementById('evDetailMeta').innerHTML =
       '<div class="event-detail-meta">📅 ' + dateStr + '</div>'
       + (timeStr ? '<div class="event-detail-meta">🕐 ' + timeStr + (timeEndStr ? ' – ' + timeEndStr : '') + '</div>' : '')
