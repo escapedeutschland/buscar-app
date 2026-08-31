@@ -3326,7 +3326,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   function continueAsGuest(){ setNav('navHome'); showScreen('screenHome'); setTimeout(maybeShowWelcomeTour, 700); }
 
   // ── Erst-Tour beim ersten Öffnen (einmalig, überspringbar, rein additiv) ──
+  // Beim Start per Deep-Link (?ort/?event/?q, z. B. Kalender-/Teilen-Links, SEO-Seiten) KEINE
+  // Auto-Tour: der Besucher will genau EIN Ding sehen. Merker wird bewusst NICHT gesetzt,
+  // damit die Tour beim nächsten normalen Besuch regulär einmal kommt. (Nutzer-Report 2026-08-31)
+  var _bootHadDeepLink = /[?&](ort|event|q)=/.test((typeof location !== 'undefined' && location.search) || '');
   function maybeShowWelcomeTour(){
+    if(_bootHadDeepLink) return;
     try{ if(localStorage.getItem('buscar_tour_done_v2')==='1') return; }catch(e){}
     if(document.querySelector('.ct-root')) return;
     var sp=document.getElementById('splash'); if(sp && !sp.classList.contains('hidden')) return;
