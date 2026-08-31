@@ -34,7 +34,7 @@
   <meta name="apple-touch-fullscreen" content="yes">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=356">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=357">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <title>Buscar – Der Guide für Paraguay</title>
   <meta name="description" content="Buscar ist der Guide für Paraguay: Geschäfte, Dienstleistungen, Restaurants, Ärzte, Behörden und Events – für Auswanderer und Einheimische. Finde geprüfte Orte in Asunción, Encarnación, Ciudad del Este und ganz Paraguay.">
@@ -52,17 +52,17 @@
   <meta name="twitter:title" content="Buscar – Der Guide für Paraguay">
   <meta name="twitter:description" content="Der Guide für Paraguay: geprüfte Orte, Dienstleistungen und Events – für Auswanderer und Einheimische.">
   <meta name="twitter:image" content="https://escapedeutschland.github.io/buscar-app/og-default.jpg">
-  <link rel="preload" href="styles.css?v=356" as="style">
-  <link rel="preload" href="app.js?v=356" as="script">
+  <link rel="preload" href="styles.css?v=357" as="style">
+  <link rel="preload" href="app.js?v=357" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" integrity="sha384-MinO0mNliZ3vwppuPOUnGa+iq619pfMhLVUXfC4LHwSCvF9H+6P/KO4Q7qBOYV5V" crossorigin="anonymous">
-  <link href="styles.css?v=356" rel="stylesheet">
+  <link href="styles.css?v=357" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" integrity="sha384-SYKAG6cglRMN0RVvhNeBY0r3FYKNOJtznwA0v7B5Vp9tr31xAHsZC0DqkQ/pZDmj" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" integrity="sha384-yuGdyIzzYtOBlBG6JOWn+Ey9kpq7HocusNuxEGyyohr1eEyXpeEyehIIXC/hznw4" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" integrity="sha384-nwX2Qpkhc2sv6L0ZPkLefLGguao67toSowvePuQvGF6cG+8MUphGI2uI94Ls3JF7" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" integrity="sha384-lI+CxEx/bCvWP1b0OK13j5HTrTZP7yf1xle8TVOFq2smz6KC1RChTarRV/RHP5PP" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js" integrity="sha384-oze9siCpFoiDBZ37lLp99ZmOMO+je1s/xtvwtbNv3NXQXLpbpfPSzZSpbT3xV9da" crossorigin="anonymous"></script>
-  <script defer src="app.js?v=356"></script>
+  <script defer src="app.js?v=357"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -133,8 +133,8 @@
       <nav class="bottom-nav">
       <div class="nav-item active" id="navHome" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span data-i18n="nav_home">Home</span></div>
       <div class="nav-item" id="navMap" onclick="setNav('navMap');showScreen('screenMap')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span data-i18n="nav_map">Karte</span></div>
+      <div class="nav-item nav-create" id="navForm" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span data-i18n="nav_entry">Eintrag</span></div>
       <div class="nav-item" id="navEvents" onclick="setNav('navEvents');showScreen('screenEvents');requestAnimationFrame(function(){loadEvents();})"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span data-i18n="nav_events">Events</span></div>
-      <div class="nav-item" id="navForm" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span data-i18n="nav_entry">Eintrag</span></div>
       <div class="nav-item" id="navProfil" onclick="setNav('navProfil');showScreen('screenProfil')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span data-i18n="nav_profile">Profil</span></div>
     </nav>
     </div>
@@ -434,8 +434,8 @@
     <nav class="bottom-nav">
       <div class="nav-item active" id="navHome" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span data-i18n="nav_home">Home</span></div>
       <div class="nav-item" id="navMap" onclick="setNav('navMap');showScreen('screenMap')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span data-i18n="nav_map">Karte</span></div>
+      <div class="nav-item nav-create" id="navForm" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span data-i18n="nav_entry">Eintrag</span></div>
       <div class="nav-item" id="navEvents" onclick="setNav('navEvents');showScreen('screenEvents');requestAnimationFrame(function(){loadEvents();})"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span data-i18n="nav_events">Events</span></div>
-      <div class="nav-item" id="navForm" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span data-i18n="nav_entry">Eintrag</span></div>
       <div class="nav-item" id="navProfil" onclick="setNav('navProfil');showScreen('screenProfil')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span data-i18n="nav_profile">Profil</span></div>
     </nav>
   </div>
@@ -603,8 +603,8 @@
     <nav class="bottom-nav">
       <div class="nav-item" id="navHome2" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
       <div class="nav-item active" id="navMap2" onclick="setNav('navMap');showScreen('screenMap')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span>Karte</span></div>
+      <div class="nav-item nav-create" id="navForm2" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Eintrag</span></div>
       <div class="nav-item" id="navEvents2" onclick="setNav('navEvents');showScreen('screenEvents');requestAnimationFrame(function(){loadEvents();})"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span data-i18n="nav_events">Events</span></div>
-      <div class="nav-item" id="navForm2" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Eintrag</span></div>
       <div class="nav-item" id="navProfil2" onclick="setNav('navProfil');showScreen('screenProfil')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profil</span></div>
     </nav>
   </div>
@@ -1038,8 +1038,8 @@
     <nav class="bottom-nav">
       <div class="nav-item" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
       <div class="nav-item" onclick="setNav('navMap');showScreen('screenMap')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span>Karte</span></div>
+      <div class="nav-item nav-create" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Eintrag</span></div>
       <div class="nav-item" onclick="setNav('navEvents');showScreen('screenEvents');requestAnimationFrame(function(){loadEvents();})"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span data-i18n="nav_events">Events</span></div>
-      <div class="nav-item" onclick="setNav('navForm');showScreen('screenForm')"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Eintrag</span></div>
       <div class="nav-item active"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profil</span></div>
     </nav>
   </div>
