@@ -603,10 +603,6 @@
     .nav-item span { font-size: 10px; font-weight: 600; color: var(--text-3); transition: color 0.08s; letter-spacing: 0.2px; }
     .nav-item.active svg { stroke: var(--yellow); }
     .nav-item.active span { color: var(--yellow); }
-    /* Erstellen-Button mittig als erhabener Orange-Kreis (IG/TikTok-Muster, v357) */
-    .nav-create span { display: none; }
-    .nav-create svg { width: 42px; height: 42px; padding: 10px; box-sizing: border-box; background: var(--yellow); stroke: #fff; border-radius: 50%; box-shadow: 0 3px 10px rgba(245,166,35,0.35); }
-    .nav-create.active svg { stroke: #fff; background: var(--yellow-dark); }
   
     /* ── EVENTS ─────────────────────────────────────────────────────────── */
     .event-filter-bar { display:flex; gap:8px; padding:10px 16px 6px; overflow-x:auto; scrollbar-width:none; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; }
