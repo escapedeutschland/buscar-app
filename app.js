@@ -23,6 +23,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       adm_all_entries: 'Alle Einträge', adm_review: 'Einträge prüfen', adm_all_checked: 'Alles geprüft!', adm_none_open: 'Keine offenen Einträge.', adm_similar: '⚠️ Ähnliche Einträge gefunden – bitte prüfen:',
       err_generic: 'Fehler.', err_prefix: 'Fehler: ',
       report_detail_ph: 'Kurz beschreiben, was nicht stimmt (optional)',
+      report_title_listing: 'Eintrag melden', report_forum_title: 'Inhalt melden',
+      report_opt_spam: '🚫 Spam oder Werbung', report_opt_offensive: '⚠️ Beleidigend oder unangemessen',
+      report_opt_false: '❗ Falsche oder irreführende Info', report_opt_other: '💬 Sonstiges',
+      report_block_user: '⛔ Nutzer blockieren', fc_report: 'Melden',
+      block_confirm: 'Diesen Nutzer blockieren? Du siehst seine Beiträge dann nicht mehr.',
+      block_done: '✅ Nutzer blockiert.', unblock_done: '✅ Blockierung aufgehoben.',
+      blocked_users_title: 'Blockierte Nutzer', blocked_none: 'Keine blockierten Nutzer.', unblock_btn: 'Entsperren',
       link_copied: '🔗 Link kopiert',
       share_cta: 'Entdeckt auf Buscar – dem Guide für Paraguay. Lade dir die App auch herunter! 👇',
       tags_title: 'Merkmale & Tags',
@@ -289,6 +296,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       adm_all_entries: 'Todas las entradas', adm_review: 'Revisar entradas', adm_all_checked: '¡Todo revisado!', adm_none_open: 'No hay entradas pendientes.', adm_similar: '⚠️ Se encontraron entradas similares — por favor revisa:',
       err_generic: 'Error.', err_prefix: 'Error: ',
       report_detail_ph: 'Describe brevemente qué pasa (opcional)',
+      report_title_listing: 'Reportar entrada', report_forum_title: 'Reportar contenido',
+      report_opt_spam: '🚫 Spam o publicidad', report_opt_offensive: '⚠️ Ofensivo o inapropiado',
+      report_opt_false: '❗ Información falsa o engañosa', report_opt_other: '💬 Otro',
+      report_block_user: '⛔ Bloquear usuario', fc_report: 'Reportar',
+      block_confirm: '¿Bloquear a este usuario? Ya no verás sus publicaciones.',
+      block_done: '✅ Usuario bloqueado.', unblock_done: '✅ Bloqueo eliminado.',
+      blocked_users_title: 'Usuarios bloqueados', blocked_none: 'No hay usuarios bloqueados.', unblock_btn: 'Desbloquear',
       link_copied: '🔗 Enlace copiado',
       share_cta: 'Descubierto en Buscar – la guía para Paraguay. ¡Descargate la app también! 👇',
       tags_title: 'Características y etiquetas',
@@ -555,6 +569,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       adm_all_entries: 'All entries', adm_review: 'Review entries', adm_all_checked: 'All checked!', adm_none_open: 'No pending entries.', adm_similar: '⚠️ Similar entries found – please check:',
       err_generic: 'Error.', err_prefix: 'Error: ',
       report_detail_ph: 'Briefly describe what\'s wrong (optional)',
+      report_title_listing: 'Report listing', report_forum_title: 'Report content',
+      report_opt_spam: '🚫 Spam or advertising', report_opt_offensive: '⚠️ Offensive or inappropriate',
+      report_opt_false: '❗ False or misleading info', report_opt_other: '💬 Other',
+      report_block_user: '⛔ Block user', fc_report: 'Report',
+      block_confirm: 'Block this user? You will no longer see their posts.',
+      block_done: '✅ User blocked.', unblock_done: '✅ Unblocked.',
+      blocked_users_title: 'Blocked users', blocked_none: 'No blocked users.', unblock_btn: 'Unblock',
       link_copied: '🔗 Link copied',
       share_cta: 'Discovered on Buscar – the guide for Paraguay. Download the app too! 👇',
       tags_title: 'Features & tags',
@@ -3252,7 +3273,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           const data = userDoc.data();
           displayName = data.username || data.name || displayName;
           avatarUrl = data.avatar_url || null;
-        }
+          _blockedUsers = Array.isArray(data.blocked_users) ? data.blocked_users : [];
+        } else { _blockedUsers = []; }
       } catch(e) {}
       const initial = displayName.charAt(0).toUpperCase();
       setAvatarDisplay(avatarUrl, initial);
@@ -3272,6 +3294,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       setTimeout(maybeShowRatePrompt, 2600);
     } else {
       // Gäste-Modus: ohne Konto nutzbar (nur Lesen). Aktionen (posten, favorisieren, fragen …) fordern Login an.
+      _blockedUsers = [];
+      var _blb=document.getElementById('blockedListBody'); if(_blb) _blb.style.display='none';
       var pn=document.getElementById('profilName'); if(pn) pn.textContent=t('guest_name');
       var pe=document.getElementById('profilEmail'); if(pe) pe.textContent='';
       try { setAvatarDisplay(null, GUEST_AVATAR_SVG); } catch(e){}
@@ -5254,6 +5278,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if(!_qLoaded.length){ list.innerHTML = (_qBoardMode==='mine') ? _qEmpty(t('fc_no_my_questions'), t('fc_empty_sub')) : _qEmpty(t('fc_empty_title'), t('fc_empty_sub')); return; }
     var s=norm(_qSearch||'');
     var filtered=_qLoaded.filter(function(q){
+      if(_isBlocked(q.created_by)) return false; // blockierte Nutzer ausblenden
       if(_qCat!=='Alle' && (q.category_id||'')!==_qCat) return false;
       if(s && norm(q.text||'').indexOf(s)<0) return false;
       return true;
@@ -5593,7 +5618,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     // „Bearbeiten" nur für den Autor der Antwort (Rules erlauben author-update)
     var edit = (currentUser && a.created_by && a.created_by === currentUser.uid)
       ? '<button class="ans-reply-btn" onclick="event.stopPropagation();openEditAnswer(\''+a.id+'\')">'+esc(t('fc_edit'))+'</button>' : '';
-    return '<div class="ans-foot">'+best+reply+edit+like+'</div>';
+    // „Melden" für fremde Inhalte (Gäste werden zum Login geführt)
+    var rep = (!currentUser || !a.created_by || a.created_by !== currentUser.uid)
+      ? '<button class="ans-reply-btn" onclick="event.stopPropagation();reportAnswer(\''+a.id+'\')">'+esc(t('fc_report'))+'</button>' : '';
+    return '<div class="ans-foot">'+best+reply+edit+rep+like+'</div>';
   }
   // Rendert eine einzelne Antwortkarte (Top-Level oder Reply)
   function _renderAnswerCard(a, bestId, isAsker, isReply){
@@ -5634,6 +5662,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       var snap = await db.collection('answers').where('question_id','==',qid).get();
       var items = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      items = items.filter(function(a){ return !_isBlocked(a.created_by); }); // blockierte Nutzer ausblenden
       var bestId = _currentQuestion && _currentQuestion.best_answer_id;
       var isAsker = !!(currentUser && _currentQuestion && _currentQuestion.created_by === currentUser.uid);
       _lastAnswers = items;
@@ -7351,6 +7380,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var pil=document.getElementById('profilImpressumLabel'); if(pil) pil.textContent=L('Impressum','Aviso Legal','Legal Notice');
     var pdl=document.getElementById('profilDatenschutzLabel'); if(pdl) pdl.textContent=L('Datenschutz','Privacidad','Privacy');
     var pal=document.getElementById('profilAgbLabel'); if(pal) pal.textContent=L('Nutzungsbedingungen','Términos de Uso','Terms of Use');
+    var pbl=document.getElementById('profilBlockedLabel'); if(pbl) pbl.textContent=L('Blockierte Nutzer','Usuarios bloqueados','Blocked users');
     var el = function(id){return document.getElementById(id);};
     if(el('impressumTitle')) el('impressumTitle').textContent = L('Impressum','Aviso Legal','Legal Notice');
     if(el('impressumBody')) el('impressumBody').innerHTML = L(
@@ -7364,9 +7394,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Privacy Policy</p><p><strong>Controller:</strong><br>Maxime Christalle, San Bernardino, Paraguay, maximechristalle@gmail.com</p><br><p><strong>Data we collect:</strong><br>Email, username, profile photo and content you create (listings, questions, answers). Your username and posts are publicly visible in the app. No sharing with third parties without your consent.</p><br><p><strong>Notifications (optional):</strong><br>If you enable push notifications, we store a device token to send you alerts (e.g. answers to your questions, events near you). Delivery is handled via Firebase Cloud Messaging (Google). You can turn notifications off anytime in your profile.</p><br><p><strong>Location (optional):</strong><br>Only if you enable "Events near me" do we process your approximate location (rounded to ~11 km) to notify you of nearby events. No background tracking; can be disabled anytime.</p><br><p><strong>Firebase (Google):</strong><br>We use Firebase for operation, login, storage and notifications: <a href="https://firebase.google.com/support/privacy" target="_blank" style="color:var(--yellow)">firebase.google.com/support/privacy</a></p><br><p><strong>Your rights:</strong><br>Access, correction and deletion of your data – email maximechristalle@gmail.com.</p><br><p style="color:var(--text-3);font-size:12px">Last updated: August 2026</p>');
     if(el('agbTitle')) el('agbTitle').textContent = L('Nutzungsbedingungen','Términos de Uso','Terms of Use');
     if(el('agbBody')) el('agbBody').innerHTML = L(
-      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Nutzungsbedingungen</p><p><strong>1. Geltungsbereich</strong><br>Diese Nutzungsbedingungen gelten für die Verwendung der App Buscar, erreichbar unter escapedeutschland.github.io/buscar-app. Mit der Nutzung der App erklärt sich der Nutzer mit diesen Bedingungen einverstanden.</p><br><p><strong>2. Nutzung der App</strong><br>Buscar ist ein kostenloses Informationsverzeichnis für Menschen in Paraguay (Auswanderer und Einheimische) und ist auf Deutsch, Spanisch und Englisch verfügbar. Die Nutzung ist für alle registrierten Nutzer kostenlos. Jeder Nutzer verpflichtet sich, keine falschen, irreführenden, beleidigenden oder rechtswidrigen Inhalte einzustellen.</p><br><p><strong>3. Einträge und Inhalte</strong><br>Jeder registrierte Nutzer kann Einträge erstellen, Fotos hochladen sowie Fragen und Antworten in der Community verfassen. Community-Beiträge und der Benutzername sind öffentlich sichtbar. Der Betreiber behält sich vor, Einträge, Fotos oder Kommentare ohne Angabe von Gründen zu entfernen. Spam, unerwünschte Werbung und missbräuchliche Nutzung sind nicht gestattet.</p><br><p><strong>4. Verantwortung der Nutzer</strong><br>Jeder Nutzer ist für die von ihm erstellten Inhalte selbst verantwortlich. Es dürfen keine Bilder von Personen ohne deren Einwilligung hochgeladen werden. Urheberrechtlich geschütztes Material darf nicht ohne Erlaubnis verwendet werden.</p><br><p><strong>5. Haftungsausschluss</strong><br>Buscar übernimmt keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der gelisteten Einträge. Die Nutzung erfolgt auf eigene Verantwortung des Nutzers.</p><br><p><strong>6. Datenschutz</strong><br>Die Verarbeitung personenbezogener Daten erfolgt gemäß unserer Datenschutzerklärung, die in der App einsehbar ist.</p><br><p><strong>7. Änderungen</strong><br>Der Betreiber behält sich vor, diese Nutzungsbedingungen jederzeit zu ändern. Die jeweils aktuelle Version ist in der App einsehbar.</p>',
-      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Términos de Uso</p><p><strong>1. Ámbito de aplicación</strong><br>Estos términos de uso aplican al uso de la aplicación Buscar, disponible en escapedeutschland.github.io/buscar-app. Al usar la app, el usuario acepta estos términos.</p><br><p><strong>2. Uso de la aplicación</strong><br>Buscar es un directorio de información gratuito para personas en Paraguay (migrantes y locales), disponible en alemán, español e inglés. El uso es gratuito para todos los usuarios registrados. Cada usuario se compromete a no publicar contenido falso, engañoso, ofensivo o ilegal.</p><br><p><strong>3. Entradas y contenido</strong><br>Cualquier usuario registrado puede crear entradas, subir fotos y publicar preguntas y respuestas en la comunidad. Las publicaciones de la comunidad y el nombre de usuario son visibles públicamente. El administrador se reserva el derecho de eliminar entradas, fotos o comentarios sin justificación. No se permite el spam, publicidad no solicitada ni el uso abusivo.</p><br><p><strong>4. Responsabilidad del usuario</strong><br>Cada usuario es responsable del contenido que publica. No se deben subir imágenes de personas sin su consentimiento. No se puede utilizar material protegido por derechos de autor sin autorización.</p><br><p><strong>5. Limitación de responsabilidad</strong><br>Buscar no garantiza la exactitud, integridad ni actualidad de las entradas listadas. El uso es bajo la propia responsabilidad del usuario.</p><br><p><strong>6. Privacidad</strong><br>El tratamiento de datos personales se realiza conforme a nuestra política de privacidad, disponible en la aplicación.</p><br><p><strong>7. Modificaciones</strong><br>El administrador se reserva el derecho de modificar estos términos en cualquier momento. La versión actualizada estará siempre disponible en la aplicación.</p>',
-      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Terms of Use</p><p><strong>1. Scope</strong><br>These terms of use apply to the use of the Buscar app, available at escapedeutschland.github.io/buscar-app. By using the app, the user agrees to these terms.</p><br><p><strong>2. Use of the app</strong><br>Buscar is a free information directory for people living in Paraguay. Use is free for all registered users. Each user agrees not to post false, misleading, offensive or unlawful content.</p><br><p><strong>3. Listings and content</strong><br>Any registered user can create listings, upload photos and post questions and answers in the community. Community posts and the username are publicly visible. The operator reserves the right to remove listings, photos or comments without stating reasons. Spam, unsolicited advertising and abuse are not permitted.</p><br><p><strong>4. User responsibility</strong><br>Each user is responsible for the content they create. Images of people may not be uploaded without their consent. Copyrighted material may not be used without permission.</p><br><p><strong>5. Disclaimer</strong><br>Buscar makes no warranty as to the accuracy, completeness or timeliness of the listed entries. Use is at the user\'s own risk.</p><br><p><strong>6. Privacy</strong><br>Personal data is processed in accordance with our privacy policy, available in the app.</p><br><p><strong>7. Changes</strong><br>The operator reserves the right to change these terms at any time. The current version is always available in the app.</p>');
+      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Nutzungsbedingungen</p><p><strong>1. Geltungsbereich</strong><br>Diese Nutzungsbedingungen gelten für die Verwendung der App Buscar, erreichbar unter escapedeutschland.github.io/buscar-app. Mit der Nutzung der App erklärt sich der Nutzer mit diesen Bedingungen einverstanden.</p><br><p><strong>2. Nutzung der App</strong><br>Buscar ist ein kostenloses Informationsverzeichnis für Menschen in Paraguay (Auswanderer und Einheimische) und ist auf Deutsch, Spanisch und Englisch verfügbar. Die Nutzung ist für alle registrierten Nutzer kostenlos. Jeder Nutzer verpflichtet sich, keine falschen, irreführenden, beleidigenden oder rechtswidrigen Inhalte einzustellen.</p><br><p><strong>3. Einträge und Inhalte</strong><br>Jeder registrierte Nutzer kann Einträge erstellen, Fotos hochladen sowie Fragen und Antworten in der Community verfassen. Community-Beiträge und der Benutzername sind öffentlich sichtbar. Der Betreiber behält sich vor, Einträge, Fotos oder Kommentare ohne Angabe von Gründen zu entfernen. Spam, unerwünschte Werbung und missbräuchliche Nutzung sind nicht gestattet.</p><br><p><strong>4. Verantwortung der Nutzer</strong><br>Jeder Nutzer ist für die von ihm erstellten Inhalte selbst verantwortlich. Es dürfen keine Bilder von Personen ohne deren Einwilligung hochgeladen werden. Urheberrechtlich geschütztes Material darf nicht ohne Erlaubnis verwendet werden.</p><br><p><strong>5. Haftungsausschluss</strong><br>Buscar übernimmt keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der gelisteten Einträge. Die Nutzung erfolgt auf eigene Verantwortung des Nutzers.</p><br><p><strong>6. Datenschutz</strong><br>Die Verarbeitung personenbezogener Daten erfolgt gemäß unserer Datenschutzerklärung, die in der App einsehbar ist.</p><br><p><strong>7. Änderungen</strong><br>Der Betreiber behält sich vor, diese Nutzungsbedingungen jederzeit zu ändern. Die jeweils aktuelle Version ist in der App einsehbar.</p><br><p><strong>8. Anwendbares Recht und Gerichtsstand</strong><br>Es gilt das Recht der Republik Paraguay. Gerichtsstand ist, soweit gesetzlich zulässig, Paraguay. Zwingende verbraucherschützende Vorschriften des Landes, in dem der Nutzer seinen gewöhnlichen Aufenthalt hat, bleiben unberührt.</p>',
+      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Términos de Uso</p><p><strong>1. Ámbito de aplicación</strong><br>Estos términos de uso aplican al uso de la aplicación Buscar, disponible en escapedeutschland.github.io/buscar-app. Al usar la app, el usuario acepta estos términos.</p><br><p><strong>2. Uso de la aplicación</strong><br>Buscar es un directorio de información gratuito para personas en Paraguay (migrantes y locales), disponible en alemán, español e inglés. El uso es gratuito para todos los usuarios registrados. Cada usuario se compromete a no publicar contenido falso, engañoso, ofensivo o ilegal.</p><br><p><strong>3. Entradas y contenido</strong><br>Cualquier usuario registrado puede crear entradas, subir fotos y publicar preguntas y respuestas en la comunidad. Las publicaciones de la comunidad y el nombre de usuario son visibles públicamente. El administrador se reserva el derecho de eliminar entradas, fotos o comentarios sin justificación. No se permite el spam, publicidad no solicitada ni el uso abusivo.</p><br><p><strong>4. Responsabilidad del usuario</strong><br>Cada usuario es responsable del contenido que publica. No se deben subir imágenes de personas sin su consentimiento. No se puede utilizar material protegido por derechos de autor sin autorización.</p><br><p><strong>5. Limitación de responsabilidad</strong><br>Buscar no garantiza la exactitud, integridad ni actualidad de las entradas listadas. El uso es bajo la propia responsabilidad del usuario.</p><br><p><strong>6. Privacidad</strong><br>El tratamiento de datos personales se realiza conforme a nuestra política de privacidad, disponible en la aplicación.</p><br><p><strong>7. Modificaciones</strong><br>El administrador se reserva el derecho de modificar estos términos en cualquier momento. La versión actualizada estará siempre disponible en la aplicación.</p><br><p><strong>8. Legislación aplicable y jurisdicción</strong><br>Se aplica el derecho de la República del Paraguay. La jurisdicción competente es, en la medida en que la ley lo permita, Paraguay. Quedan a salvo las normas imperativas de protección al consumidor del país de residencia habitual del usuario.</p>',
+      '<p style="font-weight:700;color:var(--text-1);font-size:16px;margin-bottom:12px">Terms of Use</p><p><strong>1. Scope</strong><br>These terms of use apply to the use of the Buscar app, available at escapedeutschland.github.io/buscar-app. By using the app, the user agrees to these terms.</p><br><p><strong>2. Use of the app</strong><br>Buscar is a free information directory for people living in Paraguay. Use is free for all registered users. Each user agrees not to post false, misleading, offensive or unlawful content.</p><br><p><strong>3. Listings and content</strong><br>Any registered user can create listings, upload photos and post questions and answers in the community. Community posts and the username are publicly visible. The operator reserves the right to remove listings, photos or comments without stating reasons. Spam, unsolicited advertising and abuse are not permitted.</p><br><p><strong>4. User responsibility</strong><br>Each user is responsible for the content they create. Images of people may not be uploaded without their consent. Copyrighted material may not be used without permission.</p><br><p><strong>5. Disclaimer</strong><br>Buscar makes no warranty as to the accuracy, completeness or timeliness of the listed entries. Use is at the user\'s own risk.</p><br><p><strong>6. Privacy</strong><br>Personal data is processed in accordance with our privacy policy, available in the app.</p><br><p><strong>7. Changes</strong><br>The operator reserves the right to change these terms at any time. The current version is always available in the app.</p><br><p><strong>8. Governing law and jurisdiction</strong><br>The law of the Republic of Paraguay applies. The place of jurisdiction is, to the extent legally permissible, Paraguay. Mandatory consumer protection provisions of the country in which the user habitually resides remain unaffected.</p>');
   }
 
   function isOpen(hours) {
@@ -8744,27 +8774,121 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch(e) {}
   }
 
+  // Melde-Ziel: Eintrag (Standard) oder Forum-Inhalt (Frage/Antwort).
+  // Forum-Meldungen + Nutzer-Blockieren sind Pflicht nach der Google-Play-UGC-Richtlinie.
+  var _reportTarget = null;
   function openReport() {
+    _reportTarget = { type: 'listing', id: currentListingId };
+    _showReportSheet();
+  }
+  function reportQuestion() {
+    if (!currentUser) { setNav('navProfil'); showScreen('screenAuth'); return; }
+    var q = _currentQuestion; if (!q) return;
+    _reportTarget = { type: 'question', id: q.id, author_uid: q.created_by || '', author_name: q.author_name || '' };
+    _showReportSheet();
+  }
+  function reportAnswer(aid) {
+    if (!currentUser) { setNav('navProfil'); showScreen('screenAuth'); return; }
+    var a = _lastAnswers.find(function(x){ return x.id === aid; }); if (!a) return;
+    _reportTarget = { type: 'answer', id: aid, question_id: (_currentQuestion && _currentQuestion.id) || '',
+                      author_uid: a.created_by || '', author_name: a.author_name || '' };
+    _showReportSheet();
+  }
+  function _showReportSheet() {
+    var isForum = _reportTarget && _reportTarget.type !== 'listing';
+    var tl = document.getElementById('reportTitle');
+    if (tl) tl.textContent = isForum ? t('report_forum_title') : t('report_title_listing');
+    var ol = document.getElementById('reportOptionsListing'); if (ol) ol.style.display = isForum ? 'none' : '';
+    var of = document.getElementById('reportOptionsForum'); if (of) of.style.display = isForum ? '' : 'none';
+    var bb = document.getElementById('reportBlockBtn');
+    if (bb) {
+      var canBlock = isForum && currentUser && _reportTarget.author_uid && _reportTarget.author_uid !== currentUser.uid;
+      bb.style.display = canBlock ? '' : 'none';
+    }
     var _rd = document.getElementById('reportDetail'); if (_rd) _rd.value = '';
     document.getElementById('reportOverlay').classList.add('visible');
   }
   function closeReport() {
     document.getElementById('reportOverlay').classList.remove('visible');
     var _rd = document.getElementById('reportDetail'); if (_rd) _rd.value = '';
+    _reportTarget = null;
   }
 
   async function submitReport(reason) {
-    if (!currentUser || !currentListingId) { closeReport(); return; }
+    var tgt = _reportTarget || { type: 'listing', id: currentListingId };
+    if (!currentUser || !tgt.id) { closeReport(); return; }
     var _rd = document.getElementById('reportDetail');
     var detail = _rd ? _rd.value.trim().slice(0, 500) : '';
+    var data = { target_type: tgt.type, user_id: currentUser.uid,
+                 reason: reason, detail: detail, status: 'pending', created_at: new Date() };
+    if (tgt.type === 'listing') { data.listing_id = tgt.id; }
+    else {
+      data.target_id = tgt.id;
+      if (tgt.question_id) data.question_id = tgt.question_id;
+      if (tgt.author_uid) data.author_uid = tgt.author_uid;
+    }
     try {
-      await db.collection('reports').add({
-        listing_id: currentListingId, user_id: currentUser.uid,
-        reason: reason, detail: detail, status: 'pending', created_at: new Date()
-      });
+      await db.collection('reports').add(data);
       closeReport();
       showToast(t('toast_report_sent'));
     } catch(e) { showToast(t('err_generic')); closeReport(); }
+  }
+
+  // ⛔ Nutzer blockieren: Liste [{uid,name}] am eigenen users-Doc (Rules: Owner-Update erlaubt).
+  // Blockierte Inhalte werden clientseitig aus Pinnwand + Antworten gefiltert.
+  var _blockedUsers = [];
+  function _isBlocked(uid) {
+    if (!uid) return false;
+    for (var i = 0; i < _blockedUsers.length; i++) { if (_blockedUsers[i].uid === uid) return true; }
+    return false;
+  }
+  async function blockReportedUser() {
+    var tgt = _reportTarget;
+    if (!currentUser || !tgt || !tgt.author_uid) { closeReport(); return; }
+    if (!confirm(t('block_confirm'))) return;
+    if (!_isBlocked(tgt.author_uid)) _blockedUsers.push({ uid: tgt.author_uid, name: tgt.author_name || '' });
+    try {
+      await db.collection('users').doc(currentUser.uid).set({ blocked_users: _blockedUsers }, { merge: true });
+      closeReport();
+      showToast(t('block_done'));
+      try { renderQuestionList(); } catch(e) {}
+      try { renderBlockedList(); } catch(e) {}
+      if (tgt.type === 'question' && _currentQuestion && _currentQuestion.created_by === tgt.author_uid) {
+        // Die gemeldete Frage stammt vom Blockierten -> zurück zur Pinnwand
+        showScreen('screenQuestions'); loadQuestions();
+      } else if (_currentQuestion) {
+        try { loadAnswers(_currentQuestion.id); } catch(e) {}
+      }
+    } catch(e) { showToast(t('err_generic')); }
+  }
+  async function unblockUser(uid) {
+    if (!currentUser) return;
+    _blockedUsers = _blockedUsers.filter(function(b){ return b.uid !== uid; });
+    try {
+      await db.collection('users').doc(currentUser.uid).set({ blocked_users: _blockedUsers }, { merge: true });
+      showToast(t('unblock_done'));
+      renderBlockedList();
+      try { renderQuestionList(); } catch(e) {}
+    } catch(e) { showToast(t('err_generic')); }
+  }
+  function toggleBlockedList() {
+    var c = document.getElementById('blockedListBody'); if (!c) return;
+    var open = c.style.display !== 'none';
+    c.style.display = open ? 'none' : 'block';
+    if (!open) renderBlockedList();
+  }
+  function renderBlockedList() {
+    var c = document.getElementById('blockedListBody'); if (!c) return;
+    if (!_blockedUsers.length) {
+      c.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:4px 0 8px">' + esc(t('blocked_none')) + '</div>';
+      return;
+    }
+    c.innerHTML = _blockedUsers.map(function(b){
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)">'
+        + '<span style="font-size:14px;font-weight:600;color:var(--text-1)">' + esc(b.name || t('guest_name')) + '</span>'
+        + '<button onclick="unblockUser(\'' + b.uid + '\')" style="background:var(--surface-2);border:none;border-radius:10px;padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--text-2);cursor:pointer">' + esc(t('unblock_btn')) + '</button>'
+        + '</div>';
+    }).join('');
   }
 
   // Service Worker registrieren fuer Offline-Funktionalitaet
