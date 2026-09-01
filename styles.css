@@ -801,8 +801,11 @@
 .create-pop-item svg { width:19px; height:19px; stroke:var(--yellow); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
 .create-pop-t { font-size:13.5px; font-weight:700; color:var(--text-1); line-height:1.25; }
 .create-pop-s { font-size:10.5px; color:var(--text-3); margin-top:1px; line-height:1.3; }
-/* ⋮-Menü im Fragen-Detail: gleiches Popover, aber oben rechts unter dem Button verankert (top setzt JS) */
-.create-pop.qd-menu-pop { left:auto; right:14px; bottom:auto; transform:none; transform-origin:85% 0; min-width:190px; }
+/* ⋮-Menü im Fragen-Detail: gleiches Popover, aber oben rechts unter dem Button verankert (top setzt JS).
+   Eigene Keyframes OHNE translateX(-50%) — die createPop-Animation würde das Menü sonst
+   während des Einblendens nach links versetzen und am Ende zurückspringen lassen. */
+.create-pop.qd-menu-pop { left:auto; right:14px; bottom:auto; transform:none; transform-origin:85% 0; min-width:190px; animation:qdMenuPop 0.16s ease-out; }
+@keyframes qdMenuPop { from { opacity:0; transform:translateY(-6px) scale(0.94); } to { opacity:1; transform:translateY(0) scale(1); } }
 .browser-mode .create-pop.qd-menu-pop { bottom:auto; }
 .create-pop.qd-menu-pop::after { bottom:auto; top:-6px; left:auto; right:15px; transform:rotate(225deg); }
 /* Kennzeichnung maschinell übersetzter Nutzer-Texte (gesetzt von translateVisibleContent) */
