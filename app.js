@@ -1637,7 +1637,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     else if(kind==='question'){ openAskQuestion(); }
   }
   function _closeAnyOverlay(){
-    var sheets = ['createSheetOverlay','filterSheetOverlay','citySheetOverlay','mapCitySheetOverlay','mapFilterSheetOverlay','reportOverlay','photoLightbox','tagSuggestOverlay','askQuestionOverlay','answerPickOverlay'];
+    var sheets = ['createSheetOverlay','qdMenuOverlay','filterSheetOverlay','citySheetOverlay','mapCitySheetOverlay','mapFilterSheetOverlay','reportOverlay','photoLightbox','tagSuggestOverlay','askQuestionOverlay','answerPickOverlay'];
     for (var i=0;i<sheets.length;i++){
       var el = document.getElementById(sheets[i]);
       if (el && el.classList.contains('visible')){ el.classList.remove('visible'); return true; }
@@ -5528,18 +5528,32 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       mr.innerHTML = (cl?'<span class="qd-cat-chip">'+esc(cl)+'</span>':'') + cityChip + authorHtml;
       mr.style.display=(cl||cityChip||authorHtml)?'block':'none';
     }
-    var delBtn=document.getElementById('qdDeleteBtn');
-    if(delBtn){ var canDel = currentUser && (currentUser.email===ADMIN_EMAIL || (q.created_by && q.created_by===currentUser.uid)); delBtn.style.display = canDel?'inline-flex':'none'; delBtn.onclick=function(){ deleteQuestion(q.id); }; }
-    // 📌 Anpinnen: nur Admin (Rules: istAdmin() darf questions frei updaten)
-    var pinBtn=document.getElementById('qdPinBtn');
-    if(pinBtn){
-      var isAdm = currentUser && currentUser.email===ADMIN_EMAIL;
-      pinBtn.style.display = isAdm?'inline-flex':'none';
-      pinBtn.style.opacity = q.pinned ? '1' : '0.55';
-      pinBtn.title = q.pinned ? L('Anpinnen lösen','Quitar fijado','Unpin') : L('Anpinnen','Fijar','Pin');
-      pinBtn.onclick=function(){ toggleQuestionPin(); };
-    }
   }
+  // ⋮-Menü im Fragen-Detail: bündelt Teilen/Melden/Anpinnen(Admin)/Löschen(Ersteller+Admin)
+  // in einem Popover (Stil wie das Erstellen-Menü), statt einzelner Buttons in der Aktionszeile.
+  function openQdMenu(){
+    var q=_currentQuestion; if(!q) return;
+    var ov=document.getElementById('qdMenuOverlay'), pop=document.getElementById('qdMenuPop');
+    if(!ov||!pop) return;
+    var isAdm = currentUser && currentUser.email===ADMIN_EMAIL;
+    var canDel = currentUser && (isAdm || (q.created_by && q.created_by===currentUser.uid));
+    var items=[];
+    items.push('<div class="create-pop-item" onclick="closeQdMenu();shareCurrentQuestion()"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><div class="create-pop-t">'+esc(L('Teilen','Compartir','Share'))+'</div></div>');
+    items.push('<div class="create-pop-item" onclick="closeQdMenu();reportQuestion()"><svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg><div class="create-pop-t">'+esc(t('fc_report'))+'</div></div>');
+    if(isAdm) items.push('<div class="create-pop-item" onclick="closeQdMenu();toggleQuestionPin()"><svg viewBox="0 0 24 24"><path d="M12 17v5"/><path d="M9 10.76V7a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3.76a2 2 0 0 0 .59 1.42l1.7 1.7a1 1 0 0 1-.7 1.7H7.41a1 1 0 0 1-.7-1.7l1.7-1.7A2 2 0 0 0 9 10.76z"/><path d="M8 6h8"/></svg><div class="create-pop-t">'+esc(q.pinned?L('Anpinnen lösen','Quitar fijado','Unpin'):L('Anpinnen','Fijar','Pin'))+'</div></div>');
+    if(canDel) items.push('<div class="create-pop-item" onclick="closeQdMenu();deleteQuestion(\''+q.id+'\')"><svg viewBox="0 0 24 24" style="stroke:#C0392B"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><div class="create-pop-t" style="color:#C0392B">'+esc(L('Frage löschen','Eliminar pregunta','Delete question'))+'</div></div>');
+    pop.innerHTML = items.join('');
+    var btn=document.getElementById('qdMenuBtn');
+    if(btn){
+      var r=btn.getBoundingClientRect();
+      pop.style.top = Math.round(r.bottom+9)+'px';
+      // Rechte Kante des Popovers an der rechten Button-Kante ausrichten (wichtig im
+      // Browser-Modus, wo die App-Spalte zentriert ist und right:14px sonst am Fensterrand klebt)
+      pop.style.right = Math.max(8, Math.round(window.innerWidth - r.right)) + 'px';
+    }
+    ov.classList.add('visible');
+  }
+  function closeQdMenu(){ var ov=document.getElementById('qdMenuOverlay'); if(ov) ov.classList.remove('visible'); }
   async function toggleQuestionPin(){
     if(!currentUser || currentUser.email!==ADMIN_EMAIL) return;
     var q=_currentQuestion; if(!q) return;
