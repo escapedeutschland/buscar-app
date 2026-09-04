@@ -1634,7 +1634,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     closeCreateSheet();
     if(kind==='entry'){ setNav('navForm'); showScreen('screenForm'); }
     else if(kind==='event'){ showEventForm(); }
-    else if(kind==='question'){ openAskQuestion(); }
+    else if(kind==='question'){
+      // Hintergrund sofort ins Forum wechseln: das Frage-Formular liegt dann über der
+      // Pinnwand statt über dem zuvor aktiven Screen (Karte/Events/Profil/Home).
+      // Nur für Eingeloggte — Gäste schickt openAskQuestion wie bisher zum Login.
+      if(currentUser) openQuestions('all');
+      openAskQuestion();
+    }
   }
   function _closeAnyOverlay(){
     var sheets = ['createSheetOverlay','qdMenuOverlay','filterSheetOverlay','citySheetOverlay','mapCitySheetOverlay','mapFilterSheetOverlay','reportOverlay','photoLightbox','tagSuggestOverlay','askQuestionOverlay','answerPickOverlay'];
