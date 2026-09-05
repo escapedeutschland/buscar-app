@@ -6052,7 +6052,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     let f = allListings;
     if (mapCategory !== 'Alle') f = f.filter(l => l.category_id === mapCategory);
     if (mapCityFilter !== 'Alle') f = f.filter(l => norm(l.city||'') === norm(mapCityFilter));
-    if (mapSubcatFilter !== 'Alle') f = f.filter(l => norm(l.subcategory||'') === norm(mapSubcatFilter));
+    if (mapSubcatFilter !== 'Alle') {
+      if (mapCategory === 'kat-immobilien') f = f.filter(l => (l.re_type||'') === mapSubcatFilter);
+      else f = f.filter(l => norm(l.subcategory||'') === norm(mapSubcatFilter));
+    }
     if (mapMinStars > 0) f = f.filter(l => { const a = getAvgRating(l.id); return a && a >= mapMinStars; });
     if (activeDeal) f = f.filter(l => l.deal_text && l.deal_text.trim() !== '');
     return f;
@@ -6278,6 +6281,12 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     document.querySelectorAll('#mapCats .map-chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     mapCategory = chip.dataset.cat;
+    // Typ-Filter zuruecksetzen: Unterkategorien/re_type gelten je Kategorie unterschiedlich
+    if (mapSubcatFilter !== 'Alle') {
+      mapSubcatFilter = 'Alle';
+      var _sb=document.getElementById('mapFilterSubBtn'); if(_sb) _sb.classList.remove('active');
+      var _sl=document.getElementById('mapFilterSubLabel'); if(_sl) _sl.textContent = t('map_type');
+    }
     renderMap();
     if (mapMode === 'radar') { if (_radarEvents) setRadarEvents(false); else renderRadar(); }
   });
@@ -8458,6 +8467,22 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (mapMode === 'radar') renderRadar();
   }
 
+  // Immobilien-Typen liegen im Feld re_type (nicht subcategory) — für den Karten-Typ-Filter.
+  var IMMO_TYPE_KEYS = ['wohnung','haus','grundstueck','land','gewerbe'];
+  function _immoTypeLabel(k){
+    if(k==='wohnung') return L('Wohnung','Departamento','Apartment');
+    if(k==='haus') return L('Haus','Casa','House');
+    if(k==='grundstueck') return L('Grundstück','Terreno','Plot');
+    if(k==='land') return L('Land','Campo','Farmland');
+    if(k==='gewerbe') return L('Gewerbe','Comercial','Commercial');
+    return k;
+  }
+  // Label eines Typ-Werts: Immobilien -> re_type-Label, sonst normale Unterkategorie
+  function _mapTypeLabel(val){
+    if(val==='Alle') return tSubcat('Alle');
+    if(mapCategory==='kat-immobilien') return _immoTypeLabel(val);
+    return tSubcat(val);
+  }
   function openMapFilterSheet(mode) {
     mapFilterMode = mode;
     const overlay = document.getElementById('mapFilterSheetOverlay');
@@ -8465,9 +8490,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     const content = document.getElementById('mapFilterSheetContent');
     if (mode === 'sub') {
       document.getElementById('mapFilterSheetTitle').textContent = 'Unterkategorie';
-      const cats = subcats[mapCategory] || [];
+      // Immobilien: Typen aus re_type; sonst normale Unterkategorien
+      const cats = (mapCategory === 'kat-immobilien') ? ['Alle'].concat(IMMO_TYPE_KEYS) : (subcats[mapCategory] || []);
       if (!cats.length) { content.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3)">Erst Kategorie wählen</div>'; return; }
-      content.innerHTML = `<div class="filter-section"><div class="filter-chips">${cats.map(s => `<div class="filter-chip${mapSubcatFilter===s?' active':''}" onclick="selectMapFilterChip('${s}')">${tSubcat(s)}</div>`).join('')}</div></div>`;
+      content.innerHTML = `<div class="filter-section"><div class="filter-chips">${cats.map(s => `<div class="filter-chip${mapSubcatFilter===s?' active':''}" onclick="selectMapFilterChip('${s}')">${_mapTypeLabel(s)}</div>`).join('')}</div></div>`;
     } else {
       document.getElementById('mapFilterSheetTitle').textContent = 'Mindest-Bewertung';
       content.innerHTML = `<div class="filter-section"><div class="filter-section-label">Minimum Sterne</div><div class="filter-star-row">
@@ -8481,7 +8507,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   function selectMapFilterChip(val) {
     mapSubcatFilter = val;
-    document.querySelectorAll('#mapFilterSheetContent .filter-chip').forEach(c => c.classList.toggle('active', c.textContent === tSubcat(val) || c.textContent === val));
+    document.querySelectorAll('#mapFilterSheetContent .filter-chip').forEach(c => c.classList.toggle('active', c.textContent === _mapTypeLabel(val)));
   }
 
   function selectMapStarFilter(val) {
@@ -8498,7 +8524,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     closeMapFilterSheet();
     const subBtn = document.getElementById('mapFilterSubBtn');
     const starBtn = document.getElementById('mapFilterStarBtn');
-    if (mapSubcatFilter !== 'Alle') { subBtn.classList.add('active'); document.getElementById('mapFilterSubLabel').textContent = tSubcat(mapSubcatFilter); }
+    if (mapSubcatFilter !== 'Alle') { subBtn.classList.add('active'); document.getElementById('mapFilterSubLabel').textContent = _mapTypeLabel(mapSubcatFilter); }
     else { subBtn.classList.remove('active'); document.getElementById('mapFilterSubLabel').textContent = t('map_type'); }
     if (mapMinStars > 0) { starBtn.classList.add('active'); document.getElementById('mapFilterStarLabel').textContent = mapMinStars + '+ ★'; }
     else { starBtn.classList.remove('active'); document.getElementById('mapFilterStarLabel').textContent = '★'; }
