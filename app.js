@@ -1226,6 +1226,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   const firebaseConfig = { apiKey: "AIzaSyC_nxQL9Jo0EPUCtyI8QvnnRVKRBPbREKU", authDomain: "paraguay-app-8beb3.firebaseapp.com", projectId: "paraguay-app-8beb3", storageBucket: "paraguay-app-8beb3.firebasestorage.app", messagingSenderId: "966029575850", appId: "1:966029575850:web:59a41621877663bc0572d3" };
   firebase.initializeApp(firebaseConfig);
+  // App Check (reCAPTCHA Enterprise): nur die echte App darf aufs Backend zugreifen.
+  // Defensiv gekapselt — App Check darf die App NIE blockieren, falls das SDK fehlt.
+  // Muss VOR den ersten Firestore/Auth/Storage-Anfragen aktiviert werden.
+  try {
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      self.FIREBASE_APPCHECK_DEBUG_TOKEN = true; // NUR lokal: Debug-Token statt reCAPTCHA (Produktion nutzt echtes reCAPTCHA)
+    }
+    firebase.appCheck().activate(
+      new firebase.appCheck.ReCaptchaEnterpriseProvider('6Ldxr6otAAAAAPT8gc1zxckz6HCdPSxDeI5zUtbZ'),
+      true // Token automatisch erneuern
+    );
+  } catch (e) { /* App Check optional: niemals die App blockieren */ }
   const db = firebase.firestore();
   const auth = firebase.auth();
   const storage = firebase.storage();
