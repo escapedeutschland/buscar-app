@@ -5272,13 +5272,29 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
   function selectQSort(s){ _qSort=s; renderQSort(); renderQuestionList(); }
   // Sortiert die (gefilterte) Fragenliste je nach _qSort. Rein clientseitig.
+  // „Relevant"/Hot-Bewertung: Mischung aus Aktivität (Antworten > „ich suche das auch")
+  // + Aktualität + leichtem Frischebonus für noch unbeantwortete Fragen der letzten Tage.
+  // So stehen lebhafte (auch beantwortete) Threads oben UND neue offene Fragen bleiben sichtbar.
+  // Gewichte bewusst als Konstanten, damit leicht justierbar.
+  function _hotScore(q){
+    var W_ANSWER = 3;      // eine Antwort = viel echte Aktivität
+    var W_SEEKER = 1;      // „ich suche das auch" = mittleres Signal
+    var FRESH_BOOST = 2.5; // Schub für unbeantwortete Fragen …
+    var FRESH_WINDOW_H = 72; // … der letzten 3 Tage
+    // _adminTs liefert SEKUNDEN -> Now ebenfalls in Sekunden, Alter in Stunden (/3600)
+    var ageH = Math.max(0, (Date.now()/1000 - (_adminTs(q.created_at)||0)) / 3600);
+    var recency = 48 / (ageH + 12); // frisch ~4.0, nach 1 Tag ~1.3, nach 3 Tagen ~0.6
+    var engagement = (q.answers_count||0)*W_ANSWER + (q.seekers_count||0)*W_SEEKER;
+    var open = !(q.status==='answered' || (q.answers_count||0)>0);
+    var fresh = (open && ageH < FRESH_WINDOW_H) ? FRESH_BOOST : 0;
+    return engagement + recency + fresh;
+  }
   function _sortQuestions(arr){
     var ts=function(q){ return _adminTs(q.created_at)||0; };
-    var isOpen=function(q){ return !(q.status==='answered' || (q.answers_count||0)>0); };
     if(_qSort==='new'){ arr.sort(function(a,b){ return ts(b)-ts(a); }); }
     else if(_qSort==='popular'){ arr.sort(function(a,b){ var d=(b.seekers_count||0)-(a.seekers_count||0); return d!==0?d:ts(b)-ts(a); }); }
-    else { // smart: offene zuerst, innerhalb jeder Gruppe neueste zuerst
-      arr.sort(function(a,b){ var oa=isOpen(a)?1:0, ob=isOpen(b)?1:0; if(oa!==ob) return ob-oa; return ts(b)-ts(a); });
+    else { // Relevant = Hot-Score (Aktivität + Aktualität + Frischebonus), höchster zuerst
+      arr.sort(function(a,b){ var d=_hotScore(b)-_hotScore(a); return d!==0?d:ts(b)-ts(a); });
     }
     // 📌 Angepinnte Fragen kleben IMMER oben (egal welcher Sortier-Chip aktiv ist)
     var pinnedArr = arr.filter(function(q){ return !!q.pinned; });
