@@ -1226,18 +1226,24 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   const firebaseConfig = { apiKey: "AIzaSyC_nxQL9Jo0EPUCtyI8QvnnRVKRBPbREKU", authDomain: "paraguay-app-8beb3.firebaseapp.com", projectId: "paraguay-app-8beb3", storageBucket: "paraguay-app-8beb3.firebasestorage.app", messagingSenderId: "966029575850", appId: "1:966029575850:web:59a41621877663bc0572d3" };
   firebase.initializeApp(firebaseConfig);
-  // App Check (reCAPTCHA Enterprise): nur die echte App darf aufs Backend zugreifen.
-  // Defensiv gekapselt — App Check darf die App NIE blockieren, falls das SDK fehlt.
-  // Muss VOR den ersten Firestore/Auth/Storage-Anfragen aktiviert werden.
-  try {
-    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-      self.FIREBASE_APPCHECK_DEBUG_TOKEN = true; // NUR lokal: Debug-Token statt reCAPTCHA (Produktion nutzt echtes reCAPTCHA)
-    }
-    firebase.appCheck().activate(
-      new firebase.appCheck.ReCaptchaEnterpriseProvider('6Ldxr6otAAAAAPT8gc1zxckz6HCdPSxDeI5zUtbZ'),
-      true // Token automatisch erneuern
-    );
-  } catch (e) { /* App Check optional: niemals die App blockieren */ }
+  // App Check (reCAPTCHA Enterprise): VORERST DEAKTIVIERT (2026-09-08).
+  // Grund: Wenn reCAPTCHA sporadisch keinen Token liefert, geht Firestore in
+  // Offline-Retry und die erste Abfrage HÄNGT -> App zeigt still 0 Eintraege/keine Pins
+  // (Nutzer-Report). Da die Erzwingung ohnehin AUS ist, bringt App Check aktuell keinen
+  // Schutz -> reine Downside. Zum spaeteren Scharfschalten: Flag auf true + Enforcement
+  // erst nach robustem, getestetem Client. Registrierung/SDK/Key bleiben bestehen.
+  var APPCHECK_ENABLED = false;
+  if (APPCHECK_ENABLED) {
+    try {
+      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+        self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+      }
+      firebase.appCheck().activate(
+        new firebase.appCheck.ReCaptchaEnterpriseProvider('6Ldxr6otAAAAAPT8gc1zxckz6HCdPSxDeI5zUtbZ'),
+        true
+      );
+    } catch (e) { /* App Check optional: niemals die App blockieren */ }
+  }
   const db = firebase.firestore();
   const auth = firebase.auth();
   const storage = firebase.storage();
@@ -3507,6 +3513,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     else setTimeout(fn, 0);
   }
 
+  // Verhindert endloses Hängen: eine Firestore-Abfrage, die nicht binnen ms zurückkehrt
+  // (z. B. Offline-Retry), wird als Fehler behandelt -> Cache-Fallback/Retry statt stiller leerer App.
+  function _withTimeout(p, ms) {
+    return Promise.race([
+      p,
+      new Promise(function(_, rej){ setTimeout(function(){ rej(new Error('timeout')); }, ms); })
+    ]);
+  }
   async function loadListings(force) {
     try {
       // Zeige gecachte Daten sofort waehrend frische Daten geladen werden
@@ -3529,9 +3543,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Listings + Ratings PARALLEL laden (statt nacheinander)
       // Nur noch die Einträge laden – Bewertungen kommen aus dem Aggregat (rating_sum/rating_count)
       // am Eintrag; die komplette reviews-Sammlung wird NICHT mehr beim Start gelesen.
-      const snap = await db.collection('listings').where('verified', '==', true).get();
+      const snap = await _withTimeout(db.collection('listings').where('verified', '==', true).get(), 9000);
       var _rawListings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       allListings = DEDUPE_HIDE_DUPLICATES ? _dedupeListings(_rawListings) : _rawListings;
+      window._listingsRetried = false; // erfolgreicher Laden -> Retry-Sperre zuruecksetzen
       buildCityChips();
       renderListings(); // self-guarded auf Home
       if (activeScreen === 'screenMap' && maplibreMap) updateMapData(); // Karte offen -> Pins nachziehen
@@ -3557,7 +3572,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
           return;
         }
       } catch(e) {}
+      // Kein Cache -> Fehleranzeige + EINMAL automatisch neu versuchen (Hänger/transient heilt sich so selbst)
       document.getElementById('listingsInner').innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="empty-title">Verbindungsfehler</div></div>';
+      if (!window._listingsRetried) { window._listingsRetried = true; setTimeout(function(){ loadListings(true); }, 3000); }
     }
   }
 
