@@ -6494,7 +6494,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     list.innerHTML = stage + cand.slice(0, 60).map(function(x){ return _radarRowHTML(x); }).join('');
   }
 
-  function hasEmoji(str) { return /\p{Emoji}/u.test(str); }
+  // Nur ECHTE Bild-Emojis erkennen. \p{Emoji} war falsch: es matcht auch Ziffern 0-9,
+  // '#' und '*' -> Titel wie "Farmacia 24" oder "Óptica 20/20" wurden faelschlich blockiert.
+  // \p{Extended_Pictographic} trifft Emojis (🍕😀🎉), aber KEINE Ziffern/Akzentbuchstaben.
+  function hasEmoji(str) { try { return /\p{Extended_Pictographic}/u.test(str); } catch(e) { return false; } }
   function isValidPhone(str) { return !str || /^[0-9+\s\-().]+$/.test(str); }
 
   document.getElementById('newName').addEventListener('input', function() {
