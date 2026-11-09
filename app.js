@@ -3158,7 +3158,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var btn = document.getElementById('rfSubmitBtn'); if (btn){ btn.disabled = true; btn.textContent = L('Wird veröffentlicht…','Publicando…','Publishing…'); }
     try {
       var seats = isOffer ? Math.max(1, Math.min(8, Number(document.getElementById('rfSeats').value) || 1)) : 0;
-      var expires = new Date(depart.getTime() + 6 * 60 * 60 * 1000); // 6 h Puffer nach Abfahrt
+      // Nach der angegebenen Zeit bleibt der Eintrag noch sichtbar (Puffer), dann blendet die Liste
+      // ihn aus. Gesuche sind flexibel gemeint ("ab X") -> laenger sichtbar als Angebote (Fahrer faehrt wirklich los).
+      var expires = new Date(depart.getTime() + (isOffer ? 6 : 12) * 60 * 60 * 1000);
       // Koordinaten: Start aus gesetztem Pin, sonst best-effort aus der Stadt; Ziel best-effort aus der Stadt.
       // Präziser geocoden, wenn ein konkreter Treffpunkt/Zielort angegeben ist (sonst Stadt-Mitte).
       var fromLabelV = document.getElementById('rfFromLabel').value.trim();
