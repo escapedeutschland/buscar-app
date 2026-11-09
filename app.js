@@ -3014,7 +3014,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (listEl) listEl.innerHTML = '<div class="rides-empty">' + L('Lädt…','Cargando…','Loading…') + '</div>';
     try {
       var now = new Date();
-      var snap = await db.collection('rides').where('depart_at','>=',now).orderBy('depart_at','asc').limit(200).get();
+      // Nach expires_at (= Abfahrt + 6 h) filtern, NICHT nach depart_at: sonst verschwindet eine
+      // Fahrt/Gesuch exakt zur Abfahrtsminute (auch wenn man noch kurz davor/danach koordiniert).
+      var snap = await db.collection('rides').where('expires_at','>=',now).orderBy('expires_at','asc').limit(200).get();
       _ridesCache = snap.docs.map(function(d){ return Object.assign({ id:d.id }, d.data()); })
         .filter(function(r){ return r.status === 'open' && !_isBlocked(r.driver_uid); });
     } catch(e){ _ridesCache = []; console.warn('loadRides', e && e.message); }
