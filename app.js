@@ -3292,6 +3292,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         contact_wa: wa, status: 'pending', created_at: new Date()
       });
       try { await db.collection('rides').doc(rideId).update({ requests_count: firebase.firestore.FieldValue.increment(1) }); } catch(e){}
+      try { fetch(SHARE_BASE + '/notify-ride', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ rideId: rideId, reqUid: currentUser.uid, kind:'request' }) }).catch(function(){}); } catch(e){}
       closeRequestSheet();
       showToast(L('Anfrage gesendet! Der Fahrer meldet sich.','¡Solicitud enviada!','Request sent!'));
     } catch(e){ showToast((typeof t === 'function' ? t('err_prefix') : 'Fehler: ') + (e && e.message ? e.message : e)); }
@@ -3339,13 +3340,18 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         var left = Math.max(0, Number(d.seats_free||0) - Number(reqData.seats||1));
         tx.update(rRef, { seats_free: left, status: left <= 0 ? 'full' : 'open' });
       });
+      try { fetch(SHARE_BASE + '/notify-ride', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ rideId: rideId, reqUid: reqUid, kind:'accepted' }) }).catch(function(){}); } catch(e){}
       showToast(L('Zugesagt – Kontakt ausgetauscht.','Aceptado.','Accepted.'));
       loadRideRequests(rideId);
     } catch(e){ showToast((typeof t === 'function' ? t('err_prefix') : 'Fehler: ') + (e && e.message ? e.message : e)); }
   }
   async function declineRideRequest(rideId, reqUid){
     if (!currentUser) return;
-    try { await db.collection('rides').doc(rideId).collection('requests').doc(reqUid).update({ status: 'declined' }); loadRideRequests(rideId); }
+    try {
+      await db.collection('rides').doc(rideId).collection('requests').doc(reqUid).update({ status: 'declined' });
+      try { fetch(SHARE_BASE + '/notify-ride', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ rideId: rideId, reqUid: reqUid, kind:'declined' }) }).catch(function(){}); } catch(e){}
+      loadRideRequests(rideId);
+    }
     catch(e){ showToast((typeof t === 'function' ? t('err_prefix') : 'Fehler: ') + (e && e.message ? e.message : e)); }
   }
 
