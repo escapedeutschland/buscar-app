@@ -15,7 +15,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       rf_date:'Datum *', rf_time:'Uhrzeit *', rf_direction:'Richtung', rf_dir_oneway:'nur Hinfahrt', rf_dir_round:'Hin + Zurück',
       rf_seats:'Freie Plätze', rf_price:'Kostenbeteiligung pro Person (Gs., 0 = gratis)', rf_vehicle:'Fahrzeug (optional)',
       rf_note:'Hinweis (optional)', rf_wa:'WhatsApp (erst nach Zusage sichtbar) *', rf_phone:'Telefon (optional)',
-      rf_startpoint:'Startpunkt auf Karte (optional)', rf_use_loc:'📍 Meinen Standort verwenden',
+      rf_startpoint:'Startpunkt auf Karte (optional)', rf_use_loc:'Meinen Standort verwenden',
       rf_legal:'Buscar ist nur eine Pinnwand und kein Vertragspartner. Es gilt Kostenbeteiligung (kein gewerblicher Transport). Du handelst eigenverantwortlich; Buscar haftet nicht für Fahrten, Schäden oder Zahlungen.',
       rf_submit:'Veröffentlichen', ride_detail_title:'Fahrt', my_rides_title:'Meine Fahrten',
       rc_title:'Bevor es losgeht', rc_text:'Buscar ist nur eine Pinnwand für Mitfahrten — kein Vertragspartner und kein Transportunternehmen. Es geht um Kostenbeteiligung, nicht um gewerbliche Beförderung. Du organisierst Fahrten eigenverantwortlich; Buscar übernimmt keine Haftung für Fahrten, Unfälle, Schäden oder Zahlungen. Nur für Volljährige (18+).',
@@ -306,7 +306,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       rf_date:'Fecha *', rf_time:'Hora *', rf_direction:'Sentido', rf_dir_oneway:'solo ida', rf_dir_round:'ida y vuelta',
       rf_seats:'Asientos libres', rf_price:'Aporte por persona (Gs., 0 = gratis)', rf_vehicle:'Vehículo (opcional)',
       rf_note:'Nota (opcional)', rf_wa:'WhatsApp (visible solo tras aceptar) *', rf_phone:'Teléfono (opcional)',
-      rf_startpoint:'Punto de partida en el mapa (opcional)', rf_use_loc:'📍 Usar mi ubicación',
+      rf_startpoint:'Punto de partida en el mapa (opcional)', rf_use_loc:'Usar mi ubicación',
       rf_legal:'Buscar es solo un tablón y no es parte del acuerdo. Rige el aporte de gastos (no transporte comercial). Participás bajo tu responsabilidad; Buscar no se responsabiliza de los viajes, daños ni pagos.',
       rf_submit:'Publicar', ride_detail_title:'Viaje', my_rides_title:'Mis viajes',
       rc_title:'Antes de empezar', rc_text:'Buscar es solo un tablón de viajes compartidos — no es parte del acuerdo ni una empresa de transporte. Se trata de aporte de gastos, no de transporte comercial. Organizás los viajes bajo tu responsabilidad; Buscar no se responsabiliza de viajes, accidentes, daños ni pagos. Solo mayores de edad (18+).',
@@ -597,7 +597,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       rf_date:'Date *', rf_time:'Time *', rf_direction:'Direction', rf_dir_oneway:'one way', rf_dir_round:'round trip',
       rf_seats:'Free seats', rf_price:'Cost share per person (Gs., 0 = free)', rf_vehicle:'Vehicle (optional)',
       rf_note:'Note (optional)', rf_wa:'WhatsApp (shown only after acceptance) *', rf_phone:'Phone (optional)',
-      rf_startpoint:'Start point on map (optional)', rf_use_loc:'📍 Use my location',
+      rf_startpoint:'Start point on map (optional)', rf_use_loc:'Use my location',
       rf_legal:'Buscar is only a noticeboard and not a party to the arrangement. Cost-sharing applies (not commercial transport). You take part at your own responsibility; Buscar is not liable for rides, damages or payments.',
       rf_submit:'Publish', ride_detail_title:'Ride', my_rides_title:'My rides',
       rc_title:'Before you start', rc_text:'Buscar is only a noticeboard for rides — not a party to the deal and not a transport company. This is about cost-sharing, not commercial transport. You arrange rides at your own responsibility; Buscar is not liable for rides, accidents, damages or payments. Adults only (18+).',
@@ -3054,8 +3054,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } else { rows.forEach(function(r){ r._dist = null; }); }
     if (!rows.length){
       var emptyTxt = _ridesMode === 'offer'
-        ? L('Noch keine Fahrten. Biete die erste an! 🚗','¡Aún no hay viajes. Ofrecé el primero! 🚗','No rides yet. Offer the first one! 🚗')
-        : L('Noch keine Gesuche. Gib das erste auf! 🙋','¡Aún no hay búsquedas. Creá la primera! 🙋','No ride requests yet. Post the first one! 🙋');
+        ? L('Noch keine Fahrten. Biete die erste an!','¡Aún no hay viajes. Ofrecé el primero!','No rides yet. Offer the first one!')
+        : L('Noch keine Gesuche. Gib das erste auf!','¡Aún no hay búsquedas. Creá la primera!','No ride requests yet. Post the first one!');
       var emptyBtn = _ridesMode === 'offer'
         ? L('Mitfahrt anbieten','Ofrecer viaje','Offer a ride')
         : L('Mitfahrt suchen','Buscar viaje','Find a ride');
@@ -3114,7 +3114,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (st){ st.style.display='block'; st.textContent = L('Standort wird ermittelt…','Obteniendo ubicación…','Getting location…'); }
     navigator.geolocation.getCurrentPosition(function(pos){
       _rfLat = pos.coords.latitude; _rfLng = pos.coords.longitude;
-      if (st) st.textContent = '📍 ' + _rfLat.toFixed(4) + ', ' + _rfLng.toFixed(4) + ' · ' + L('Pin verschiebbar','mové el pin','drag the pin');
+      if (st) st.textContent = _rfLat.toFixed(4) + ', ' + _rfLng.toFixed(4) + ' · ' + L('Pin verschiebbar','mové el pin','drag the pin');
       initRfMap(_rfLat, _rfLng);
     }, function(){ if(st) st.textContent = L('Standort konnte nicht ermittelt werden.','No se pudo obtener la ubicación.','Could not get location.'); });
   }
@@ -3125,7 +3125,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       _rfMapPicker.dragRotate.disable(); _rfMapPicker.touchZoomRotate.disableRotation();
       var marker = new maplibregl.Marker({ color:'#F5A623', draggable:true }).setLngLat([lng,lat]).addTo(_rfMapPicker);
       _rfMapPicker._marker = marker;
-      function upd(){ var ll = marker.getLngLat(); _rfLat = ll.lat; _rfLng = ll.lng; var st=document.getElementById('rfLocationStatus'); if(st) st.textContent = '📍 ' + _rfLat.toFixed(4) + ', ' + _rfLng.toFixed(4); }
+      function upd(){ var ll = marker.getLngLat(); _rfLat = ll.lat; _rfLng = ll.lng; var st=document.getElementById('rfLocationStatus'); if(st) st.textContent = _rfLat.toFixed(4) + ', ' + _rfLng.toFixed(4); }
       marker.on('dragend', upd);
       _rfMapPicker.on('click', function(e){ _rfLat=e.lngLat.lat; _rfLng=e.lngLat.lng; marker.setLngLat([_rfLng,_rfLat]); upd(); });
       setTimeout(function(){ try{ _rfMapPicker.resize(); }catch(e){} }, 220);
@@ -3183,7 +3183,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         created_at: new Date(), expires_at: expires
       };
       await db.collection('rides').add(doc);
-      showToast(isOffer ? L('Fahrt veröffentlicht! 🚗','¡Viaje publicado! 🚗','Ride published! 🚗') : L('Gesuch veröffentlicht! 🙋','¡Búsqueda publicada! 🙋','Request published! 🙋'));
+      showToast(isOffer ? L('Fahrt veröffentlicht!','¡Viaje publicado!','Ride published!') : L('Gesuch veröffentlicht!','¡Búsqueda publicada!','Request published!'));
       _ridesMode = isOffer ? 'offer' : 'request';
       openRides();
       try { setRidesMode(_ridesMode); } catch(e){}
@@ -3217,7 +3217,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     var html = '<div class="ride-detail-route"><b>' + esc(r.from_city||'') + '</b>'
       + '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>'
       + '<b>' + esc(r.to_city||'') + '</b></div>';
-    html += '<div class="ride-detail-badge">' + (isOffer ? L('🚗 Biete Mitfahrt','🚗 Ofrezco viaje','🚗 Offering a ride') : L('🙋 Suche Mitfahrt','🙋 Busco viaje','🙋 Looking for a ride')) + '</div>';
+    html += '<div class="ride-detail-badge">' + (isOffer ? L('Biete Mitfahrt','Ofrezco viaje','Offering a ride') : L('Suche Mitfahrt','Busco viaje','Looking for a ride')) + '</div>';
     html += '<div class="ride-detail-rows">';
     html += _rideRow(L('Wann','Cuándo','When'), _rideWhenLabel(r));
     html += _rideRow(L('Richtung','Sentido','Direction'), dir);
