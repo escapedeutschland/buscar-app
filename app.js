@@ -3092,7 +3092,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var isOffer = _rideFormMode === 'offer';
       var t = document.getElementById('rfFormTitle');
       if (t) t.textContent = isOffer ? L('Mitfahrt anbieten','Ofrecer viaje','Offer a ride') : L('Mitfahrt suchen','Buscar viaje','Find a ride');
-      ['rfSeatsRow','rfVehicleRow','rfContactRow'].forEach(function(id){
+      ['rfSeatsRow','rfVehicleRow','rfContactRow','rfPriceRow'].forEach(function(id){
         var el = document.getElementById(id); if (el) el.style.display = isOffer ? '' : 'none';
       });
       showScreen('screenRideForm');
@@ -3153,6 +3153,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       // Koordinaten: Start aus gesetztem Pin, sonst best-effort aus der Stadt; Ziel best-effort aus der Stadt.
       var fromGeo = (_rfLat != null && _rfLng != null) ? { lat:_rfLat, lng:_rfLng } : await _rideGeocode(fromCity + ', Paraguay');
       var toGeo = await _rideGeocode(toCity + ', Paraguay');
+      // Fahrer-WhatsApp NICHT ins öffentliche Fahrt-Doc (abgreifbar) — nur lokal merken; bei der
+      // Zusage schreibt der Fahrer sie ins private requests-Subdoc (nur der Mitfahrer sieht sie).
+      if (isOffer){ try { if (wa) localStorage.setItem('buscar_ride_wa', wa); var _ph = document.getElementById('rfPhone').value.trim(); if (_ph) localStorage.setItem('buscar_ride_phone', _ph); } catch(e){} }
       var doc = {
         offer_type: isOffer ? 'offer' : 'request',
         from_city: fromCity, from_label: document.getElementById('rfFromLabel').value.trim() || null,
@@ -3166,8 +3169,6 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         vehicle_note: isOffer ? (document.getElementById('rfVehicle').value.trim() || null) : null,
         note: document.getElementById('rfNote').value.trim() || null,
         driver_uid: currentUser.uid, driver_name: (await _rideDisplayName()),
-        driver_wa: isOffer ? wa : null,
-        driver_phone: isOffer ? (document.getElementById('rfPhone').value.trim() || null) : null,
         status: 'open', requests_count: 0,
         created_at: new Date(), expires_at: expires
       };
