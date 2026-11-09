@@ -1102,3 +1102,14 @@
 .req-sheet-overlay.visible{display:flex}
 .req-sheet{background:var(--card);border-radius:22px 22px 0 0;padding:10px 20px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:430px;box-shadow:0 -10px 40px rgba(0,0,0,.2)}
 .req-sheet-title{font-family:'Fraunces',serif;font-weight:800;font-size:19px;color:var(--text-1);text-align:center;margin:4px 0 6px}
+
+/* Mitfahrten – Standort/Karte (Phase 2a) */
+.ride-loc-btn{width:100%;margin-top:4px;padding:12px;border:1.5px dashed var(--border);background:var(--card);border-radius:12px;font-weight:700;font-size:13.5px;color:var(--yellow-dark,#D4841A);cursor:pointer}
+.ride-loc-btn:active{transform:scale(.99)}
+.ride-loc-status{font-size:12.5px;color:var(--text-2);margin-top:8px}
+.rides-near-btn{flex-shrink:0;width:44px;height:44px;border:1.5px solid var(--border);background:var(--card);border-radius:12px;color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.rides-near-btn svg{width:20px;height:20px}
+.rides-near-btn.active{background:var(--yellow);border-color:var(--yellow);color:#fff}
+.rides-near-btn.loading{opacity:.6;pointer-events:none}
+.ride-dist{color:#15803d;background:var(--green-light,#DCFCE7)}
+.ride-mini-map{height:170px;border-radius:14px;margin-top:16px;overflow:hidden;border:1px solid var(--border)}

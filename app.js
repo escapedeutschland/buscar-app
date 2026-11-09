@@ -15,6 +15,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       rf_date:'Datum *', rf_time:'Uhrzeit *', rf_direction:'Richtung', rf_dir_oneway:'nur Hinfahrt', rf_dir_round:'Hin + Zurück',
       rf_seats:'Freie Plätze', rf_price:'Kostenbeteiligung pro Person (Gs., 0 = gratis)', rf_vehicle:'Fahrzeug (optional)',
       rf_note:'Hinweis (optional)', rf_wa:'WhatsApp (erst nach Zusage sichtbar) *', rf_phone:'Telefon (optional)',
+      rf_startpoint:'Startpunkt auf Karte (optional)', rf_use_loc:'📍 Meinen Standort verwenden',
       rf_legal:'Buscar ist nur eine Pinnwand und kein Vertragspartner. Es gilt Kostenbeteiligung (kein gewerblicher Transport). Du handelst eigenverantwortlich; Buscar haftet nicht für Fahrten, Schäden oder Zahlungen.',
       rf_submit:'Veröffentlichen', ride_detail_title:'Fahrt', my_rides_title:'Meine Fahrten',
       rc_title:'Bevor es losgeht', rc_text:'Buscar ist nur eine Pinnwand für Mitfahrten — kein Vertragspartner und kein Transportunternehmen. Es geht um Kostenbeteiligung, nicht um gewerbliche Beförderung. Du organisierst Fahrten eigenverantwortlich; Buscar übernimmt keine Haftung für Fahrten, Unfälle, Schäden oder Zahlungen. Nur für Volljährige (18+).',
@@ -305,6 +306,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       rf_date:'Fecha *', rf_time:'Hora *', rf_direction:'Sentido', rf_dir_oneway:'solo ida', rf_dir_round:'ida y vuelta',
       rf_seats:'Asientos libres', rf_price:'Aporte por persona (Gs., 0 = gratis)', rf_vehicle:'Vehículo (opcional)',
       rf_note:'Nota (opcional)', rf_wa:'WhatsApp (visible solo tras aceptar) *', rf_phone:'Teléfono (opcional)',
+      rf_startpoint:'Punto de partida en el mapa (opcional)', rf_use_loc:'📍 Usar mi ubicación',
       rf_legal:'Buscar es solo un tablón y no es parte del acuerdo. Rige el aporte de gastos (no transporte comercial). Participás bajo tu responsabilidad; Buscar no se responsabiliza de los viajes, daños ni pagos.',
       rf_submit:'Publicar', ride_detail_title:'Viaje', my_rides_title:'Mis viajes',
       rc_title:'Antes de empezar', rc_text:'Buscar es solo un tablón de viajes compartidos — no es parte del acuerdo ni una empresa de transporte. Se trata de aporte de gastos, no de transporte comercial. Organizás los viajes bajo tu responsabilidad; Buscar no se responsabiliza de viajes, accidentes, daños ni pagos. Solo mayores de edad (18+).',
@@ -595,6 +597,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       rf_date:'Date *', rf_time:'Time *', rf_direction:'Direction', rf_dir_oneway:'one way', rf_dir_round:'round trip',
       rf_seats:'Free seats', rf_price:'Cost share per person (Gs., 0 = free)', rf_vehicle:'Vehicle (optional)',
       rf_note:'Note (optional)', rf_wa:'WhatsApp (shown only after acceptance) *', rf_phone:'Phone (optional)',
+      rf_startpoint:'Start point on map (optional)', rf_use_loc:'📍 Use my location',
       rf_legal:'Buscar is only a noticeboard and not a party to the arrangement. Cost-sharing applies (not commercial transport). You take part at your own responsibility; Buscar is not liable for rides, damages or payments.',
       rf_submit:'Publish', ride_detail_title:'Ride', my_rides_title:'My rides',
       rc_title:'Before you start', rc_text:'Buscar is only a noticeboard for rides — not a party to the deal and not a transport company. This is about cost-sharing, not commercial transport. You arrange rides at your own responsibility; Buscar is not liable for rides, accidents, damages or payments. Adults only (18+).',
@@ -2942,6 +2945,27 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   var _currentRide = null;
   var _ridesConsentNext = null;
   var _rideReqTarget = null;
+  var _rfLat = null, _rfLng = null, _rfMapPicker = null; // Start-Pin im Formular
+  var _userLoc = null;        // {lat,lng} für „in der Nähe"
+  var _rideMiniMap = null;    // Routen-Karte im Detail
+
+  function _haversine(a, b, c, d){
+    var R = 6371, toR = Math.PI/180;
+    var dLat = (c-a)*toR, dLng = (d-b)*toR;
+    var s = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(a*toR)*Math.cos(c*toR)*Math.sin(dLng/2)*Math.sin(dLng/2);
+    return 2*R*Math.asin(Math.sqrt(s));
+  }
+  // Best-effort-Geocoding einer Stadt/Adresse über den Worker (/search). Still scheitern = null.
+  function _rideGeocode(q){
+    return new Promise(function(resolve){
+      try {
+        fetch(SHARE_BASE + '/search?q=' + encodeURIComponent(q) + '&n=1')
+          .then(function(r){ return r.json(); })
+          .then(function(d){ var p = ((d && d.results) || [])[0]; resolve(p && p.lat != null ? { lat:p.lat, lng:p.lng } : null); })
+          .catch(function(){ resolve(null); });
+      } catch(e){ resolve(null); }
+    });
+  }
 
   function _ridesConsentOk(){ try { return localStorage.getItem('buscar_rides_consent') === '1'; } catch(e){ return false; } }
   function _ensureRidesConsent(next){
@@ -3002,6 +3026,17 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (b) b.classList.toggle('active', m === 'request');
     renderRidesList();
   }
+  function setRidesNearMe(){
+    var btn = document.getElementById('ridesNearBtn');
+    if (_userLoc){ _userLoc = null; if (btn) btn.classList.remove('active'); renderRidesList(); return; }
+    if (!navigator.geolocation){ showToast(L('Standort nicht verfügbar.','Ubicación no disponible.','Location unavailable.')); return; }
+    if (btn) btn.classList.add('loading');
+    navigator.geolocation.getCurrentPosition(function(pos){
+      _userLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      if (btn){ btn.classList.remove('loading'); btn.classList.add('active'); }
+      renderRidesList();
+    }, function(){ if (btn) btn.classList.remove('loading'); showToast(L('Standort konnte nicht ermittelt werden.','No se pudo obtener la ubicación.','Could not get location.')); });
+  }
 
   function renderRidesList(){
     var listEl = document.getElementById('ridesList'); if (!listEl) return;
@@ -3011,6 +3046,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (q) rows = rows.filter(function(r){
       return ((r.from_city||'') + ' ' + (r.to_city||'') + ' ' + (r.from_label||'') + ' ' + (r.to_label||'')).toLowerCase().indexOf(q) !== -1;
     });
+    if (_userLoc){
+      rows.forEach(function(r){ r._dist = (r.from_lat != null && r.from_lng != null) ? _haversine(_userLoc.lat, _userLoc.lng, r.from_lat, r.from_lng) : null; });
+      rows.sort(function(a,b){ if(a._dist==null && b._dist==null) return 0; if(a._dist==null) return 1; if(b._dist==null) return -1; return a._dist - b._dist; });
+    } else { rows.forEach(function(r){ r._dist = null; }); }
     if (!rows.length){
       listEl.innerHTML = '<div class="rides-empty">' + (_ridesMode === 'offer'
         ? L('Noch keine Fahrten. Biete die erste an! 🚗','¡Aún no hay viajes. Ofrecé el primero! 🚗','No rides yet. Offer the first one! 🚗')
@@ -3022,12 +3061,13 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
         '<span class="ride-chip">' + (Number(r.seats_free||0)) + ' ' + L('Plätze frei','asientos','seats') + '</span>';
       var dir = (r.direction === 'roundtrip')
         ? L('Hin + Zurück','Ida y vuelta','Round trip') : L('nur Hinfahrt','solo ida','one way');
+      var distChip = (r._dist != null) ? '<span class="ride-chip ride-dist">~' + (r._dist < 1 ? Math.round(r._dist*1000) + ' m' : r._dist.toFixed(r._dist < 10 ? 1 : 0) + ' km') + '</span>' : '';
       return '<div class="ride-card" onclick="showRideDetail(\'' + r.id + '\')">'
         + '<div class="ride-route"><b>' + esc(r.from_city||'') + '</b>'
         + '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>'
         + '<b>' + esc(r.to_city||'') + '</b></div>'
         + '<div class="ride-meta">' + esc(_rideWhenLabel(r)) + ' · ' + dir + '</div>'
-        + '<div class="ride-foot">' + seats
+        + '<div class="ride-foot">' + distChip + seats
         + '<span class="ride-price">' + _ridePriceLabel(r) + '</span>'
         + '<span class="ride-driver">' + esc(r.driver_name || '') + '</span></div>'
         + '</div>';
@@ -3045,6 +3085,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var seatsEl = document.getElementById('rfSeats'); if (seatsEl) seatsEl.value = '3';
       var dirEl = document.getElementById('rfDirection'); if (dirEl) dirEl.value = 'oneway';
       var err = document.getElementById('rfError'); if (err) err.style.display = 'none';
+      _rfLat = null; _rfLng = null;
+      var rfLoc = document.getElementById('rfLocationStatus'); if (rfLoc){ rfLoc.style.display = 'none'; rfLoc.textContent = ''; }
+      var rfMp = document.getElementById('rfMapPicker'); if (rfMp) rfMp.style.display = 'none';
       // Biete vs. Suche: Plätze/Fahrzeug/Kontakt nur beim Biete-Formular
       var isOffer = _rideFormMode === 'offer';
       var t = document.getElementById('rfFormTitle');
@@ -3057,6 +3100,33 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   var _editingRideId = null;
+
+  function rfPickLocation(){
+    var st = document.getElementById('rfLocationStatus');
+    if (!navigator.geolocation){ if(st){ st.style.display='block'; st.textContent = L('Standort nicht verfügbar.','Ubicación no disponible.','Location unavailable.'); } return; }
+    if (st){ st.style.display='block'; st.textContent = L('Standort wird ermittelt…','Obteniendo ubicación…','Getting location…'); }
+    navigator.geolocation.getCurrentPosition(function(pos){
+      _rfLat = pos.coords.latitude; _rfLng = pos.coords.longitude;
+      if (st) st.textContent = '📍 ' + _rfLat.toFixed(4) + ', ' + _rfLng.toFixed(4) + ' · ' + L('Pin verschiebbar','mové el pin','drag the pin');
+      initRfMap(_rfLat, _rfLng);
+    }, function(){ if(st) st.textContent = L('Standort konnte nicht ermittelt werden.','No se pudo obtener la ubicación.','Could not get location.'); });
+  }
+  function initRfMap(lat, lng){
+    var mp = document.getElementById('rfMapPicker'); if (mp) mp.style.display = 'block';
+    if (!_rfMapPicker){
+      _rfMapPicker = new maplibregl.Map({ container:'rfMapPicker', style:ML_STYLE, center:[lng,lat], zoom:13, interactive:true, dragRotate:false, attributionControl:false });
+      _rfMapPicker.dragRotate.disable(); _rfMapPicker.touchZoomRotate.disableRotation();
+      var marker = new maplibregl.Marker({ color:'#F5A623', draggable:true }).setLngLat([lng,lat]).addTo(_rfMapPicker);
+      _rfMapPicker._marker = marker;
+      function upd(){ var ll = marker.getLngLat(); _rfLat = ll.lat; _rfLng = ll.lng; var st=document.getElementById('rfLocationStatus'); if(st) st.textContent = '📍 ' + _rfLat.toFixed(4) + ', ' + _rfLng.toFixed(4); }
+      marker.on('dragend', upd);
+      _rfMapPicker.on('click', function(e){ _rfLat=e.lngLat.lat; _rfLng=e.lngLat.lng; marker.setLngLat([_rfLng,_rfLat]); upd(); });
+      setTimeout(function(){ try{ _rfMapPicker.resize(); }catch(e){} }, 220);
+    } else {
+      _rfMapPicker.setCenter([lng,lat]); if(_rfMapPicker._marker) _rfMapPicker._marker.setLngLat([lng,lat]);
+      setTimeout(function(){ try{ _rfMapPicker.resize(); }catch(e){} }, 220);
+    }
+  }
 
   async function submitRide(){
     var isOffer = _rideFormMode === 'offer';
@@ -3080,10 +3150,15 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     try {
       var seats = isOffer ? Math.max(1, Math.min(8, Number(document.getElementById('rfSeats').value) || 1)) : 0;
       var expires = new Date(depart.getTime() + 6 * 60 * 60 * 1000); // 6 h Puffer nach Abfahrt
+      // Koordinaten: Start aus gesetztem Pin, sonst best-effort aus der Stadt; Ziel best-effort aus der Stadt.
+      var fromGeo = (_rfLat != null && _rfLng != null) ? { lat:_rfLat, lng:_rfLng } : await _rideGeocode(fromCity + ', Paraguay');
+      var toGeo = await _rideGeocode(toCity + ', Paraguay');
       var doc = {
         offer_type: isOffer ? 'offer' : 'request',
         from_city: fromCity, from_label: document.getElementById('rfFromLabel').value.trim() || null,
+        from_lat: fromGeo ? fromGeo.lat : null, from_lng: fromGeo ? fromGeo.lng : null,
         to_city: toCity,     to_label: document.getElementById('rfToLabel').value.trim() || null,
+        to_lat: toGeo ? toGeo.lat : null, to_lng: toGeo ? toGeo.lng : null,
         depart_at: depart,
         direction: document.getElementById('rfDirection').value || 'oneway',
         seats_total: seats, seats_free: seats,
@@ -3143,6 +3218,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (r.note)         html += _rideRow(L('Hinweis','Nota','Note'), esc(r.note));
     html += _rideRow(isOffer ? L('Fahrer','Conductor','Driver') : L('Eingestellt von','Publicado por','Posted by'), esc(r.driver_name||''));
     html += '</div>';
+    html += '<div id="rideMiniMap" class="ride-mini-map" style="display:none"></div>';
 
     // Aktionen
     if (isOwner){
@@ -3161,8 +3237,33 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     body.innerHTML = html;
     showScreen('screenRideDetail');
     if (isOwner) loadRideRequests(r.id);
+    _initRideMiniMap(r);
   }
   function _rideRow(k, v){ return '<div class="ride-row"><span class="ride-row-k">' + k + '</span><span class="ride-row-v">' + v + '</span></div>'; }
+
+  function _initRideMiniMap(r){
+    var el = document.getElementById('rideMiniMap'); if (!el) return;
+    var hasFrom = r.from_lat != null && r.from_lng != null;
+    var hasTo   = r.to_lat != null && r.to_lng != null;
+    if (!hasFrom && !hasTo) return;
+    if (typeof maplibregl === 'undefined' || typeof ML_STYLE === 'undefined') return;
+    el.style.display = 'block';
+    if (_rideMiniMap){ try { _rideMiniMap.remove(); } catch(e){} _rideMiniMap = null; }
+    var center = hasFrom ? [r.from_lng, r.from_lat] : [r.to_lng, r.to_lat];
+    _rideMiniMap = new maplibregl.Map({ container:'rideMiniMap', style:ML_STYLE, center:center, zoom:9, interactive:true, dragRotate:false, attributionControl:false });
+    _rideMiniMap.dragRotate.disable();
+    _rideMiniMap.on('load', function(){
+      var pts = [];
+      if (hasFrom){ new maplibregl.Marker({ color:'#22C55E' }).setLngLat([r.from_lng, r.from_lat]).addTo(_rideMiniMap); pts.push([r.from_lng, r.from_lat]); }
+      if (hasTo){   new maplibregl.Marker({ color:'#EF4444' }).setLngLat([r.to_lng, r.to_lat]).addTo(_rideMiniMap); pts.push([r.to_lng, r.to_lat]); }
+      if (hasFrom && hasTo){
+        _rideMiniMap.addSource('rideline', { type:'geojson', data:{ type:'Feature', properties:{}, geometry:{ type:'LineString', coordinates:[[r.from_lng,r.from_lat],[r.to_lng,r.to_lat]] } } });
+        _rideMiniMap.addLayer({ id:'rideline', type:'line', source:'rideline', paint:{ 'line-color':'#D4841A', 'line-width':3, 'line-dasharray':[2,1.5] } });
+        var b = new maplibregl.LngLatBounds(); pts.forEach(function(p){ b.extend(p); }); _rideMiniMap.fitBounds(b, { padding:48, maxZoom:11, duration:0 });
+      }
+      setTimeout(function(){ try{ _rideMiniMap.resize(); }catch(e){} }, 160);
+    });
+  }
 
   // ── Anfrage stellen ──────────────────────────────────────────────────────────
   function openRequestSheet(rideId){

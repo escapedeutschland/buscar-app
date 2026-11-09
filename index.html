@@ -34,7 +34,7 @@
   <meta name="apple-touch-fullscreen" content="yes">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=379">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=380">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <title>Buscar – Der Guide für Paraguay</title>
   <meta name="description" content="Buscar ist der Guide für Paraguay: Geschäfte, Dienstleistungen, Restaurants, Ärzte, Behörden und Events – für Auswanderer und Einheimische. Finde geprüfte Orte in Asunción, Encarnación, Ciudad del Este und ganz Paraguay.">
@@ -52,18 +52,18 @@
   <meta name="twitter:title" content="Buscar – Der Guide für Paraguay">
   <meta name="twitter:description" content="Der Guide für Paraguay: geprüfte Orte, Dienstleistungen und Events – für Auswanderer und Einheimische.">
   <meta name="twitter:image" content="https://escapedeutschland.github.io/buscar-app/og-default.jpg">
-  <link rel="preload" href="styles.css?v=379" as="style">
-  <link rel="preload" href="app.js?v=379" as="script">
+  <link rel="preload" href="styles.css?v=380" as="style">
+  <link rel="preload" href="app.js?v=380" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" integrity="sha384-MinO0mNliZ3vwppuPOUnGa+iq619pfMhLVUXfC4LHwSCvF9H+6P/KO4Q7qBOYV5V" crossorigin="anonymous">
-  <link href="styles.css?v=379" rel="stylesheet">
+  <link href="styles.css?v=380" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" integrity="sha384-SYKAG6cglRMN0RVvhNeBY0r3FYKNOJtznwA0v7B5Vp9tr31xAHsZC0DqkQ/pZDmj" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" integrity="sha384-yuGdyIzzYtOBlBG6JOWn+Ey9kpq7HocusNuxEGyyohr1eEyXpeEyehIIXC/hznw4" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" integrity="sha384-nwX2Qpkhc2sv6L0ZPkLefLGguao67toSowvePuQvGF6cG+8MUphGI2uI94Ls3JF7" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" integrity="sha384-lI+CxEx/bCvWP1b0OK13j5HTrTZP7yf1xle8TVOFq2smz6KC1RChTarRV/RHP5PP" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js" integrity="sha384-oze9siCpFoiDBZ37lLp99ZmOMO+je1s/xtvwtbNv3NXQXLpbpfPSzZSpbT3xV9da" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check-compat.js" integrity="sha384-rxbD+YIVHadImwEcPc07/NNXIMwVf3RtXkQUgI0cE4GzDCFQ9IQ+kLvlefJ/Eb7E" crossorigin="anonymous"></script>
-  <script defer src="app.js?v=379"></script>
+  <script defer src="app.js?v=380"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -1525,6 +1525,7 @@
     </div>
     <div style="padding:10px 16px 8px;display:flex;gap:8px;align-items:center">
       <input class="field-input" id="ridesFilter" type="text" placeholder="Stadt suchen…" data-i18n-ph="rides_filter_ph" oninput="renderRidesList()" style="flex:1;margin:0">
+      <button class="rides-near-btn" id="ridesNearBtn" onclick="setRidesNearMe()" aria-label="In der Nähe" title="In der Nähe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></button>
       <button class="rides-mine-btn" onclick="openMyRides()" data-i18n="rides_mine">Meine</button>
     </div>
     <div style="overflow-y:auto;flex:1;min-height:0">
@@ -1551,6 +1552,10 @@
       <input class="field-input" id="rfToCity" type="text" maxlength="60">
       <label class="ride-lbl" data-i18n="rf_to_label">Ziel genau (optional)</label>
       <input class="field-input" id="rfToLabel" type="text" maxlength="80">
+      <label class="ride-lbl" data-i18n="rf_startpoint">Startpunkt auf Karte (optional)</label>
+      <button type="button" class="ride-loc-btn" onclick="rfPickLocation()" data-i18n="rf_use_loc">📍 Meinen Standort verwenden</button>
+      <div id="rfLocationStatus" class="ride-loc-status" style="display:none"></div>
+      <div id="rfMapPicker" style="display:none;height:180px;border-radius:12px;margin-top:8px;overflow:hidden"></div>
       <div style="display:flex;gap:10px">
         <div style="flex:1"><label class="ride-lbl" data-i18n="rf_date">Datum *</label><input class="field-input" id="rfDate" type="date"></div>
         <div style="flex:1"><label class="ride-lbl" data-i18n="rf_time">Uhrzeit *</label><input class="field-input" id="rfTime" type="time"></div>
