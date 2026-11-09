@@ -5,6 +5,23 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   const translations = {
     de: {
+      // Mitfahrten
+      create_ride_offer:'Mitfahrt anbieten', create_ride_offer_sub:'Du fährst — biete freie Plätze an',
+      create_ride_request:'Mitfahrt suchen', create_ride_request_sub:'Finde eine Fahrgelegenheit',
+      rides_title:'Mitfahrten', rides_sub:'Fahrgemeinschaften in Paraguay',
+      rides_tab_offer:'Biete', rides_tab_request:'Suche', rides_filter_ph:'Stadt suchen…', rides_mine:'Meine',
+      rides_form_sub:'Nur Kostenbeteiligung · kein kommerzieller Transport',
+      rf_from:'Von (Stadt) *', rf_from_label:'Treffpunkt (optional)', rf_to:'Nach (Stadt) *', rf_to_label:'Ziel genau (optional)',
+      rf_date:'Datum *', rf_time:'Uhrzeit *', rf_direction:'Richtung', rf_dir_oneway:'nur Hinfahrt', rf_dir_round:'Hin + Zurück',
+      rf_seats:'Freie Plätze', rf_price:'Kostenbeteiligung pro Person (Gs., 0 = gratis)', rf_vehicle:'Fahrzeug (optional)',
+      rf_note:'Hinweis (optional)', rf_wa:'WhatsApp (erst nach Zusage sichtbar) *', rf_phone:'Telefon (optional)',
+      rf_legal:'Buscar ist nur eine Pinnwand und kein Vertragspartner. Es gilt Kostenbeteiligung (kein gewerblicher Transport). Du handelst eigenverantwortlich; Buscar haftet nicht für Fahrten, Schäden oder Zahlungen.',
+      rf_submit:'Veröffentlichen', ride_detail_title:'Fahrt', my_rides_title:'Meine Fahrten',
+      rc_title:'Bevor es losgeht', rc_text:'Buscar ist nur eine Pinnwand für Mitfahrten — kein Vertragspartner und kein Transportunternehmen. Es geht um Kostenbeteiligung, nicht um gewerbliche Beförderung. Du organisierst Fahrten eigenverantwortlich; Buscar übernimmt keine Haftung für Fahrten, Unfälle, Schäden oder Zahlungen. Nur für Volljährige (18+).',
+      rc_accept:'Verstanden & akzeptieren', rc_cancel:'Abbrechen',
+      req_title:'Mitfahren anfragen', req_seats:'Wie viele Plätze?', req_wa:'Deine WhatsApp-Nummer *', req_msg:'Nachricht (optional)',
+      req_note:'Dein Kontakt wird nur dem Fahrer gezeigt, wenn er zusagt.', req_send:'Anfrage senden',
+      home_rides:'Mitfahrten', home_rides_sub:'Fahrgemeinschaften finden & anbieten',
       // Navigation
       nav_home: 'Home', nav_map: 'Karte', nav_entry: 'Eintrag', nav_profile: 'Profil',
       // Header
@@ -278,6 +295,23 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_count_0: 'Noch keine eigenen Einträge', badge_count_1: '1 eigener Eintrag', badge_count_n: ' eigene Einträge',
     },
     es: {
+      // Viajes compartidos
+      create_ride_offer:'Ofrecer viaje', create_ride_offer_sub:'Vos manejás — ofrecé lugares libres',
+      create_ride_request:'Buscar viaje', create_ride_request_sub:'Encontrá un lugar para viajar',
+      rides_title:'Viajes compartidos', rides_sub:'Carpooling en Paraguay',
+      rides_tab_offer:'Ofrezco', rides_tab_request:'Busco', rides_filter_ph:'Buscar ciudad…', rides_mine:'Míos',
+      rides_form_sub:'Solo aporte de gastos · no es transporte comercial',
+      rf_from:'Desde (ciudad) *', rf_from_label:'Punto de encuentro (opcional)', rf_to:'Hasta (ciudad) *', rf_to_label:'Destino exacto (opcional)',
+      rf_date:'Fecha *', rf_time:'Hora *', rf_direction:'Sentido', rf_dir_oneway:'solo ida', rf_dir_round:'ida y vuelta',
+      rf_seats:'Asientos libres', rf_price:'Aporte por persona (Gs., 0 = gratis)', rf_vehicle:'Vehículo (opcional)',
+      rf_note:'Nota (opcional)', rf_wa:'WhatsApp (visible solo tras aceptar) *', rf_phone:'Teléfono (opcional)',
+      rf_legal:'Buscar es solo un tablón y no es parte del acuerdo. Rige el aporte de gastos (no transporte comercial). Participás bajo tu responsabilidad; Buscar no se responsabiliza de los viajes, daños ni pagos.',
+      rf_submit:'Publicar', ride_detail_title:'Viaje', my_rides_title:'Mis viajes',
+      rc_title:'Antes de empezar', rc_text:'Buscar es solo un tablón de viajes compartidos — no es parte del acuerdo ni una empresa de transporte. Se trata de aporte de gastos, no de transporte comercial. Organizás los viajes bajo tu responsabilidad; Buscar no se responsabiliza de viajes, accidentes, daños ni pagos. Solo mayores de edad (18+).',
+      rc_accept:'Entendido y acepto', rc_cancel:'Cancelar',
+      req_title:'Solicitar lugar', req_seats:'¿Cuántos asientos?', req_wa:'Tu número de WhatsApp *', req_msg:'Mensaje (opcional)',
+      req_note:'Tu contacto se muestra al conductor solo si acepta.', req_send:'Enviar solicitud',
+      home_rides:'Viajes compartidos', home_rides_sub:'Encontrá y ofrecé carpooling',
       // Navegación
       nav_home: 'Inicio', nav_map: 'Mapa', nav_entry: 'Agregar', nav_profile: 'Perfil',
       // Encabezado
@@ -551,6 +585,23 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       badge_count_0: 'Aún sin registros propios', badge_count_1: '1 registro propio', badge_count_n: ' registros propios',
     },
     en: {
+      // Rides / carpooling
+      create_ride_offer:'Offer a ride', create_ride_offer_sub:'You drive — offer free seats',
+      create_ride_request:'Find a ride', create_ride_request_sub:'Find a lift',
+      rides_title:'Rides', rides_sub:'Carpooling in Paraguay',
+      rides_tab_offer:'Offering', rides_tab_request:'Looking', rides_filter_ph:'Search city…', rides_mine:'Mine',
+      rides_form_sub:'Cost-sharing only · not commercial transport',
+      rf_from:'From (city) *', rf_from_label:'Meeting point (optional)', rf_to:'To (city) *', rf_to_label:'Exact drop-off (optional)',
+      rf_date:'Date *', rf_time:'Time *', rf_direction:'Direction', rf_dir_oneway:'one way', rf_dir_round:'round trip',
+      rf_seats:'Free seats', rf_price:'Cost share per person (Gs., 0 = free)', rf_vehicle:'Vehicle (optional)',
+      rf_note:'Note (optional)', rf_wa:'WhatsApp (shown only after acceptance) *', rf_phone:'Phone (optional)',
+      rf_legal:'Buscar is only a noticeboard and not a party to the arrangement. Cost-sharing applies (not commercial transport). You take part at your own responsibility; Buscar is not liable for rides, damages or payments.',
+      rf_submit:'Publish', ride_detail_title:'Ride', my_rides_title:'My rides',
+      rc_title:'Before you start', rc_text:'Buscar is only a noticeboard for rides — not a party to the deal and not a transport company. This is about cost-sharing, not commercial transport. You arrange rides at your own responsibility; Buscar is not liable for rides, accidents, damages or payments. Adults only (18+).',
+      rc_accept:'Got it & accept', rc_cancel:'Cancel',
+      req_title:'Request a seat', req_seats:'How many seats?', req_wa:'Your WhatsApp number *', req_msg:'Message (optional)',
+      req_note:'Your contact is shown to the driver only if they accept.', req_send:'Send request',
+      home_rides:'Rides', home_rides_sub:'Find & offer carpooling',
       // Navigation
       nav_home: 'Home', nav_map: 'Map', nav_entry: 'Add', nav_profile: 'Profile',
       // Header
@@ -1659,6 +1710,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       if(currentUser) openQuestions('all');
       openAskQuestion();
     }
+    else if(kind==='ride_offer'){ openRideForm('offer'); }
+    else if(kind==='ride_request'){ openRideForm('request'); }
   }
   function _closeAnyOverlay(){
     var sheets = ['createSheetOverlay','qdMenuOverlay','filterSheetOverlay','citySheetOverlay','mapCitySheetOverlay','mapFilterSheetOverlay','reportOverlay','photoLightbox','tagSuggestOverlay','askQuestionOverlay','answerPickOverlay'];
@@ -1689,6 +1742,10 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       case 'screenFavorites': return 'screenProfil';
       case 'screenQuestions': return 'screenHome';
       case 'screenQuestionDetail': return 'screenQuestions';
+      case 'screenRides': return 'screenHome';
+      case 'screenRideForm': return 'screenRides';
+      case 'screenRideDetail': return 'screenRides';
+      case 'screenMyRides': return 'screenProfil';
       case 'screenCoordEditor': return 'screenDetail';
       case 'screenImmobilien':
       case 'screenMap':
@@ -2873,6 +2930,363 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     } catch(e) { showToast(t('err_prefix') + e.message); }
   }
   // ══ END EVENTS SYSTEM ══════════════════════════════════════════════════════
+
+  // ══ MITFAHRTEN (Fahrgemeinschaften) ════════════════════════════════════════
+  // Reine Pinnwand: Buscar vermittelt nur Sichtbarkeit, ist kein Vertragspartner,
+  // kein Geld läuft durch die App (Kostenbeteiligung bar/privat). Kontakt wird erst
+  // nach Zusage sichtbar und liegt im privaten requests-Subdoc (nicht im öffentlichen
+  // rides-Doc). Siehe Firestore-Rules /rides + /rides/{id}/requests.
+  var _ridesMode = 'offer';        // Listen-Umschalter: 'offer' (Biete) | 'request' (Suche)
+  var _ridesCache = [];
+  var _rideFormMode = 'offer';
+  var _currentRide = null;
+  var _ridesConsentNext = null;
+  var _rideReqTarget = null;
+
+  function _ridesConsentOk(){ try { return localStorage.getItem('buscar_rides_consent') === '1'; } catch(e){ return false; } }
+  function _ensureRidesConsent(next){
+    if (!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
+    if (_ridesConsentOk()){ next(); return; }
+    _ridesConsentNext = next;
+    var el = document.getElementById('ridesConsentOverlay'); if (el) el.classList.add('visible');
+  }
+  function acceptRidesConsent(){
+    try { localStorage.setItem('buscar_rides_consent','1'); } catch(e){}
+    var el = document.getElementById('ridesConsentOverlay'); if (el) el.classList.remove('visible');
+    var n = _ridesConsentNext; _ridesConsentNext = null; if (n) n();
+  }
+  function closeRidesConsent(){
+    var el = document.getElementById('ridesConsentOverlay'); if (el) el.classList.remove('visible');
+    _ridesConsentNext = null;
+  }
+
+  // Einstieg aus dem Home-Screen / Karte
+  function openRides(){ showScreen('screenRides'); loadRides(); }
+
+  function _rideWhenLabel(r){
+    var d = (r.depart_at && r.depart_at.toDate) ? r.depart_at.toDate() : (r.depart_at instanceof Date ? r.depart_at : null);
+    if (!d) return '';
+    var ds = d.toLocaleDateString(dateLoc(), { weekday:'short', day:'numeric', month:'short' });
+    var ts = d.toLocaleTimeString(dateLoc(), { hour:'2-digit', minute:'2-digit' });
+    return ds + ' · ' + ts;
+  }
+  function _ridePriceLabel(r){
+    var p = Number(r.cost_share_gs || 0);
+    if (!p) return L('gratis','gratis','free');
+    return 'Gs. ' + p.toLocaleString('es-PY');
+  }
+  function _rideWa(num){
+    var n = String(num || '').replace(/[^0-9]/g,'');
+    if (!n) return '';
+    if (n.indexOf('0') === 0) n = '595' + n.slice(1);      // 0981... -> 595981...
+    else if (n.indexOf('595') !== 0 && n.length <= 10) n = '595' + n;
+    return 'https://wa.me/' + n;
+  }
+
+  async function loadRides(){
+    var listEl = document.getElementById('ridesList');
+    if (listEl) listEl.innerHTML = '<div class="rides-empty">' + L('Lädt…','Cargando…','Loading…') + '</div>';
+    try {
+      var now = new Date();
+      var snap = await db.collection('rides').where('depart_at','>=',now).orderBy('depart_at','asc').limit(200).get();
+      _ridesCache = snap.docs.map(function(d){ return Object.assign({ id:d.id }, d.data()); })
+        .filter(function(r){ return r.status === 'open' && !_isBlocked(r.driver_uid); });
+    } catch(e){ _ridesCache = []; console.warn('loadRides', e && e.message); }
+    renderRidesList();
+  }
+
+  function setRidesMode(m){
+    _ridesMode = m;
+    var a = document.getElementById('ridesTabOffer'), b = document.getElementById('ridesTabRequest');
+    if (a) a.classList.toggle('active', m === 'offer');
+    if (b) b.classList.toggle('active', m === 'request');
+    renderRidesList();
+  }
+
+  function renderRidesList(){
+    var listEl = document.getElementById('ridesList'); if (!listEl) return;
+    var q = (document.getElementById('ridesFilter') || {}).value;
+    q = (q || '').trim().toLowerCase();
+    var rows = _ridesCache.filter(function(r){ return (r.offer_type || 'offer') === _ridesMode; });
+    if (q) rows = rows.filter(function(r){
+      return ((r.from_city||'') + ' ' + (r.to_city||'') + ' ' + (r.from_label||'') + ' ' + (r.to_label||'')).toLowerCase().indexOf(q) !== -1;
+    });
+    if (!rows.length){
+      listEl.innerHTML = '<div class="rides-empty">' + (_ridesMode === 'offer'
+        ? L('Noch keine Fahrten. Biete die erste an! 🚗','¡Aún no hay viajes. Ofrecé el primero! 🚗','No rides yet. Offer the first one! 🚗')
+        : L('Noch keine Gesuche. Stell das erste ein! 🙋','¡Aún no hay búsquedas. Creá la primera! 🙋','No ride requests yet. Post the first one! 🙋')) + '</div>';
+      return;
+    }
+    listEl.innerHTML = rows.map(function(r){
+      var seats = (r.offer_type === 'request') ? '' :
+        '<span class="ride-chip">' + (Number(r.seats_free||0)) + ' ' + L('Plätze frei','asientos','seats') + '</span>';
+      var dir = (r.direction === 'roundtrip')
+        ? L('Hin + Zurück','Ida y vuelta','Round trip') : L('nur Hinfahrt','solo ida','one way');
+      return '<div class="ride-card" onclick="showRideDetail(\'' + r.id + '\')">'
+        + '<div class="ride-route"><b>' + esc(r.from_city||'') + '</b>'
+        + '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>'
+        + '<b>' + esc(r.to_city||'') + '</b></div>'
+        + '<div class="ride-meta">' + esc(_rideWhenLabel(r)) + ' · ' + dir + '</div>'
+        + '<div class="ride-foot">' + seats
+        + '<span class="ride-price">' + _ridePriceLabel(r) + '</span>'
+        + '<span class="ride-driver">' + esc(r.driver_name || '') + '</span></div>'
+        + '</div>';
+    }).join('');
+  }
+
+  // ── Fahrt einstellen (Biete/Suche) ─────────────────────────────────────────
+  function openRideForm(mode){
+    _ensureRidesConsent(function(){
+      _rideFormMode = mode || 'offer';
+      _editingRideId = null;
+      ['rfFromCity','rfFromLabel','rfToCity','rfToLabel','rfDate','rfTime','rfNote','rfVehicle','rfPrice','rfWa','rfPhone'].forEach(function(id){
+        var el = document.getElementById(id); if (el) el.value = '';
+      });
+      var seatsEl = document.getElementById('rfSeats'); if (seatsEl) seatsEl.value = '3';
+      var dirEl = document.getElementById('rfDirection'); if (dirEl) dirEl.value = 'oneway';
+      var err = document.getElementById('rfError'); if (err) err.style.display = 'none';
+      // Biete vs. Suche: Plätze/Fahrzeug/Kontakt nur beim Biete-Formular
+      var isOffer = _rideFormMode === 'offer';
+      var t = document.getElementById('rfFormTitle');
+      if (t) t.textContent = isOffer ? L('Mitfahrt anbieten','Ofrecer viaje','Offer a ride') : L('Mitfahrt suchen','Buscar viaje','Find a ride');
+      ['rfSeatsRow','rfVehicleRow','rfContactRow'].forEach(function(id){
+        var el = document.getElementById(id); if (el) el.style.display = isOffer ? '' : 'none';
+      });
+      showScreen('screenRideForm');
+    });
+  }
+
+  var _editingRideId = null;
+
+  async function submitRide(){
+    var isOffer = _rideFormMode === 'offer';
+    var fromCity = document.getElementById('rfFromCity').value.trim();
+    var toCity   = document.getElementById('rfToCity').value.trim();
+    var date     = document.getElementById('rfDate').value;
+    var time     = document.getElementById('rfTime').value;
+    var err = document.getElementById('rfError');
+    function fail(msg){ err.textContent = msg; err.style.display = 'block'; }
+
+    if (!fromCity || !toCity || !date || !time){ fail(L('Bitte Von, Nach, Datum und Uhrzeit ausfüllen.','Completá De, A, fecha y hora.','Please fill from, to, date and time.')); return; }
+    var wa = isOffer ? document.getElementById('rfWa').value.trim() : '';
+    if (isOffer && wa.replace(/[^0-9]/g,'').length < 6){ fail(L('Bitte eine gültige WhatsApp-Nummer angeben.','Ingresá un número de WhatsApp válido.','Please enter a valid WhatsApp number.')); return; }
+    if (typeof hasEmoji === 'function' && (hasEmoji(fromCity) || hasEmoji(toCity))){ fail(L('Bitte keine Emojis in den Städtenamen.','Sin emojis en las ciudades.','No emojis in city names.')); return; }
+
+    var depart = new Date(date + 'T' + time);
+    if (isNaN(depart.getTime())){ fail(L('Datum/Uhrzeit ungültig.','Fecha/hora inválida.','Invalid date/time.')); return; }
+    if (depart.getTime() < Date.now() - 60000){ fail(L('Die Abfahrt liegt in der Vergangenheit.','La salida es en el pasado.','Departure is in the past.')); return; }
+
+    var btn = document.getElementById('rfSubmitBtn'); if (btn){ btn.disabled = true; btn.textContent = L('Wird veröffentlicht…','Publicando…','Publishing…'); }
+    try {
+      var seats = isOffer ? Math.max(1, Math.min(8, Number(document.getElementById('rfSeats').value) || 1)) : 0;
+      var expires = new Date(depart.getTime() + 6 * 60 * 60 * 1000); // 6 h Puffer nach Abfahrt
+      var doc = {
+        offer_type: isOffer ? 'offer' : 'request',
+        from_city: fromCity, from_label: document.getElementById('rfFromLabel').value.trim() || null,
+        to_city: toCity,     to_label: document.getElementById('rfToLabel').value.trim() || null,
+        depart_at: depart,
+        direction: document.getElementById('rfDirection').value || 'oneway',
+        seats_total: seats, seats_free: seats,
+        cost_share_gs: Number(String(document.getElementById('rfPrice').value).replace(/[^0-9]/g,'')) || 0,
+        vehicle_note: isOffer ? (document.getElementById('rfVehicle').value.trim() || null) : null,
+        note: document.getElementById('rfNote').value.trim() || null,
+        driver_uid: currentUser.uid, driver_name: (await _rideDisplayName()),
+        driver_wa: isOffer ? wa : null,
+        driver_phone: isOffer ? (document.getElementById('rfPhone').value.trim() || null) : null,
+        status: 'open', requests_count: 0,
+        created_at: new Date(), expires_at: expires
+      };
+      await db.collection('rides').add(doc);
+      showToast(isOffer ? L('Fahrt veröffentlicht! 🚗','¡Viaje publicado! 🚗','Ride published! 🚗') : L('Gesuch veröffentlicht! 🙋','¡Búsqueda publicada! 🙋','Request published! 🙋'));
+      _ridesMode = isOffer ? 'offer' : 'request';
+      openRides();
+      try { setRidesMode(_ridesMode); } catch(e){}
+    } catch(e){
+      fail((typeof t === 'function' ? t('err_prefix') : 'Fehler: ') + (e && e.message ? e.message : e));
+    }
+    if (btn){ btn.disabled = false; btn.textContent = L('Veröffentlichen','Publicar','Publish'); }
+  }
+
+  async function _rideDisplayName(){
+    try {
+      var d = await db.collection('users').doc(currentUser.uid).get();
+      if (d.exists){ var x = d.data(); return x.username || x.name || (currentUser.email ? currentUser.email.split('@')[0] : 'User'); }
+    } catch(e){}
+    return currentUser.email ? currentUser.email.split('@')[0] : 'User';
+  }
+
+  // ── Detail ──────────────────────────────────────────────────────────────────
+  async function showRideDetail(id){
+    var r = _ridesCache.find(function(x){ return x.id === id; });
+    if (!r){
+      try { var d = await db.collection('rides').doc(id).get(); if (d.exists) r = Object.assign({ id:d.id }, d.data()); } catch(e){}
+    }
+    if (!r) return;
+    _currentRide = r;
+    var isOffer = (r.offer_type || 'offer') === 'offer';
+    var isOwner = currentUser && r.driver_uid === currentUser.uid;
+    var dir = (r.direction === 'roundtrip') ? L('Hin- und Rückfahrt','Ida y vuelta','Round trip') : L('nur Hinfahrt','solo ida','one way');
+    var body = document.getElementById('rideDetailBody'); if (!body) return;
+
+    var html = '<div class="ride-detail-route"><b>' + esc(r.from_city||'') + '</b>'
+      + '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>'
+      + '<b>' + esc(r.to_city||'') + '</b></div>';
+    html += '<div class="ride-detail-badge">' + (isOffer ? L('🚗 Biete Mitfahrt','🚗 Ofrezco viaje','🚗 Offering a ride') : L('🙋 Suche Mitfahrt','🙋 Busco viaje','🙋 Looking for a ride')) + '</div>';
+    html += '<div class="ride-detail-rows">';
+    html += _rideRow(L('Wann','Cuándo','When'), _rideWhenLabel(r));
+    html += _rideRow(L('Richtung','Sentido','Direction'), dir);
+    if (r.from_label) html += _rideRow(L('Treffpunkt','Punto de encuentro','Meeting point'), esc(r.from_label));
+    if (r.to_label)   html += _rideRow(L('Ziel genau','Destino','Drop-off'), esc(r.to_label));
+    if (isOffer) html += _rideRow(L('Freie Plätze','Asientos libres','Free seats'), String(r.seats_free||0) + ' / ' + String(r.seats_total||0));
+    html += _rideRow(L('Kostenbeteiligung','Aporte','Cost share'), _ridePriceLabel(r) + (Number(r.cost_share_gs||0) ? ' ' + L('pro Person','por persona','per person') : ''));
+    if (r.vehicle_note) html += _rideRow(L('Fahrzeug','Vehículo','Vehicle'), esc(r.vehicle_note));
+    if (r.note)         html += _rideRow(L('Hinweis','Nota','Note'), esc(r.note));
+    html += _rideRow(isOffer ? L('Fahrer','Conductor','Driver') : L('Eingestellt von','Publicado por','Posted by'), esc(r.driver_name||''));
+    html += '</div>';
+
+    // Aktionen
+    if (isOwner){
+      html += '<div class="ride-owner-actions">'
+        + '<button class="ride-btn-sec" onclick="cancelRide(\'' + r.id + '\')">' + L('Fahrt absagen','Cancelar','Cancel') + '</button>'
+        + '<button class="ride-btn-del" onclick="deleteRide(\'' + r.id + '\')">' + L('Löschen','Eliminar','Delete') + '</button></div>';
+      html += '<div class="ride-reqs" id="rideReqs"><div class="rides-empty">' + L('Lädt Anfragen…','Cargando solicitudes…','Loading requests…') + '</div></div>';
+    } else if (isOffer){
+      html += '<button class="ride-btn-main" onclick="openRequestSheet(\'' + r.id + '\')">' + L('Mitfahren anfragen','Solicitar lugar','Request a seat') + '</button>';
+      html += '<div class="ride-note-mini">' + L('Kontakt wird erst nach Zusage des Fahrers sichtbar.','El contacto se muestra solo tras la aceptación.','Contact is shown only after the driver accepts.') + '</div>';
+    } else {
+      // Gesuch: Fahrer, die anbieten können, kontaktieren den Suchenden via Anfrage ebenfalls
+      html += '<button class="ride-btn-main" onclick="openRequestSheet(\'' + r.id + '\')">' + L('Ich kann mitnehmen','Puedo llevarte','I can take you') + '</button>';
+    }
+    html += '<div class="ride-report" onclick="reportRide()">' + L('Melden','Reportar','Report') + '</div>';
+    body.innerHTML = html;
+    showScreen('screenRideDetail');
+    if (isOwner) loadRideRequests(r.id);
+  }
+  function _rideRow(k, v){ return '<div class="ride-row"><span class="ride-row-k">' + k + '</span><span class="ride-row-v">' + v + '</span></div>'; }
+
+  // ── Anfrage stellen ──────────────────────────────────────────────────────────
+  function openRequestSheet(rideId){
+    if (!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
+    _ensureRidesConsent(function(){
+      _rideReqTarget = rideId;
+      var s = document.getElementById('reqSeats'); if (s) s.value = '1';
+      var m = document.getElementById('reqMsg'); if (m) m.value = '';
+      var w = document.getElementById('reqWa'); if (w) w.value = '';
+      var el = document.getElementById('reqSheetOverlay'); if (el) el.classList.add('visible');
+    });
+  }
+  function closeRequestSheet(){ var el = document.getElementById('reqSheetOverlay'); if (el) el.classList.remove('visible'); _rideReqTarget = null; }
+
+  async function submitRideRequest(){
+    if (!currentUser || !_rideReqTarget) return;
+    var wa = document.getElementById('reqWa').value.trim();
+    if (wa.replace(/[^0-9]/g,'').length < 6){ showToast(L('Bitte gültige WhatsApp-Nummer.','WhatsApp inválido.','Enter a valid WhatsApp number.')); return; }
+    var rideId = _rideReqTarget;
+    try {
+      var name = await _rideDisplayName();
+      await db.collection('rides').doc(rideId).collection('requests').doc(currentUser.uid).set({
+        uid: currentUser.uid, name: name,
+        seats: Math.max(1, Math.min(8, Number(document.getElementById('reqSeats').value) || 1)),
+        message: document.getElementById('reqMsg').value.trim().slice(0,300) || null,
+        contact_wa: wa, status: 'pending', created_at: new Date()
+      });
+      try { await db.collection('rides').doc(rideId).update({ requests_count: firebase.firestore.FieldValue.increment(1) }); } catch(e){}
+      closeRequestSheet();
+      showToast(L('Anfrage gesendet! Der Fahrer meldet sich.','¡Solicitud enviada!','Request sent!'));
+    } catch(e){ showToast((typeof t === 'function' ? t('err_prefix') : 'Fehler: ') + (e && e.message ? e.message : e)); }
+  }
+
+  // ── Fahrer: Anfragen verwalten ──────────────────────────────────────────────
+  async function loadRideRequests(rideId){
+    var box = document.getElementById('rideReqs'); if (!box) return;
+    try {
+      var snap = await db.collection('rides').doc(rideId).collection('requests').get();
+      var reqs = snap.docs.map(function(d){ return Object.assign({ id:d.id }, d.data()); });
+      if (!reqs.length){ box.innerHTML = '<div class="ride-reqs-title">' + L('Anfragen','Solicitudes','Requests') + '</div><div class="rides-empty">' + L('Noch keine Anfragen.','Sin solicitudes aún.','No requests yet.') + '</div>'; return; }
+      box.innerHTML = '<div class="ride-reqs-title">' + L('Anfragen','Solicitudes','Requests') + ' (' + reqs.length + ')</div>' + reqs.map(function(q){
+        var acc = q.status === 'accepted';
+        var dec = q.status === 'declined';
+        var contact = acc && q.contact_wa ? '<a class="ride-wa" href="' + _rideWa(q.contact_wa) + '" target="_blank" rel="noopener">WhatsApp: ' + esc(q.contact_wa) + '</a>' : '';
+        var actions = (acc || dec) ? ('<span class="ride-req-status ' + (acc?'ok':'no') + '">' + (acc ? L('Zugesagt','Aceptado','Accepted') : L('Abgelehnt','Rechazado','Declined')) + '</span>')
+          : ('<button class="ride-mini-ok" onclick="acceptRideRequest(\'' + rideId + '\',\'' + q.id + '\')">' + L('Zusagen','Aceptar','Accept') + '</button>'
+             + '<button class="ride-mini-no" onclick="declineRideRequest(\'' + rideId + '\',\'' + q.id + '\')">' + L('Ablehnen','Rechazar','Decline') + '</button>');
+        return '<div class="ride-req"><div class="ride-req-head"><b>' + esc(q.name||'') + '</b><span>' + (Number(q.seats||1)) + ' ' + L('Platz/Plätze','asiento(s)','seat(s)') + '</span></div>'
+          + (q.message ? '<div class="ride-req-msg">' + esc(q.message) + '</div>' : '')
+          + contact
+          + '<div class="ride-req-actions">' + actions + '</div></div>';
+      }).join('');
+    } catch(e){ box.innerHTML = '<div class="rides-empty">' + L('Anfragen konnten nicht geladen werden.','No se pudieron cargar.','Could not load requests.') + '</div>'; }
+  }
+
+  async function acceptRideRequest(rideId, reqUid){
+    if (!currentUser) return;
+    var saved = '';
+    try { saved = localStorage.getItem('buscar_ride_wa') || ''; } catch(e){}
+    var wa = prompt(L('Deine WhatsApp-Nummer für den Mitfahrer:','Tu WhatsApp para el pasajero:','Your WhatsApp for the passenger:'), saved);
+    if (wa == null) return;
+    wa = wa.trim();
+    if (wa.replace(/[^0-9]/g,'').length < 6){ showToast(L('Ungültige Nummer.','Número inválido.','Invalid number.')); return; }
+    try { localStorage.setItem('buscar_ride_wa', wa); } catch(e){}
+    try {
+      var reqRef = db.collection('rides').doc(rideId).collection('requests').doc(reqUid);
+      var reqSnap = await reqRef.get(); var reqData = reqSnap.exists ? reqSnap.data() : {};
+      await reqRef.update({ status: 'accepted', driver_contact: wa, accepted_at: new Date() });
+      // Plätze reduzieren + ggf. voll
+      var rRef = db.collection('rides').doc(rideId);
+      await db.runTransaction(async function(tx){
+        var rd = await tx.get(rRef); if (!rd.exists) return; var d = rd.data();
+        var left = Math.max(0, Number(d.seats_free||0) - Number(reqData.seats||1));
+        tx.update(rRef, { seats_free: left, status: left <= 0 ? 'full' : 'open' });
+      });
+      showToast(L('Zugesagt – Kontakt ausgetauscht.','Aceptado.','Accepted.'));
+      loadRideRequests(rideId);
+    } catch(e){ showToast((typeof t === 'function' ? t('err_prefix') : 'Fehler: ') + (e && e.message ? e.message : e)); }
+  }
+  async function declineRideRequest(rideId, reqUid){
+    if (!currentUser) return;
+    try { await db.collection('rides').doc(rideId).collection('requests').doc(reqUid).update({ status: 'declined' }); loadRideRequests(rideId); }
+    catch(e){ showToast((typeof t === 'function' ? t('err_prefix') : 'Fehler: ') + (e && e.message ? e.message : e)); }
+  }
+
+  async function cancelRide(id){
+    if (!await confirmSheet(L('Diese Fahrt absagen?','¿Cancelar este viaje?','Cancel this ride?'))) return;
+    try { await db.collection('rides').doc(id).update({ status: 'cancelled' }); showToast(L('Fahrt abgesagt.','Viaje cancelado.','Ride cancelled.')); openRides(); }
+    catch(e){ showToast((typeof t === 'function' ? t('err_prefix') : 'Fehler: ') + (e && e.message ? e.message : e)); }
+  }
+  async function deleteRide(id){
+    if (!await confirmSheet(L('Fahrt endgültig löschen?','¿Eliminar definitivamente?','Delete permanently?'))) return;
+    try { await db.collection('rides').doc(id).delete(); showToast(L('Gelöscht.','Eliminado.','Deleted.')); openRides(); }
+    catch(e){ showToast((typeof t === 'function' ? t('err_prefix') : 'Fehler: ') + (e && e.message ? e.message : e)); }
+  }
+
+  function reportRide(){
+    if (!currentUser){ setNav('navProfil'); showScreen('screenAuth'); return; }
+    var r = _currentRide; if (!r) return;
+    _reportTarget = { type: 'ride', id: r.id, author_uid: r.driver_uid || '', author_name: r.driver_name || '' };
+    _showReportSheet();
+  }
+
+  // ── Meine Fahrten ────────────────────────────────────────────────────────────
+  async function openMyRides(){
+    showScreen('screenMyRides');
+    var box = document.getElementById('myRidesBody'); if (box) box.innerHTML = '<div class="rides-empty">' + L('Lädt…','Cargando…','Loading…') + '</div>';
+    if (!currentUser) return;
+    try {
+      var snap = await db.collection('rides').where('driver_uid','==',currentUser.uid).get();
+      var mine = snap.docs.map(function(d){ return Object.assign({ id:d.id }, d.data()); })
+        .sort(function(a,b){ return _rideTs(b.created_at) - _rideTs(a.created_at); });
+      if (!mine.length){ box.innerHTML = '<div class="rides-empty">' + L('Du hast noch keine Fahrten eingestellt.','Aún no publicaste viajes.','You have no rides yet.') + '</div>'; return; }
+      box.innerHTML = mine.map(function(r){
+        var st = r.status === 'cancelled' ? L('abgesagt','cancelado','cancelled') : (r.status === 'full' ? L('voll','lleno','full') : L('aktiv','activo','active'));
+        return '<div class="ride-card" onclick="showRideDetail(\'' + r.id + '\')">'
+          + '<div class="ride-route"><b>' + esc(r.from_city||'') + '</b> → <b>' + esc(r.to_city||'') + '</b></div>'
+          + '<div class="ride-meta">' + esc(_rideWhenLabel(r)) + ' · ' + st
+          + (Number(r.requests_count||0) ? ' · <span class="ride-reqs-badge">' + r.requests_count + ' ' + L('Anfragen','solicitudes','requests') + '</span>' : '') + '</div></div>';
+      }).join('');
+    } catch(e){ box.innerHTML = '<div class="rides-empty">' + L('Konnte nicht laden.','No se pudo cargar.','Could not load.') + '</div>'; }
+  }
+  function _rideTs(x){ try { if (!x) return 0; if (x.toMillis) return x.toMillis(); if (x.seconds) return x.seconds*1000; return new Date(x).getTime()||0; } catch(e){ return 0; } }
+  // ══ END MITFAHRTEN ═════════════════════════════════════════════════════════
 
   // ── EVENTS ON MAP ──────────────────────────────────────────────────────────
   let _showEventsOnMap = false;

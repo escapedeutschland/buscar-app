@@ -34,7 +34,7 @@
   <meta name="apple-touch-fullscreen" content="yes">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=377">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=378">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <title>Buscar – Der Guide für Paraguay</title>
   <meta name="description" content="Buscar ist der Guide für Paraguay: Geschäfte, Dienstleistungen, Restaurants, Ärzte, Behörden und Events – für Auswanderer und Einheimische. Finde geprüfte Orte in Asunción, Encarnación, Ciudad del Este und ganz Paraguay.">
@@ -52,18 +52,18 @@
   <meta name="twitter:title" content="Buscar – Der Guide für Paraguay">
   <meta name="twitter:description" content="Der Guide für Paraguay: geprüfte Orte, Dienstleistungen und Events – für Auswanderer und Einheimische.">
   <meta name="twitter:image" content="https://escapedeutschland.github.io/buscar-app/og-default.jpg">
-  <link rel="preload" href="styles.css?v=377" as="style">
-  <link rel="preload" href="app.js?v=377" as="script">
+  <link rel="preload" href="styles.css?v=378" as="style">
+  <link rel="preload" href="app.js?v=378" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" integrity="sha384-MinO0mNliZ3vwppuPOUnGa+iq619pfMhLVUXfC4LHwSCvF9H+6P/KO4Q7qBOYV5V" crossorigin="anonymous">
-  <link href="styles.css?v=377" rel="stylesheet">
+  <link href="styles.css?v=378" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" integrity="sha384-SYKAG6cglRMN0RVvhNeBY0r3FYKNOJtznwA0v7B5Vp9tr31xAHsZC0DqkQ/pZDmj" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" integrity="sha384-yuGdyIzzYtOBlBG6JOWn+Ey9kpq7HocusNuxEGyyohr1eEyXpeEyehIIXC/hznw4" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" integrity="sha384-nwX2Qpkhc2sv6L0ZPkLefLGguao67toSowvePuQvGF6cG+8MUphGI2uI94Ls3JF7" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" integrity="sha384-lI+CxEx/bCvWP1b0OK13j5HTrTZP7yf1xle8TVOFq2smz6KC1RChTarRV/RHP5PP" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js" integrity="sha384-oze9siCpFoiDBZ37lLp99ZmOMO+je1s/xtvwtbNv3NXQXLpbpfPSzZSpbT3xV9da" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check-compat.js" integrity="sha384-rxbD+YIVHadImwEcPc07/NNXIMwVf3RtXkQUgI0cE4GzDCFQ9IQ+kLvlefJ/Eb7E" crossorigin="anonymous"></script>
-  <script defer src="app.js?v=377"></script>
+  <script defer src="app.js?v=378"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -401,6 +401,7 @@
       <div class="cats-scroll" id="catsScroll">
         <div class="cat-chip active" data-cat="Alle" data-i18n="cat_all">Alle</div>
         <div class="cat-chip-immo" onclick="openImmobilien()"><svg class="immo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10.2V19h14v-8.8"/></svg><span data-i18n="immo_tile">Immobilien</span></div>
+        <div class="cat-chip-immo" onclick="openRides()"><svg class="immo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11m-14 0h14M5 11a2 2 0 0 0-2 2v3h2m14-5a2 2 0 0 1 2 2v3h-2m-12 0h10m-10 0v2m10-2v2"/><circle cx="7.5" cy="14.5" r="0.7" fill="currentColor"/><circle cx="16.5" cy="14.5" r="0.7" fill="currentColor"/></svg><span data-i18n="home_rides">Mitfahrten</span></div>
         <div class="cat-chip" data-cat="kat-restaurants" data-i18n="cat_restaurants">Restaurants</div>
         <div class="cat-chip" data-cat="kat-dienstleistung" data-i18n="cat_services">Dienstleistungen</div>
         <div class="cat-chip" data-cat="kat-orte" data-i18n="cat_places">Orte</div>
@@ -954,6 +955,14 @@
           <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><span class="profil-row-label" data-i18n="fc_entry_answers">Meine Antworten</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
+        <div class="profil-row" onclick="openRides()">
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11m-14 0h14M5 11a2 2 0 0 0-2 2v3h2m14-5a2 2 0 0 1 2 2v3h-2m-12 0h10"/><circle cx="7.5" cy="14.5" r="0.7" fill="currentColor"/><circle cx="16.5" cy="14.5" r="0.7" fill="currentColor"/></svg></div><span class="profil-row-label" data-i18n="rides_title">Mitfahrten</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="profil-row auth-only" onclick="openMyRides()">
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10.2V19h14v-8.8"/><circle cx="12" cy="13" r="1.5"/></svg></div><span class="profil-row-label" data-i18n="my_rides_title">Meine Fahrten</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
         <div class="profil-row" id="adminRow" style="display:none" onclick="loadAdmin()">
           <div class="profil-row-left"><div class="profil-row-icon dark"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="profil-row-label" data-i18n="admin_panel">Admin Panel</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
@@ -1501,6 +1510,118 @@
 
   <!-- FILTER SHEET -->
   <!-- ═ Erstellen-Menü: kompaktes Popover über dem Plus-Button ═ -->
+  <!-- ══ MITFAHRTEN ══ -->
+  <!-- Liste -->
+  <div class="screen" id="screenRides">
+    <div class="form-header">
+      <button class="form-back" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="form-title" data-i18n="rides_title">Mitfahrten</div>
+      <div class="form-sub" data-i18n="rides_sub">Fahrgemeinschaften in Paraguay</div>
+    </div>
+    <div class="rides-tabs">
+      <button id="ridesTabOffer" class="rides-tab active" onclick="setRidesMode('offer')" data-i18n="rides_tab_offer">Biete</button>
+      <button id="ridesTabRequest" class="rides-tab" onclick="setRidesMode('request')" data-i18n="rides_tab_request">Suche</button>
+    </div>
+    <div style="padding:10px 16px 8px;display:flex;gap:8px;align-items:center">
+      <input class="field-input" id="ridesFilter" type="text" placeholder="Stadt suchen…" data-i18n-ph="rides_filter_ph" oninput="renderRidesList()" style="flex:1;margin:0">
+      <button class="rides-mine-btn" onclick="openMyRides()" data-i18n="rides_mine">Meine</button>
+    </div>
+    <div style="overflow-y:auto;flex:1;min-height:0">
+      <div id="ridesList" style="padding:6px 16px 120px"></div>
+    </div>
+    <button class="rides-fab" onclick="openRideForm('offer')" aria-label="+">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </div>
+
+  <!-- Formular (Biete/Suche) -->
+  <div class="screen" id="screenRideForm">
+    <div class="form-header">
+      <button class="form-back" onclick="showScreen('screenRides')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="form-title" id="rfFormTitle">Mitfahrt anbieten</div>
+      <div class="form-sub" data-i18n="rides_form_sub">Nur Kostenbeteiligung · kein kommerzieller Transport</div>
+    </div>
+    <div style="overflow-y:auto;flex:1;min-height:0;padding:14px 16px 120px">
+      <label class="ride-lbl" data-i18n="rf_from">Von (Stadt) *</label>
+      <input class="field-input" id="rfFromCity" type="text" maxlength="60">
+      <label class="ride-lbl" data-i18n="rf_from_label">Treffpunkt (optional)</label>
+      <input class="field-input" id="rfFromLabel" type="text" maxlength="80">
+      <label class="ride-lbl" data-i18n="rf_to">Nach (Stadt) *</label>
+      <input class="field-input" id="rfToCity" type="text" maxlength="60">
+      <label class="ride-lbl" data-i18n="rf_to_label">Ziel genau (optional)</label>
+      <input class="field-input" id="rfToLabel" type="text" maxlength="80">
+      <div style="display:flex;gap:10px">
+        <div style="flex:1"><label class="ride-lbl" data-i18n="rf_date">Datum *</label><input class="field-input" id="rfDate" type="date"></div>
+        <div style="flex:1"><label class="ride-lbl" data-i18n="rf_time">Uhrzeit *</label><input class="field-input" id="rfTime" type="time"></div>
+      </div>
+      <label class="ride-lbl" data-i18n="rf_direction">Richtung</label>
+      <select class="field-input" id="rfDirection">
+        <option value="oneway" data-i18n="rf_dir_oneway">nur Hinfahrt</option>
+        <option value="roundtrip" data-i18n="rf_dir_round">Hin + Zurück</option>
+      </select>
+      <div id="rfSeatsRow"><label class="ride-lbl" data-i18n="rf_seats">Freie Plätze</label><input class="field-input" id="rfSeats" type="number" min="1" max="8" value="3" inputmode="numeric"></div>
+      <label class="ride-lbl" data-i18n="rf_price">Kostenbeteiligung pro Person (Gs., 0 = gratis)</label>
+      <input class="field-input" id="rfPrice" type="number" min="0" inputmode="numeric" placeholder="50000">
+      <div id="rfVehicleRow"><label class="ride-lbl" data-i18n="rf_vehicle">Fahrzeug (optional)</label><input class="field-input" id="rfVehicle" type="text" maxlength="80"></div>
+      <label class="ride-lbl" data-i18n="rf_note">Hinweis (optional)</label>
+      <textarea class="field-input" id="rfNote" rows="2" maxlength="300"></textarea>
+      <div id="rfContactRow">
+        <label class="ride-lbl" data-i18n="rf_wa">WhatsApp (erst nach Zusage sichtbar) *</label>
+        <input class="field-input" id="rfWa" type="text" inputmode="tel" placeholder="0981 123456" maxlength="30">
+        <label class="ride-lbl" data-i18n="rf_phone">Telefon (optional)</label>
+        <input class="field-input" id="rfPhone" type="text" inputmode="tel" maxlength="30">
+      </div>
+      <div class="ride-legal" data-i18n="rf_legal">Buscar ist nur eine Pinnwand und kein Vertragspartner. Es gilt Kostenbeteiligung (kein gewerblicher Transport). Du handelst eigenverantwortlich; Buscar haftet nicht für Fahrten, Schäden oder Zahlungen.</div>
+      <div id="rfError" class="form-error" style="display:none;color:var(--red);font-size:13px;margin:8px 0"></div>
+      <button class="form-submit" id="rfSubmitBtn" onclick="submitRide()" data-i18n="rf_submit">Veröffentlichen</button>
+    </div>
+  </div>
+
+  <!-- Detail -->
+  <div class="screen" id="screenRideDetail">
+    <div class="form-header">
+      <button class="form-back" onclick="showScreen('screenRides')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="form-title" data-i18n="ride_detail_title">Fahrt</div>
+    </div>
+    <div style="overflow-y:auto;flex:1;min-height:0"><div id="rideDetailBody" style="padding:16px 16px 120px"></div></div>
+  </div>
+
+  <!-- Meine Fahrten -->
+  <div class="screen" id="screenMyRides">
+    <div class="form-header">
+      <button class="form-back" onclick="setNav('navProfil');showScreen('screenProfil')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="form-title" data-i18n="my_rides_title">Meine Fahrten</div>
+    </div>
+    <div style="overflow-y:auto;flex:1;min-height:0"><div id="myRidesBody" style="padding:14px 16px 120px"></div></div>
+  </div>
+
+  <!-- Consent-Dialog (einmalig) -->
+  <div class="rides-consent-overlay" id="ridesConsentOverlay">
+    <div class="rides-consent">
+      <div class="rc-emoji">🚗</div>
+      <div class="rc-title" data-i18n="rc_title">Bevor es losgeht</div>
+      <div class="rc-text" data-i18n="rc_text">Buscar ist nur eine Pinnwand für Mitfahrten — kein Vertragspartner und kein Transportunternehmen. Es geht um Kostenbeteiligung, nicht um gewerbliche Beförderung. Du organisierst Fahrten eigenverantwortlich; Buscar übernimmt keine Haftung für Fahrten, Unfälle, Schäden oder Zahlungen. Nur für Volljährige (18+).</div>
+      <button class="form-submit" onclick="acceptRidesConsent()" data-i18n="rc_accept">Verstanden &amp; akzeptieren</button>
+      <div class="rc-cancel" onclick="closeRidesConsent()" data-i18n="rc_cancel">Abbrechen</div>
+    </div>
+  </div>
+
+  <!-- Anfrage-Sheet -->
+  <div class="req-sheet-overlay" id="reqSheetOverlay" onclick="if(event.target.id==='reqSheetOverlay')closeRequestSheet()">
+    <div class="req-sheet">
+      <div class="filter-sheet-handle"></div>
+      <div class="req-sheet-title" data-i18n="req_title">Mitfahren anfragen</div>
+      <label class="ride-lbl" data-i18n="req_seats">Wie viele Plätze?</label>
+      <input class="field-input" id="reqSeats" type="number" min="1" max="8" value="1" inputmode="numeric">
+      <label class="ride-lbl" data-i18n="req_wa">Deine WhatsApp-Nummer *</label>
+      <input class="field-input" id="reqWa" type="text" inputmode="tel" placeholder="0981 123456" maxlength="30">
+      <label class="ride-lbl" data-i18n="req_msg">Nachricht (optional)</label>
+      <textarea class="field-input" id="reqMsg" rows="2" maxlength="300"></textarea>
+      <div class="ride-note-mini" data-i18n="req_note">Dein Kontakt wird nur dem Fahrer gezeigt, wenn er zusagt.</div>
+      <button class="form-submit" onclick="submitRideRequest()" data-i18n="req_send">Anfrage senden</button>
+    </div>
+  </div>
+
   <div class="create-pop-overlay" id="createSheetOverlay" onclick="if(event.target.id==='createSheetOverlay')closeCreateSheet()">
     <div class="create-pop">
       <div class="create-pop-item" onclick="createFromSheet('entry')">
@@ -1514,6 +1635,14 @@
       <div class="create-pop-item" onclick="createFromSheet('question')">
         <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         <div><div class="create-pop-t" data-i18n="create_question">Frage</div><div class="create-pop-s" data-i18n="create_question_sub">Frag oder diskutier mit der Community</div></div>
+      </div>
+      <div class="create-pop-item" onclick="createFromSheet('ride_offer')">
+        <svg viewBox="0 0 24 24"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11m-14 0h14m-14 0a2 2 0 0 0-2 2v3h2m14-5a2 2 0 0 1 2 2v3h-2m-12 0h10m-10 0v2m10-2v2"/><circle cx="7.5" cy="14.5" r="0.6" fill="currentColor"/><circle cx="16.5" cy="14.5" r="0.6" fill="currentColor"/></svg>
+        <div><div class="create-pop-t" data-i18n="create_ride_offer">Mitfahrt anbieten</div><div class="create-pop-s" data-i18n="create_ride_offer_sub">Du fährst — biete freie Plätze an</div></div>
+      </div>
+      <div class="create-pop-item" onclick="createFromSheet('ride_request')">
+        <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11l-2 2-2-2M20 13V9"/></svg>
+        <div><div class="create-pop-t" data-i18n="create_ride_request">Mitfahrt suchen</div><div class="create-pop-s" data-i18n="create_ride_request_sub">Finde eine Fahrgelegenheit</div></div>
       </div>
     </div>
   </div>
