@@ -1116,3 +1116,4 @@
 
 /* Mitfahrten – Header-Landschaft (Hügel/Berge + Straße) */
 .rides-header-deco{position:absolute;left:0;right:0;top:4px;width:100%;height:74px;pointer-events:none;z-index:0 !important}
+.ride-map-hint{font-size:11.5px;color:var(--text-3);text-align:center;margin-top:8px;line-height:1.45}

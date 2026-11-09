@@ -3158,8 +3158,11 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       var seats = isOffer ? Math.max(1, Math.min(8, Number(document.getElementById('rfSeats').value) || 1)) : 0;
       var expires = new Date(depart.getTime() + 6 * 60 * 60 * 1000); // 6 h Puffer nach Abfahrt
       // Koordinaten: Start aus gesetztem Pin, sonst best-effort aus der Stadt; Ziel best-effort aus der Stadt.
-      var fromGeo = (_rfLat != null && _rfLng != null) ? { lat:_rfLat, lng:_rfLng } : await _rideGeocode(fromCity + ', Paraguay');
-      var toGeo = await _rideGeocode(toCity + ', Paraguay');
+      // Präziser geocoden, wenn ein konkreter Treffpunkt/Zielort angegeben ist (sonst Stadt-Mitte).
+      var fromLabelV = document.getElementById('rfFromLabel').value.trim();
+      var toLabelV = document.getElementById('rfToLabel').value.trim();
+      var fromGeo = (_rfLat != null && _rfLng != null) ? { lat:_rfLat, lng:_rfLng } : await _rideGeocode((fromLabelV ? fromLabelV + ', ' : '') + fromCity + ', Paraguay');
+      var toGeo = await _rideGeocode((toLabelV ? toLabelV + ', ' : '') + toCity + ', Paraguay');
       // Fahrer-WhatsApp NICHT ins öffentliche Fahrt-Doc (abgreifbar) — nur lokal merken; bei der
       // Zusage schreibt der Fahrer sie ins private requests-Subdoc (nur der Mitfahrer sieht sie).
       if (isOffer){ try { if (wa) localStorage.setItem('buscar_ride_wa', wa); var _ph = document.getElementById('rfPhone').value.trim(); if (_ph) localStorage.setItem('buscar_ride_phone', _ph); } catch(e){} }
@@ -3227,6 +3230,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     html += _rideRow(isOffer ? L('Fahrer','Conductor','Driver') : L('Eingestellt von','Publicado por','Posted by'), esc(r.driver_name||''));
     html += '</div>';
     html += '<div id="rideMiniMap" class="ride-mini-map" style="display:none"></div>';
+    html += '<div id="rideMapHint" class="ride-map-hint" style="display:none">' + L('Ungefähre Route – der genaue Treffpunkt wird mit dem Fahrer abgestimmt.','Ruta aproximada – el punto exacto se coordina con el conductor.','Approximate route – the exact meeting point is arranged with the driver.') + '</div>';
 
     // Aktionen
     if (isOwner){
@@ -3256,6 +3260,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (!hasFrom && !hasTo) return;
     if (typeof maplibregl === 'undefined' || typeof ML_STYLE === 'undefined') return;
     el.style.display = 'block';
+    var _hint = document.getElementById('rideMapHint'); if (_hint) _hint.style.display = 'block';
     if (_rideMiniMap){ try { _rideMiniMap.remove(); } catch(e){} _rideMiniMap = null; }
     var center = hasFrom ? [r.from_lng, r.from_lat] : [r.to_lng, r.to_lat];
     _rideMiniMap = new maplibregl.Map({ container:'rideMiniMap', style:ML_STYLE, center:center, zoom:9, interactive:true, dragRotate:false, attributionControl:false });
