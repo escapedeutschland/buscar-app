@@ -3228,7 +3228,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     if (r.from_label) html += _rideRow(L('Treffpunkt','Punto de encuentro','Meeting point'), esc(r.from_label));
     if (r.to_label)   html += _rideRow(L('Ziel genau','Destino','Drop-off'), esc(r.to_label));
     if (isOffer) html += _rideRow(L('Freie Plätze','Asientos libres','Free seats'), String(r.seats_free||0) + ' / ' + String(r.seats_total||0));
-    html += _rideRow(L('Kostenbeteiligung','Aporte','Cost share'), _ridePriceLabel(r) + (Number(r.cost_share_gs||0) ? ' ' + L('pro Person','por persona','per person') : ''));
+    if (isOffer) html += _rideRow(L('Kostenbeteiligung','Aporte','Cost share'), _ridePriceLabel(r) + (Number(r.cost_share_gs||0) ? ' ' + L('pro Person','por persona','per person') : ''));
     if (r.vehicle_note) html += _rideRow(L('Fahrzeug','Vehículo','Vehicle'), esc(r.vehicle_note));
     if (r.note)         html += _rideRow(L('Hinweis','Nota','Note'), esc(r.note));
     html += _rideRow(isOffer ? L('Fahrer','Conductor','Driver') : L('Eingestellt von','Publicado por','Posted by'), esc(r.driver_name||''));
@@ -3239,7 +3239,7 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
     // Aktionen
     if (isOwner){
       html += '<div class="ride-owner-actions">'
-        + '<button class="ride-btn-sec" onclick="cancelRide(\'' + r.id + '\')">' + L('Fahrt absagen','Cancelar','Cancel') + '</button>'
+        + '<button class="ride-btn-sec" onclick="cancelRide(\'' + r.id + '\')">' + (isOffer ? L('Fahrt absagen','Cancelar viaje','Cancel ride') : L('Gesuch zurückziehen','Retirar búsqueda','Withdraw request')) + '</button>'
         + '<button class="ride-btn-del" onclick="deleteRide(\'' + r.id + '\')">' + L('Löschen','Eliminar','Delete') + '</button></div>';
       html += '<div class="ride-reqs" id="rideReqs"><div class="rides-empty">' + L('Lädt Anfragen…','Cargando solicitudes…','Loading requests…') + '</div></div>';
     } else if (isOffer){
@@ -3373,8 +3373,9 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
   }
 
   async function cancelRide(id){
-    if (!await confirmSheet(L('Diese Fahrt absagen?','¿Cancelar este viaje?','Cancel this ride?'))) return;
-    try { await db.collection('rides').doc(id).update({ status: 'cancelled' }); showToast(L('Fahrt abgesagt.','Viaje cancelado.','Ride cancelled.')); openRides(); }
+    var isReq = _currentRide && _currentRide.id === id && (_currentRide.offer_type === 'request');
+    if (!await confirmSheet(isReq ? L('Dieses Gesuch zurückziehen?','¿Retirar esta búsqueda?','Withdraw this request?') : L('Diese Fahrt absagen?','¿Cancelar este viaje?','Cancel this ride?'))) return;
+    try { await db.collection('rides').doc(id).update({ status: 'cancelled' }); showToast(isReq ? L('Gesuch zurückgezogen.','Búsqueda retirada.','Request withdrawn.') : L('Fahrt abgesagt.','Viaje cancelado.','Ride cancelled.')); openRides(); }
     catch(e){ showToast((typeof t === 'function' ? t('err_prefix') : 'Fehler: ') + (e && e.message ? e.message : e)); }
   }
   async function deleteRide(id){
