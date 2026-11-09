@@ -34,7 +34,7 @@
   <meta name="apple-touch-fullscreen" content="yes">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=391">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=392">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <title>Buscar – Der Guide für Paraguay</title>
   <meta name="description" content="Buscar ist der Guide für Paraguay: Geschäfte, Dienstleistungen, Restaurants, Ärzte, Behörden und Events – für Auswanderer und Einheimische. Finde geprüfte Orte in Asunción, Encarnación, Ciudad del Este und ganz Paraguay.">
@@ -52,18 +52,18 @@
   <meta name="twitter:title" content="Buscar – Der Guide für Paraguay">
   <meta name="twitter:description" content="Der Guide für Paraguay: geprüfte Orte, Dienstleistungen und Events – für Auswanderer und Einheimische.">
   <meta name="twitter:image" content="https://escapedeutschland.github.io/buscar-app/og-default.jpg">
-  <link rel="preload" href="styles.css?v=391" as="style">
-  <link rel="preload" href="app.js?v=391" as="script">
+  <link rel="preload" href="styles.css?v=392" as="style">
+  <link rel="preload" href="app.js?v=392" as="script">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" integrity="sha384-MinO0mNliZ3vwppuPOUnGa+iq619pfMhLVUXfC4LHwSCvF9H+6P/KO4Q7qBOYV5V" crossorigin="anonymous">
-  <link href="styles.css?v=391" rel="stylesheet">
+  <link href="styles.css?v=392" rel="stylesheet">
   <script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" integrity="sha384-SYKAG6cglRMN0RVvhNeBY0r3FYKNOJtznwA0v7B5Vp9tr31xAHsZC0DqkQ/pZDmj" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" integrity="sha384-yuGdyIzzYtOBlBG6JOWn+Ey9kpq7HocusNuxEGyyohr1eEyXpeEyehIIXC/hznw4" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" integrity="sha384-nwX2Qpkhc2sv6L0ZPkLefLGguao67toSowvePuQvGF6cG+8MUphGI2uI94Ls3JF7" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" integrity="sha384-lI+CxEx/bCvWP1b0OK13j5HTrTZP7yf1xle8TVOFq2smz6KC1RChTarRV/RHP5PP" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js" integrity="sha384-oze9siCpFoiDBZ37lLp99ZmOMO+je1s/xtvwtbNv3NXQXLpbpfPSzZSpbT3xV9da" crossorigin="anonymous"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check-compat.js" integrity="sha384-rxbD+YIVHadImwEcPc07/NNXIMwVf3RtXkQUgI0cE4GzDCFQ9IQ+kLvlefJ/Eb7E" crossorigin="anonymous"></script>
-  <script defer src="app.js?v=391"></script>
+  <script defer src="app.js?v=392"></script>
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">📡 Kein Internet – zeige gespeicherte Daten</div>
@@ -947,16 +947,16 @@
           <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span class="profil-row-label" data-i18n="fc_entry_prof">Frag die Community</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
+        <div class="profil-row" onclick="openRides()">
+          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6.8 11l1.5-2.2A2 2 0 0 1 10 8h4a2 2 0 0 1 1.7.9L17.2 11"/><path d="M3 15.4l1.1-3A2.2 2.2 0 0 1 6.2 11h11.6a2.2 2.2 0 0 1 2.1 1.4l1 3"/><path d="M3 15.4h18v1.4a.9.9 0 0 1-.9.9h-1.3"/><path d="M3 15.4v1.4a.9.9 0 0 0 .9.9h1.3"/><path d="M9.3 17.7h5.4"/><circle cx="7" cy="17.2" r="1.9"/><circle cx="17" cy="17.2" r="1.9"/></svg></div><span class="profil-row-label" data-i18n="rides_title">Mitfahrten</span></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
         <div class="profil-row auth-only" onclick="openQuestions('mine')">
           <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div><span class="profil-row-label" data-i18n="fc_entry_mine">Meine Fragen</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
         <div class="profil-row auth-only" onclick="openQuestions('answers')">
           <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><span class="profil-row-label" data-i18n="fc_entry_answers">Meine Antworten</span></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-        <div class="profil-row" onclick="openRides()">
-          <div class="profil-row-left"><div class="profil-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6.8 11l1.5-2.2A2 2 0 0 1 10 8h4a2 2 0 0 1 1.7.9L17.2 11"/><path d="M3 15.4l1.1-3A2.2 2.2 0 0 1 6.2 11h11.6a2.2 2.2 0 0 1 2.1 1.4l1 3"/><path d="M3 15.4h18v1.4a.9.9 0 0 1-.9.9h-1.3"/><path d="M3 15.4v1.4a.9.9 0 0 0 .9.9h1.3"/><path d="M9.3 17.7h5.4"/><circle cx="7" cy="17.2" r="1.9"/><circle cx="17" cy="17.2" r="1.9"/></svg></div><span class="profil-row-label" data-i18n="rides_title">Mitfahrten</span></div>
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
         <div class="profil-row auth-only" onclick="openMyRides()">
@@ -1517,7 +1517,7 @@
       <svg class="rides-header-deco" viewBox="0 0 375 74" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
         <path d="M0 74 L0 40 L55 16 L95 36 L150 10 L205 38 L260 14 L320 36 L375 20 L375 74 Z" fill="rgba(255,255,255,0.07)"/>
         <path d="M0 74 L0 55 C45 46 90 58 140 56 C190 54 228 45 280 52 C322 57 352 50 375 53 L375 74 Z" fill="rgba(255,255,255,0.12)"/>
-        <path d="M0 64 H375" fill="none" stroke="rgba(255,255,255,0.42)" stroke-width="2.6" stroke-dasharray="15 11" stroke-linecap="round"/>
+        <path d="M0 71 H375" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="1.5" stroke-dasharray="8 11" stroke-linecap="round"/>
       </svg>
       <button class="form-back" onclick="setNav('navHome');showScreen('screenHome')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       <div class="form-title" data-i18n="rides_title">Mitfahrten</div>
