@@ -2986,6 +2986,8 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
 
   // Einstieg aus dem Home-Screen / Karte
   function openRides(){ showScreen('screenRides'); loadRides(); }
+  // +-Knopf / Leer-Zustand in der Liste: richtet sich nach dem aktiven Tab (Biete vs. Suche)
+  function openRideFormFromList(){ openRideForm(_ridesMode === 'request' ? 'request' : 'offer'); }
 
   function _rideWhenLabel(r){
     var d = (r.depart_at && r.depart_at.toDate) ? r.depart_at.toDate() : (r.depart_at instanceof Date ? r.depart_at : null);
@@ -3051,9 +3053,14 @@ const ADMIN_EMAIL = 'maximechristalle@gmail.com';
       rows.sort(function(a,b){ if(a._dist==null && b._dist==null) return 0; if(a._dist==null) return 1; if(b._dist==null) return -1; return a._dist - b._dist; });
     } else { rows.forEach(function(r){ r._dist = null; }); }
     if (!rows.length){
-      listEl.innerHTML = '<div class="rides-empty">' + (_ridesMode === 'offer'
+      var emptyTxt = _ridesMode === 'offer'
         ? L('Noch keine Fahrten. Biete die erste an! 🚗','¡Aún no hay viajes. Ofrecé el primero! 🚗','No rides yet. Offer the first one! 🚗')
-        : L('Noch keine Gesuche. Stell das erste ein! 🙋','¡Aún no hay búsquedas. Creá la primera! 🙋','No ride requests yet. Post the first one! 🙋')) + '</div>';
+        : L('Noch keine Gesuche. Gib das erste auf! 🙋','¡Aún no hay búsquedas. Creá la primera! 🙋','No ride requests yet. Post the first one! 🙋');
+      var emptyBtn = _ridesMode === 'offer'
+        ? L('Mitfahrt anbieten','Ofrecer viaje','Offer a ride')
+        : L('Mitfahrt suchen','Buscar viaje','Find a ride');
+      listEl.innerHTML = '<div class="rides-empty">' + emptyTxt
+        + '<div style="margin-top:18px"><button class="ride-btn-main" style="max-width:260px;margin:0 auto" onclick="openRideFormFromList()">' + emptyBtn + '</button></div></div>';
       return;
     }
     listEl.innerHTML = rows.map(function(r){
