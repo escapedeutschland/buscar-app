@@ -1113,3 +1113,6 @@
 .rides-near-btn.loading{opacity:.6;pointer-events:none}
 .ride-dist{color:#15803d;background:var(--green-light,#DCFCE7)}
 .ride-mini-map{height:170px;border-radius:14px;margin-top:16px;overflow:hidden;border:1px solid var(--border)}
+
+/* Mitfahrten – Header-Landschaft (Hügel/Berge + Straße) */
+.rides-header-deco{position:absolute;left:0;right:0;top:4px;width:100%;height:74px;pointer-events:none;z-index:0 !important}
